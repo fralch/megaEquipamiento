@@ -6,6 +6,8 @@ import {
     mdiWidgetsOutline,
 } from "@mdi/js";
 import { useEffect, useState } from "react";
+import CartIcon from "@/Components/CartIcon ";
+import Slider from "@/Components/Slider";
 
 export default function Welcome() {
     const [showUIElements, setShowUIElements] = useState(false);
@@ -158,8 +160,9 @@ export default function Welcome() {
 
             <div>
                 <header className="bg-white">
-                    <div className="container mx-auto flex items-center px-4 py-8 md:px-12">
-                        <div className="mr-auto w-2/12 flex-shrink-0 sm:w-1/12 md:w-1/6">
+                    <div className="container mx-auto flex items-center px-8 py-8 md:px-12 max-w-full">
+                        {/* Logo */}
+                        <div className="mr-auto w-2/12 flex-shrink-0 sm:w-1/12 md:w-1/6 pr-4 ml-10">
                             <img
                                 className="w-full object-contain"
                                 src="/img/logo2.jpg"
@@ -167,7 +170,8 @@ export default function Welcome() {
                             />
                         </div>
 
-                        <div className="ml-4 hidden w-full max-w-lg items-center rounded-md bg-gray-100 xl:flex 2xl:max-w-2xl">
+                        {/* Input de búsqueda centrado */}
+                        <div className="mx-auto flex w-full max-w-lg items-center rounded-md bg-gray-100 xl:max-w-2xl">
                             <input
                                 className="w-full border-l border-gray-300 bg-transparent py-2 pl-4 text-sm font-semibold"
                                 type="text"
@@ -190,11 +194,10 @@ export default function Welcome() {
                             </svg>
                         </div>
 
-                        
-
+                        {/* Contacto */}
                         <div
-                            className="hidden flex-row items-center gap-4 sm:flex md:w-44 xl:w-52"
-                            id="contacto"
+                            className="hidden flex-row items-center gap-4 sm:flex md:w-44 xl:w-52 pl-4 mr-20"
+                            id="contactos"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -216,103 +219,31 @@ export default function Welcome() {
                                 <path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" />
                             </svg>
 
-                            <div
-                                className="flex flex-col"
-                                style={{ marginLeft: "-10px" }}
-                            >
+                            <div className="flex flex-col">
                                 <span className="text-xl font-bold">
-                                    905465791
+                                    +51 939 294 882
                                 </span>
                                 <span className="text-sm font-semibold text-gray-400">
-                                    51(01)336-4583
+                                    ventas@megaequipamiento.com
                                 </span>
                             </div>
                         </div>
+
+                        <CartIcon />
                     </div>
                 </header>
+
                 <div
                     className="min-w-screen min-h-screen bg-gray-200"
-                    style={{ marginTop: "-40px" }}
+                    style={{ marginTop: "-20px"}}
                 >
-                    <div className="rounded bg-white px-5 py-3 shadow-xl">
+                    <div className="rounded bg-white px-5 py-3 shadow-xl pb-5">
                         <div className="-mx-1 flex items-center justify-between">
                             <ul className="flex h-10 w-full flex-wrap items-center">
                                 <li className="relative block">
                                     <a
                                         href="#"
-                                        className="mx-1 flex h-10 cursor-pointer items-center rounded bg-[#0071d1] px-4 leading-10 text-white no-underline transition-colors duration-100 hover:no-underline"
-                                    >
-                                        <span className="mr-3 text-xl">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path d={mdiGauge} />
-                                            </svg>
-                                        </span>
-                                        <span>Inicio</span>
-                                        <span className="ml-2">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path d={mdiChevronDown} />
-                                            </svg>
-                                        </span>
-                                    </a>
-                                </li>
-                                <li className="relative block">
-                                    <a
-                                        href="#"
-                                        className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
-                                    >
-                                        <span className="mr-3 text-xl">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path d={mdiWidgetsOutline} />
-                                            </svg>
-                                        </span>
-                                        <span>Ubiquenos</span>
-                                    </a>
-                                </li>
-                                <li className="relative block">
-                                    <a
-                                        href="#"
-                                        className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
-                                    >
-                                        <span className="mr-3 text-xl">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path d={mdiWidgetsOutline} />
-                                            </svg>
-                                        </span>
-                                        <span>Nosotros</span>
-                                    </a>
-                                </li>
-                                <li className="relative block">
-                                    <a
-                                        href="#"
-                                        className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
-                                    >
-                                        <span className="mr-3 text-xl">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path d={mdiWidgetsOutline} />
-                                            </svg>
-                                        </span>
-                                        <span>Contactenos</span>
-                                    </a>
-                                </li>
-                                <li className="relative block">
-                                    <a
-                                        href="#"
-                                        className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
+                                        className="mx-1 flex h-10 cursor-pointer items-center rounded bg-[#2bc6e0] px-4 leading-10 text-white no-underline transition-colors duration-100 hover:no-underline"
                                         onClick={(e) => {
                                             e.preventDefault();
                                             setShowUIElements(!showUIElements);
@@ -417,6 +348,47 @@ export default function Welcome() {
                                         </div>
                                     )}
                                 </li>
+                                <li className="relative block">
+                                    <a
+                                        href="#"
+                                        className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
+                                    >
+                                        <span className="mr-3 text-xl">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path d={mdiGauge} />
+                                            </svg>
+                                        </span>
+                                        <span>Inicio</span>
+                                        <span className="ml-2">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path d={mdiChevronDown} />
+                                            </svg>
+                                        </span>
+                                    </a>
+                                </li>
+
+                                <li className="relative block">
+                                    <a
+                                        href="#"
+                                        className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
+                                    >
+                                        <span className="mr-3 text-xl">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path d={mdiWidgetsOutline} />
+                                            </svg>
+                                        </span>
+                                        <span>Contactenos</span>
+                                    </a>
+                                </li>
                             </ul>
                             <div
                                 className="ml-10 hidden flex-row items-center gap-4 sm:flex md:w-44 xl:w-52"
@@ -460,12 +432,11 @@ export default function Welcome() {
                             </div>
                         </div>
                     </div>
+                    <main className="mt-0 w-full">
+                        <Slider />
+                    </main>
+                    <footer className="py-16 text-center text-sm text-black dark:text-white/70"></footer>
                 </div>
-                <main className="mt-0 w-full">
-                    <iframe class="video-youtube-portada" src="https://www.youtube.com/embed/F8pMhuLK7nE?mute=1&amp;autoplay=1&amp;loop=1&amp;playlist=F8pMhuLK7nE&amp;vq=hd1080" frameborder="0" allowfullscreen="" title="Descripción breve del video"></iframe>
-                </main>
-
-                <footer className="py-16 text-center text-sm text-black dark:text-white/70"></footer>
             </div>
         </>
     );
