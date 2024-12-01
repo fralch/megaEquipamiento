@@ -243,7 +243,7 @@ export default function Welcome() {
                                 <li className="relative block">
                                     <a
                                         href="#"
-                                        className="mx-1 flex h-10 cursor-pointer items-center rounded bg-[#2bc6e0] px-4 leading-10 text-white no-underline transition-colors duration-100 hover:no-underline"
+                                        className="mx-1 flex h-10 cursor-pointer items-center rounded bg-[#005dad] px-4 leading-10 text-white no-underline transition-colors duration-100 hover:no-underline"
                                         onClick={(e) => {
                                             e.preventDefault();
                                             setShowUIElements(!showUIElements);

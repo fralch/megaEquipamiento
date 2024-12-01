@@ -37,6 +37,86 @@ const Slider = () => {
                         objectFit: "cover",
                     }}
                 />
+                <div
+                        style={{
+                            position: "absolute",
+                            top: "47%",
+                            left: "20%",
+                            transform: "translate(-50%, -50%)",
+                            color: "#fff",
+                            textAlign: "left",
+                        }}
+                    >
+                        {/* ponle una fuerte de letra como el impact  */}
+                        <h2
+                            style={{
+                                margin: 0,
+                                fontSize: "2.5rem",
+                                fontFamily: "verdana, sans-serif, serif, arial",
+                                fontWeight: "bold",
+                                color: "#777",
+                                textShadow: "2px 2px 4px rgba(255, 255, 255, 0.9)",
+                            }}
+                        >
+                            Líder en Ventas de
+                        </h2>
+                        <h2
+                            style={{
+                                margin: 0,
+                                fontSize: "2.5rem",
+                                fontFamily: "verdana, sans-serif, serif, arial",
+                                fontWeight: "bold",
+                                color: "#005dad",
+                                marginTop: -10,
+                            }}
+                        >
+                            Equipos de
+                        </h2>
+                        <h2
+                            style={{
+                                margin: 0,
+                                fontSize: "2.5rem",
+                                fontFamily: "verdana, sans-serif, serif, arial",
+                                fontWeight: "bold",
+                                color: "#005dad",
+                                marginTop: -20,
+                            }}
+                        >
+                            Laboratorio
+                        </h2>
+                        <h2
+                            style={{
+                                margin: 0,
+                                fontSize: "2.5rem",
+                                margin: 0,
+                                fontSize: "1rem",
+                                fontFamily: "",
+                                fontWeight: "bold",
+                                color: "#777",
+                            }}
+                        >
+                            En todas las regiones del Peru
+                        </h2>
+                        <a
+                            href="https://wa.me/51999999999"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                display: "block",
+                                marginTop: "1rem",
+                                fontSize: "1.2rem",
+                                color: "#fff",
+                                textDecoration: "none",
+                                backgroundColor: "#005dad",
+                                padding: "0.5rem 1rem",
+                                borderRadius: "5px",
+                                transition: "background-color 0.3s ease",
+                                width: "fit-content",
+                            }}
+                        >
+                            Ver más
+                        </a>
+                    </div>
             </SwiperSlide>
 
             {/* Slide con otra imagen */}
@@ -60,18 +140,81 @@ const Slider = () => {
                     <div
                         style={{
                             position: "absolute",
-                            top: "40%",
-                            left: "10%",
+                            top: "45%",
+                            left: "20%",
                             transform: "translate(-50%, -50%)",
                             color: "#fff",
                             textAlign: "left",
-                            textShadow: "0px 2px 4px rgba(0, 0, 0, 0.7)",
                         }}
                     >
-                        <h2 style={{ margin: 0, fontSize: "2rem" }}>Líder en Ventas de</h2>
-                        <h2 style={{ margin: 0, fontSize: "1rem" }}>Equipos de Laboratorio</h2>
-                        <h2 style={{ margin: 0, fontSize: "1rem" }}>En todas las regiones del Peru</h2>
-                        <a  href="https://wa.me/51999999999" target="_blank" rel="noopener noreferrer" style={{ display: "block", marginTop: "1rem", fontSize: "1.5rem", color: "#fff", textDecoration: "none" }}>Contactanos</a>
+                        {/* ponle una fuerte de letra como el impact  */}
+                        <h2
+                            style={{
+                                margin: 0,
+                                fontSize: "2.5rem",
+                                fontFamily: "verdana, sans-serif, serif, arial",
+                                fontWeight: "bold",
+                                color: "#777",
+                            }}
+                        >
+                            Líder en Ventas de
+                        </h2>
+                        <h2
+                            style={{
+                                margin: 0,
+                                fontSize: "2.5rem",
+                                fontFamily: "verdana, sans-serif, serif, arial",
+                                fontWeight: "bold",
+                                color: "#005dad",
+                                marginTop: -10,
+                            }}
+                        >
+                            Equipos de
+                        </h2>
+                        <h2
+                            style={{
+                                margin: 0,
+                                fontSize: "2.5rem",
+                                fontFamily: "verdana, sans-serif, serif, arial",
+                                fontWeight: "bold",
+                                color: "#005dad",
+                                marginTop: -20,
+                            }}
+                        >
+                            Laboratorio
+                        </h2>
+                        <h2
+                            style={{
+                                margin: 0,
+                                fontSize: "2.5rem",
+                                margin: 0,
+                                fontSize: "1rem",
+                                fontFamily: "",
+                                fontWeight: "bold",
+                                color: "#777",
+                            }}
+                        >
+                            En todas las regiones del Peru
+                        </h2>
+                        <a
+                            href="https://wa.me/51999999999"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                                display: "block",
+                                marginTop: "1rem",
+                                fontSize: "1.2rem",
+                                color: "#fff",
+                                textDecoration: "none",
+                                backgroundColor: "#005dad",
+                                padding: "0.5rem 1rem",
+                                borderRadius: "5px",
+                                transition: "background-color 0.3s ease",
+                                width: "fit-content",
+                            }}
+                        >
+                            Ver más
+                        </a>
                     </div>
                 </div>
             </SwiperSlide>

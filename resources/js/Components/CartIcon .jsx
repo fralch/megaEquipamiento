@@ -5,7 +5,7 @@ const CartIcon = ({  }) => {
     <div style={{ position: 'relative', display: 'inline-block' }}>
       <div
         style={{
-          backgroundColor: '#2bc6e0',
+          backgroundColor: '#005dad',
           borderRadius: '50%',
           width: '50px',
           height: '50px',
