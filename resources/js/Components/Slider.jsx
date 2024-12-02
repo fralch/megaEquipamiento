@@ -21,94 +21,115 @@ const Slider = () => {
         >
             {/* Slide con iframe */}
             <SwiperSlide>
-                <div style={{ width: "100%", height: "100%" }}>
-                    <iframe
-                        src="https://www.youtube.com/embed/F8pMhuLK7nE?mute=1&autoplay=1&loop=1&playlist=F8pMhuLK7nE&vq=hd1080&controls=0&modestbranding=1&showinfo=0&rel=0"
-                        title="YouTube video"
-                        style={{ width: "100%", height: "100%" }}
-                        allow="autoplay; encrypted-media"
-                    ></iframe>
-                    <div
-                    style={{
-                        position: "absolute",
-                        top: "47%",
-                        left: "20%",
-                        transform: "translate(-50%, -50%)",
-                        color: "#fff",
-                        textAlign: "left",
-                    }}
-                >
-                    {/* ponle una fuerte de letra como el impact  */}
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#fff",
-                        }}
-                    >
-                        Líder en Ventas de
-                    </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            marginTop: -10,
-                        }}
-                    >
-                        Equipos de
-                    </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            marginTop: -20,
-                        }}
-                    >
-                        Laboratorio
-                    </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
-                            margin: 0,
-                            fontSize: "1rem",
-                            fontFamily: "",
-                            fontWeight: "bold",
-                            color: "#fff",
-                        }}
-                    >
-                        En todas las regiones del Peru
-                    </h2>
-                    <a
-                        href="https://wa.me/51999999999"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            display: "block",
-                            marginTop: "1rem",
-                            fontSize: "1.2rem",
-                            color: "#fff",
-                            textDecoration: "none",
-                            backgroundColor: "#005dad",
-                            padding: "0.5rem 1rem",
-                            borderRadius: "5px",
-                            transition: "background-color 0.3s ease",
-                            width: "fit-content",
-                        }}
-                    >
-                        Ver más
-                    </a>
-                </div>
-                </div>
-            </SwiperSlide>
+    <div
+        style={{
+            position: "relative",
+            width: "100%",
+            height: "100%",
+        }}
+    >
+        <iframe
+            src="https://www.youtube.com/embed/F8pMhuLK7nE?mute=1&autoplay=1&loop=1&playlist=F8pMhuLK7nE&vq=hd1080&controls=0&modestbranding=1&showinfo=0&rel=0"
+            title="YouTube video"
+            style={{ width: "100%", height: "100%" }}
+            allow="autoplay; encrypted-media"
+        ></iframe>
+        {/* Div que cubre el iframe, con z-index bajo */}
+        <div
+            style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo transparente
+                zIndex: 0, // Asegúrate de que esté debajo del enlace
+            }}
+        ></div>
+    </div>
+
+    {/* Contenido adicional (incluyendo el enlace) */}
+    <div
+        style={{
+            position: "absolute",
+            top: "47%",
+            left: "20%",
+            transform: "translate(-50%, -50%)",
+            color: "#fff",
+            textAlign: "left",
+            zIndex: 2, // Asegura que el contenido esté por encima del iframe
+        }}
+    >
+        <h2
+            style={{
+                margin: 0,
+                fontSize: "2.5rem",
+                fontFamily: "verdana, sans-serif, serif, arial",
+                fontWeight: "bold",
+                color: "#fff",
+            }}
+        >
+            Líder en Ventas de
+        </h2>
+        <h2
+            style={{
+                margin: 0,
+                fontSize: "2.5rem",
+                fontFamily: "verdana, sans-serif, serif, arial",
+                fontWeight: "bold",
+                color: "#fff",
+                marginTop: -10,
+            }}
+        >
+            Equipos de
+        </h2>
+        <h2
+            style={{
+                margin: 0,
+                fontSize: "2.5rem",
+                fontFamily: "verdana, sans-serif, serif, arial",
+                fontWeight: "bold",
+                color: "#fff",
+                marginTop: -20,
+            }}
+        >
+            Laboratorio
+        </h2>
+        <h2
+            style={{
+                margin: 0,
+                fontSize: "2.5rem",
+                margin: 0,
+                fontSize: "1rem",
+                fontFamily: "",
+                fontWeight: "bold",
+                color: "#fff",
+            }}
+        >
+            En todas las regiones del Peru
+        </h2>
+        <a
+            href="https://wa.me/51999999999"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+                display: "block",
+                marginTop: "1rem",
+                fontSize: "1.2rem",
+                color: "#fff",
+                textDecoration: "none",
+                backgroundColor: "#005dad",
+                padding: "0.5rem 1rem",
+                borderRadius: "5px",
+                transition: "background-color 0.3s ease",
+                width: "fit-content",
+            }}
+        >
+            Ver más
+        </a>
+    </div>
+</SwiperSlide>
+
 
             {/* Slide con imagen */}
             <SwiperSlide>
