@@ -1,6 +1,7 @@
 import { Head } from "@inertiajs/react";
 import {
     mdiChevronDown,
+    mdiChevronRight,
     mdiGauge,
     mdiLayersOutline,
     mdiWidgetsOutline,
@@ -306,7 +307,7 @@ export default function Welcome() {
                                                                         >
                                                                             <path
                                                                                 d={
-                                                                                    mdiChevronDown
+                                                                                    mdiChevronRight
                                                                                 }
                                                                             />
                                                                         </svg>
@@ -316,7 +317,7 @@ export default function Welcome() {
                                                                 {/* Subcategorías */}
                                                                 {activeSubMenu ===
                                                                     categoria && (
-                                                                    <ul className="ml-4 mt-2 space-y-2">
+                                                                    <ul className="absolute left-full top-0 mt-0 w-48 bg-white border border-gray-300 rounded shadow-md">
                                                                         {subcategoriasArray[
                                                                             categoria
                                                                         ].map(
@@ -324,18 +325,18 @@ export default function Welcome() {
                                                                                 subcategoria,
                                                                                 subIndex
                                                                             ) => (
-                                                                                <a href="#">
-                                                                                    <li
-                                                                                        key={
-                                                                                            subIndex
-                                                                                        }
-                                                                                        className="text-sm text-gray-700  hover:bg-slate-200  px-3 py-2 shadow-sm transition-all"
-                                                                                    >
+                                                                                <li
+                                                                                    key={
+                                                                                        subIndex
+                                                                                    }
+                                                                                    className="text-sm text-gray-700 hover:bg-slate-200 px-3 py-2 shadow-sm transition-all"
+                                                                                >
+                                                                                    <a href="#">
                                                                                         {
                                                                                             subcategoria
                                                                                         }
-                                                                                    </li>
-                                                                                </a>
+                                                                                    </a>
+                                                                                </li>
                                                                             )
                                                                         )}
                                                                     </ul>
