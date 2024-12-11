@@ -98,8 +98,6 @@ const Slider = () => {
         <h2
             style={{
                 margin: 0,
-                fontSize: "2.5rem",
-                margin: 0,
                 fontSize: "1rem",
                 fontFamily: "",
                 fontWeight: "bold",
@@ -191,8 +189,6 @@ const Slider = () => {
                     </h2>
                     <h2
                         style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
                             margin: 0,
                             fontSize: "1rem",
                             fontFamily: "",
@@ -290,8 +286,6 @@ const Slider = () => {
                         </h2>
                         <h2
                             style={{
-                                margin: 0,
-                                fontSize: "2.5rem",
                                 margin: 0,
                                 fontSize: "1rem",
                                 fontFamily: "",
