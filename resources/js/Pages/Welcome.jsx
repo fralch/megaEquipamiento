@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import CartIcon from "@/Components/home/CartIcon ";
 import Slider from "@/Components/home/Slider";
 import Sectores from "@/Components/home/Sectores";
+import Categorias_cuadrado from "@/Components/home/Categorias_cuadrado";
 
 export default function Welcome() {
     const [showUIElements, setShowUIElements] = useState(false);
@@ -92,7 +93,8 @@ export default function Welcome() {
         "Viscosímetros",
     ]);
 
-    const [subcategoriasArray, setSubcategoriasArray] = useState({
+    const [subcategoriasArray, setSubcategoriasArray] = useState(
+        { 
         "Accesorios de Laboratorio": [
             "Accesorios de Laboratorio",
             "Accesorios de Agitadores",
@@ -253,7 +255,7 @@ export default function Welcome() {
             "Baños Ultrasónicos Industriales",
             "Baños Ultrasónicos Profesionales",
         ],
-        Biorreactores: [
+        "Biorreactores": [
             "Biorreactores",
             "Biorreactores personales",
             "Fotobiorreactores",
@@ -285,7 +287,7 @@ export default function Welcome() {
             "Cabinas de Flujo Vertical",
             "Cabinas de Seguridad Biológica",
         ],
-        Calorímetros: [
+        "Calorímetros": [
             "Calorímetros",
             "Calorímetros automáticos",
             "Calorímetros de Chaqueta Estática",
@@ -302,7 +304,7 @@ export default function Welcome() {
             "Estantes de Crecimiento de Plantas",
         ],
         "Campanas Extractoras": ["Campanas Extractoras", "Depurador de Gases"],
-        Centrífugas: [
+        "Centrífugas": [
             "Centrífugas",
             "Centrífuga clínicas de baja velocidad",
             "Centrífugas",
@@ -404,8 +406,8 @@ export default function Welcome() {
             "Contadores de Colonias Automático",
             "Contadores de Colonias Manual",
         ],
-        Criostatos: ["Criostatos", "Criostatos con Agitador Magnético"],
-        Densímetros: [
+        "Criostatos": ["Criostatos", "Criostatos con Agitador Magnético"],
+        "Densímetros": [
             "Densímetros",
             "Densímetros automático",
             "Densímetros manual",
@@ -424,19 +426,19 @@ export default function Welcome() {
             "Dispersores en Linea",
             "Sistemas Desechables",
         ],
-        Electroquímica: [
+        "Electroquímica": [
             "Electroquímica",
             "Kit de electroquímica",
             "Sistema de detección",
         ],
         "Equipos de seguridad": ["Equipos de seguridad", "Cabina de Guantes"],
-        Espectrofotómetros: ["Espectrofotómetros", "Espectrofotómetro"],
-        Espectroscopía: [
+        "Espectrofotómetros": ["Espectrofotómetros", "Espectrofotómetro"],
+        "Espectroscopía": [
             "Espectroscopía",
             "Espectrómetros de Fluorescencia",
             "Espectrómetros XRF de mano",
         ],
-        Espectroscopios: [
+        "Espectroscopios": [
             "Espectroscopios",
             "Espectroscopio de Kirchhoff-Bunsen",
             "Espectroscopios portátil con Escala",
@@ -469,7 +471,7 @@ export default function Welcome() {
             "Extracción en Fase Sólida",
             "Sistema automático",
         ],
-        Fotómetros: [
+        "Fotómetros": [
             "Fotómetros",
             "Fotómetros de llama automática",
             "Fotómetros de llama básico",
@@ -482,7 +484,7 @@ export default function Welcome() {
             "Generadores Eléctricos",
         ],
         "Homogenizador de laboratorio": ["Homogenizador de laboratorio"],
-        Hornos: [
+        "Hornos": [
             "Hornos",
             "Hornos de convección forzada",
             "Hornos de Convección Natural",
@@ -586,7 +588,7 @@ export default function Welcome() {
             "Mezcladores de Laboratotio",
             "Mezcladores Digitales",
         ],
-        Microscopios: [
+        "Microscopios": [
             "Microscopios",
             "Microscopios Binoculares",
             "Microscopios de vídeo",
@@ -604,7 +606,7 @@ export default function Welcome() {
             "Estación de Lavado",
             "Gabinetes de Seguridad",
         ],
-        Molinos: [
+        "Molinos": [
             "Molinos",
             "Cámaras de Molienda",
             "Molino en Linea",
@@ -638,7 +640,7 @@ export default function Welcome() {
             "Controladores de temperatura",
             "Placas Calefactoras",
         ],
-        Polarímetros: [
+        "Polarímetros": [
             "Polarímetros",
             "Polarímetros Automático",
             "Polarímetros Automáticos",
@@ -656,7 +658,7 @@ export default function Welcome() {
             "Sistemas Advanced",
             "Sistemas Starter",
         ],
-        Refractómetros: [
+        "Refractómetros": [
             "Refractómetros",
             "Refractómetro de mano",
             "Refractómetros Abbe",
@@ -674,8 +676,8 @@ export default function Welcome() {
             "Refrigeradores de Laboratorio",
             "Refrigeradores Medicos",
         ],
-        Reómetros: ["Reómetros", "Reómetros Rotacional"],
-        Rotavapores: [
+        "Reómetros": ["Reómetros", "Reómetros Rotacional"],
+        "Rotavapores": [
             "Rotavapores",
             "Evaporador Rotativo de Elevación Automático",
             "Evaporador Rotativo de Elevación Manual",
@@ -709,9 +711,9 @@ export default function Welcome() {
             "Software de Medición, Control y Regulación",
             "Software de Viscosímetro",
         ],
-        Tamizadora: ["Tamizadora"],
-        Tamizadores: ["Tamizadores"],
-        Termobloques: [
+        "Tamizadora": ["Tamizadora"],
+        "Tamizadores": ["Tamizadores"],
+        "Termobloques": [
             "Termobloques",
             "Calentadores de Bloque Seco",
             "Calentamiento y Refrigeración de Bloques seco",
@@ -734,7 +736,7 @@ export default function Welcome() {
             "Trituradores de Laboratorio",
             "Trituradoras",
         ],
-        Viscosímetros: [
+        "Viscosímetros": [
             "Viscosímetros",
             "Instrumentos medidores de torque",
             "Viscosímetros",
@@ -1135,6 +1137,8 @@ export default function Welcome() {
                       {/* ------------- */}
                       <Sectores />
                    
+                      {/* ------------- */}
+                      <Categorias_cuadrado />
                     </main>
                     <footer className="py-16 text-center text-sm text-black dark:text-white/70"></footer>
                 </div>

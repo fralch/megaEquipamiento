@@ -34,7 +34,7 @@ const Carrusel = () => {
                         <div className="relative p-10">
                             <h2 className="text-4xl font-bold text-center mb-6">
                                 Manufactura
-                            </h2>
+                            </h2> 
                             <ul className="space-y-4 text-xl">
                                 <li className="flex items-center">
                                     <svg
