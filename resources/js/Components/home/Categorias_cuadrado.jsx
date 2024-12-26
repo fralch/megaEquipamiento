@@ -68,9 +68,7 @@ const CategoryCard = ({ title, items }) => {
             </button>
           </div>
         </div>
-      );
-      
-      
+      ); 
 };
 
 
@@ -733,12 +731,15 @@ const Categories = () => {
 
 
 return (
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4 bg-gray-100 min-h-screen mr-5">
-    {Object.entries(categories).map(([title, items]) => (
-      <CategoryCard key={title} title={title} items={items} />
-    ))}
-  </div>
-);
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 bg-gray-100 min-h-screen">
+      {Object.entries(categories).map(([title, items]) => (
+        <div className="m-4">
+          <CategoryCard key={title} title={title} items={items} />
+        </div>
+      ))}
+    </div>
+  );
+  
 };
 
 export default Categories;
