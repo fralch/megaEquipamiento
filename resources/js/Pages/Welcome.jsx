@@ -12,6 +12,7 @@ import Slider from "@/Components/home/Slider";
 import Sectores from "@/Components/home/Sectores";
 import Categorias_cuadrado from "@/Components/home/Categorias_cuadrado";
 import NavVertical from "@/Components/home/NavVertical";
+import ClientSlider from "@/Components/home/ClientSlider";
 
 export default function Welcome() {
     const [showUIElements, setShowUIElements] = useState(false);
@@ -379,7 +380,7 @@ export default function Welcome() {
                                 ))}
                             </div>
                     </div>
-
+                    <ClientSlider />
                     </main>
                     <footer className="py-16 text-center text-sm text-black dark:text-white/70"></footer>
                 </div>
