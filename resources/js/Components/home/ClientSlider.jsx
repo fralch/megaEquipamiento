@@ -21,7 +21,7 @@ const ClientSlider = () => {
   ];
 
   return (
-    <div className="client-slider bg-white shadow-lg h-24 mx-auto overflow-hidden relative">
+    <div className="client-slider pt-10 shadow-lg h-24 mx-auto overflow-hidden relative bg-[#f3f4f6]">
       <div className="client-slide-track flex">
         {clients.map((client, index) => (
           <div key={index} className="client-slide h-24 w-64">
