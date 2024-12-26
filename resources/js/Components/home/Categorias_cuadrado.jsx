@@ -672,6 +672,10 @@ const Categories = () => {
         "Mantenimiento Preventivo y/o Reparación de Baños María",
         "Servicio de mantenimiento preventivo y/o correctivo de balanza analítica",
     ],
+    "Sistemas de Electroforesis":[
+        "Electroforesis en Gel",
+        "Fundición de Gel"
+    ],
     "Sistemas de extracción de ADN-ARN y purificación de proteínas": [
         "Sistemas de extracción de ADN-ARN y purificación de proteínas",
         "Sistemas de PCR",
