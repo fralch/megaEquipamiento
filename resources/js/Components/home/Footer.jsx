@@ -42,10 +42,11 @@ const Footer = () => {
           <h4 className="font-bold border-b border-white pb-2 mb-4">Ubícanos</h4>
           <iframe
             title="mapa"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.4204!..."
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3901.5434744929966!2d-77.08142328503174!3d-12.006693491424473!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105cf441e4b9bc3%3A0xe06a0030338de733!2sEQUINLAB%20SAC!5e0!3m2!1ses-419!2spe!4v1633084269747!5m2!1ses-419!2spe"
             className="w-full h-40 border-0 rounded"
             loading="lazy"
           ></iframe>
+
         </div>
 
         {/* Síguenos */}
