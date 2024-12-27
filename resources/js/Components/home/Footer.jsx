@@ -54,7 +54,7 @@ const Footer = () => {
           <h4 className="font-bold border-b border-white pb-2 mb-4">Síguenos</h4>
           <div className="flex space-x-4">
             <a href="#" className="bg-gray-800 p-2 rounded hover:bg-gray-700">
-              <img src="/icons/youtube.svg" alt="YouTube" className="w-6 h-6" />
+            <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="currentColor"  class="icon icon-tabler icons-tabler-filled icon-tabler-brand-youtube"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M18 3a5 5 0 0 1 5 5v8a5 5 0 0 1 -5 5h-12a5 5 0 0 1 -5 -5v-8a5 5 0 0 1 5 -5zm-9 6v6a1 1 0 0 0 1.514 .857l5 -3a1 1 0 0 0 0 -1.714l-5 -3a1 1 0 0 0 -1.514 .857z" /></svg>
             </a>
             <a href="#" className="bg-gray-800 p-2 rounded hover:bg-gray-700">
               <img src="/icons/linkedin.svg" alt="LinkedIn" className="w-6 h-6" />
