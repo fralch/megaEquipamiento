@@ -23,17 +23,17 @@ const BrandSection = () => {
     return (
         <div className="p-8 bg-white" id="marcas">
             <h1 className="text-2xl font-bold mb-8 text-center">Marcas</h1>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
                 {brands.map((brand, index) => (
                     <div
                         key={index}
                         className="relative flex flex-col items-center text-center p-4 group"
                     >
-                        <div className="w-24 h-24 flex items-center justify-center rounded-full border-2 border-blue-500">
+                        <div className="w-36 h-36 flex items-center justify-center rounded-full border-2 border-blue-500">
                             <img
                                 src={brand.image}
                                 alt={brand.name}
-                                className="object-contain w-20 h-20"
+                                className="object-contain w-32 h-32"
                             />
                         </div>
 
