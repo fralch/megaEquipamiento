@@ -1,3 +1,4 @@
+// Welcome.jsx
 import { Head } from "@inertiajs/react";
 import {
     mdiChevronDown,
@@ -13,26 +14,14 @@ import Sectores from "@/Components/home/Sectores";
 import Categorias_cuadrado from "@/Components/home/Categorias_cuadrado";
 import NavVertical from "@/Components/home/NavVertical";
 import ClientSlider from "@/Components/home/ClientSlider";
+import BrandSection from "@/Components/home/BrandSection"; // Import the new component
 
 export default function Welcome() {
     const [showUIElements, setShowUIElements] = useState(false);
     const [activeSubMenu, setActiveSubMenu] = useState(null); // New state to track active submenu
     const [isOpen, setIsOpen] = useState(false);
 
-    const brands = [
-        { name: "IKA", logo: "url-del-logo-ika", description: "Descripción de IKA" },
-        { name: "2mag", logo: "url-del-logo-2mag", description: "Descripción de 2mag" },
-        { name: "A&D", logo: "url-del-logo-and", description: "Descripción de A&D" },
-        { name: "Accumax", logo: "url-del-logo-accumax", description: "Descripción de Accumax" },
-        { name: "Aczet", logo: "url-del-logo-aczet", description: "Descripción de Aczet" },
-        { name: "Adam", logo: "url-del-logo-adam", description: "Descripción de Adam" },
-        { name: "ALP Co., Ltd.", logo: "url-del-logo-alp", description: "Descripción de ALP Co., Ltd." },
-        { name: "Aralab", logo: "url-del-logo-aralab", description: "Descripción de Aralab" },
-        { name: "Asecos", logo: "url-del-logo-asecos", description: "Descripción de Asecos" },
-        { name: "Axis", logo: "url-del-logo-axis", description: "Descripción de Axis" },
-      ];
-
-
+    
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -54,10 +43,10 @@ export default function Welcome() {
         };
     }, []);
 
- 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
+
     return (
         <>
             <Head title="EquinLab" />
@@ -154,7 +143,7 @@ export default function Welcome() {
                                         width={"26px"}
                                         height={"26px"}
                                     >
-                                        <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48L48 64zM0 176L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-208L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z" />
+                                        <path d="M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48L48 64zM0 176L0 384c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-208L322.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z" />
                                     </svg>
                                     <svg
                                         viewBox="0 0 512 512"
@@ -203,7 +192,7 @@ export default function Welcome() {
                                             </svg>
                                         </span>
                                     </a>
-                                  
+
                                 </li>
                                 <li className="relative hidden md:block ">
                                     <a
@@ -342,50 +331,18 @@ export default function Welcome() {
                         </section>
                       {/* ------------- */}
                       <Sectores />
-                   
+
                       {/* ------------- */}
                       <Categorias_cuadrado />
-                      <div className="p-8 bg-[#f3f4f6]" id="marcas">
-                            <h1 className="text-2xl font-bold mb-8 text-center">Marcas</h1>
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                                {brands.map((brand, index) => (
-                                <div
-                                    key={index}
-                                    className="relative flex flex-col items-center text-center p-4 group"
-                                >
-                                    {/* Logo */}
-                                    <div className="w-20 h-20 flex items-center justify-center rounded-full border-2 border-blue-500">
-                                    <img
-                                        src={brand.logo}
-                                        alt={brand.name}
-                                        className="object-contain w-16 h-16"
-                                    />
-                                    </div>
 
-                                    {/* Name */}
-                                    <h2 className="mt-4 text-lg font-semibold">{brand.name}</h2>
+                      {/* ------------- */}
+                      <BrandSection/>
 
-                                    {/* Button */}
-                                    <button className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                                    Ver Productos
-                                    </button>
-
-                                    {/* Tooltip */}
-                                    <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 hidden group-hover:flex flex-col items-center w-40 p-2 bg-gray-700 text-white text-sm rounded-full shadow-lg z-10">
-                                        <div className="w-full h-full flex items-center justify-center">
-                                            {brand.description}
-                                        </div>
-                                    </div>
-                                </div>
-                                ))}
-                            </div>
-                    </div>
-                    <ClientSlider />
+                      <ClientSlider />
                     </main>
                     <footer className="py-16 text-center text-sm text-black dark:text-white/70"></footer>
                 </div>
-                
-                
+
             </div>
         </>
     );

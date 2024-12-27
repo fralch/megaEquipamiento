@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import '../../../css/ClientSlider.css'; // Importamos el archivo CSS para las animaciones
+import '../../../css/ClientSlider.css';
 
 const ClientSlider = () => {
   const [clients, setClients] = useState([]);
 
   useEffect(() => {
-    // Usar import.meta.glob para importar todas las imágenes desde la carpeta public/img/marcas
-    const images = import.meta.glob('/public/img/marcas/**/*.{jpg,png}');
+    const images = import.meta.glob('/public/img/nuestros clientes/**/*.{jpg,png}');
     const clientsData = Object.keys(images).map((path) => {
-      const name = path.split('/').pop().split('.').shift(); // Obtener el nombre del archivo sin extensión
+      const name = path.split('/').pop().split('.').shift();
+      const adjustedPath = path.replace('/public', '');
+      console.log(adjustedPath); // Verifica las rutas en la consola
       return {
-        image: path.replace('/public', ''), // Ajustar la ruta para que sea accesible
+        image: adjustedPath,
         name,
       };
     });
@@ -19,13 +20,13 @@ const ClientSlider = () => {
   }, []);
 
   return (
-    <div className="client-slider pt-10 shadow-lg h-24 mx-auto overflow-hidden relative bg-[#f3f4f6]">
+    <div className="client-slider pt-10 shadow-lg h-24 mx-auto overflow-hidden relative bg-white">
       <div className="client-slide-track flex space-x-6 animate-scroll">
         {clients.map((client, index) => (
-          <div key={index} className="client-slide flex-shrink-0 h-24 w-64">
+          <div key={index} className="client-slide flex-shrink-0 w-40 h-24 flex items-center justify-center">
             <img
               src={client.image}
-              className="h-full w-full object-contain"
+              className="h-full w-auto max-w-full object-contain"
               alt={client.name}
             />
           </div>

@@ -34,7 +34,7 @@ const CategoryCard = ({ title, items }) => {
     }, [categoryImages.length]);
 
     return (
-        <div className="relative group w-full h-96 rounded-lg overflow-hidden shadow-lg m-4">
+        <div className="  relative group w-full h-96 rounded-lg overflow-hidden shadow-lg m-4">
           {/* Imagen de fondo que rota */}
           <div
             className="absolute inset-0 bg-cover bg-center transition-opacity duration-500"
@@ -731,7 +731,7 @@ const Categories = () => {
 
 
 return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 bg-gray-100 min-h-screen">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 bg-white min-h-screen">
       {Object.entries(categories).map(([title, items]) => (
         <div className="m-4">
           <CategoryCard key={title} title={title} items={items} />
