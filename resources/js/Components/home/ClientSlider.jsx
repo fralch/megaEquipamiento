@@ -1,31 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../../css/ClientSlider.css'; // Importamos el archivo CSS para las animaciones
 
 const ClientSlider = () => {
-  const clients = [
-    { image: './img/cajahuancayo.jpg', name: 'Cajahuancayo' },
-    { image: './img/DIMEXA.png', name: 'DIMEXA' },
-    { image: './img/FLORES.png', name: 'FLORES' },
-    { image: './img/GALAXIA.png', name: 'GALAXIA' },
-    { image: './img/GRANDE.jpg', name: 'GRANDE' },
-    { image: './img/PRAXIS.png', name: 'PRAXIS' },
-    { image: './img/PRUCIL.png', name: 'PRUCIL' },
-    { image: './img/1.jpg', name: 'Client 1' },
-    { image: './img/2.jpg', name: 'Client 2' },
-    { image: './img/3.jpg', name: 'Client 3' },
-    { image: './img/4.jpg', name: 'Client 4' },
-    { image: './img/5.jpg', name: 'Client 5' },
-    { image: './img/6.jpg', name: 'Client 6' },
-    { image: './img/7.jpg', name: 'Client 7' },
-    { image: './img/8.jpg', name: 'Client 8' },
-  ];
+  const [clients, setClients] = useState([]);
+
+  useEffect(() => {
+    // Usar import.meta.glob para importar todas las imágenes desde la carpeta public/img/marcas
+    const images = import.meta.glob('/public/img/marcas/**/*.{jpg,png}');
+    const clientsData = Object.keys(images).map((path) => {
+      const name = path.split('/').pop().split('.').shift(); // Obtener el nombre del archivo sin extensión
+      return {
+        image: path.replace('/public', ''), // Ajustar la ruta para que sea accesible
+        name,
+      };
+    });
+
+    setClients(clientsData);
+  }, []);
 
   return (
     <div className="client-slider pt-10 shadow-lg h-24 mx-auto overflow-hidden relative bg-[#f3f4f6]">
-      <div className="client-slide-track flex">
+      <div className="client-slide-track flex space-x-6 animate-scroll">
         {clients.map((client, index) => (
-          <div key={index} className="client-slide h-24 w-64">
-            <img src={client.image} className="h-24 w-64" alt={client.name} />
+          <div key={index} className="client-slide flex-shrink-0 h-24 w-64">
+            <img
+              src={client.image}
+              className="h-full w-full object-contain"
+              alt={client.name}
+            />
           </div>
         ))}
       </div>

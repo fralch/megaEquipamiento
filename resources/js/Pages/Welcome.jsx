@@ -345,7 +345,7 @@ export default function Welcome() {
                    
                       {/* ------------- */}
                       <Categorias_cuadrado />
-                      <div className="p-8 bg-[#f3f4f6]">
+                      <div className="p-8 bg-[#f3f4f6]" id="marcas">
                             <h1 className="text-2xl font-bold mb-8 text-center">Marcas</h1>
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
                                 {brands.map((brand, index) => (
