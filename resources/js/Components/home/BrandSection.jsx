@@ -22,7 +22,7 @@ const BrandSection = () => {
 
     return (
         <div className="p-8 bg-white" id="marcas">
-            <h1 className="text-2xl font-bold mb-8 text-center">Marcas</h1>
+            <h2 className="text-2xl font-bold mb-8 text-center">Marcas</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
                 {brands.map((brand, index) => (
                     <div
@@ -56,6 +56,7 @@ const BrandSection = () => {
                     </div>
                 ))}
             </div>
+            
         </div>
     );
 };

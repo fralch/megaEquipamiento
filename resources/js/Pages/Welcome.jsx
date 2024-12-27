@@ -15,13 +15,12 @@ import Categorias_cuadrado from "@/Components/home/Categorias_cuadrado";
 import NavVertical from "@/Components/home/NavVertical";
 import ClientSlider from "@/Components/home/ClientSlider";
 import BrandSection from "@/Components/home/BrandSection"; // Import the new component
+import Footer from "@/Components/home/Footer";
 
 export default function Welcome() {
     const [showUIElements, setShowUIElements] = useState(false);
     const [activeSubMenu, setActiveSubMenu] = useState(null); // New state to track active submenu
     const [isOpen, setIsOpen] = useState(false);
-
-    
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -192,7 +191,6 @@ export default function Welcome() {
                                             </svg>
                                         </span>
                                     </a>
-
                                 </li>
                                 <li className="relative hidden md:block ">
                                     <a
@@ -329,20 +327,19 @@ export default function Welcome() {
                                 />
                             </div>
                         </section>
-                      {/* ------------- */}
-                      <Sectores />
+                        {/* ------------- */}
+                        <Sectores />
 
-                      {/* ------------- */}
-                      <Categorias_cuadrado />
+                        {/* ------------- */}
+                        <Categorias_cuadrado />
 
-                      {/* ------------- */}
-                      <BrandSection/>
+                        {/* ------------- */}
+                        <BrandSection />
 
-                      <ClientSlider />
+                        <ClientSlider />
                     </main>
-                    <footer className="py-16 text-center text-sm text-black dark:text-white/70"></footer>
+                    <Footer />
                 </div>
-
             </div>
         </>
     );
