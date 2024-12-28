@@ -9,10 +9,10 @@ const Footer = () => {
         <div>
           <h4 className="font-bold border-b border-white pb-2 mb-4">Sobre megaequipamiento.com</h4>
           <ul className="space-y-2">
-            <li>✔ Inicio</li>
-            <li>✔ Nuestro equipo</li>
-            <li>✔ Sobre nosotros</li>
-            <li>✔ Nuestros clientes</li>
+            <li> - Inicio</li>
+            <li> - Nuestro equipo</li>
+            <li> - Sobre nosotros</li>
+            <li> - Nuestros clientes</li>
           </ul>
         </div>
 
@@ -20,9 +20,9 @@ const Footer = () => {
         <div>
           <h4 className="font-bold border-b border-white pb-2 mb-4">¿Qué ofrecemos?</h4>
           <ul className="space-y-2">
-            <li>✔ Venta de equipos de laboratorio</li>
-            <li>✔ Calibración de equipos de laboratorio</li>
-            <li>✔ Mantenimiento de equipos de laboratorio</li>
+            <li> - Venta de equipos de laboratorio</li>
+            <li> - Calibración de equipos de laboratorio</li>
+            <li> - Mantenimiento de equipos de laboratorio</li>
           </ul>
         </div>
 
@@ -30,10 +30,10 @@ const Footer = () => {
         <div>
           <h4 className="font-bold border-b border-white pb-2 mb-4">Información de contacto</h4>
           <ul className="space-y-2">
-            <li>📞 +51 939 294 882</li>
-            <li>📧 ventas@megaequipamiento.com</li>
-            <li>📧 ventas1@megaequipamiento.com</li>
-            <li>📧 operaciones@megaequipamiento.com</li>
+            <li>+51 939 294 882</li>
+            <li>ventas@megaequipamiento.com</li>
+            <li>ventas1@megaequipamiento.com</li>
+            <li>operaciones@megaequipamiento.com</li>
           </ul>
         </div>
 
