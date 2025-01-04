@@ -7,7 +7,7 @@ const Header = () => {
         <header className="bg-white">
             <div className="container mx-auto flex items-center px-8 py-8 md:px-12 max-w-full" id="">
                 {/* Logo */}
-                <div className="mr-auto w-2/12 flex-shrink-0 sm:w-1/12 md:w-1/6 pr-4 ml-10">
+                <div className="mr-auto w-6/12 flex-shrink-0 sm:w-1/12 md:w-1/6 pr-4 ml-10">
                     <img
                         className="w-full object-contain"
                         src="/img/logo2.jpg"
@@ -15,8 +15,8 @@ const Header = () => {
                     />
                 </div>
 
-                {/* Input de búsqueda centrado */}
-                <div className="mx-auto flex w-full max-w-lg items-center rounded-md bg-gray-100 xl:max-w-2xl">
+                {/* Input de búsqueda centrado - oculto en móvil */}
+                <div className="hidden sm:flex mx-auto w-full max-w-lg items-center rounded-md bg-gray-100 xl:max-w-2xl">
                     <input
                         className="w-full border-l border-gray-300 bg-transparent py-2 pl-4 text-sm font-semibold"
                         type="text"
