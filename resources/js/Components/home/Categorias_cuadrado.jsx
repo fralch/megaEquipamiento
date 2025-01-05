@@ -39,7 +39,7 @@ const CategoryCard = ({ title, items }) => {
           <div
             className="absolute inset-0 bg-cover bg-center transition-opacity duration-500"
             style={{
-              backgroundImage: `url(${categoryImages[activeImageIndex]})`,
+              backgroundImage: `url(${categoryImages[activeImageIndex] || 'https://aringenieriaa.com/storage/servicio/125456545.jpg'})`,
             }}
           ></div>
       
