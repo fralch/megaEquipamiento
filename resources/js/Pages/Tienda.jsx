@@ -765,8 +765,8 @@ export default function Tienda() {
                             onClick={() => toggleCategory(categoria)}
                             className={`block w-full text-left p-2 rounded ${
                                 activeCategory === categoria
-                                    ? 'bg-blue-200 text-blue-800' // Estilos de la categoría activa
-                                    : 'bg-white hover:bg-gray-200'
+                                    ? 'bg-[#0c2249] text-blue-200' // Estilos de la categoría activa invertidos
+                                    : 'bg-gray-200 hover:bg-white'
                             }`}
                         >
                             {categoria}
@@ -780,7 +780,7 @@ export default function Tienda() {
                                 <a
                                     key={subIndex}
                                     href="#"
-                                    className="block p-2 pl-6 hover:bg-blue-50 rounded"
+                                    className="block p-2 pl-6 hover:bg-blue-100 bg-blue-50 rounded"
                                 >
                                     {subcategoria}
                                 </a>
