@@ -50,20 +50,21 @@ const Slider = () => {
 
                 {/* Contenido adicional (incluyendo el enlace) */}
                 <div
+                    className="hidden md:block" // Hide on mobile, show on medium screens and up
                     style={{
                         position: "absolute",
                         top: "47%",
-                        left: "50%",
+                        left: "20%",
                         transform: "translate(-50%, -50%)",
                         color: "#fff",
-                        textAlign: "center",
+                        textAlign: "left",
                         zIndex: 2, // Asegura que el contenido esté por encima del iframe
                     }}
                 >
                     <h2
                         style={{
                             margin: 0,
-                            fontSize: "2rem",
+                            fontSize: "2.5rem",
                             fontFamily: "verdana, sans-serif, serif, arial",
                             fontWeight: "bold",
                             color: "#fff",
@@ -74,7 +75,7 @@ const Slider = () => {
                     <h2
                         style={{
                             margin: 0,
-                            fontSize: "2rem",
+                            fontSize: "2.5rem",
                             fontFamily: "verdana, sans-serif, serif, arial",
                             fontWeight: "bold",
                             color: "#fff",
@@ -86,7 +87,7 @@ const Slider = () => {
                     <h2
                         style={{
                             margin: 0,
-                            fontSize: "2rem",
+                            fontSize: "2.5rem",
                             fontFamily: "verdana, sans-serif, serif, arial",
                             fontWeight: "bold",
                             color: "#fff",
@@ -140,20 +141,21 @@ const Slider = () => {
                     }}
                 />
                 <div
+                    className="hidden md:block" // Hide on mobile, show on medium screens and up
                     style={{
                         position: "absolute",
                         top: "47%",
-                        left: "50%",
+                        left: "20%",
                         transform: "translate(-50%, -50%)",
                         color: "#fff",
-                        textAlign: "center",
+                        textAlign: "left",
                     }}
                 >
                     {/* ponle una fuerte de letra como el impact  */}
                     <h2
                         style={{
                             margin: 0,
-                            fontSize: "2rem",
+                            fontSize: "2.5rem",
                             fontFamily: "verdana, sans-serif, serif, arial",
                             fontWeight: "bold",
                             color: "#777",
@@ -165,7 +167,7 @@ const Slider = () => {
                     <h2
                         style={{
                             margin: 0,
-                            fontSize: "2rem",
+                            fontSize: "2.5rem",
                             fontFamily: "verdana, sans-serif, serif, arial",
                             fontWeight: "bold",
                             color: "#0c2249",
@@ -177,7 +179,7 @@ const Slider = () => {
                     <h2
                         style={{
                             margin: 0,
-                            fontSize: "2rem",
+                            fontSize: "2.5rem",
                             fontFamily: "verdana, sans-serif, serif, arial",
                             fontWeight: "bold",
                             color: "#0c2249",
@@ -238,20 +240,21 @@ const Slider = () => {
                         }}
                     />
                     <div
+                        className="hidden md:block" // Hide on mobile, show on medium screens and up
                         style={{
                             position: "absolute",
                             top: "45%",
-                            left: "50%",
+                            left: "20%",
                             transform: "translate(-50%, -50%)",
                             color: "#fff",
-                            textAlign: "center",
+                            textAlign: "left",
                         }}
                     >
                         {/* ponle una fuerte de letra como el impact  */}
                         <h2
                             style={{
                                 margin: 0,
-                                fontSize: "2rem",
+                                fontSize: "2.5rem",
                                 fontFamily: "verdana, sans-serif, serif, arial",
                                 fontWeight: "bold",
                                 color: "#777",
@@ -262,7 +265,7 @@ const Slider = () => {
                         <h2
                             style={{
                                 margin: 0,
-                                fontSize: "2rem",
+                                fontSize: "2.5rem",
                                 fontFamily: "verdana, sans-serif, serif, arial",
                                 fontWeight: "bold",
                                 color: "#0c2249",
@@ -274,7 +277,7 @@ const Slider = () => {
                         <h2
                             style={{
                                 margin: 0,
-                                fontSize: "2rem",
+                                fontSize: "2.5rem",
                                 fontFamily: "verdana, sans-serif, serif, arial",
                                 fontWeight: "bold",
                                 color: "#0c2249",
