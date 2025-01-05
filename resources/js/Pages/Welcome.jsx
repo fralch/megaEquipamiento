@@ -43,7 +43,7 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title="EquinLab" />
+            <Head title="MegaEquipamiento"  />
 
             <div>
                 <Header /> {/* Use the new Header component */}
