@@ -13,4 +13,8 @@ Route::get('/tienda', function () {
     return Inertia::render('Tienda');
 });
 
+Route::get('/product', function () {
+    return Inertia::render('Product');
+});
+
 
