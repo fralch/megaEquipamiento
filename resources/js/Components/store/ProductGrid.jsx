@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const products = [
   {
@@ -220,8 +220,229 @@ const products = [
     price: 420.50,
     image: "https://your-image-url.com/image20.png",
     flag: "https://flagcdn.com/w320/ie.png"
+  },
+  {
+    id: 21,
+    title: "Sonda Esférica – TechFlow (Ø 38 mm)",
+    diameter: "38 mm",
+    material: "Acero inoxidable 316L",
+    brand: "TechFlow",
+    origin: "Brasil",
+    price: 370.00,
+    image: "https://your-image-url.com/image21.png",
+    flag: "https://flagcdn.com/w320/br.png"
+  },
+  {
+    id: 22,
+    title: "Sonda Cilíndrica – MasterRheo (Ø 28 mm)",
+    diameter: "28 mm",
+    material: "Titanio Grado 5",
+    brand: "MasterRheo",
+    origin: "México",
+    price: 460.00,
+    image: "https://your-image-url.com/image22.png",
+    flag: "https://flagcdn.com/w320/mx.png"
+  },
+  {
+    id: 23,
+    title: "Sonda Cónica – FlowTech (Ø 48 mm)",
+    diameter: "48 mm",
+    material: "Aluminio 6061",
+    brand: "FlowTech",
+    origin: "Argentina",
+    price: 319.99,
+    image: "https://your-image-url.com/image23.png",
+    flag: "https://flagcdn.com/w320/ar.png"
+  },
+  {
+    id: 24,
+    title: "Sonda Plana – ViscoMaster (Ø 58 mm)",
+    diameter: "58 mm",
+    material: "Acero inoxidable 304",
+    brand: "ViscoMaster",
+    origin: "Chile",
+    price: 430.50,
+    image: "https://your-image-url.com/image24.png",
+    flag: "https://flagcdn.com/w320/cl.png"
+  },
+  {
+    id: 25,
+    title: "Sonda Esférica – RheoSense (Ø 31 mm)",
+    diameter: "31 mm",
+    material: "Titanio Grado 2",
+    brand: "RheoSense",
+    origin: "Colombia",
+    price: 360.75,
+    image: "https://your-image-url.com/image25.png",
+    flag: "https://flagcdn.com/w320/co.png"
+  },
+  {
+    id: 26,
+    title: "Sonda Cilíndrica – FlowMaster (Ø 21 mm)",
+    diameter: "21 mm",
+    material: "Aluminio 7075",
+    brand: "FlowMaster",
+    origin: "Perú",
+    price: 470.00,
+    image: "https://your-image-url.com/image26.png",
+    flag: "https://flagcdn.com/w320/pe.png"
+  },
+  {
+    id: 27,
+    title: "Sonda Cónica – ViscoTech (Ø 41 mm)",
+    diameter: "41 mm",
+    material: "Acero inoxidable 316L",
+    brand: "ViscoTech",
+    origin: "Ecuador",
+    price: 329.99,
+    image: "https://your-image-url.com/image27.png",
+    flag: "https://flagcdn.com/w320/ec.png"
+  },
+  {
+    id: 28,
+    title: "Sonda Plana – RheoFlow (Ø 51 mm)",
+    diameter: "51 mm",
+    material: "Titanio Grado 5",
+    brand: "RheoFlow",
+    origin: "Venezuela",
+    price: 440.50,
+    image: "https://your-image-url.com/image28.png",
+    flag: "https://flagcdn.com/w320/ve.png"
+  },
+  {
+    id: 29,
+    title: "Sonda Esférica – FlowSense (Ø 33 mm)",
+    diameter: "33 mm",
+    material: "Aluminio 6061",
+    brand: "FlowSense",
+    origin: "Uruguay",
+    price: 380.75,
+    image: "https://your-image-url.com/image29.png",
+    flag: "https://flagcdn.com/w320/uy.png"
+  },
+  {
+    id: 30,
+    title: "Sonda Cilíndrica – ViscoMaster (Ø 23 mm)",
+    diameter: "23 mm",
+    material: "Acero inoxidable 304",
+    brand: "ViscoMaster",
+    origin: "Paraguay",
+    price: 490.00,
+    image: "https://your-image-url.com/image30.png",
+    flag: "https://flagcdn.com/w320/py.png"
+  },
+  {
+    id: 31,
+    title: "Sonda Cónica – RheoSense (Ø 43 mm)",
+    diameter: "43 mm",
+    material: "Titanio Grado 2",
+    brand: "RheoSense",
+    origin: "Bolivia",
+    price: 339.99,
+    image: "https://your-image-url.com/image31.png",
+    flag: "https://flagcdn.com/w320/bo.png"
+  },
+  {
+    id: 32,
+    title: "Sonda Plana – FlowTech (Ø 53 mm)",
+    diameter: "53 mm",
+    material: "Aluminio 7075",
+    brand: "FlowTech",
+    origin: "Guatemala",
+    price: 450.50,
+    image: "https://your-image-url.com/image32.png",
+    flag: "https://flagcdn.com/w320/gt.png"
+  },
+  {
+    id: 33,
+    title: "Sonda Esférica – ViscoSense (Ø 37 mm)",
+    diameter: "37 mm",
+    material: "Acero inoxidable 316L",
+    brand: "ViscoSense",
+    origin: "Costa Rica",
+    price: 390.75,
+    image: "https://your-image-url.com/image33.png",
+    flag: "https://flagcdn.com/w320/cr.png"
+  },
+  {
+    id: 34,
+    title: "Sonda Cilíndrica – RheoMaster (Ø 27 mm)",
+    diameter: "27 mm",
+    material: "Titanio Grado 5",
+    brand: "RheoMaster",
+    origin: "Panamá",
+    price: 500.00,
+    image: "https://your-image-url.com/image34.png",
+    flag: "https://flagcdn.com/w320/pa.png"
+  },
+  {
+    id: 35,
+    title: "Sonda Cónica – FlowSense (Ø 47 mm)",
+    diameter: "47 mm",
+    material: "Aluminio 6061",
+    brand: "FlowSense",
+    origin: "Honduras",
+    price: 349.99,
+    image: "https://your-image-url.com/image35.png",
+    flag: "https://flagcdn.com/w320/hn.png"
+  },
+  {
+    id: 36,
+    title: "Sonda Plana – ViscoMaster (Ø 57 mm)",
+    diameter: "57 mm",
+    material: "Acero inoxidable 304",
+    brand: "ViscoMaster",
+    origin: "El Salvador",
+    price: 460.50,
+    image: "https://your-image-url.com/image36.png",
+    flag: "https://flagcdn.com/w320/sv.png"
+  },
+  {
+    id: 37,
+    title: "Sonda Esférica – RheoSense (Ø 39 mm)",
+    diameter: "39 mm",
+    material: "Titanio Grado 2",
+    brand: "RheoSense",
+    origin: "Nicaragua",
+    price: 370.75,
+    image: "https://your-image-url.com/image37.png",
+    flag: "https://flagcdn.com/w320/ni.png"
+  },
+  {
+    id: 38,
+    title: "Sonda Cilíndrica – FlowMaster (Ø 29 mm)",
+    diameter: "29 mm",
+    material: "Aluminio 7075",
+    brand: "FlowMaster",
+    origin: "República Dominicana",
+    price: 510.00,
+    image: "https://your-image-url.com/image38.png",
+    flag: "https://flagcdn.com/w320/do.png"
+  },
+  {
+    id: 39,
+    title: "Sonda Cónica – ViscoTech (Ø 49 mm)",
+    diameter: "49 mm",
+    material: "Acero inoxidable 316L",
+    brand: "ViscoTech",
+    origin: "Cuba",
+    price: 359.99,
+    image: "https://your-image-url.com/image39.png",
+    flag: "https://flagcdn.com/w320/cu.png"
+  },
+  {
+    id: 40,
+    title: "Sonda Plana – RheoFlow (Ø 59 mm)",
+    diameter: "59 mm",
+    material: "Titanio Grado 5",
+    brand: "RheoFlow",
+    origin: "Haití",
+    price: 470.50,
+    image: "https://your-image-url.com/image40.png",
+    flag: "https://flagcdn.com/w320/ht.png"
   }
 ];
+
 
 
 const Card = ({ product }) => {
@@ -290,17 +511,44 @@ const Card = ({ product }) => {
 };
 
 const ProductGrid = () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 24;
+
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const totalPages = Math.ceil(products.length / productsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
-      {products.map((product) => (
-        <Card key={product.id} product={product} />
-      ))}
+    <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
+        {currentProducts.map((product) => (
+          <Card key={product.id} product={product} />
+        ))}
+      </div>
+      <div className="flex justify-center space-x-2 mt-4">
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => handlePageChange(i + 1)}
+            className={`px-4 py-2 rounded ${
+              currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200'
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
 
 export default ProductGrid;
-
 
 
 
