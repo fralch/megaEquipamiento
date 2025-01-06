@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
+import ProductGrid from "../Components/store/ProductGrid";
+import Footer from "../Components/home/Footer";
 
 
 export default function Tienda() {
@@ -790,8 +792,10 @@ export default function Tienda() {
             </nav>
             <div className="flex-1 p-4">
                 {/* Contenido principal aquí */}
+                <ProductGrid />
             </div>
         </div>
+            <Footer /> 
     </div>
 );
 
