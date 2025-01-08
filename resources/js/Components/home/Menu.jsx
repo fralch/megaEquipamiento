@@ -29,7 +29,7 @@ const Menu = ({ toggleMenu }) => {
                     </li>
                     <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0 mt-2 md:mt-0">
                         <a
-                            href="#"
+                            href="/"
                             className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
                         >
                             <span className="mr-3 text-xl">
