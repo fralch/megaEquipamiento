@@ -16,8 +16,10 @@ const BrandSection = () => {
                 description: `Descripción de ${name}`, // Puedes ajustar esto según tus necesidades
             };
         });
-
+        // json de las marcas
+        
         setBrands(brandsData);
+        console.log(brandsData);
     }, []);
 
     return (
