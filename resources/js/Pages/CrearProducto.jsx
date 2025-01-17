@@ -52,7 +52,7 @@ const CrearProducto = () => {
     };
 
     return (
-        <div className="w-full mx-auto bg-gray-100 ">
+        <div className=" w-full">
             <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
             <Head title="Crear" />
                     <Sidebar />
