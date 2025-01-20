@@ -26,6 +26,6 @@ Route::apiResource('usuarios', UsuarioController::class);
 Route::post('login', [UsuarioController::class, 'login']);
 
 // Ruta para la vista de crear producto
-Route::get('/crear-producto', function () {
-    return Inertia::render('CrearProducto');
+Route::get('/crear', function () {
+    return Inertia::render('Crear');
 });
