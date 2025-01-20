@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import { Head } from "@inertiajs/react";
 import Productos from "../Components/create/productos";
 import Categorias from "../Components/create/categoria";
+import Subcategorias from "../Components/create/subcategoria";
 
 const CrearProducto = () => {
     const [crearProducto, setCrearProducto] = useState(true);
     const [crearCategoria, setCrearCategoria] = useState(false);
+    const [crearSubcategoria, setCrearSubcategoria] = useState(false);
 
     const [form, setForm] = useState({
         sku: "",
@@ -31,6 +33,12 @@ const CrearProducto = () => {
     const handleCrearCategoriaClick = () => {
         setCrearProducto(false);
         setCrearCategoria(true);
+    };
+
+    const handleCrearSubcategoriaClick = () => {
+        setCrearProducto(false);
+        setCrearCategoria(false);
+        setCrearSubcategoria(true);
     };
 
     return (
@@ -61,7 +69,9 @@ const CrearProducto = () => {
                         >
                             Crear Categoria
                         </button>
-                        <button className="w-full bg-blue-200 text-blue-600 py-2 px-4 rounded-md font-medium">
+                        <button className="w-full bg-blue-200 text-blue-600 py-2 px-4 rounded-md font-medium"
+                            onClick={handleCrearSubcategoriaClick}
+                        >
                             Crear Subcategoria
                         </button>
                         <button className="w-full bg-blue-200 text-blue-600 py-2 px-4 rounded-md font-medium">
@@ -75,6 +85,9 @@ const CrearProducto = () => {
                     </div>
                     <div className={crearCategoria ? "block" : "hidden"}>
                         <Categorias onSubmit={handleSubmit} />
+                    </div>
+                    <div className={crearSubcategoria ? "block" : "hidden"}>
+                        <Subcategorias onSubmit={handleSubmit} />
                     </div>
                 </div>
             </div>
