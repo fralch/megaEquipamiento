@@ -3,11 +3,14 @@ import { Head } from "@inertiajs/react";
 import Productos from "../Components/create/productos";
 import Categorias from "../Components/create/categoria";
 import Subcategorias from "../Components/create/subcategoria";
+import Marcas from "../Components/create/marca";
 
 const CrearProducto = () => {
     const [crearProducto, setCrearProducto] = useState(true);
     const [crearCategoria, setCrearCategoria] = useState(false);
     const [crearSubcategoria, setCrearSubcategoria] = useState(false);
+    const [crearMarca, setCrearMarca] = useState(false);
+
 
     const [form, setForm] = useState({
         sku: "",
@@ -39,6 +42,13 @@ const CrearProducto = () => {
         setCrearProducto(false);
         setCrearCategoria(false);
         setCrearSubcategoria(true);
+    };
+
+    const handleCrearMarcaClick = () => {
+        setCrearProducto(false);
+        setCrearCategoria(false);
+        setCrearSubcategoria(false);
+        setCrearMarca(true);
     };
 
     return (
@@ -74,7 +84,9 @@ const CrearProducto = () => {
                         >
                             Crear Subcategoria
                         </button>
-                        <button className="w-full bg-blue-200 text-blue-600 py-2 px-4 rounded-md font-medium">
+                        <button className="w-full bg-blue-200 text-blue-600 py-2 px-4 rounded-md font-medium"
+                            onClick={handleCrearMarcaClick}
+                        >
                             Crear Marca
                         </button>
                     </div>
@@ -88,6 +100,9 @@ const CrearProducto = () => {
                     </div>
                     <div className={crearSubcategoria ? "block" : "hidden"}>
                         <Subcategorias onSubmit={handleSubmit} />
+                    </div>
+                    <div className={crearMarca ? "block" : "hidden"}>
+                        <Marcas onSubmit={handleSubmit} />
                     </div>
                 </div>
             </div>
