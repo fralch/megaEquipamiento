@@ -9,7 +9,7 @@ const Productos = ({ onSubmit }) => {
     marca_id: "",
     pais: "",
     precio_sin_ganancia: "",
-    imagen: "",
+    imagen: null,
     descripcion: "",
   });
 
@@ -18,9 +18,31 @@ const Productos = ({ onSubmit }) => {
     setForm({ ...form, [name]: value });
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setForm({ ...form, imagen: file });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    setProductos([...productos, form]);
+    
+    const formData = new FormData();
+    formData.append('sku', form.sku);
+    formData.append('nombre', form.nombre);
+    formData.append('id_subcategoria', form.id_subcategoria);
+    formData.append('marca_id', form.marca_id);
+    formData.append('pais', form.pais);
+    formData.append('precio_sin_ganancia', form.precio_sin_ganancia);
+    formData.append('descripcion', form.descripcion);
+    if (form.imagen) {
+      formData.append('imagen', form.imagen);
+    }
+
+    setProductos([...productos, {
+      ...form,
+      imagen: form.imagen ? URL.createObjectURL(form.imagen) : ''
+    }]);
+
     setForm({
       sku: "",
       nombre: "",
@@ -28,10 +50,11 @@ const Productos = ({ onSubmit }) => {
       marca_id: "",
       pais: "",
       precio_sin_ganancia: "",
-      imagen: "",
+      imagen: null,
       descripcion: "",
     });
-    onSubmit(form);
+
+    onSubmit(formData);
   };
 
   return (
@@ -47,7 +70,6 @@ const Productos = ({ onSubmit }) => {
             { label: "Marca", name: "marca_id", type: "number" },
             { label: "País", name: "pais", type: "text" },
             { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01" },
-            { label: "Imagen (URL)", name: "imagen", type: "text" },
           ].map(({ label, name, type, step }) => (
             <div key={name} className="mb-4">
               <label htmlFor={name} className="block text-sm font-medium text-gray-700">
@@ -65,6 +87,28 @@ const Productos = ({ onSubmit }) => {
               />
             </div>
           ))}
+
+          <div className="mb-4">
+            <label htmlFor="imagen" className="block text-sm font-medium text-gray-700">
+              Imagen
+            </label>
+            <div className="mt-1 block w-full">
+              <input
+                type="file"
+                id="imagen"
+                name="imagen"
+                onChange={handleImageChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <label
+                htmlFor="imagen"
+                className="block w-full border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 cursor-pointer bg-white text-indigo-600 py-2 px-4 text-sm font-medium text-center transition duration-150 ease-in-out"
+              >
+                Seleccionar archivo
+              </label>
+            </div>
+          </div>
 
           <div className="mb-4">
             <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
@@ -112,7 +156,11 @@ const Productos = ({ onSubmit }) => {
                   <td className="px-6 py-4 whitespace-nowrap">{producto.marca_id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{producto.pais}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{producto.precio_sin_ganancia}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{producto.imagen}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {producto.imagen && (
+                      <img src={producto.imagen} alt="Producto" className="h-10 w-10 object-cover rounded-full" />
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">{producto.descripcion}</td>
                 </tr>
               ))}
