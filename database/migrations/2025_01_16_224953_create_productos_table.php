@@ -27,6 +27,9 @@ return new class extends Migration
             $table->string('envio', 100)->nullable();
             $table->string('soporte_tecnico', 100)->nullable();
             $table->json('caracteristicas')->nullable();
+            $table->json('datos_tecnicos')->nullable(); // Campo para datos técnicos
+            $table->json('documentos')->nullable(); // Campo para documentos relacionados
+
             $table->foreign('id_subcategoria')->references('id_subcategoria')->on('subcategorias')->onDelete('cascade');
             $table->foreign('marca_id')->references('id_marca')->on('marcas')->onDelete('cascade');
             $table->timestamps();

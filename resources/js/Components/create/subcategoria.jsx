@@ -43,6 +43,20 @@ const Subcategorias = ({ onSubmit }) => {
               required
             />
           </div>
+          <div className="mb-4">
+            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
+              Categoria Padre
+            </label>
+            <input
+              type="text"
+              id="nombre"
+              name="nombre"
+              value={form.nombre}
+              onChange={handleChange}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              required
+            />
+          </div>
 
           <div className="mb-4">
             <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
@@ -73,6 +87,7 @@ const Subcategorias = ({ onSubmit }) => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria Padre</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
