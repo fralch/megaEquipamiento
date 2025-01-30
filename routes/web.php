@@ -10,8 +10,8 @@ Route::get('/', function () {
     return Inertia::render('Welcome');
 });
 
-Route::get('/tienda', function () {
-    return Inertia::render('Tienda');
+Route::get('/categoria', function () {
+    return Inertia::render('Categoria');
 });
 
 Route::get('/product', function () {

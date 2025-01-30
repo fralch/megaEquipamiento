@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id('id_detalle_comparacion');
             $table->unsignedBigInteger('id_comparacion');
             $table->unsignedBigInteger('id_producto');
+            $table->string('notas')->nullable(); // Campo opcional para notas adicionales
+
             $table->foreign('id_comparacion')->references('id_comparacion')->on('comparaciones_productos')->onDelete('cascade');
             $table->foreign('id_producto')->references('id_producto')->on('productos')->onDelete('cascade');
             $table->timestamps();
