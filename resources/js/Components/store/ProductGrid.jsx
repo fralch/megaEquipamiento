@@ -31,7 +31,7 @@ const products = [
     brand: "FlowMaster",
     origin: "Estados Unidos",
     price: 299.99,
-    image: "https://your-image-url.com/image3.png",
+    image: "",
     flag: "https://flagcdn.com/w320/us.png"
   },
   {
