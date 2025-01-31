@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Categoria;
+use App\Models\Subcategoria;
 
 class CategoriaController extends Controller
 {
@@ -15,6 +16,41 @@ class CategoriaController extends Controller
         $categorias = Categoria::all();
         return view('categorias.index', compact('categorias'));
     }
+
+    /**
+     * Obtener las categorías y subcategorías en el formato deseado.
+     */
+    public function getCategoriasConSubcategorias()
+    {
+        // Obtener todas las categorías con sus subcategorías relacionadas
+        $categorias = Categoria::with('subcategorias')->get();
+
+        // Formatear los datos
+        $formattedData = [];
+        foreach ($categorias as $categoria) {
+            $subcategorias = $categoria->subcategorias->pluck('nombre')->toArray();
+            $formattedData[$categoria->nombre] = $subcategorias;
+        }
+
+        return response()->json($formattedData);
+    }
+
+
+    /*
+     * obtener todas las categorias  em json 
+    */
+    public function getCategorias()
+    {
+        // Obtener todas las categorías
+        $categorias = Categoria::all();
+
+        // Extraer solo los nombres de las categorías
+        $nombresCategorias = $categorias->pluck('nombre');
+
+        // Devolver la respuesta en formato JSON
+        return response()->json($nombresCategorias);
+    }
+
 
     /**
      * Show the form for creating a new resource.

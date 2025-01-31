@@ -35,4 +35,10 @@ class Categoria extends Model
         'created_at',
         'updated_at',
     ];
+
+    // En el modelo Categoria.php
+    public function subcategorias()
+    {
+        return $this->hasMany(Subcategoria::class, 'id_categoria');
+    }
 }
