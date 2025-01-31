@@ -77,9 +77,22 @@ const Categories = () => {
     const [categories, setCategories] = useState([]);
 
     useEffect(() => {
+      // comprobar si hay datos en localStorage
+      const storedCategories = localStorage.getItem('categorias');
+
+      if (storedCategories) {
+        // Si los datos están en el localStorage, úsalos
+        console.log("están en el localStorage");
+        setCategories(JSON.parse(storedCategories));
+      } else {
+        // Si no están en el localStorage, haz las solicitudes a la API
+        console.log("no están en el localStorage");
         fetch('http://127.0.0.1:8000/categorias-con-subcategorias')
             .then(response => response.json())
             .then(data => setCategories(data));
+            localStorage.setItem('subcategorias', JSON.stringify(data)); // Guarda en localStorage
+            }
+
     }, []);
 
 

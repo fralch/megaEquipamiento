@@ -20,7 +20,7 @@ const NavVertical = ({ isOpen, onClose }) => {
             .then((data) => {
                 setCategoriasArray(data);
                 localStorage.setItem('categorias', JSON.stringify(data)); // Guarda en localStorage
-                fetch('http://127.0.0.1:8000/subcategorias-all')
+                fetch('http://127.0.0.1:8000/categorias-con-subcategorias')
                     .then((response) => response.json())
                     .then((data) => {
                         setSubcategoriasArray(data);

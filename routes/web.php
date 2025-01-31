@@ -11,11 +11,11 @@ Route::get('/', function () {
     return Inertia::render('Welcome');
 });
 
-Route::get('/categoria', function () {
+Route::get('/categorias', function () {
     return Inertia::render('Categoria');
 });
 
-Route::get('/product', function () {
+Route::get('/producto', function () {
     return Inertia::render('Product');
 });
 
