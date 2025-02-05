@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\SubcategoriaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,11 +16,6 @@ Route::get('/producto', function () { return Inertia::render('Product'); });
 Route::get('/crear', function () {return Inertia::render('Crear');});
 
 
-//Rutas para las operaciones CRUD
-Route::get('/categorias-con-subcategorias', [CategoriaController::class, 'getCategoriasConSubcategorias']);
-Route::get('/categorias-all', [CategoriaController::class, 'getCategorias']);
-Route::post('/login', [UsuarioController::class, 'login']);
-Route::apiResource('usuarios', UsuarioController::class);
 
 
 // rutas para crear y mostrar productos
@@ -28,6 +25,14 @@ Route::get('/product/all', [ProductoController::class, 'getProductos']);
 Route::get('/product/all-imagen', [ProductoController::class, 'getProductosImagen']);
 Route::get('/product/show/{id}', [ProductoController::class, 'showProduct']);
 Route::get('/product/image/{id}', [ProductoController::class, 'getImagenProducto']);
+
+
+//Rutas para las operaciones CRUD
+Route::get('/categorias-con-subcategorias', [CategoriaController::class, 'getCategoriasConSubcategorias']);
+Route::get('/categorias-all', [CategoriaController::class, 'getCategorias']);
+Route::get('/categorias-con-subcategorias-con-id', [CategoriaController::class, 'getCategoriasConSubcategoriasConId']);
+Route::post('/login', [UsuarioController::class, 'login']);
+Route::apiResource('usuarios', UsuarioController::class);
 
 
 // rutas para crear y mostrar subcategorias

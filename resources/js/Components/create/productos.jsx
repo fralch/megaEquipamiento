@@ -21,10 +21,22 @@ const Productos = ({ onSubmit }) => {
     documentos: "{}",
   });
 
-  const [Subcategorias, setSubcategorias] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [subcategorias, setSubcategorias] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
 
   useEffect(() => {
-  
+    // Fetch categorías
+    fetch('http://127.0.0.1:8000/categorias-all')
+      .then(response => response.json())
+      .then(data => setCategorias(data))
+      .catch(error => console.error('Error fetching categorías:', error));
+
+    // Fetch subcategorías
+    fetch('http://127.0.0.1:8000/subcategoria/all')
+      .then(response => response.json())
+      .then(data => setSubcategorias(data))
+      .catch(error => console.error('Error fetching subcategorías:', error));
   }, []);
 
   const handleChange = (e) => {
@@ -37,9 +49,14 @@ const Productos = ({ onSubmit }) => {
     setForm({ ...form, imagen: file });
   };
 
-  const handleSubmit = (e) => {
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+    setForm({ ...form, id_subcategoria: '' }); // Reset subcategoría al cambiar de categoría
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+  
     const formData = new FormData();
     formData.append('sku', form.sku);
     formData.append('nombre', form.nombre);
@@ -59,33 +76,56 @@ const Productos = ({ onSubmit }) => {
     if (form.imagen) {
       formData.append('imagen', form.imagen);
     }
-
-    setProductos([...productos, {
-      ...form,
-      imagen: form.imagen ? URL.createObjectURL(form.imagen) : ''
-    }]);
-
-    setForm({
-      sku: "",
-      nombre: "",
-      id_subcategoria: "",
-      marca_id: "",
-      pais: "",
-      precio_sin_ganancia: "",
-      precio_ganancia: "",
-      precio_igv: "",
-      imagen: null,
-      descripcion: "",
-      video: "",
-      envio: "",
-      soporte_tecnico: "",
-      caracteristicas: "",
-      datos_tecnicos: "",
-      documentos: "",
-    });
-
-    onSubmit(formData);
+  
+    try {
+      const response =  await fetch('http://127.0.0.1:8000/product/create', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Producto creado:', result);
+  
+        setProductos([...productos, {
+          ...form,
+          imagen: form.imagen ? URL.createObjectURL(form.imagen) : ''
+        }]);
+  
+        setForm({
+          sku: "",
+          nombre: "",
+          id_subcategoria: "",
+          marca_id: "",
+          pais: "",
+          precio_sin_ganancia: "",
+          precio_ganancia: "",
+          precio_igv: "",
+          imagen: null,
+          descripcion: "",
+          video: "",
+          envio: "",
+          soporte_tecnico: "",
+          caracteristicas: "",
+          datos_tecnicos: "",
+          documentos: "",
+        });
+      } else {
+        console.error('Error al crear el producto:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+    }
   };
+  
+
+  // Filtrar subcategorías basadas en la categoría seleccionada
+  const filteredSubcategorias = subcategorias.filter(
+    subcategory => subcategory.id_categoria === parseInt(selectedCategory)
+  );
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
@@ -96,7 +136,24 @@ const Productos = ({ onSubmit }) => {
           {[
             { label: "SKU", name: "sku", type: "text" },
             { label: "Nombre", name: "nombre", type: "text" },
-            { label: "Subcategoría", name: "id_subcategoria", type: "number" },
+            {
+              label: "Categoría",
+              name: "categoria",
+              type: "select",
+              options: categorias.map(category => ({
+                value: category.id_categoria,
+                label: category.nombre
+              }))
+            },
+            {
+              label: "Subcategoría",
+              name: "id_subcategoria",
+              type: "select",
+              options: filteredSubcategorias.map(subcategory => ({
+                value: subcategory.id_subcategoria,
+                label: subcategory.nombre
+              }))
+            },
             { label: "Marca", name: "marca_id", type: "number" },
             { label: "País", name: "pais", type: "text" },
             { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01" },
@@ -108,21 +165,39 @@ const Productos = ({ onSubmit }) => {
             { label: "Características", name: "caracteristicas", type: "text" },
             { label: "Datos Técnicos", name: "datos_tecnicos", type: "text" },
             { label: "Documentos", name: "documentos", type: "text" },
-          ].map(({ label, name, type, step }) => (
+          ].map(({ label, name, type, options, step }) => (
             <div key={name} className="mb-4">
               <label htmlFor={name} className="block text-sm font-medium text-gray-700">
                 {label}
               </label>
-              <input
-                type={type}
-                id={name}
-                name={name}
-                value={form[name]}
-                onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                step={step}
-                required={name === "sku" || name === "nombre" || name === "id_subcategoria" || name === "marca_id"}
-              />
+              {type === "select" ? (
+                <select
+                  id={name}
+                  name={name}
+                  value={name === "categoria" ? selectedCategory : form[name]}
+                  onChange={name === "categoria" ? handleCategoryChange : handleChange}
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  required={name === "id_subcategoria" || name === "marca_id"}
+                >
+                  <option value="">--Selecciona una opción--</option>
+                  {options && options.map(({ value, label }) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type={type}
+                  id={name}
+                  name={name}
+                  value={form[name]}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  step={step}
+                  required={name === "sku" || name === "nombre" || name === "id_subcategoria" || name === "marca_id"}
+                />
+              )}
             </div>
           ))}
 

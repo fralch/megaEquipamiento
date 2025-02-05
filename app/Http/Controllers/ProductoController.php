@@ -37,8 +37,7 @@ class ProductoController extends Controller
 
         Producto::create($request->all());
 
-        return redirect()->route('productos.index')
-                         ->with('success', 'Producto creado exitosamente.');
+        return response()->json($producto);
     }
 
        /**

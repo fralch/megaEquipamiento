@@ -8,15 +8,7 @@ use App\Models\Subcategoria;
 
 class CategoriaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $categorias = Categoria::all();
-        return view('categorias.index', compact('categorias'));
-    }
-
+   
     /**
      * Obtener las categorías y subcategorías en el formato deseado.
      */
@@ -34,6 +26,7 @@ class CategoriaController extends Controller
 
         return response()->json($formattedData);
     }
+    
 
 
     /*
@@ -44,24 +37,14 @@ class CategoriaController extends Controller
         // Obtener todas las categorías
         $categorias = Categoria::all();
 
-        // Extraer solo los nombres de las categorías
-        $nombresCategorias = $categorias->pluck('nombre');
-
-        // Devolver la respuesta en formato JSON
-        return response()->json($nombresCategorias);
+        return response()->json($categorias);
     }
 
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('categorias.create');
-    }
+   
 
     /**
-     * Store a newly created resource in storage.
+     * crear una nueva categoría y devolver el id
      */
     public function store(Request $request)
     {
@@ -70,30 +53,13 @@ class CategoriaController extends Controller
             'descripcion' => 'nullable|string',
         ]);
 
-        Categoria::create($request->all());
-
-        return redirect()->route('categorias.index')
-                         ->with('success', 'Categoría creada exitosamente.');
+        $creado = Categoria::create($request->all());
+        return response()->json($creado);    
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Categoria $categoria)
-    {
-        return view('categorias.show', compact('categoria'));
-    }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Categoria $categoria)
-    {
-        return view('categorias.edit', compact('categoria'));
-    }
-
-    /**
-     * Update the specified resource in storage.
+     * Actualizar una categoría y devolver el id
      */
     public function update(Request $request, Categoria $categoria)
     {
@@ -104,18 +70,9 @@ class CategoriaController extends Controller
 
         $categoria->update($request->all());
 
-        return redirect()->route('categorias.index')
-                         ->with('success', 'Categoría actualizada exitosamente.');
+         return response()->json($categoria);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Categoria $categoria)
-    {
-        $categoria->delete();
-
-        return redirect()->route('categorias.index')
-                         ->with('success', 'Categoría eliminada exitosamente.');
-    }
+    
+   
 }
