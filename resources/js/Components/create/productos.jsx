@@ -23,6 +23,7 @@ const Productos = ({ onSubmit }) => {
 
   const [categorias, setCategorias] = useState([]);
   const [subcategorias, setSubcategorias] = useState([]);
+  const [marcas, setMarcas] = useState([]); // Nuevo estado para las marcas
   const [selectedCategory, setSelectedCategory] = useState('');
 
   useEffect(() => {
@@ -37,6 +38,12 @@ const Productos = ({ onSubmit }) => {
       .then(response => response.json())
       .then(data => setSubcategorias(data))
       .catch(error => console.error('Error fetching subcategorías:', error));
+
+    // Fetch marcas
+    fetch('http://127.0.0.1:8000/marca/all')
+      .then(response => response.json())
+      .then(data => setMarcas(data))
+      .catch(error => console.error('Error fetching marcas:', error));
   }, []);
 
   const handleChange = (e) => {
@@ -154,7 +161,15 @@ const Productos = ({ onSubmit }) => {
                 label: subcategory.nombre
               }))
             },
-            { label: "Marca", name: "marca_id", type: "number" },
+            {
+              label: "Marca",
+              name: "marca_id",
+              type: "select",
+              options: marcas.map(marca => ({
+                value: marca.id_marca,
+                label: marca.nombre
+              }))
+            },
             { label: "País", name: "pais", type: "text" },
             { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01" },
             { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01" },

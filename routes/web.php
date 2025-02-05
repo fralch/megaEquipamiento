@@ -5,6 +5,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\SubcategoriaController;
+use App\Http\Controllers\MarcaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -40,3 +41,8 @@ Route::post('/subcategoria/create', [SubcategoriaController::class, 'store']);
 Route::post('/subcategoria/update/{id}', [SubcategoriaController::class, 'update']);
 Route::get('/subcategoria/all', [SubcategoriaController::class, 'getSubcategorias']);
 Route::get('/subcategoria/categoria/{id}', [SubcategoriaController::class, 'getSubcategoriasCategoria']);
+
+// rutas para crear y mostrar marcas 
+Route::post('/marca/create', [MarcaController::class, 'createMarca']);
+Route::post('/marca/update/{id}', [MarcaController::class, 'updateMarca']);
+Route::get('/marca/all', [MarcaController::class, 'getMarcas']);
