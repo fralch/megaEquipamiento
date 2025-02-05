@@ -10,7 +10,8 @@ use App\Models\Marca;
 class ProductoController extends Controller
 {
     /**   Crear producto   */
-    public function createProduct(Request $request){
+    public function createProduct(Request $request)
+    {
         $request->validate([
             'sku' => 'required|max:100',
             'nombre' => 'required|max:100',
@@ -30,15 +31,30 @@ class ProductoController extends Controller
             'documentos' => 'nullable|json',
         ]);
 
+        // Procesar la imagen si se proporciona
+        $imagePath = null;
+
         if ($request->hasFile('imagen')) {
-            $imagePath = $request->file('imagen')->store('productos', 'public');
-            $request->merge(['imagen' => $imagePath]);
+            $image = $request->file('imagen');
+
+            // Nombre de la imagen con marca de tiempo para evitar conflictos de nombres
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+
+            // Ruta de destino donde se guardará la imagen
+            $imagePath = 'images/productos/' . $imageName;
+
+            // Mover la imagen a la ruta de destino
+            if (!move_uploaded_file($image->getPathname(), public_path($imagePath))) {
+                return response()->json(['error' => 'Error al mover el archivo.'], 500);
+            }
         }
 
-        $producto = Producto::create($request->all());
+        // Crear el producto
+        $producto = Producto::create(array_merge($request->all(), ['imagen' => $imagePath]));
 
         return response()->json($producto);
     }
+
 
        /**
      *  Actualizar producto
