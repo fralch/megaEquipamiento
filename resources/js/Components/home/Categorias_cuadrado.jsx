@@ -61,6 +61,7 @@ const CategoryCard = ({ title, items }) => {
                 </p>
               ))}
             </div>
+
       
             {/* Botón */}
             <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4">
@@ -96,15 +97,16 @@ const Categories = () => {
     }, []);
 
 
-return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 bg-white min-h-screen">
-      {Object.entries(categories).map(([title, items]) => (
-        <div className="m-4">
-          <CategoryCard key={title} title={title} items={items} />
-        </div>
-      ))}
-    </div>
-  );
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 bg-white min-h-screen">
+        {Object.entries(categories).map(([title, items]) => (
+          <div className="m-4" key={title}>
+            <CategoryCard title={title} items={items} />
+          </div>
+        ))}
+      </div>
+    );
+  
   
 };
 

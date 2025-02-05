@@ -9,30 +9,8 @@ use App\Models\Marca;
 
 class ProductoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $productos = Producto::with(['subcategoria', 'marca'])->get();
-        return view('productos.index', compact('productos'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $subcategorias = Subcategoria::all();
-        $marcas = Marca::all();
-        return view('productos.create', compact('subcategorias', 'marcas'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
+    /**   Crear producto   */
+    public function createProduct(Request $request){
         $request->validate([
             'sku' => 'required|max:100',
             'nombre' => 'required|max:100',
@@ -63,28 +41,10 @@ class ProductoController extends Controller
                          ->with('success', 'Producto creado exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
+       /**
+     *  Actualizar producto
      */
-    public function show(Producto $producto)
-    {
-        return view('productos.show', compact('producto'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Producto $producto)
-    {
-        $subcategorias = Subcategoria::all();
-        $marcas = Marca::all();
-        return view('productos.edit', compact('producto', 'subcategorias', 'marcas'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Producto $producto)
+    public function updateProduct(Request $request, Producto $producto)
     {
         $request->validate([
             'sku' => 'required|max:100',
@@ -116,18 +76,26 @@ class ProductoController extends Controller
                          ->with('success', 'Producto actualizado exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Producto $producto)
-    {
-        if ($producto->imagen) {
-            \Storage::delete('public/' . $producto->imagen);
-        }
-
-        $producto->delete();
-
-        return redirect()->route('productos.index')
-                         ->with('success', 'Producto eliminado exitosamente.');
+    // obtener todos los productos
+    public function getProductos(){
+        $productos = Producto::all();
+        return response()->json($productos);
     }
+    // obtener todos los productos con su imagen
+    public function getProductosImagen(){
+        $productos = Producto::with('imagen')->get();
+        return response()->json($productos);
+    }
+
+    // obtener un producto
+    public function showProduct(Producto $producto){
+        return response()->json($producto);
+    }
+
+    // obtener la imagen de un producto
+    public function getImagenProducto(Producto $producto){
+        return response()->json($producto->imagen);
+    }
+
+   
 }

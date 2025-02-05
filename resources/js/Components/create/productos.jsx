@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Productos = ({ onSubmit }) => {
   const [productos, setProductos] = useState([]);
@@ -9,9 +9,23 @@ const Productos = ({ onSubmit }) => {
     marca_id: "",
     pais: "",
     precio_sin_ganancia: "",
+    precio_ganancia: "",
+    precio_igv: "",
     imagen: null,
     descripcion: "",
+    video: "",
+    envio: "",
+    soporte_tecnico: "",
+    caracteristicas: "{}",
+    datos_tecnicos: "{}",
+    documentos: "{}",
   });
+
+  const [Subcategorias, setSubcategorias] = useState([]);
+
+  useEffect(() => {
+  
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,7 +47,15 @@ const Productos = ({ onSubmit }) => {
     formData.append('marca_id', form.marca_id);
     formData.append('pais', form.pais);
     formData.append('precio_sin_ganancia', form.precio_sin_ganancia);
+    formData.append('precio_ganancia', form.precio_ganancia);
+    formData.append('precio_igv', form.precio_igv);
     formData.append('descripcion', form.descripcion);
+    formData.append('video', form.video);
+    formData.append('envio', form.envio);
+    formData.append('soporte_tecnico', form.soporte_tecnico);
+    formData.append('caracteristicas', form.caracteristicas);
+    formData.append('datos_tecnicos', form.datos_tecnicos);
+    formData.append('documentos', form.documentos);
     if (form.imagen) {
       formData.append('imagen', form.imagen);
     }
@@ -50,8 +72,16 @@ const Productos = ({ onSubmit }) => {
       marca_id: "",
       pais: "",
       precio_sin_ganancia: "",
+      precio_ganancia: "",
+      precio_igv: "",
       imagen: null,
       descripcion: "",
+      video: "",
+      envio: "",
+      soporte_tecnico: "",
+      caracteristicas: "",
+      datos_tecnicos: "",
+      documentos: "",
     });
 
     onSubmit(formData);
@@ -70,6 +100,14 @@ const Productos = ({ onSubmit }) => {
             { label: "Marca", name: "marca_id", type: "number" },
             { label: "País", name: "pais", type: "text" },
             { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01" },
+            { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01" },
+            { label: "Precio IGV", name: "precio_igv", type: "number", step: "0.01" },
+            { label: "Video", name: "video", type: "text" },
+            { label: "Envío", name: "envio", type: "text" },
+            { label: "Soporte Técnico", name: "soporte_tecnico", type: "text" },
+            { label: "Características", name: "caracteristicas", type: "text" },
+            { label: "Datos Técnicos", name: "datos_tecnicos", type: "text" },
+            { label: "Documentos", name: "documentos", type: "text" },
           ].map(({ label, name, type, step }) => (
             <div key={name} className="mb-4">
               <label htmlFor={name} className="block text-sm font-medium text-gray-700">
@@ -83,7 +121,7 @@ const Productos = ({ onSubmit }) => {
                 onChange={handleChange}
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                 step={step}
-                required={name !== "pais"}
+                required={name === "sku" || name === "nombre" || name === "id_subcategoria" || name === "marca_id"}
               />
             </div>
           ))}

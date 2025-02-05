@@ -1,4 +1,3 @@
-// Welcome.jsx
 import { Head } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import Slider from "@/Components/home/Slider";
@@ -11,6 +10,7 @@ import BrandSection from "@/Components/home/BrandSection";
 import Footer from "@/Components/home/Footer";
 import Header from "@/Components/home/Header"; // Import the new Header component
 import LabEquipmentSection from "@/Components/home/LabEquipmentSection"; // Import the new LabEquipmentSection component
+import ErrorBoundary from "@/Components/ErrorBoundary";
 
 export default function Welcome() {
     const [showUIElements, setShowUIElements] = useState(false);
@@ -55,20 +55,32 @@ export default function Welcome() {
                     <Menu toggleMenu={toggleMenu} />
                     <NavVertical isOpen={isOpen} onClose={toggleMenu} />
                     <main className="mt-0 w-full">
-                        <Slider />
+                        <ErrorBoundary>
+                            <Slider />
+                        </ErrorBoundary>
 
-                        <LabEquipmentSection /> {/* Use the new LabEquipmentSection component */}
-
-                        {/* ------------- */}
-                        <Sectores />
-
-                        {/* ------------- */}
-                        <Categorias_cuadrado />
+                        <ErrorBoundary>
+                            <LabEquipmentSection /> {/* Use the new LabEquipmentSection component */}
+                        </ErrorBoundary>
 
                         {/* ------------- */}
-                        <BrandSection />
+                        <ErrorBoundary>
+                            <Sectores />
+                        </ErrorBoundary>
 
-                        <ClientSlider />
+                        {/* ------------- */}
+                        <ErrorBoundary>
+                            <Categorias_cuadrado />
+                        </ErrorBoundary>
+
+                        {/* ------------- */}
+                        <ErrorBoundary>
+                            <BrandSection />
+                        </ErrorBoundary>
+
+                        <ErrorBoundary>
+                            <ClientSlider />
+                        </ErrorBoundary>
                     </main>
                     <Footer />
                 </div>

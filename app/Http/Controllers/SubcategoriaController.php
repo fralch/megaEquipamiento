@@ -8,25 +8,7 @@ use App\Models\Categoria;
 
 class SubcategoriaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        $subcategorias = Subcategoria::with('categoria')->get();
-        return view('subcategorias.index', compact('subcategorias'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $categorias = Categoria::all();
-        return view('subcategorias.create', compact('categorias'));
-    }
-
-    /**
+        /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -43,23 +25,9 @@ class SubcategoriaController extends Controller
                          ->with('success', 'Subcategoría creada exitosamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Subcategoria $subcategoria)
-    {
-        return view('subcategorias.show', compact('subcategoria'));
-    }
+   
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Subcategoria $subcategoria)
-    {
-        $categorias = Categoria::all();
-        return view('subcategorias.edit', compact('subcategoria', 'categorias'));
-    }
-
+   
     /**
      * Update the specified resource in storage.
      */
@@ -77,14 +45,17 @@ class SubcategoriaController extends Controller
                          ->with('success', 'Subcategoría actualizada exitosamente.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Subcategoria $subcategoria)
-    {
-        $subcategoria->delete();
-
-        return redirect()->route('subcategorias.index')
-                         ->with('success', 'Subcategoría eliminada exitosamente.');
+    // Obtener todas las subcategorías
+    public function getSubcategorias(){
+        $subcategorias = Subcategoria::all();
+        return response()->json($subcategorias);
     }
+
+    // obtener las subcategorias de una categoria
+    public function getSubcategoriasCategoria(Categoria $categoria){
+        $subcategorias = $categoria->subcategorias;
+        return response()->json($subcategorias);
+    }
+
+  
 }
