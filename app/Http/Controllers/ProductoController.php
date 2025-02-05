@@ -35,7 +35,7 @@ class ProductoController extends Controller
             $request->merge(['imagen' => $imagePath]);
         }
 
-        Producto::create($request->all());
+        $producto = Producto::create($request->all());
 
         return response()->json($producto);
     }
