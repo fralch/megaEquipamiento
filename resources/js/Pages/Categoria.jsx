@@ -6,99 +6,86 @@ import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
 
-
 export default function Tienda() {
     const [isOpen, setIsOpen] = useState(false);
-
-    // Categorias Vertical----
     const [categoriasArray, setCategoriasArray] = useState([]);
-    const [subcategoriasArray, setSubcategoriasArray] = useState({});
-     const [openCategories, setOpenCategories] = useState({});
-    const [activeCategory, setActiveCategory] = useState(null); // Estado para la categoría activa
+    const [openCategories, setOpenCategories] = useState({});
+    const [activeCategory, setActiveCategory] = useState(null);
 
     useEffect(() => {
         // Verifica si los datos ya están en el localStorage
-        const storedCategorias = localStorage.getItem('categorias');
-        const storedSubcategorias = localStorage.getItem('subcategorias');
+        const storedData = localStorage.getItem('categoriasCompleta');
 
-        if (storedCategorias && storedSubcategorias) {
+        if (storedData) {
             // Si los datos están en el localStorage, úsalos
-            console.log("están en el localStorage");
-            setCategoriasArray(JSON.parse(storedCategorias));
-            setSubcategoriasArray(JSON.parse(storedSubcategorias));
+            setCategoriasArray(JSON.parse(storedData));
         } else {
-            // Si no están en el localStorage, haz las solicitudes a la API
-            console.log("no están en el localStorage");
-            fetch('http://127.0.0.1:8000/categorias-all')
-            .then((response) => response.json())
-            .then((data) => {
-                setCategoriasArray(data);
-                localStorage.setItem('categorias', JSON.stringify(data)); // Guarda en localStorage
-                fetch('http://127.0.0.1:8000/categorias-con-subcategorias')
-                    .then((response) => response.json())
-                    .then((data) => {
-                        setSubcategoriasArray(data);
-                        localStorage.setItem('subcategorias', JSON.stringify(data)); // Guarda en localStorage
-                    });
-            });
+            // Si no están en el localStorage, haz la solicitud a la API
+            fetch('http://127.0.0.1:8000/categorias-completa')
+                .then((response) => response.json())
+                .then((data) => {
+                    setCategoriasArray(data);
+                    localStorage.setItem('categoriasCompleta', JSON.stringify(data)); // Guarda en localStorage
+                })
+                .catch((error) => console.error('Error fetching data:', error));
         }
     }, []);
 
-    const toggleCategory = (categoria) => {
+    const toggleCategory = (categoriaNombre) => {
         setOpenCategories((prevState) => ({
             ...prevState,
-            [categoria]: !prevState[categoria],
+            [categoriaNombre]: !prevState[categoriaNombre],
         }));
-        setActiveCategory(categoria); // Establece la categoría activa
+        setActiveCategory(categoriaNombre);
     };
-    //-------------
+
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
-    return (
-    <div>
-        <Head title="Tienda" />
-        <Header />
-            <Menu toggleMenu={toggleMenu} className="mt-10"/>
-            <NavVertical isOpen={isOpen} onClose={toggleMenu} />
-        <div className="min-w-screen min-h-screen bg-gray-200 flex">
-            <nav className="w-1/6 p-4 overflow-y-auto bg-white" id="nav-fijo">
-                {categoriasArray.map((categoria, index) => (
-                    <div key={index}>
-                        <button
-                            onClick={() => toggleCategory(categoria)}
-                            className={`block w-full text-left p-2 rounded ${
-                                activeCategory === categoria
-                                    ? 'bg-[#0c2249] text-blue-200' // Estilos de la categoría activa invertidos
-                                    : 'bg-gray-200 hover:bg-white'
-                            }`}
-                        >
-                            {categoria}
-                            <span className="float-right">
-                                {openCategories[categoria] ? '-' : '+'}
-                            </span>
-                        </button>
-                        {openCategories[categoria] &&
-                            subcategoriasArray[categoria] &&
-                            subcategoriasArray[categoria].map((subcategoria, subIndex) => (
-                                <a
-                                    key={subIndex}
-                                    href="#"
-                                    className="block p-2 pl-6 hover:bg-blue-100 bg-blue-50 rounded"
-                                >
-                                    {subcategoria}
-                                </a>
-                            ))}
-                    </div>
-                ))}
-            </nav>
-            <div className="flex-1 p-4">
-                {/* Contenido principal aquí */}
-                <ProductGrid />
-            </div>
-        </div>
-            <Footer /> 
-    </div>
-);
 
+    return (
+        <div>
+            <Head title="Tienda" />
+            <Header />
+            <Menu toggleMenu={toggleMenu} className="mt-10" />
+            <NavVertical isOpen={isOpen} onClose={toggleMenu} />
+            <div className="min-w-screen min-h-screen bg-gray-200 flex">
+                <nav className="w-1/6 p-4 overflow-y-auto bg-white" id="nav-fijo">
+                    {categoriasArray.map((categoria) => (
+                        <div key={categoria.id_categoria}>
+                            <button
+                                onClick={() => toggleCategory(categoria.nombre)}
+                                className={`block w-full text-left p-2 rounded ${
+                                    activeCategory === categoria.nombre
+                                        ? 'bg-[#0c2249] text-blue-200'
+                                        : 'bg-gray-200 hover:bg-white'
+                                }`}
+                            >
+                                {categoria.nombre}
+                                <span className="float-right">
+                                    {openCategories[categoria.nombre] ? '-' : '+'}
+                                </span>
+                            </button>
+                            {openCategories[categoria.nombre] &&
+                                categoria.subcategorias &&
+                                categoria.subcategorias.map((subcategoria) => (
+                                    <a
+                                        key={subcategoria.id_subcategoria}
+                                        href="#"
+                                        className="block p-2 pl-6 hover:bg-blue-100 bg-blue-50 rounded"
+                                    >
+                                        {subcategoria.nombre}
+                                    </a>
+                                ))}
+                        </div>
+                    ))}
+                </nav>
+                <div className="flex-1 p-4">
+                    {/* Contenido principal aquí */}
+                    <ProductGrid />
+                </div>
+            </div>
+            <Footer />
+        </div>
+    );
 }

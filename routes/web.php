@@ -28,12 +28,13 @@ Route::get('/product/show/{id}', [ProductoController::class, 'showProduct']);
 Route::get('/product/image/{id}', [ProductoController::class, 'getImagenProducto']);
 
 
-//Rutas para las operaciones CRUD
+Route::post('/login', [UsuarioController::class, 'login']);
+Route::apiResource('usuarios', UsuarioController::class);
+//Rutas para las operaciones Categorias
 Route::get('/categorias-con-subcategorias', [CategoriaController::class, 'getCategoriasConSubcategorias']);
 Route::get('/categorias-all', [CategoriaController::class, 'getCategorias']);
 Route::get('/categorias-con-subcategorias-con-id', [CategoriaController::class, 'getCategoriasConSubcategoriasConId']);
-Route::post('/login', [UsuarioController::class, 'login']);
-Route::apiResource('usuarios', UsuarioController::class);
+Route::get('/categorias-completa', [CategoriaController::class, 'getCategoriasConSubcategoriasIds']);
 
 
 // rutas para crear y mostrar subcategorias

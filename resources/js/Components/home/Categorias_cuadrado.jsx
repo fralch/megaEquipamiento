@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 
 // Importar todas las imágenes de la carpeta "public/img/categorias"
 const images = import.meta.glob('/public/img/categorias/**/*.{jpg,png}');
@@ -12,734 +12,94 @@ const processedImages = Object.keys(images).reduce((acc, path) => {
 }, {});
 
 const getCategoryImages = (categoryName) => {
-    const folderName = categoryName.toLowerCase().replace(/\s+/g, '-');
-    return Object.keys(processedImages).filter((path) =>
-      path.includes(`/img/categorias/${folderName}/`)
-    );
-  };
-
-const CategoryCard = ({ title, items }) => {
-
-    const categoryImages = getCategoryImages(title);
-
-    // Estado para manejar la imagen activa
-    const [activeImageIndex, setActiveImageIndex] = useState(0);
-  
-    // Cambia la imagen activa cada 3 segundos
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setActiveImageIndex((prevIndex) => (prevIndex + 1) % categoryImages.length);
-      }, 3000);
-      return () => clearInterval(interval);
-    }, [categoryImages.length]);
-
-    return (
-        <div className="  relative group w-full h-96 rounded-lg overflow-hidden shadow-lg m-4">
-          {/* Imagen de fondo que rota */}
-          <div
-            className="absolute inset-0 bg-cover bg-center transition-opacity duration-500"
-            style={{
-              backgroundImage: `url(${categoryImages[activeImageIndex] || 'https://aringenieriaa.com/storage/servicio/125456545.jpg'})`,
-            }}
-          ></div>
-      
-          {/* Título visible por defecto pero desaparece con hover */}
-          <div className="absolute top-4 left-4 bg-gray-900 bg-opacity-70 text-white text-xl font-bold py-2 px-4 rounded-md z-10 transition-opacity duration-300 group-hover:opacity-0">
-            {title}
-          </div>
-      
-          {/* Contenido oculto que aparece con hover */}
-          <div className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-center items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-            
-            <h2 className="text-2xl font-semibold mb-4 text-center">{title}</h2>
-
-            {/* Lista desplazable */}
-            <div className="space-y-2 h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-300">
-              {items.map((item, index) => (
-                <p key={index} className="hover:bg-gray-700 p-2 rounded-md cursor-pointer">
-                  {item}
-                </p>
-              ))}
-            </div>
-      
-            {/* Botón */}
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4">
-              Ver más
-            </button>
-          </div>
-        </div>
-      ); 
+  const folderName = categoryName.toLowerCase().replace(/\s+/g, '-');
+  return Object.keys(processedImages).filter((path) =>
+    path.includes(`/img/categorias/${folderName}/`)
+  );
 };
 
+const CategoryCard = ({ title, items }) => {
+  const categoryImages = getCategoryImages(title);
+
+  // Estado para manejar la imagen activa
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  // Cambia la imagen activa cada 3 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveImageIndex((prevIndex) => (prevIndex + 1) % categoryImages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [categoryImages.length]);
+
+  return (
+    <div className="relative group w-full h-96 rounded-lg overflow-hidden shadow-lg m-4">
+      {/* Imagen de fondo que rota */}
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-opacity duration-500"
+        style={{
+          backgroundImage: `url(${categoryImages[activeImageIndex] || 'https://aringenieriaa.com/storage/servicio/125456545.jpg'})`,
+        }}
+      ></div>
+
+      {/* Título visible por defecto pero desaparece con hover */}
+      <div className="absolute top-4 left-4 bg-gray-900 bg-opacity-70 text-white text-xl font-bold py-2 px-4 rounded-md z-10 transition-opacity duration-300 group-hover:opacity-0">
+        {title}
+      </div>
+
+      {/* Contenido oculto que aparece con hover */}
+      <div className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-center items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+        <h2 className="text-2xl font-semibold mb-4 text-center">{title}</h2>
+
+        {/* Lista desplazable */}
+        <div className="space-y-2 h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-300">
+          {items.map((item, index) => (
+            <p key={index} className="hover:bg-gray-700 p-2 rounded-md cursor-pointer">
+              {item.nombre}
+            </p>
+          ))}
+        </div>
+
+        {/* Botón */}
+        <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4">
+          Ver más
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const Categories = () => {
-  const categories =  { 
-    "Accesorios de Laboratorio": [
-        "Accesorios de Laboratorio",
-        "Accesorios de Agitadores",
-        "Accesorios de Agitadores de Hélice",
-        "Accesorios de Agitadores de Incubación",
-        "Accesorios de Agitadores de Laboratorio",
-        "Accesorios de Agitadores de Microplacas",
-        "Accesorios de Agitadores de Rodillo",
-        "Accesorios de Agitadores de vórtex",
-        "Accesorios de Agitadores Magnéticos",
-        "Accesorios de Agitadores Orbitales",
-        "Accesorios de Agitadores Oscilantes",
-        "Accesorios de Agitadores Rotativos",
-        "Accesorios de Agitadores Térmicos",
-        "Accesorios de Analizador de texturas",
-        "Accesorios de Analizadores de alimentos",
-        "Accesorios de Autoclaves",
-        "Accesorios de Balanzas",
-        "Accesorios de Baño Ultrasonico",
-        "Accesorios de Baños de Laboratorio",
-        "Accesorios de Baños Maria",
-        "Accesorios de Biorreactores",
-        "Accesorios de Bombas y compresores",
-        "Accesorios de Buretas y dispensadores",
-        "Accesorios de Cabinas de Flujo Laminar",
-        "Accesorios de Cabinas de Ventilación de Laboratorio",
-        "Accesorios de Calorímetros",
-        "Accesorios de Cámaras Climáticas",
-        "Accesorios de Cámaras Climáticas de Laboratorio",
-        "Accesorios de Campanas Extractoras",
-        "Accesorios de Centrífugas",
-        "Accesorios de Congeladores",
-        "Accesorios de Congeladores de laboratorio",
-        "Accesorios de Contadores de Colonias",
-        "Accesorios de Densímetros",
-        "Accesorios de Desecadores",
-        "Accesorios de Destiladores y Purificadores de Agua",
-        "Accesorios de Dispersores",
-        "Accesorios de Esterilizadores",
-        "Accesorios de Esterilizadores de laboratorio",
-        "Accesorios de Estufas",
-        "Accesorios de Fotómetros",
-        "Accesorios de Generadores de Laboratorio",
-        "Accesorios de Homogeneizadores",
-        "Accesorios de Hornos",
-        "Accesorios de Incubadoras",
-        "Accesorios de Incubadoras de Laboratorio",
-        "Accesorios de Instrumentos Analíticos",
-        "Accesorios de Kit de electroquímica",
-        "Accesorios de Laboratorio",
-        "Accesorios de Lavadores de microplacas",
-        "Accesorios de Limpiadores a vapor",
-        "Accesorios de Microscopios",
-        "Accesorios de Mobiliarios de laboratorio",
-        "Accesorios de Molinos",
-        "Accesorios de Pesas Patrón",
-        "Accesorios de Pipetas",
-        "Accesorios de Placas de Calentamiento",
-        "Accesorios de Polarímetros",
-        "Accesorios de Polarímetros Automáticos",
-        "Accesorios de probetas",
-        "Accesorios de Reactores de alta viscosidad",
-        "Accesorios de Reactores de síntesis",
-        "Accesorios de Refractómetros",
-        "Accesorios de Refrigeradores",
-        "Accesorios de Refrigeradores de Laboratorio",
-        "Accesorios de Reómetros",
-        "Accesorios de Rotavapores",
-        "Accesorios de Sistema de detección",
-        "Accesorios de Sistemas de Limpieza UV",
-        "Accesorios de Sistemas de purificación de agua",
-        "Accesorios de Software de Laboratorio",
-        "Accesorios de Tamizadoras",
-        "Accesorios de Termobloques",
-        "Accesorios de Termostatos",
-        "Accesorios de Viscosímetros",
-        "Accesorios Sistemas de extracción de ADN-ARN y purificación de proteínas",
-        "Liofilizadores con trampa de enfriamiento",
-    ],
-    "Agitadores de Laboratorio": [
-        "Agitadores de Laboratorio",
-        "Agitadores de Hélice",
-        "Agitadores de Incubación",
-        "Agitadores de Laboratorio",
-        "Agitadores de Microplacas",
-        "Agitadores de Rodillos",
-        "Agitadores de Varillas",
-        "Agitadores Magnéticos",
-        "Agitadores Orbitales",
-        "Agitadores Oscilantes",
-        "Agitadores Recíprocos",
-        "Agitadores Rotativos",
-        "Agitadores Térmicos",
-        "Agitadores Vortex",
-    ],
-    "Analizadores de alimentos": [
-        "Analizadores de alimentos",
-        "Determinadores de Fibra",
-        "Determinadores de Fósforo",
-        "Determinadores de Grasa",
-        "Determinadores de Proteínas",
-        "Digestores de Laboratorio",
-    ],
-    "Analizadores de Gases": [
-        "Analizadores de Gases",
-        "Analizadores de gases para concentraciones de O 2 y CO 2",
-        "Analizadores de gases para medición de O 2 y CO 2",
-    ],
-    "Analizadores de Texturas": ["Analizadores de Texturas"],
-    "Autoclaves de laboratorio": [
-        "Autoclaves de laboratorio",
-        "Autoclaves de Mesa",
-        "Autoclaves Horizontales",
-        "Autoclaves Vertical",
-        "Esterilizadores a Vapor Sin Presión",
-    ],
-    "Balanzas de laboratorio": [
-        "Balanzas de laboratorio",
-        "Balanzas Analíticas",
-        "Balanzas Antiexplosión",
-        "Balanzas Colgantes",
-        "Balanzas Contadoras",
-        "Balanzas de Bolsillo",
-        "Balanzas de Densidad",
-        "Balanzas de Humedad",
-        "Balanzas de Joyeria",
-        "Balanzas de laboratorio",
-        "Balanzas de Mesa",
-        "Balanzas de Piso",
-        "Balanzas de Precisión",
-        "Balanzas de Quilates",
-        "Balanzas Escolares",
-        "Balanzas Mecánicas",
-        "Balanzas para bebés y niños pequeños",
-        "Balanzas para Paqueteria",
-        "Balanzas Semi-Micro",
-        "Balanzas Triple Brazo",
-        "Báscula Contadora",
-        "Básculas de Transpaletas",
-        "Microbalanzas",
-    ],
-    "Baños de Laboratorio": [
-        "Baños de Laboratorio",
-        "Baños de Aceite para Laboratorio",
-        "Baños de Ebullición",
-        "Baños de Flotación",
-        "Baños de Laboratorio",
-        "Baños María Con Agitación",
-        "Baños Maria Con Agitador Magnético",
-        "Baños María Refrigerada",
-        "Baños Maria Sin Agitación",
-        "Baños María Sin Agitación",
-    ],
-    "Baños Ultrasónicos": [
-        "Baños Ultrasónicos",
-        "Baños Ultrasónicos Análogos",
-        "Baños Ultrasónicos Digitales",
-        "Baños Ultrasónicos Industriales",
-        "Baños Ultrasónicos Profesionales",
-    ],
-    "Biorreactores": [
-        "Biorreactores",
-        "Biorreactores personales",
-        "Fotobiorreactores",
-        "Paquetes de Modelo Control",
-        "Paquetes de Recipientes",
-        "Sistema de Flujo",
-    ],
-    "Bombas y compresores de Laboratorio": [
-        "Bombas y compresores de Laboratorio",
-        "Bombas de Vacío",
-        "Bombas de Vacío con Transmisión por Correa",
-        "Bombas de Vacío de Diafragma",
-        "Bombas de Vacío de Paletas Rotativas",
-        "Bombas de Vacío seca",
-        "Bombas de Vacío Sin Aceite",
-        "Bombas Peristáltica",
-        "Controlador de Vacío",
-    ],
-    "Buretas y Dispensadores": [
-        "Buretas y Dispensadores",
-        "Buretas Digitales",
-        "Dispensadores de Laboratorio",
-    ],
-    "Cabinas de Ventilación de Laboratorio": [
-        "Cabinas de Ventilación de Laboratorio",
-        "Cabinas de Flujo Horizontal",
-        "Cabinas de Flujo Laminar",
-        "Cabinas de Flujo Laminar UV de ADN/ARN",
-        "Cabinas de Flujo Vertical",
-        "Cabinas de Seguridad Biológica",
-    ],
-    "Calorímetros": [
-        "Calorímetros",
-        "Calorímetros automáticos",
-        "Calorímetros de Chaqueta Estática",
-        "Sistemas de Descomposición",
-    ],
-    "Cámaras Climáticas de Laboratorio": [
-        "Cámaras Climáticas de Laboratorio",
-        "Cámaras Climáticas",
-        "Cámaras Climáticas Visitables",
-        "Cámaras De Calentamiento",
-        "Cámaras de Choque Térmico",
-        "Cámaras de Estabilidad",
-        "Cámaras de Pruebas Ambientales",
-        "Estantes de Crecimiento de Plantas",
-    ],
-    "Campanas Extractoras": ["Campanas Extractoras", "Depurador de Gases"],
-    "Centrífugas": [
-        "Centrífugas",
-        "Centrífuga clínicas de baja velocidad",
-        "Centrífugas",
-        "Centrífugas Automatizadas",
-        "Centrífugas de alta velocidad y gran capacidad",
-        "Centrífugas de Mesa",
-        "Centrífugas Multipropósito",
-        "Centrífugas Pequeñas",
-        "Microcentrífugas",
-    ],
-    "Certificados De Calibración Acreditado": [
-        "Certificados De Calibración Acreditado",
-        "Calibración acreditada de balanza analítica",
-        "Calibración Acreditado de Agitadores de Hélice",
-        "Calibración Acreditado de Agitadores de Incubación",
-        "Calibración Acreditado de Agitadores de Microplacas",
-        "Calibración Acreditado de Agitadores de Rodillos",
-        "Calibración Acreditado de Agitadores Magnéticos",
-        "Calibración Acreditado de Agitadores Oscilantes",
-        "Calibración Acreditado de Agitadores Recíprocos",
-        "Calibración Acreditado de Baños de Ebullición",
-        "Calibración Acreditado de Baños María",
-        "Calibración Acreditado de Cámaras Climáticas",
-    ],
-    "Certificados De Calibración Trazable": [
-        "Certificados De Calibración Trazable",
-        "Calibración Trazable de Agitadores de Hélice",
-        "Calibración Trazable de Agitadores de Incubación",
-        "Calibración Trazable de Agitadores de Microplacas",
-        "Calibración Trazable de Agitadores de Rodillos",
-        "Calibración Trazable de Agitadores Magnéticos",
-        "Calibración Trazable de Agitadores Orbitales",
-        "Calibración Trazable de Agitadores Oscilantes",
-        "Calibración Trazable de Agitadores Rotativos",
-        "Calibración Trazable de Agitadores Térmicos",
-        "Calibración Trazable de Agitadores Vortex",
-        "Calibración Trazable de Analizador de Texturas",
-        "Calibración Trazable de Autoclaves",
-        "Calibración Trazable de Baños de Ebullición",
-        "Calibración Trazable de Baños María",
-        "Calibración Trazable de Baños Ultrasónicos",
-        "Calibración Trazable de Cabinas de Flujo Laminar",
-        "Calibración Trazable de Calorímetros",
-        "Calibración Trazable de Centrífugas",
-        "Calibración Trazable de Congeladores",
-        "Calibración Trazable de Densímetros",
-        "Calibración Trazable de Dispersores",
-        "Calibración Trazable de Espectroscopios",
-        "Calibración Trazable de Estufas",
-        "Calibración Trazable de Fotómetros",
-        "Calibración Trazable de Incubadoras",
-        "Calibración Trazable de Microscopios",
-        "Calibración Trazable de Pipetas",
-        "Calibración Trazable de Placas de Calentamiento",
-        "Calibración Trazable de Refractómetros",
-        "Calibración Trazable de Refrigeradores",
-        "Calibración Trazable de Reómetros",
-        "Calibración Trazable de Rotavapores",
-        "Calibración Trazable de Termobloques",
-        "Calibración Trazable de Viscosímetros",
-        "Certificado de Calibración Trazable de Balanza Analítica",
-    ],
-    "Congeladores de laboratorio": [
-        "Congeladores de laboratorio",
-        "Congeladoras de laboratorio de convección forzada",
-        "Congeladoras de laboratorio de convección natural",
-        "Ultra Congeladores de Laboratorio",
-    ],
-    "Consumibles de Laboratorio": [
-        "Consumibles de Laboratorio",
-        "Consumibles de analizadores de alimentos",
-        "Consumibles de Balanzas",
-        "Consumibles de Baño Ultrasónico",
-        "Consumibles de Baños Maria",
-        "Consumibles de Cabinas de Flujo Laminar",
-        "Consumibles de Cabinas de Ventilación de Laboratorio",
-        "Consumibles de Calorímetros",
-        "Consumibles de Cámaras Climáticas de Laboratorio",
-        "Consumibles de Campanas Extractoras",
-        "Consumibles de Centrífugas",
-        "Consumibles de Congeladores de laboratorio",
-        "Consumibles de Destiladores de Agua",
-        "Consumibles de Esterilizadores",
-        "Consumibles de Esterilizadores de laboratorio",
-        "Consumibles de Fotómetro de llama",
-        "Consumibles de Incubadoras de Laboratorio",
-        "Consumibles de Instrumentos Analíticos",
-        "Consumibles de Laboratorio",
-        "Consumibles de Medidores de punto de fusión",
-        "Consumibles de Pipetas",
-        "Consumibles de Refractómetros",
-        "Consumibles de Refrigeradores de Laboratorio",
-        "Consumibles de Sistemas de extracción de ADN-ARN y purificación de proteínas",
-        "Consumibles de Termostatos",
-        "Consumibles de Viscosímetros",
-    ],
-    "Contadores de Colonias": [
-        "Contadores de Colonias",
-        "Contadores de Colonias Automático",
-        "Contadores de Colonias Manual",
-    ],
-    "Criostatos": ["Criostatos", "Criostatos con Agitador Magnético"],
-    "Densímetros": [
-        "Densímetros",
-        "Densímetros automático",
-        "Densímetros manual",
-        "Densímetros semiautomática",
-    ],
-    "Destiladores de Agua": [
-        "Destiladores de Agua",
-        "Destiladores automático de agua",
-        "Destiladores de Amoníaco",
-        "Sistemas de purificación de agua",
-    ],
-    "Dispersores de laboratorios": [
-        "Dispersores de laboratorios",
-        "Dispersores a Escala de Laboratorio",
-        "Dispersores de Escala Piloto",
-        "Dispersores en Linea",
-        "Sistemas Desechables",
-    ],
-    "Electroquímica": [
-        "Electroquímica",
-        "Kit de electroquímica",
-        "Sistema de detección",
-    ],
-    "Equipos de seguridad": ["Equipos de seguridad", "Cabina de Guantes"],
-    "Espectrofotómetros": ["Espectrofotómetros", "Espectrofotómetro"],
-    "Espectroscopía": [
-        "Espectroscopía",
-        "Espectrómetros de Fluorescencia",
-        "Espectrómetros XRF de mano",
-    ],
-    "Espectroscopios": [
-        "Espectroscopios",
-        "Espectroscopio de Kirchhoff-Bunsen",
-        "Espectroscopios portátil con Escala",
-        "Espectroscopios portátil sin Escala",
-        "Goniómetros y Espectrómetros",
-    ],
-    "Esterilizadores de laboratorio": [
-        "Esterilizadores de laboratorio",
-        "Esterilizadores de Convección Forzada",
-        "Esterilizadores de Convección Natural",
-        "Esterilizadores por Infrarrojo",
-        "Esterilizadores por Llama",
-        "Mecheros Bunsen",
-    ],
-    "Estufas de Laboratorio": [
-        "Estufas de Laboratorio",
-        "Estufas de Convección Forzada",
-        "Estufas de Convección Natural",
-        "Estufas de Secado",
-        "Estufas de Vacío",
-        "Horno de Secado de Alta Temperatura",
-        "Horno de Secado de Limpieza",
-        "Hornos de secado",
-    ],
-    "Evaporadores o Concentradores de Muestras": [
-        "Evaporadores o Concentradores de Muestras",
-        "Concentradores de Nitrógeno",
-    ],
-    "Extracción en Fase Sólida": [
-        "Extracción en Fase Sólida",
-        "Sistema automático",
-    ],
-    "Fotómetros": [
-        "Fotómetros",
-        "Fotómetros de llama automática",
-        "Fotómetros de llama básico",
-        "Fotómetros de microplacas",
-        "Fotómetros Portátiles",
-    ],
-    "Generadores de Laboratorio": [
-        "Generadores de Laboratorio",
-        "Generadores de Ozono",
-        "Generadores Eléctricos",
-    ],
-    "Homogenizador de laboratorio": ["Homogenizador de laboratorio"],
-    "Hornos": [
-        "Hornos",
-        "Hornos de convección forzada",
-        "Hornos de Convección Natural",
-        "Hornos de Fusión por Inducción",
-        "Hornos de Mufla",
-    ],
-    "Incubadoras de Laboratorio": [
-        "Incubadoras de Laboratorio",
-        "Cultivos Anaeróbico",
-        "Incubadora de Plaquetas",
-        "Incubadoras con Agitación",
-        "Incubadoras de Co2",
-        "Incubadoras de Convección Aire Forzado",
-        "Incubadoras de Convección Natural",
-        "Incubadoras de Laboratorio",
-        "Incubadoras Económicas",
-        "Incubadoras Para Cultivos",
-        "Incubadoras Refrigeradas",
-    ],
-    "Instrumentos Analíticos": [
-        "Instrumentos Analíticos",
-        "Electroanalizadores",
-        "Medidor de pH",
-        "Medidores de Aceite",
-        "Medidores de Calcio",
-        "Medidores de Conductividad",
-        "Medidores de Fluoruro",
-        "Medidores de Nitrato",
-        "Medidores de ORP",
-        "Medidores de Oxígeno Disuelto",
-        "Medidores de Potasio",
-        "Medidores de Salinidad",
-        "Medidores de Sodio",
-        "Medidores Multiparamétricos",
-        "Sistemas de Ensayo de Desintegración",
-        "Sondas y Sensores",
-        "Unidades de Control",
-    ],
-    "Lámparas de análisis UV": ["Lámparas de análisis UV"],
-    "Lavadores de microplacas": ["Lavadores de microplacas"],
-    "Limpiadores a vapor": [
-        "Limpiadores a vapor",
-        "Limpiadores a vapor Básico",
-        "Limpiadores a vapor Industrial",
-    ],
-    "Liofilizadores para laboratorio": [
-        "Liofilizadores para laboratorio",
-        "Cámara de Secado para Liofilizador",
-        "Liofilizadores con trampa de enfriamiento",
-        "Liofilizadores de Mesa",
-        "Liofilizadores para laboratorio",
-        "Liofilizadores Piloto",
-        "Liofilizadores sin CFC",
-        "Secadoras de Hielo",
-    ],
-    "Máquina de limpieza de relojes": [
-        "Máquina de limpieza de relojes",
-        "Máquina de limpieza Automático de relojes",
-        "Máquina de limpieza Manual de relojes",
-    ],
-    "Maquinas Laser": [
-        "Maquinas Laser",
-        "Máquinas de Marcado Láser UV",
-        "Maquinas Láser de Diodo",
-        "Maquinas Laser de Fibra",
-    ],
-    "Materiales de Laboratorio": [
-        "Materiales de Laboratorio",
-        "Buretas Automáticas",
-        "Condensadores",
-        "Crisoles",
-        "Desecadores",
-        "Embudos",
-        "Frascos de Bureta",
-        "Frascos de Laboratorio",
-        "Frascos de lavado",
-        "Jarras Medidoras de Laboratorio",
-        "Llaves de paso",
-        "Matraces Aforados",
-        "Matraces de Erlenmeyer",
-        "Matraces Esférico de Fondo Plano",
-        "Matraces Esféricos",
-        "Matraces Kjeldahl",
-        "Microburetas",
-        "Pipetas Automática Kipp",
-        "Pipetas Pasteur",
-        "Pipetas Volumétricas",
-        "Probetas",
-        "Sistemas de extracción",
-        "Tapones",
-        "Tubos de Centrífuga",
-        "Tubos De Ensayo",
-        "Vasos Precipitados",
-    ],
-    "Medidores de punto de fusión": [
-        "Medidores de punto de fusión",
-        "Medidores de punto de fusión automáticos",
-        "Medidores de punto de fusión semiautomáticos",
-    ],
-    "Mezcladores de Laboratotio": [
-        "Mezcladores de Laboratotio",
-        "Mezcladores Digitales",
-    ],
-    "Microscopios": [
-        "Microscopios",
-        "Microscopios Binoculares",
-        "Microscopios de vídeo",
-        "Microscopios Digitales",
-        "Microscopios Estereoscópicos",
-        "Microscopios Invertidos",
-        "Microscopios metalúrgicos",
-        "Microscopios Monocular",
-        "Microscopios Trinocular",
-    ],
-    "Mobiliarios de laboratorio": [
-        "Mobiliarios de laboratorio",
-        "Cajoneras de laboratorio",
-        "Escritorios de laboratorio",
-        "Estación de Lavado",
-        "Gabinetes de Seguridad",
-    ],
-    "Molinos": [
-        "Molinos",
-        "Cámaras de Molienda",
-        "Molino en Linea",
-        "Molinos de Lotes",
-        "Sistema Desechables",
-    ],
-    "Molinos de Laboratorio": [
-        "Molinos de Laboratorio",
-        "Molinos de Bolas",
-        "Molinos de Discos",
-        "Molinos de Martillos",
-        "Molinos Tipo Wiley",
-    ],
-    "Pesas Patrón": [
-        "Pesas Patrón",
-        "Pesas Patrón de Clase ASTM",
-        "Pesas Patrón de Clase OIML E",
-        "Pesas Patrón de Clase OIML F",
-        "Pesas Patrón de Clase OIML M",
-    ],
-    "Pipetas de Laboratorio": [
-        "Pipetas de Laboratorio",
-        "Aspiradores de Pipetas",
-        "Cargadores de Pipetas",
-        "Pipetas Monocanal - Volumen Fijo",
-        "Pipetas Monocanal - Volumen Variable",
-        "Pipetas Multicanal - Volumen Variable",
-    ],
-    "Placas de Calentamiento": [
-        "Placas de Calentamiento",
-        "Controladores de temperatura",
-        "Placas Calefactoras",
-    ],
-    "Polarímetros": [
-        "Polarímetros",
-        "Polarímetros Automático",
-        "Polarímetros Automáticos",
-        "Polarímetros Económico",
-        "Polarímetros Manuales",
-        "Polarímetros profesional",
-    ],
-    "Reactores de Alta Viscosidad": [
-        "Reactores de Alta Viscosidad",
-        "Reactores de Laboratorio",
-        "Reactores de Laboratorio Compactos",
-    ],
-    "Reactores de Síntesis": [
-        "Reactores de Síntesis",
-        "Sistemas Advanced",
-        "Sistemas Starter",
-    ],
-    "Refractómetros": [
-        "Refractómetros",
-        "Refractómetro de mano",
-        "Refractómetros Abbe",
-        "Refractómetros de proceso",
-        "Refractómetros digital de mano",
-        "Refractómetros Digitales",
-    ],
-    "Refrigeradores de Laboratorio": [
-        "Refrigeradores de Laboratorio",
-        "Congeladoras de laboratorio de convección forzada",
-        "Congeladoras de laboratorio de convección natural",
-        "Maquinas de Hielo",
-        "Refrigerador Portátil",
-        "Refrigeradores de Bancos de Sangre",
-        "Refrigeradores de Laboratorio",
-        "Refrigeradores Medicos",
-    ],
-    "Reómetros": ["Reómetros", "Reómetros Rotacional"],
-    "Rotavapores": [
-        "Rotavapores",
-        "Evaporador Rotativo de Elevación Automático",
-        "Evaporador Rotativo de Elevación Manual",
-        "Sistema Automático con Bomba de Vacío",
-        "Sistema Completo",
-        "Sistemas de Aspiración",
-    ],
-    "Servicio de Mantenimiento Equipos de Laboratorio": [
-        "Servicio de Mantenimiento Equipos de Laboratorio",
-        "Mantenimiento Preventivo y/o Reparación de Baños de Ebullición",
-        "Mantenimiento Preventivo y/o Reparación de Baños María",
-        "Servicio de mantenimiento preventivo y/o correctivo de balanza analítica",
-    ],
-    "Sistemas de Electroforesis":[
-        "Electroforesis en Gel",
-        "Fundición de Gel"
-    ],
-    "Sistemas de extracción de ADN-ARN y purificación de proteínas": [
-        "Sistemas de extracción de ADN-ARN y purificación de proteínas",
-        "Sistemas de PCR",
-    ],
-    "Sistemas de Histotecnología": [
-        "Sistemas de Histotecnología",
-        "Micrótomos",
-    ],
-    "Sistemas de Limpieza UV": ["Sistemas de Limpieza UV"],
-    "Software de Laboratorio": [
-        "Software de Laboratorio",
-        "Software de Balanzas",
-        "Software de Baños Termostáticos de Circulación",
-        "Software de calibración de pipetas",
-        "Software de Cámaras Climáticas",
-        "Software de Control y Evaluación para Calorímetros",
-        "Software de Incubadoras",
-        "Software de Medición, Control y Regulación",
-        "Software de Viscosímetro",
-    ],
-    "Tamizadora": ["Tamizadora"],
-    "Tamizadores": ["Tamizadores"],
-    "Termobloques": [
-        "Termobloques",
-        "Calentadores de Bloque Seco",
-        "Calentamiento y Refrigeración de Bloques seco",
-    ],
-    "Termostatos de Laboratorio": [
-        "Termostatos de Laboratorio",
-        "Baños de Calibración",
-        "Baños de viscosidad",
-        "Baños termostáticos con Agitación Magnética",
-        "Baños Termostáticos con Agitación Orbital",
-        "Baños Termostáticos con Agitación Vaivén",
-        "Baños Termostáticos de Circulación",
-        "Baños Termostáticos De Circulación Con Refrigeración",
-        "Baños Termostáticos para Cata de Aceite",
-        "Enfriadores de inmersión",
-        "Recirculadores de Laboratorio",
-        "Termostatos de Circulación",
-    ],
-    "Trituradores de Laboratorio": [
-        "Trituradores de Laboratorio",
-        "Trituradoras",
-    ],
-    "Viscosimetros": [
-        "Viscosímetros",
-        "Instrumentos medidores de torque",
-        "Viscosímetros",
-        "Viscosímetros Industriales",
-        "Viscosímetros Portátiles",
-        "Viscosímetros Rotacional",
-    ],
-}; 
+  const [categories, setCategories] = useState([]);
 
+  useEffect(() => {
+    // Verifica si los datos ya están en el localStorage
+    const storedData = localStorage.getItem('categoriasCompleta');
 
-return (
+    if (storedData) {
+      // Si los datos están en el localStorage, úsalos
+      setCategories(JSON.parse(storedData));
+    } else {
+      // Si no están en el localStorage, haz la solicitud a la API
+      fetch('http://127.0.0.1:8000/categorias-completa')
+        .then((response) => response.json())
+        .then((data) => {
+          setCategories(data);
+          localStorage.setItem('categoriasCompleta', JSON.stringify(data)); // Guarda en localStorage
+        })
+        .catch((error) => console.error('Error fetching data:', error));
+    }
+  }, []);
+
+  return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 bg-white min-h-screen">
-      {Object.entries(categories).map(([title, items]) => (
-        <div className="m-4">
-          <CategoryCard key={title} title={title} items={items} />
+      {categories.map((category) => (
+        <div key={category.id_categoria} className="m-4">
+          <CategoryCard title={category.nombre} items={category.subcategorias} />
         </div>
       ))}
     </div>
   );
-  
 };
 
 export default Categories;

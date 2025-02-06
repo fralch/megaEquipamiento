@@ -73,6 +73,14 @@ class CategoriaController extends Controller
          return response()->json($categoria);
     }
 
-    
-   
+
+    // obtener  las categorias y las sub categorias con sus ids y sus nombres
+    public function getCategoriasConSubcategoriasIds()
+    {
+        // Obtener todas las categorías con sus subcategorías
+        $categorias = Categoria::with('subcategorias:id_subcategoria,nombre,id_categoria')->get(['id_categoria', 'nombre']);
+
+        // Devolver las categorías como respuesta JSON
+        return response()->json($categorias);
+    }
 }
