@@ -53,7 +53,9 @@ export default function Welcome() {
                     style={{ marginTop: "-20px" }}
                 >
                     <Menu toggleMenu={toggleMenu} />
-                    <NavVertical isOpen={isOpen} onClose={toggleMenu} />
+                    <ErrorBoundary>
+                        <NavVertical isOpen={isOpen} onClose={toggleMenu} />
+                    </ErrorBoundary>
                     <main className="mt-0 w-full">
                         <ErrorBoundary>
                             <Slider />
