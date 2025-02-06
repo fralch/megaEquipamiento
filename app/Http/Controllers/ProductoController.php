@@ -9,7 +9,9 @@ use App\Models\Marca;
 
 class ProductoController extends Controller
 {
-    /**   Crear producto   */
+    /**
+     * Crear producto
+     */
     public function createProduct(Request $request)
     {
         $request->validate([
@@ -22,13 +24,13 @@ class ProductoController extends Controller
             'precio_ganancia' => 'nullable|numeric',
             'precio_igv' => 'nullable|numeric',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'descripcion' => 'nullable|string|max:255',
+            'descripcion' => 'nullable|string',
             'video' => 'nullable|string|max:255',
             'envio' => 'nullable|string|max:100',
             'soporte_tecnico' => 'nullable|string|max:100',
             'caracteristicas' => 'nullable|json',
             'datos_tecnicos' => 'nullable|json',
-            'documentos' => 'nullable|json',
+            'archivos_adicionales' => 'nullable|json', // Cambiado de 'documentos' a 'archivos_adicionales'
         ]);
 
         // Procesar la imagen si se proporciona
@@ -55,9 +57,8 @@ class ProductoController extends Controller
         return response()->json($producto);
     }
 
-
-       /**
-     *  Actualizar producto
+    /**
+     * Actualizar producto
      */
     public function updateProduct(Request $request, Producto $producto)
     {
@@ -71,13 +72,13 @@ class ProductoController extends Controller
             'precio_ganancia' => 'nullable|numeric',
             'precio_igv' => 'nullable|numeric',
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'descripcion' => 'nullable|string|max:255',
+            'descripcion' => 'nullable|string',
             'video' => 'nullable|string|max:255',
             'envio' => 'nullable|string|max:100',
             'soporte_tecnico' => 'nullable|string|max:100',
             'caracteristicas' => 'nullable|json',
             'datos_tecnicos' => 'nullable|json',
-            'documentos' => 'nullable|json',
+            'archivos_adicionales' => 'nullable|json', // Cambiado de 'documentos' a 'archivos_adicionales'
         ]);
 
         if ($request->hasFile('imagen')) {
@@ -91,26 +92,29 @@ class ProductoController extends Controller
                          ->with('success', 'Producto actualizado exitosamente.');
     }
 
-    // obtener todos los productos
-    public function getProductos(){
+    // Obtener todos los productos
+    public function getProductos()
+    {
         $productos = Producto::all();
         return response()->json($productos);
     }
-    // obtener todos los productos con su imagen
-    public function getProductosImagen(){
-        $productos = Producto::with('imagen')->get();
+
+    // Obtener todos los productos con su imagen
+    public function getProductosImagen()
+    {
+        $productos = Producto::all(); // No es necesario usar 'with' para la imagen
         return response()->json($productos);
     }
 
-    // obtener un producto
-    public function showProduct(Producto $producto){
+    // Obtener un producto
+    public function showProduct(Producto $producto)
+    {
         return response()->json($producto);
     }
 
-    // obtener la imagen de un producto
-    public function getImagenProducto(Producto $producto){
-        return response()->json($producto->imagen);
+    // Obtener la imagen de un producto
+    public function getImagenProducto(Producto $producto)
+    {
+        return response()->json(['imagen' => $producto->imagen]);
     }
-
-   
 }

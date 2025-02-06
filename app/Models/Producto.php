@@ -16,7 +16,7 @@ class Producto extends Model
     protected $primaryKey = 'id_producto';
 
     // Indicar que la clave primaria no es un entero incremental
-    public $incrementing = false;
+    public $incrementing = true; // Cambiado a true porque 'id_producto' es autoincremental
 
     // Definir los campos que se pueden asignar en masa
     protected $fillable = [
@@ -35,7 +35,7 @@ class Producto extends Model
         'soporte_tecnico',
         'caracteristicas',
         'datos_tecnicos',
-        'documentos',
+        'archivos_adicionales', // Cambiado de 'documentos' a 'archivos_adicionales'
     ];
 
     // Definir los campos que deben ser ocultados en arrays
@@ -54,7 +54,7 @@ class Producto extends Model
     protected $casts = [
         'caracteristicas' => 'array',
         'datos_tecnicos' => 'array',
-        'documentos' => 'array',
+        'archivos_adicionales' => 'array', // Cambiado de 'documentos' a 'archivos_adicionales'
     ];
 
     // Definir la relación con el modelo Subcategoria

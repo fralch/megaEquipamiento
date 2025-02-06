@@ -18,7 +18,7 @@ const Productos = ({ onSubmit }) => {
     soporte_tecnico: "",
     caracteristicas: "{}",
     datos_tecnicos: "{}",
-    documentos: "{}",
+    archivos_adicionales: "{}", // Cambiado de 'documentos' a 'archivos_adicionales'
   });
 
   const [categorias, setCategorias] = useState([]);
@@ -63,7 +63,7 @@ const Productos = ({ onSubmit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData();
     formData.append('sku', form.sku);
     formData.append('nombre', form.nombre);
@@ -79,29 +79,29 @@ const Productos = ({ onSubmit }) => {
     formData.append('soporte_tecnico', form.soporte_tecnico);
     formData.append('caracteristicas', form.caracteristicas);
     formData.append('datos_tecnicos', form.datos_tecnicos);
-    formData.append('documentos', form.documentos);
+    formData.append('archivos_adicionales', form.archivos_adicionales); // Cambiado de 'documentos' a 'archivos_adicionales'
     if (form.imagen) {
       formData.append('imagen', form.imagen);
     }
-  
+
     try {
-      const response =  await fetch('http://127.0.0.1:8000/product/create', {
+      const response = await fetch('http://127.0.0.1:8000/product/create', {
         method: 'POST',
         body: formData,
         headers: {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
         },
       });
-  
+
       if (response.ok) {
         const result = await response.json();
         console.log('Producto creado:', result);
-  
+
         setProductos([...productos, {
           ...form,
           imagen: form.imagen ? URL.createObjectURL(form.imagen) : ''
         }]);
-  
+
         setForm({
           sku: "",
           nombre: "",
@@ -116,9 +116,9 @@ const Productos = ({ onSubmit }) => {
           video: "",
           envio: "",
           soporte_tecnico: "",
-          caracteristicas: "",
-          datos_tecnicos: "",
-          documentos: "",
+          caracteristicas: "{}",
+          datos_tecnicos: "{}",
+          archivos_adicionales: "{}", // Cambiado de 'documentos' a 'archivos_adicionales'
         });
       } else {
         console.error('Error al crear el producto:', response.statusText);
@@ -127,7 +127,6 @@ const Productos = ({ onSubmit }) => {
       console.error('Error en la solicitud:', error);
     }
   };
-  
 
   // Filtrar subcategorías basadas en la categoría seleccionada
   const filteredSubcategorias = subcategorias.filter(
@@ -179,7 +178,7 @@ const Productos = ({ onSubmit }) => {
             { label: "Soporte Técnico", name: "soporte_tecnico", type: "text" },
             { label: "Características", name: "caracteristicas", type: "text" },
             { label: "Datos Técnicos", name: "datos_tecnicos", type: "text" },
-            { label: "Documentos", name: "documentos", type: "text" },
+            { label: "Archivos Adicionales", name: "archivos_adicionales", type: "text" }, // Cambiado de 'Documentos' a 'Archivos Adicionales'
           ].map(({ label, name, type, options, step }) => (
             <div key={name} className="mb-4">
               <label htmlFor={name} className="block text-sm font-medium text-gray-700">
