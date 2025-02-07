@@ -118,7 +118,10 @@ const Card = ({ product }) => {
         <p className="text-sm text-gray-300 mb-2">
           <strong>Procedencia:</strong> {product.origin}
         </p>
-        <p className="text-sm text-gray-300 mb-4">{product.description}</p>
+        <p
+          className="text-sm text-gray-300 mb-4"
+          dangerouslySetInnerHTML={{ __html: product.description }}
+        ></p>
 
         {/* Botones */}
         <div className="flex space-x-4">
