@@ -1,4 +1,4 @@
-import { Head, Link } from "@inertiajs/react";
+import { Head } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
@@ -6,11 +6,12 @@ import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
 
-export default function Tienda() {
+export default function Subcategoria({ subcategoriaId }) {
     const [isOpen, setIsOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [openCategories, setOpenCategories] = useState({});
     const [activeCategory, setActiveCategory] = useState(null);
+    const [products, setProducts] = useState([]);
 
     useEffect(() => {
         const storedData = localStorage.getItem('categoriasCompleta');
@@ -27,6 +28,20 @@ export default function Tienda() {
         }
     }, []);
 
+    useEffect(() => {
+        if (subcategoriaId) {
+            const requestOptions = {
+                method: "GET",
+                redirect: "follow"
+            };
+
+            fetch(`http://127.0.0.1:8000/product/subcategoria/${subcategoriaId}`, requestOptions)
+                .then((response) => response.json())
+                .then((data) => setProducts(data))
+                .catch((error) => console.error('Error fetching products:', error));
+        }
+    }, [subcategoriaId]);
+
     const toggleCategory = (categoriaNombre) => {
         setOpenCategories((prevState) => ({
             ...prevState,
@@ -41,7 +56,7 @@ export default function Tienda() {
 
     return (
         <div>
-            <Head title="Tienda" />
+            <Head title="Subcategoria" />
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
@@ -65,19 +80,19 @@ export default function Tienda() {
                             {openCategories[categoria.nombre] &&
                                 categoria.subcategorias &&
                                 categoria.subcategorias.map((subcategoria) => (
-                                    <Link
+                                    <a
                                         key={subcategoria.id_subcategoria}
-                                        href={`/subcategoria/${subcategoria.id_subcategoria}`}
+                                        href="#"
                                         className="block p-2 pl-6 hover:bg-blue-100 bg-blue-50 rounded"
                                     >
                                         {subcategoria.nombre}
-                                    </Link>
+                                    </a>
                                 ))}
                         </div>
                     ))}
                 </nav>
                 <div className="flex-1 p-4">
-                    <ProductGrid />
+                    <ProductGrid products={products} />
                 </div>
             </div>
             <Footer />

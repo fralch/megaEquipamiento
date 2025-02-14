@@ -117,4 +117,13 @@ class ProductoController extends Controller
     {
         return response()->json(['imagen' => $producto->imagen]);
     }
+
+    // Obtener producto por subcategoria id
+    public function getProductosSubcategoria($subcategoria_id)
+    {
+        $productos = Producto::where('id_subcategoria', $subcategoria_id)->get();
+        return response()->json($productos);
+    }
+         
+     
 }
