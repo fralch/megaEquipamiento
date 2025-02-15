@@ -1,0 +1,2168 @@
+{
+  "_Footer-DN0bjEgH.js": {
+    "file": "assets/Footer-DN0bjEgH.js",
+    "name": "Footer",
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
+  "_ProductGrid-DdRd47wC.js": {
+    "file": "assets/ProductGrid-DdRd47wC.js",
+    "name": "ProductGrid",
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
+  "public/img/categorias/accesorios-de-laboratorio/1.jpg": {
+    "file": "assets/1-uKsPHiiL.js",
+    "name": "1",
+    "src": "public/img/categorias/accesorios-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-8Sbnp239.jpg"
+    ]
+  },
+  "public/img/categorias/accesorios-de-laboratorio/2.jpg": {
+    "file": "assets/2-CCjrOyvQ.js",
+    "name": "2",
+    "src": "public/img/categorias/accesorios-de-laboratorio/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-BPVAsVvi.jpg"
+    ]
+  },
+  "public/img/categorias/accesorios-de-laboratorio/3.jpg": {
+    "file": "assets/3-DDJB_g_J.js",
+    "name": "3",
+    "src": "public/img/categorias/accesorios-de-laboratorio/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-CJwtiaqX.jpg"
+    ]
+  },
+  "public/img/categorias/agitadores-de-laboratorio/1.jpg": {
+    "file": "assets/1-C5zc7xX3.js",
+    "name": "1",
+    "src": "public/img/categorias/agitadores-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-wKOSD9IU.jpg"
+    ]
+  },
+  "public/img/categorias/agitadores-de-laboratorio/2.jpg": {
+    "file": "assets/2-DqO_uPEb.js",
+    "name": "2",
+    "src": "public/img/categorias/agitadores-de-laboratorio/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-CvQARHcJ.jpg"
+    ]
+  },
+  "public/img/categorias/agitadores-de-laboratorio/3.jpg": {
+    "file": "assets/3-DHuOzNxs.js",
+    "name": "3",
+    "src": "public/img/categorias/agitadores-de-laboratorio/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-C8Q6R1E_.jpg"
+    ]
+  },
+  "public/img/categorias/analizadores-de-alimentos/1.jpg": {
+    "file": "assets/1-AHVMmOTW.js",
+    "name": "1",
+    "src": "public/img/categorias/analizadores-de-alimentos/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CS1OA2BD.jpg"
+    ]
+  },
+  "public/img/categorias/analizadores-de-gases/1.jpg": {
+    "file": "assets/1-BYgOoemg.js",
+    "name": "1",
+    "src": "public/img/categorias/analizadores-de-gases/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-mDASQF3r.jpg"
+    ]
+  },
+  "public/img/categorias/analizadores-de-texturas/1.jpg": {
+    "file": "assets/1-Dam2Nyve.js",
+    "name": "1",
+    "src": "public/img/categorias/analizadores-de-texturas/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BAIPNS-F.jpg"
+    ]
+  },
+  "public/img/categorias/autoclaves-de-laboratorio/1.jpg": {
+    "file": "assets/1-BN5UoA-O.js",
+    "name": "1",
+    "src": "public/img/categorias/autoclaves-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CPlcfRsv.jpg"
+    ]
+  },
+  "public/img/categorias/balanzas-de-laboratorio/1.jpg": {
+    "file": "assets/1-K1AKlea0.js",
+    "name": "1",
+    "src": "public/img/categorias/balanzas-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CVi4QoeW.jpg"
+    ]
+  },
+  "public/img/categorias/baños-de-laboratorio/1.jpg": {
+    "file": "assets/1-NoHvixes.js",
+    "name": "1",
+    "src": "public/img/categorias/baños-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CGrxWlos.jpg"
+    ]
+  },
+  "public/img/categorias/baños-de-laboratorio/2.jpg": {
+    "file": "assets/2-qNX1fEFm.js",
+    "name": "2",
+    "src": "public/img/categorias/baños-de-laboratorio/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-DssNBhIq.jpg"
+    ]
+  },
+  "public/img/categorias/baños-de-laboratorio/3.jpg": {
+    "file": "assets/3-CQJCaz6d.js",
+    "name": "3",
+    "src": "public/img/categorias/baños-de-laboratorio/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-CN9IFYbF.jpg"
+    ]
+  },
+  "public/img/categorias/baños-ultrasónicos/1.jpg": {
+    "file": "assets/1-BWoNOw9H.js",
+    "name": "1",
+    "src": "public/img/categorias/baños-ultrasónicos/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-oLWSC0Z8.jpg"
+    ]
+  },
+  "public/img/categorias/baños-ultrasónicos/2.jpg": {
+    "file": "assets/2-DPaDNCfs.js",
+    "name": "2",
+    "src": "public/img/categorias/baños-ultrasónicos/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-zAElmu_P.jpg"
+    ]
+  },
+  "public/img/categorias/baños-ultrasónicos/3.jpg": {
+    "file": "assets/3-By5X1TU0.js",
+    "name": "3",
+    "src": "public/img/categorias/baños-ultrasónicos/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-WY3fMZsH.jpg"
+    ]
+  },
+  "public/img/categorias/biorreactores/1.jpg": {
+    "file": "assets/1-CN7_X3pU.js",
+    "name": "1",
+    "src": "public/img/categorias/biorreactores/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BRXxHkdm.jpg"
+    ]
+  },
+  "public/img/categorias/biorreactores/2.jpg": {
+    "file": "assets/2-DqqLwy_9.js",
+    "name": "2",
+    "src": "public/img/categorias/biorreactores/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-LOwntaTN.jpg"
+    ]
+  },
+  "public/img/categorias/bombas-y-compresores-de-laboratorio/1.jpg": {
+    "file": "assets/1-B4E9ckf6.js",
+    "name": "1",
+    "src": "public/img/categorias/bombas-y-compresores-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CXGakxws.jpg"
+    ]
+  },
+  "public/img/categorias/bombas-y-compresores-de-laboratorio/2.jpg": {
+    "file": "assets/2-DJ8-LyyP.js",
+    "name": "2",
+    "src": "public/img/categorias/bombas-y-compresores-de-laboratorio/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-wQ-NrArG.jpg"
+    ]
+  },
+  "public/img/categorias/buretas-y-dispensadores/1.jpg": {
+    "file": "assets/1-BiTdAoZi.js",
+    "name": "1",
+    "src": "public/img/categorias/buretas-y-dispensadores/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CH5qo-dI.jpg"
+    ]
+  },
+  "public/img/categorias/cabinas-de-ventilación-de-laboratorio/1.jpg": {
+    "file": "assets/1-CMvK6s-x.js",
+    "name": "1",
+    "src": "public/img/categorias/cabinas-de-ventilación-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CwUBXxyV.jpg"
+    ]
+  },
+  "public/img/categorias/calorímetros/1.jpg": {
+    "file": "assets/1-DF6wZ0A_.js",
+    "name": "1",
+    "src": "public/img/categorias/calorímetros/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CLbR9qFm.jpg"
+    ]
+  },
+  "public/img/categorias/calorímetros/2.jpg": {
+    "file": "assets/2-DACamWmm.js",
+    "name": "2",
+    "src": "public/img/categorias/calorímetros/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-DU7-a1ja.jpg"
+    ]
+  },
+  "public/img/categorias/campanas-extractoras/1.jpg": {
+    "file": "assets/1-BM9uJ21T.js",
+    "name": "1",
+    "src": "public/img/categorias/campanas-extractoras/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BOYCT5Ae.jpg"
+    ]
+  },
+  "public/img/categorias/campanas-extractoras/2.jpg": {
+    "file": "assets/2-Dg5JIZfu.js",
+    "name": "2",
+    "src": "public/img/categorias/campanas-extractoras/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-2M9iIiP3.jpg"
+    ]
+  },
+  "public/img/categorias/centrífugas/1.jpg": {
+    "file": "assets/1-CV1-tZo3.js",
+    "name": "1",
+    "src": "public/img/categorias/centrífugas/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BZpF2Q_q.jpg"
+    ]
+  },
+  "public/img/categorias/centrífugas/2.jpg": {
+    "file": "assets/2-DI-EEHRm.js",
+    "name": "2",
+    "src": "public/img/categorias/centrífugas/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-uno4lxiS.jpg"
+    ]
+  },
+  "public/img/categorias/certificados-de-calibración-acreditado/1.jpg": {
+    "file": "assets/1-D5Q5Vx6n.js",
+    "name": "1",
+    "src": "public/img/categorias/certificados-de-calibración-acreditado/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-sPIFmMpC.jpg"
+    ]
+  },
+  "public/img/categorias/certificados-de-calibración-trazable/1.jpg": {
+    "file": "assets/1-DqLvhI2h.js",
+    "name": "1",
+    "src": "public/img/categorias/certificados-de-calibración-trazable/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-luFBf45h.jpg"
+    ]
+  },
+  "public/img/categorias/congeladores-de-laboratorio/1.jpg": {
+    "file": "assets/1-CrfED7_7.js",
+    "name": "1",
+    "src": "public/img/categorias/congeladores-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-gW7pQaMO.jpg"
+    ]
+  },
+  "public/img/categorias/consumibles-de-laboratorio/1.jpg": {
+    "file": "assets/1-CAkvZtqV.js",
+    "name": "1",
+    "src": "public/img/categorias/consumibles-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-j6FceCyh.jpg"
+    ]
+  },
+  "public/img/categorias/consumibles-de-laboratorio/2.jpg": {
+    "file": "assets/2-B3Qh5kuE.js",
+    "name": "2",
+    "src": "public/img/categorias/consumibles-de-laboratorio/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-C2dIBvvr.jpg"
+    ]
+  },
+  "public/img/categorias/consumibles-de-laboratorio/3.jpg": {
+    "file": "assets/3-CsnDsOpM.js",
+    "name": "3",
+    "src": "public/img/categorias/consumibles-de-laboratorio/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-4Y9H5im7.jpg"
+    ]
+  },
+  "public/img/categorias/contadores-de-colonias/1.jpg": {
+    "file": "assets/1-CxBffenO.js",
+    "name": "1",
+    "src": "public/img/categorias/contadores-de-colonias/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CNpga2TU.jpg"
+    ]
+  },
+  "public/img/categorias/criostatos/1.jpg": {
+    "file": "assets/1-E0CBMMA-.js",
+    "name": "1",
+    "src": "public/img/categorias/criostatos/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-dJW4ptNe.jpg"
+    ]
+  },
+  "public/img/categorias/cámaras-climáticas-de-laboratorio/1.jpg": {
+    "file": "assets/1-7BlVflWG.js",
+    "name": "1",
+    "src": "public/img/categorias/cámaras-climáticas-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BSZCjjTt.jpg"
+    ]
+  },
+  "public/img/categorias/cámaras-climáticas-de-laboratorio/2.jpg": {
+    "file": "assets/2-DARJkHRT.js",
+    "name": "2",
+    "src": "public/img/categorias/cámaras-climáticas-de-laboratorio/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-Bp55n0ES.jpg"
+    ]
+  },
+  "public/img/categorias/cámaras-climáticas-de-laboratorio/3.jpg": {
+    "file": "assets/3-ckWbylzv.js",
+    "name": "3",
+    "src": "public/img/categorias/cámaras-climáticas-de-laboratorio/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-BBDWAD8i.jpg"
+    ]
+  },
+  "public/img/categorias/densímetros/1.jpg": {
+    "file": "assets/1-CKBONQfM.js",
+    "name": "1",
+    "src": "public/img/categorias/densímetros/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-gAFpGso_.jpg"
+    ]
+  },
+  "public/img/categorias/destiladores-de-agua/1.jpg": {
+    "file": "assets/1-Cdfj8FYq.js",
+    "name": "1",
+    "src": "public/img/categorias/destiladores-de-agua/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-ClUdeRft.jpg"
+    ]
+  },
+  "public/img/categorias/destiladores-de-agua/2.jpg": {
+    "file": "assets/2-i49TQPSM.js",
+    "name": "2",
+    "src": "public/img/categorias/destiladores-de-agua/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-B-uZ3TL_.jpg"
+    ]
+  },
+  "public/img/categorias/dispersores-de-laboratorios/1.jpg": {
+    "file": "assets/1-CGO6WORH.js",
+    "name": "1",
+    "src": "public/img/categorias/dispersores-de-laboratorios/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BU7Ta53J.jpg"
+    ]
+  },
+  "public/img/categorias/dispersores-de-laboratorios/2.jpg": {
+    "file": "assets/2-Dm8_zdM5.js",
+    "name": "2",
+    "src": "public/img/categorias/dispersores-de-laboratorios/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-B5HpTjeS.jpg"
+    ]
+  },
+  "public/img/categorias/dispersores-de-laboratorios/3.jpg": {
+    "file": "assets/3-7AstOumM.js",
+    "name": "3",
+    "src": "public/img/categorias/dispersores-de-laboratorios/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-Dn1ZIhHA.jpg"
+    ]
+  },
+  "public/img/categorias/electroquímica/1.jpg": {
+    "file": "assets/1-N37gDWK5.js",
+    "name": "1",
+    "src": "public/img/categorias/electroquímica/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-Cz8ZbLwB.jpg"
+    ]
+  },
+  "public/img/categorias/electroquímica/2.jpg": {
+    "file": "assets/2-pjwrfaBc.js",
+    "name": "2",
+    "src": "public/img/categorias/electroquímica/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-BMEs6V-d.jpg"
+    ]
+  },
+  "public/img/categorias/espectroscopios/1.jpg": {
+    "file": "assets/1-OavKw8k-.js",
+    "name": "1",
+    "src": "public/img/categorias/espectroscopios/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-XSdXaTcY.jpg"
+    ]
+  },
+  "public/img/categorias/espectroscopios/2.jpg": {
+    "file": "assets/2-CxsNH0uP.js",
+    "name": "2",
+    "src": "public/img/categorias/espectroscopios/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-Bsc992jd.jpg"
+    ]
+  },
+  "public/img/categorias/espectroscopía/1.jpg": {
+    "file": "assets/1-ZInRzPrY.js",
+    "name": "1",
+    "src": "public/img/categorias/espectroscopía/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-Dp81Hx7F.jpg"
+    ]
+  },
+  "public/img/categorias/espectroscopía/2.jpg": {
+    "file": "assets/2-kELoBro3.js",
+    "name": "2",
+    "src": "public/img/categorias/espectroscopía/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-OJVXGsBX.jpg"
+    ]
+  },
+  "public/img/categorias/espectroscopía/3.jpg": {
+    "file": "assets/3-BQlVqDHi.js",
+    "name": "3",
+    "src": "public/img/categorias/espectroscopía/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3--S47HGyi.jpg"
+    ]
+  },
+  "public/img/categorias/esterilizadores-de-laboratorio/1.jpg": {
+    "file": "assets/1-Bx3wlyKu.js",
+    "name": "1",
+    "src": "public/img/categorias/esterilizadores-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BXbF8rY0.jpg"
+    ]
+  },
+  "public/img/categorias/esterilizadores-de-laboratorio/2.jpg": {
+    "file": "assets/2-CqU00X35.js",
+    "name": "2",
+    "src": "public/img/categorias/esterilizadores-de-laboratorio/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-B3I1k3ol.jpg"
+    ]
+  },
+  "public/img/categorias/estufas-de-laboratorio/1.jpg": {
+    "file": "assets/1-0NFq4LUP.js",
+    "name": "1",
+    "src": "public/img/categorias/estufas-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CD_LH8Xa.jpg"
+    ]
+  },
+  "public/img/categorias/fotómetros/1.jpg": {
+    "file": "assets/1-B2ErGu3Q.js",
+    "name": "1",
+    "src": "public/img/categorias/fotómetros/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BwGd2b37.jpg"
+    ]
+  },
+  "public/img/categorias/generadores-de-laboratorio/1.jpg": {
+    "file": "assets/1-Bgc6oyRe.js",
+    "name": "1",
+    "src": "public/img/categorias/generadores-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CUNRlC5f.jpg"
+    ]
+  },
+  "public/img/categorias/homogenizador-de-laboratorio/1.jpg": {
+    "file": "assets/1-CL9LI55N.js",
+    "name": "1",
+    "src": "public/img/categorias/homogenizador-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-B5zMVc_u.jpg"
+    ]
+  },
+  "public/img/categorias/hornos/1.jpg": {
+    "file": "assets/1-CN3-FJs6.js",
+    "name": "1",
+    "src": "public/img/categorias/hornos/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-DFlta4f5.jpg"
+    ]
+  },
+  "public/img/categorias/hornos/2.jpg": {
+    "file": "assets/2-aSKihvXQ.js",
+    "name": "2",
+    "src": "public/img/categorias/hornos/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-BC6W5d7Y.jpg"
+    ]
+  },
+  "public/img/categorias/hornos/3.jpg": {
+    "file": "assets/3-CdYUBqA4.js",
+    "name": "3",
+    "src": "public/img/categorias/hornos/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-CDe4u1zS.jpg"
+    ]
+  },
+  "public/img/categorias/incubadoras-de-laboratorio/1.jpg": {
+    "file": "assets/1-D8OpbIN-.js",
+    "name": "1",
+    "src": "public/img/categorias/incubadoras-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CJJLMJ7R.jpg"
+    ]
+  },
+  "public/img/categorias/instrumentos-analíticos/1.jpg": {
+    "file": "assets/1-f9W1I5Gj.js",
+    "name": "1",
+    "src": "public/img/categorias/instrumentos-analíticos/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-B7ukiu7g.jpg"
+    ]
+  },
+  "public/img/categorias/lavadores-de-microplacas/1.jpg": {
+    "file": "assets/1-D7pZTcBg.js",
+    "name": "1",
+    "src": "public/img/categorias/lavadores-de-microplacas/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-D5EBiHB1.jpg"
+    ]
+  },
+  "public/img/categorias/limpiadores-a-vapor/1.jpg": {
+    "file": "assets/1-BcN1uWdZ.js",
+    "name": "1",
+    "src": "public/img/categorias/limpiadores-a-vapor/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-DrTLxgmm.jpg"
+    ]
+  },
+  "public/img/categorias/limpiadores-a-vapor/2.jpg": {
+    "file": "assets/2-Ba4Q0FMp.js",
+    "name": "2",
+    "src": "public/img/categorias/limpiadores-a-vapor/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-5ieDSDa0.jpg"
+    ]
+  },
+  "public/img/categorias/liofilizadores-para-laboratorio/1.jpg": {
+    "file": "assets/1-BKEZW-x4.js",
+    "name": "1",
+    "src": "public/img/categorias/liofilizadores-para-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CgKUcVZW.jpg"
+    ]
+  },
+  "public/img/categorias/lámparas-de-análisis-uv/1.jpg": {
+    "file": "assets/1-DmiAd4dL.js",
+    "name": "1",
+    "src": "public/img/categorias/lámparas-de-análisis-uv/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-Ce7OhBdU.jpg"
+    ]
+  },
+  "public/img/categorias/maquinas-laser/1.jpg": {
+    "file": "assets/1-pLoNgxI7.js",
+    "name": "1",
+    "src": "public/img/categorias/maquinas-laser/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-DdWr5hWG.jpg"
+    ]
+  },
+  "public/img/categorias/maquinas-laser/2.jpg": {
+    "file": "assets/2-37oa6oY3.js",
+    "name": "2",
+    "src": "public/img/categorias/maquinas-laser/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-CHfmhTY4.jpg"
+    ]
+  },
+  "public/img/categorias/materiales-de-laboratorio/1.jpg": {
+    "file": "assets/1-BA2KA_mR.js",
+    "name": "1",
+    "src": "public/img/categorias/materiales-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-Dak9juD-.jpg"
+    ]
+  },
+  "public/img/categorias/medidores-de-punto-de-fusión/1.jpg": {
+    "file": "assets/1-Da_qI6dX.js",
+    "name": "1",
+    "src": "public/img/categorias/medidores-de-punto-de-fusión/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CKnuz88Q.jpg"
+    ]
+  },
+  "public/img/categorias/medidores-de-punto-de-fusión/2.jpg": {
+    "file": "assets/2-rOCY1FA2.js",
+    "name": "2",
+    "src": "public/img/categorias/medidores-de-punto-de-fusión/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-C0BrhBur.jpg"
+    ]
+  },
+  "public/img/categorias/microscopios/1.jpg": {
+    "file": "assets/1-CdI_ttOM.js",
+    "name": "1",
+    "src": "public/img/categorias/microscopios/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-D2E-vQ8x.jpg"
+    ]
+  },
+  "public/img/categorias/microscopios/2.jpg": {
+    "file": "assets/2-DDxprGE-.js",
+    "name": "2",
+    "src": "public/img/categorias/microscopios/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-cs8Voo1N.jpg"
+    ]
+  },
+  "public/img/categorias/microscopios/3.jpg": {
+    "file": "assets/3-CVIQWTO3.js",
+    "name": "3",
+    "src": "public/img/categorias/microscopios/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-BwE4Kg6M.jpg"
+    ]
+  },
+  "public/img/categorias/mobiliarios-de-laboratorio/1.jpg": {
+    "file": "assets/1-MRgKGuHp.js",
+    "name": "1",
+    "src": "public/img/categorias/mobiliarios-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-mslZ-E9C.jpg"
+    ]
+  },
+  "public/img/categorias/molinos/1.jpg": {
+    "file": "assets/1-no3_q6Qr.js",
+    "name": "1",
+    "src": "public/img/categorias/molinos/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CCEBwmzh.jpg"
+    ]
+  },
+  "public/img/categorias/molinos/2.jpg": {
+    "file": "assets/2-30tmpJ5P.js",
+    "name": "2",
+    "src": "public/img/categorias/molinos/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-tMXBHojL.jpg"
+    ]
+  },
+  "public/img/categorias/molinos/3.jpg": {
+    "file": "assets/3-Dfolutj7.js",
+    "name": "3",
+    "src": "public/img/categorias/molinos/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-CU9atmWo.jpg"
+    ]
+  },
+  "public/img/categorias/máquina-de-limpieza-de-relojes/1.jpg": {
+    "file": "assets/1-9ZCnbD8B.js",
+    "name": "1",
+    "src": "public/img/categorias/máquina-de-limpieza-de-relojes/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-D5nfB93_.jpg"
+    ]
+  },
+  "public/img/categorias/máquina-de-limpieza-de-relojes/2.jpg": {
+    "file": "assets/2-CVLY0gWB.js",
+    "name": "2",
+    "src": "public/img/categorias/máquina-de-limpieza-de-relojes/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-DinARr8n.jpg"
+    ]
+  },
+  "public/img/categorias/máquina-de-limpieza-de-relojes/3.jpg": {
+    "file": "assets/3-Lix3u3S_.js",
+    "name": "3",
+    "src": "public/img/categorias/máquina-de-limpieza-de-relojes/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-CIXGmv6J.jpg"
+    ]
+  },
+  "public/img/categorias/pesas-patrón/1.jpg": {
+    "file": "assets/1-d_y6elQj.js",
+    "name": "1",
+    "src": "public/img/categorias/pesas-patrón/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-ChQ08T4I.jpg"
+    ]
+  },
+  "public/img/categorias/pesas-patrón/2.jpg": {
+    "file": "assets/2-Y0J4m_EA.js",
+    "name": "2",
+    "src": "public/img/categorias/pesas-patrón/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-CBmHP4Kz.jpg"
+    ]
+  },
+  "public/img/categorias/pesas-patrón/3.jpg": {
+    "file": "assets/3-BjSy7z-5.js",
+    "name": "3",
+    "src": "public/img/categorias/pesas-patrón/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-CE5NY8wu.jpg"
+    ]
+  },
+  "public/img/categorias/pipetas-de-laboratorio/1.jpg": {
+    "file": "assets/1-DgLLjFlF.js",
+    "name": "1",
+    "src": "public/img/categorias/pipetas-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-Dbt647lX.jpg"
+    ]
+  },
+  "public/img/categorias/pipetas-de-laboratorio/2.jpg": {
+    "file": "assets/2-BPTvP4ZS.js",
+    "name": "2",
+    "src": "public/img/categorias/pipetas-de-laboratorio/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-YFQZAzhj.jpg"
+    ]
+  },
+  "public/img/categorias/placas-de-calentamiento/1.jpg": {
+    "file": "assets/1-DwBo6Upt.js",
+    "name": "1",
+    "src": "public/img/categorias/placas-de-calentamiento/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BBui_Ud4.jpg"
+    ]
+  },
+  "public/img/categorias/polarímetros/1.jpg": {
+    "file": "assets/1-DpoVdmZm.js",
+    "name": "1",
+    "src": "public/img/categorias/polarímetros/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CKwJfZz0.jpg"
+    ]
+  },
+  "public/img/categorias/polarímetros/2.jpg": {
+    "file": "assets/2-CGCdDi5d.js",
+    "name": "2",
+    "src": "public/img/categorias/polarímetros/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-xygv2JF_.jpg"
+    ]
+  },
+  "public/img/categorias/reactores-de-alta-viscosidad/1.jpg": {
+    "file": "assets/1-BUeOIyBS.js",
+    "name": "1",
+    "src": "public/img/categorias/reactores-de-alta-viscosidad/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BEzL2SOv.jpg"
+    ]
+  },
+  "public/img/categorias/reactores-de-alta-viscosidad/2.jpg": {
+    "file": "assets/2-BuXBW5oh.js",
+    "name": "2",
+    "src": "public/img/categorias/reactores-de-alta-viscosidad/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-COKbzelA.jpg"
+    ]
+  },
+  "public/img/categorias/reactores-de-síntesis/1.jpg": {
+    "file": "assets/1-CXAuhnM4.js",
+    "name": "1",
+    "src": "public/img/categorias/reactores-de-síntesis/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-C-tvGjdt.jpg"
+    ]
+  },
+  "public/img/categorias/refractómetros/1.jpg": {
+    "file": "assets/1-CImOYIk5.js",
+    "name": "1",
+    "src": "public/img/categorias/refractómetros/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-bVthqssq.jpg"
+    ]
+  },
+  "public/img/categorias/refractómetros/2.jpg": {
+    "file": "assets/2-DPO7-JYd.js",
+    "name": "2",
+    "src": "public/img/categorias/refractómetros/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-Bg2Y3kmi.jpg"
+    ]
+  },
+  "public/img/categorias/refractómetros/3.jpg": {
+    "file": "assets/3-Db8mb0xd.js",
+    "name": "3",
+    "src": "public/img/categorias/refractómetros/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-BqwLl_JV.jpg"
+    ]
+  },
+  "public/img/categorias/refrigeradores-de-laboratorio/1.jpg": {
+    "file": "assets/1-wuPcGrpY.js",
+    "name": "1",
+    "src": "public/img/categorias/refrigeradores-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-Dyd7NIwg.jpg"
+    ]
+  },
+  "public/img/categorias/refrigeradores-de-laboratorio/2.jpg": {
+    "file": "assets/2-VjDi0YyX.js",
+    "name": "2",
+    "src": "public/img/categorias/refrigeradores-de-laboratorio/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-BWHXYxlP.jpg"
+    ]
+  },
+  "public/img/categorias/reómetros/1.jpg": {
+    "file": "assets/1-EmgwBpOJ.js",
+    "name": "1",
+    "src": "public/img/categorias/reómetros/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BzV2lLw9.jpg"
+    ]
+  },
+  "public/img/categorias/reómetros/2.jpg": {
+    "file": "assets/2-suQrRFU6.js",
+    "name": "2",
+    "src": "public/img/categorias/reómetros/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-E2x1-dbC.jpg"
+    ]
+  },
+  "public/img/categorias/reómetros/3.jpg": {
+    "file": "assets/3-By2Wda5c.js",
+    "name": "3",
+    "src": "public/img/categorias/reómetros/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-Dbchl5S5.jpg"
+    ]
+  },
+  "public/img/categorias/rotavapores/1.jpg": {
+    "file": "assets/1-RHButnbd.js",
+    "name": "1",
+    "src": "public/img/categorias/rotavapores/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BvVkoAai.jpg"
+    ]
+  },
+  "public/img/categorias/rotavapores/2.jpg": {
+    "file": "assets/2-Bgm3PXbK.js",
+    "name": "2",
+    "src": "public/img/categorias/rotavapores/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-Dg36gyid.jpg"
+    ]
+  },
+  "public/img/categorias/servicio-de-mantenimiento-equipos-de-laboratorio/1.jpg": {
+    "file": "assets/1-ClkIHvVF.js",
+    "name": "1",
+    "src": "public/img/categorias/servicio-de-mantenimiento-equipos-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-DuVxlf0T.jpg"
+    ]
+  },
+  "public/img/categorias/sistema-de-histotecnologia/1.jpg": {
+    "file": "assets/1-CnnDi4vF.js",
+    "name": "1",
+    "src": "public/img/categorias/sistema-de-histotecnologia/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-COKoknbI.jpg"
+    ]
+  },
+  "public/img/categorias/sistema-de-histotecnologia/2.jpg": {
+    "file": "assets/2-CnnDi4vF.js",
+    "name": "2",
+    "src": "public/img/categorias/sistema-de-histotecnologia/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-COKoknbI.jpg"
+    ]
+  },
+  "public/img/categorias/sistemas-de-extracción-de-adn-arn-y-purificación-de-proteínas/1.jpg": {
+    "file": "assets/1-CGYCrpe6.js",
+    "name": "1",
+    "src": "public/img/categorias/sistemas-de-extracción-de-adn-arn-y-purificación-de-proteínas/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-CkPuXIHl.jpg"
+    ]
+  },
+  "public/img/categorias/sistemas-de-histotecnología/1.jpg": {
+    "file": "assets/1-GVczXc2Q.js",
+    "name": "1",
+    "src": "public/img/categorias/sistemas-de-histotecnología/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-COKoknbI.jpg"
+    ]
+  },
+  "public/img/categorias/sistemas-de-limpieza-uv/1.jpg": {
+    "file": "assets/1-bLoSTgtq.js",
+    "name": "1",
+    "src": "public/img/categorias/sistemas-de-limpieza-uv/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-C68za1By.jpg"
+    ]
+  },
+  "public/img/categorias/software-de-laboratorio/1.jpg": {
+    "file": "assets/1-Cp-DqzTo.js",
+    "name": "1",
+    "src": "public/img/categorias/software-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-BNSTXPK7.jpg"
+    ]
+  },
+  "public/img/categorias/termobloques/1.jpg": {
+    "file": "assets/1-CCDYT9io.js",
+    "name": "1",
+    "src": "public/img/categorias/termobloques/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-HaWwH11E.jpg"
+    ]
+  },
+  "public/img/categorias/termostatos-de-laboratorio/1.jpg": {
+    "file": "assets/1-5LTfTvcB.js",
+    "name": "1",
+    "src": "public/img/categorias/termostatos-de-laboratorio/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-jjrM9I1C.jpg"
+    ]
+  },
+  "public/img/categorias/termostatos-de-laboratorio/2.jpg": {
+    "file": "assets/2-Blk3Pg4T.js",
+    "name": "2",
+    "src": "public/img/categorias/termostatos-de-laboratorio/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-CN3i7qva.jpg"
+    ]
+  },
+  "public/img/categorias/termostatos-de-laboratorio/3.jpg": {
+    "file": "assets/3-BIfNDZ6P.js",
+    "name": "3",
+    "src": "public/img/categorias/termostatos-de-laboratorio/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-gvVQmt08.jpg"
+    ]
+  },
+  "public/img/categorias/ubicacion/1.jpg": {
+    "file": "assets/1-DA5P30i_.js",
+    "name": "1",
+    "src": "public/img/categorias/ubicacion/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-DJXmB-sN.jpg"
+    ]
+  },
+  "public/img/categorias/viscosimetros/1.jpg": {
+    "file": "assets/1-Dw7vPiGB.js",
+    "name": "1",
+    "src": "public/img/categorias/viscosimetros/1.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/1-DHzGVMZ8.jpg"
+    ]
+  },
+  "public/img/categorias/viscosimetros/2.jpg": {
+    "file": "assets/2-C2mhQR8p.js",
+    "name": "2",
+    "src": "public/img/categorias/viscosimetros/2.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/2-CKXLQKp-.jpg"
+    ]
+  },
+  "public/img/categorias/viscosimetros/3.jpg": {
+    "file": "assets/3-lNJCcIFo.js",
+    "name": "3",
+    "src": "public/img/categorias/viscosimetros/3.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/3-CUF4Ctt5.jpg"
+    ]
+  },
+  "public/img/marcas/7_ealway.jpg": {
+    "file": "assets/7_ealway-CqZjFaJ5.js",
+    "name": "7_ealway",
+    "src": "public/img/marcas/7_ealway.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/7_ealway-DZWBpnjb.jpg"
+    ]
+  },
+  "public/img/marcas/accumax.jpg": {
+    "file": "assets/accumax-DzATDDhf.js",
+    "name": "accumax",
+    "src": "public/img/marcas/accumax.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/accumax-CCmvO7D8.jpg"
+    ]
+  },
+  "public/img/marcas/aczet.jpg": {
+    "file": "assets/aczet-DpUFX6ZH.js",
+    "name": "aczet",
+    "src": "public/img/marcas/aczet.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/aczet-DKiAK_My.jpg"
+    ]
+  },
+  "public/img/marcas/adam.jpg": {
+    "file": "assets/adam-D-FZumS8.js",
+    "name": "adam",
+    "src": "public/img/marcas/adam.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/adam-33iLSd9a.jpg"
+    ]
+  },
+  "public/img/marcas/alp.jpg": {
+    "file": "assets/alp-CcUn-0x6.js",
+    "name": "alp",
+    "src": "public/img/marcas/alp.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/alp-OH8_wut9.jpg"
+    ]
+  },
+  "public/img/marcas/and _discover-precision.jpg": {
+    "file": "assets/and _discover-precision-BS_IUHPY.js",
+    "name": "and _discover-precision",
+    "src": "public/img/marcas/and _discover-precision.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/and _discover-precision-Cc-qLb5L.jpg"
+    ]
+  },
+  "public/img/marcas/aralab.jpg": {
+    "file": "assets/aralab-CVAza00X.js",
+    "name": "aralab",
+    "src": "public/img/marcas/aralab.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/aralab-W7E8v-JC.jpg"
+    ]
+  },
+  "public/img/marcas/asecos.jpg": {
+    "file": "assets/asecos-Dx8b9wcH.js",
+    "name": "asecos",
+    "src": "public/img/marcas/asecos.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/asecos-Bi0Q2Nbj.jpg"
+    ]
+  },
+  "public/img/marcas/axis.jpg": {
+    "file": "assets/axis-Coxg_nNy.js",
+    "name": "axis",
+    "src": "public/img/marcas/axis.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/axis-IrPokvYx.jpg"
+    ]
+  },
+  "public/img/marcas/beger.jpg": {
+    "file": "assets/beger-DDsMDGeN.js",
+    "name": "beger",
+    "src": "public/img/marcas/beger.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/beger-DgJqlWV9.jpg"
+    ]
+  },
+  "public/img/marcas/biobase.jpg": {
+    "file": "assets/biobase-CmzyKtUB.js",
+    "name": "biobase",
+    "src": "public/img/marcas/biobase.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/biobase-CZkPlP8O.jpg"
+    ]
+  },
+  "public/img/marcas/biosan.jpg": {
+    "file": "assets/biosan-PWNEj0Jy.js",
+    "name": "biosan",
+    "src": "public/img/marcas/biosan.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/biosan-B9w8bi8p.jpg"
+    ]
+  },
+  "public/img/marcas/copair.jpg": {
+    "file": "assets/copair-_lOUrwB5.js",
+    "name": "copair",
+    "src": "public/img/marcas/copair.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/copair-B62f9C8x.jpg"
+    ]
+  },
+  "public/img/marcas/draglab.jpg": {
+    "file": "assets/draglab-noTPfVmf.js",
+    "name": "draglab",
+    "src": "public/img/marcas/draglab.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/draglab-CrmxDyF5.jpg"
+    ]
+  },
+  "public/img/marcas/elma.jpg": {
+    "file": "assets/elma-CN4lEABr.js",
+    "name": "elma",
+    "src": "public/img/marcas/elma.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/elma-BgrAuc3v.jpg"
+    ]
+  },
+  "public/img/marcas/equinlab.jpg": {
+    "file": "assets/equinlab-naSNCtLE.js",
+    "name": "equinlab",
+    "src": "public/img/marcas/equinlab.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/equinlab-IbY2r33N.jpg"
+    ]
+  },
+  "public/img/marcas/eyela.jpg": {
+    "file": "assets/eyela-pKZp7yMo.js",
+    "name": "eyela",
+    "src": "public/img/marcas/eyela.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/eyela-CQKLZwj9.jpg"
+    ]
+  },
+  "public/img/marcas/filtra.jpg": {
+    "file": "assets/filtra-DPEknmhn.js",
+    "name": "filtra",
+    "src": "public/img/marcas/filtra.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/filtra-BoU9Pdvm.jpg"
+    ]
+  },
+  "public/img/marcas/grant.jpg": {
+    "file": "assets/grant-D-a_0YGe.js",
+    "name": "grant",
+    "src": "public/img/marcas/grant.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/grant-3k2XNzyB.jpg"
+    ]
+  },
+  "public/img/marcas/hanon.jpg": {
+    "file": "assets/hanon-DDkZcsSr.js",
+    "name": "hanon",
+    "src": "public/img/marcas/hanon.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/hanon-BGPawK0P.jpg"
+    ]
+  },
+  "public/img/marcas/harry_gestigkeit_gmbh.jpg": {
+    "file": "assets/harry_gestigkeit_gmbh-DktZPlEj.js",
+    "name": "harry_gestigkeit_gmbh",
+    "src": "public/img/marcas/harry_gestigkeit_gmbh.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/harry_gestigkeit_gmbh-CgO0CrCI.jpg"
+    ]
+  },
+  "public/img/marcas/hirschmann.jpg": {
+    "file": "assets/hirschmann-Bp_Ha7Cl.js",
+    "name": "hirschmann",
+    "src": "public/img/marcas/hirschmann.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/hirschmann-CMAsBIqX.jpg"
+    ]
+  },
+  "public/img/marcas/horiba.jpg": {
+    "file": "assets/horiba-DlTa3vve.js",
+    "name": "horiba",
+    "src": "public/img/marcas/horiba.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/horiba-DjpJkb2z.jpg"
+    ]
+  },
+  "public/img/marcas/ika.jpg": {
+    "file": "assets/ika-Cv3amC3S.js",
+    "name": "ika",
+    "src": "public/img/marcas/ika.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/ika-CB8-tEtW.jpg"
+    ]
+  },
+  "public/img/marcas/jisico.jpg": {
+    "file": "assets/jisico-CQVAuuoT.js",
+    "name": "jisico",
+    "src": "public/img/marcas/jisico.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/jisico-U-gKwhix.jpg"
+    ]
+  },
+  "public/img/marcas/kern.jpg": {
+    "file": "assets/kern-BePntyox.js",
+    "name": "kern",
+    "src": "public/img/marcas/kern.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/kern-ow_IHhod.jpg"
+    ]
+  },
+  "public/img/marcas/kruss.jpg": {
+    "file": "assets/kruss-BTs732rG.js",
+    "name": "kruss",
+    "src": "public/img/marcas/kruss.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/kruss-DoHO5ltK.jpg"
+    ]
+  },
+  "public/img/marcas/labtech.jpg": {
+    "file": "assets/labtech-BYWgdftU.js",
+    "name": "labtech",
+    "src": "public/img/marcas/labtech.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/labtech-CsoKvv1q.jpg"
+    ]
+  },
+  "public/img/marcas/lamy_rheology.jpg": {
+    "file": "assets/lamy_rheology-BR36L4vq.js",
+    "name": "lamy_rheology",
+    "src": "public/img/marcas/lamy_rheology.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/lamy_rheology-YkCqAyje.jpg"
+    ]
+  },
+  "public/img/marcas/mag.jpg": {
+    "file": "assets/mag-Cy9Z-Cqr.js",
+    "name": "mag",
+    "src": "public/img/marcas/mag.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/mag-B4dxuqbF.jpg"
+    ]
+  },
+  "public/img/marcas/memmert.jpg": {
+    "file": "assets/memmert-BQu7tM8X.js",
+    "name": "memmert",
+    "src": "public/img/marcas/memmert.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/memmert-C4OLHflp.jpg"
+    ]
+  },
+  "public/img/marcas/mpw.jpg": {
+    "file": "assets/mpw-DQw7JiFf.js",
+    "name": "mpw",
+    "src": "public/img/marcas/mpw.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/mpw-fFpmTW25.jpg"
+    ]
+  },
+  "public/img/marcas/nickel_electrolto.jpg": {
+    "file": "assets/nickel_electrolto-QTaT1MBU.js",
+    "name": "nickel_electrolto",
+    "src": "public/img/marcas/nickel_electrolto.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/nickel_electrolto-DMsedVZn.jpg"
+    ]
+  },
+  "public/img/marcas/nk.jpg": {
+    "file": "assets/nk-BVs1qLM6.js",
+    "name": "nk",
+    "src": "public/img/marcas/nk.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/nk-CiohaDDK.jpg"
+    ]
+  },
+  "public/img/marcas/nuve.jpg": {
+    "file": "assets/nuve-DVN1XUjz.js",
+    "name": "nuve",
+    "src": "public/img/marcas/nuve.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/nuve-BO-KdI5e.jpg"
+    ]
+  },
+  "public/img/marcas/ovan.jpg": {
+    "file": "assets/ovan-CkLRPH9i.js",
+    "name": "ovan",
+    "src": "public/img/marcas/ovan.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/ovan-B6nlIpv_.jpg"
+    ]
+  },
+  "public/img/marcas/pobel.jpg": {
+    "file": "assets/pobel-NbJEsVCK.js",
+    "name": "pobel",
+    "src": "public/img/marcas/pobel.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/pobel-CG5HRvAK.jpg"
+    ]
+  },
+  "public/img/marcas/poleko.jpg": {
+    "file": "assets/poleko-Dofnh1E_.js",
+    "name": "poleko",
+    "src": "public/img/marcas/poleko.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/poleko-DsU_w8xx.jpg"
+    ]
+  },
+  "public/img/marcas/polyscience.jpg": {
+    "file": "assets/polyscience-BPHvwLJN.js",
+    "name": "polyscience",
+    "src": "public/img/marcas/polyscience.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/polyscience-Bebk9W5P.jpg"
+    ]
+  },
+  "public/img/marcas/schuett-biotec_de.jpg": {
+    "file": "assets/schuett-biotec_de-GHQAaAQF.js",
+    "name": "schuett-biotec_de",
+    "src": "public/img/marcas/schuett-biotec_de.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/schuett-biotec_de-BcDse2T9.jpg"
+    ]
+  },
+  "public/img/marcas/termo_fisher.jpg": {
+    "file": "assets/termo_fisher-Zt-fayUa.js",
+    "name": "termo_fisher",
+    "src": "public/img/marcas/termo_fisher.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/termo_fisher-CkNprO5n.jpg"
+    ]
+  },
+  "public/img/marcas/vibra.jpg": {
+    "file": "assets/vibra-CYpDDTT7.js",
+    "name": "vibra",
+    "src": "public/img/marcas/vibra.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/vibra-3PWW_XqJ.jpg"
+    ]
+  },
+  "public/img/marcas/wld_tec.jpg": {
+    "file": "assets/wld_tec-DHfw_O3B.js",
+    "name": "wld_tec",
+    "src": "public/img/marcas/wld_tec.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/wld_tec-DEcHdxtJ.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/alicorp.jpg": {
+    "file": "assets/alicorp-B63-_A5z.js",
+    "name": "alicorp",
+    "src": "public/img/nuestros clientes/alicorp.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/alicorp-hSCWhICm.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/amazonas.jpg": {
+    "file": "assets/amazonas-BpkjC7K8.js",
+    "name": "amazonas",
+    "src": "public/img/nuestros clientes/amazonas.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/amazonas-H7zISG5e.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/aris.jpg": {
+    "file": "assets/aris-DFoeVGd6.js",
+    "name": "aris",
+    "src": "public/img/nuestros clientes/aris.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/aris-kgORkz0U.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/cartavio.jpg": {
+    "file": "assets/cartavio-DPYA12B6.js",
+    "name": "cartavio",
+    "src": "public/img/nuestros clientes/cartavio.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/cartavio-D9Qemcvw.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/cartavio_rum_company.jpg": {
+    "file": "assets/cartavio_rum_company-7M2aN6yc.js",
+    "name": "cartavio_rum_company",
+    "src": "public/img/nuestros clientes/cartavio_rum_company.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/cartavio_rum_company-DqSTXhqa.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/cayetano_heredia.jpg": {
+    "file": "assets/cayetano_heredia-ConLN3Tr.js",
+    "name": "cayetano_heredia",
+    "src": "public/img/nuestros clientes/cayetano_heredia.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/cayetano_heredia-CkIiOn-g.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/celima_trebol.jpg": {
+    "file": "assets/celima_trebol-CGoCXxgA.js",
+    "name": "celima_trebol",
+    "src": "public/img/nuestros clientes/celima_trebol.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/celima_trebol-Bp8jquYZ.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/cfg_investment.jpg": {
+    "file": "assets/cfg_investment-Vt_ssgme.js",
+    "name": "cfg_investment",
+    "src": "public/img/nuestros clientes/cfg_investment.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/cfg_investment-CXtHDxWF.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/chinalco.jpg": {
+    "file": "assets/chinalco-9-Q2VoKe.js",
+    "name": "chinalco",
+    "src": "public/img/nuestros clientes/chinalco.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/chinalco-D6yIhqgX.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/cori_puno.jpg": {
+    "file": "assets/cori_puno-uoT8IXsm.js",
+    "name": "cori_puno",
+    "src": "public/img/nuestros clientes/cori_puno.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/cori_puno-BUmUrSZf.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/eternit.jpg": {
+    "file": "assets/eternit-ClsXGop0.js",
+    "name": "eternit",
+    "src": "public/img/nuestros clientes/eternit.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/eternit-BecjjYq2.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/geopark.jpg": {
+    "file": "assets/geopark-BRkgbghP.js",
+    "name": "geopark",
+    "src": "public/img/nuestros clientes/geopark.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/geopark-D6VAtATD.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/gloria.jpg": {
+    "file": "assets/gloria-CmrBR-lt.js",
+    "name": "gloria",
+    "src": "public/img/nuestros clientes/gloria.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/gloria-q9tyDYkq.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/grand-invest.jpg": {
+    "file": "assets/grand-invest-8bYl_GGp.js",
+    "name": "grand-invest",
+    "src": "public/img/nuestros clientes/grand-invest.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/grand-invest-yBsEuoX_.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/herbi.jpg": {
+    "file": "assets/herbi-nARuf0lg.js",
+    "name": "herbi",
+    "src": "public/img/nuestros clientes/herbi.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/herbi-CDGJ0b_o.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/hospital_sergio_e_bernales.jpg": {
+    "file": "assets/hospital_sergio_e_bernales-D9qcWfvw.js",
+    "name": "hospital_sergio_e_bernales",
+    "src": "public/img/nuestros clientes/hospital_sergio_e_bernales.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/hospital_sergio_e_bernales-C5oxl6Ih.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/imarpe.jpg": {
+    "file": "assets/imarpe-Db4jF-DO.js",
+    "name": "imarpe",
+    "src": "public/img/nuestros clientes/imarpe.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/imarpe-Clfl-kFN.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/impala.jpg": {
+    "file": "assets/impala-Dljd77WH.js",
+    "name": "impala",
+    "src": "public/img/nuestros clientes/impala.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/impala-CkvNSF3j.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/ipen.jpg": {
+    "file": "assets/ipen-CpoI5748.js",
+    "name": "ipen",
+    "src": "public/img/nuestros clientes/ipen.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/ipen-DWStuVyW.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/itp.jpg": {
+    "file": "assets/itp-CG6oADyu.js",
+    "name": "itp",
+    "src": "public/img/nuestros clientes/itp.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/itp-DbPiHT6m.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/la_calera.jpg": {
+    "file": "assets/la_calera-D7Uo-OkA.js",
+    "name": "la_calera",
+    "src": "public/img/nuestros clientes/la_calera.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/la_calera-ChBvCWFZ.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/la_casa.jpg": {
+    "file": "assets/la_casa-YeExmnCj.js",
+    "name": "la_casa",
+    "src": "public/img/nuestros clientes/la_casa.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/la_casa-CLWmotMv.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/metalpren.jpg": {
+    "file": "assets/metalpren-DLMMj1Y2.js",
+    "name": "metalpren",
+    "src": "public/img/nuestros clientes/metalpren.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/metalpren-CPEjIs-1.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/orica.jpg": {
+    "file": "assets/orica-yMq6xryc.js",
+    "name": "orica",
+    "src": "public/img/nuestros clientes/orica.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/orica-RAal8fRz.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/poderosa.jpg": {
+    "file": "assets/poderosa-BO0l8uXN.js",
+    "name": "poderosa",
+    "src": "public/img/nuestros clientes/poderosa.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/poderosa-CRBdYUmp.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/portugal.jpg": {
+    "file": "assets/portugal-DrLX7qk9.js",
+    "name": "portugal",
+    "src": "public/img/nuestros clientes/portugal.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/portugal-DC4ERvnG.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/pronis.jpg": {
+    "file": "assets/pronis-DLna45w-.js",
+    "name": "pronis",
+    "src": "public/img/nuestros clientes/pronis.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/pronis-R4qBXRiI.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/proquinsa.jpg": {
+    "file": "assets/proquinsa-CsvOwBiN.js",
+    "name": "proquinsa",
+    "src": "public/img/nuestros clientes/proquinsa.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/proquinsa-DuFUmPH1.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/ransa.jpg": {
+    "file": "assets/ransa-Bw4n0o49.js",
+    "name": "ransa",
+    "src": "public/img/nuestros clientes/ransa.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/ransa-DSlzMxHe.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/redondos.jpg": {
+    "file": "assets/redondos-C0g9LLOg.js",
+    "name": "redondos",
+    "src": "public/img/nuestros clientes/redondos.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/redondos-lUrahpUZ.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/san_fernando.jpg": {
+    "file": "assets/san_fernando-IpMBhbz-.js",
+    "name": "san_fernando",
+    "src": "public/img/nuestros clientes/san_fernando.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/san_fernando-CX7Stm_s.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/senasa.jpg": {
+    "file": "assets/senasa-DQDVQeRG.js",
+    "name": "senasa",
+    "src": "public/img/nuestros clientes/senasa.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/senasa-Bnw9HJKb.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/senati.jpg": {
+    "file": "assets/senati-Bhaz706g.js",
+    "name": "senati",
+    "src": "public/img/nuestros clientes/senati.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/senati-C54comJ0.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/sol_de_laredo.jpg": {
+    "file": "assets/sol_de_laredo-NJrOqP0Z.js",
+    "name": "sol_de_laredo",
+    "src": "public/img/nuestros clientes/sol_de_laredo.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/sol_de_laredo-CnrDlGU3.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/summa_gold.jpg": {
+    "file": "assets/summa_gold-BblZczO1.js",
+    "name": "summa_gold",
+    "src": "public/img/nuestros clientes/summa_gold.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/summa_gold-ByM3ce90.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/superconcreto_del _peru.jpg": {
+    "file": "assets/superconcreto_del _peru-1H3lfveR.js",
+    "name": "superconcreto_del _peru",
+    "src": "public/img/nuestros clientes/superconcreto_del _peru.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/superconcreto_del _peru-DCWF-r4z.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/tasa.jpg": {
+    "file": "assets/tasa-Dlxx7uyh.js",
+    "name": "tasa",
+    "src": "public/img/nuestros clientes/tasa.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/tasa-Bk7kUPzT.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/trupal_s_a.jpg": {
+    "file": "assets/trupal_s_a-0eA95mTA.js",
+    "name": "trupal_s_a",
+    "src": "public/img/nuestros clientes/trupal_s_a.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/trupal_s_a-BGHhXFDn.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/unique.jpg": {
+    "file": "assets/unique-I1n2hL4k.js",
+    "name": "unique",
+    "src": "public/img/nuestros clientes/unique.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/unique-CI5TYPqW.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/universidad _catolica.jpg": {
+    "file": "assets/universidad _catolica-Bxo5KAjg.js",
+    "name": "universidad _catolica",
+    "src": "public/img/nuestros clientes/universidad _catolica.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/universidad _catolica-C2Cvltep.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/universidad_de_lima.jpg": {
+    "file": "assets/universidad_de_lima-DNwDWdll.js",
+    "name": "universidad_de_lima",
+    "src": "public/img/nuestros clientes/universidad_de_lima.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/universidad_de_lima-Bx2OAcjV.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/universidad_nacional_agraria_la_molina.jpg": {
+    "file": "assets/universidad_nacional_agraria_la_molina-CfHH9Wxb.js",
+    "name": "universidad_nacional_agraria_la_molina",
+    "src": "public/img/nuestros clientes/universidad_nacional_agraria_la_molina.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/universidad_nacional_agraria_la_molina-CjctZ7OE.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/universidad_nacional_de_ingenieria.jpg": {
+    "file": "assets/universidad_nacional_de_ingenieria-CrsBGjjT.js",
+    "name": "universidad_nacional_de_ingenieria",
+    "src": "public/img/nuestros clientes/universidad_nacional_de_ingenieria.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/universidad_nacional_de_ingenieria-DeB8-US7.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/unmsm.jpg": {
+    "file": "assets/unmsm-d25q0H9E.js",
+    "name": "unmsm",
+    "src": "public/img/nuestros clientes/unmsm.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/unmsm-BAy9Q-5F.jpg"
+    ]
+  },
+  "public/img/nuestros clientes/viru.jpg": {
+    "file": "assets/viru-C9r6bbG1.js",
+    "name": "viru",
+    "src": "public/img/nuestros clientes/viru.jpg",
+    "isDynamicEntry": true,
+    "assets": [
+      "assets/viru-wrzGwyay.jpg"
+    ]
+  },
+  "resources/js/Pages/Categoria.jsx": {
+    "file": "assets/Categoria-D58U6kQ_.js",
+    "name": "Categoria",
+    "src": "resources/js/Pages/Categoria.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx",
+      "_Footer-DN0bjEgH.js",
+      "_ProductGrid-DdRd47wC.js"
+    ]
+  },
+  "resources/js/Pages/Crear.jsx": {
+    "file": "assets/Crear-D2WOUIy_.js",
+    "name": "Crear",
+    "src": "resources/js/Pages/Crear.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx"
+    ]
+  },
+  "resources/js/Pages/Product.jsx": {
+    "file": "assets/Product-Bh5prbKg.js",
+    "name": "Product",
+    "src": "resources/js/Pages/Product.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx",
+      "_Footer-DN0bjEgH.js"
+    ]
+  },
+  "resources/js/Pages/Subcategorias.jsx": {
+    "file": "assets/Subcategorias-DoT6x7PQ.js",
+    "name": "Subcategorias",
+    "src": "resources/js/Pages/Subcategorias.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx",
+      "_Footer-DN0bjEgH.js",
+      "_ProductGrid-DdRd47wC.js"
+    ]
+  },
+  "resources/js/Pages/Welcome.jsx": {
+    "file": "assets/Welcome-Qm1zuKJY.js",
+    "name": "Welcome",
+    "src": "resources/js/Pages/Welcome.jsx",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.jsx",
+      "_Footer-DN0bjEgH.js"
+    ],
+    "dynamicImports": [
+      "public/img/categorias/accesorios-de-laboratorio/1.jpg",
+      "public/img/categorias/accesorios-de-laboratorio/2.jpg",
+      "public/img/categorias/accesorios-de-laboratorio/3.jpg",
+      "public/img/categorias/agitadores-de-laboratorio/1.jpg",
+      "public/img/categorias/agitadores-de-laboratorio/2.jpg",
+      "public/img/categorias/agitadores-de-laboratorio/3.jpg",
+      "public/img/categorias/analizadores-de-alimentos/1.jpg",
+      "public/img/categorias/analizadores-de-gases/1.jpg",
+      "public/img/categorias/analizadores-de-texturas/1.jpg",
+      "public/img/categorias/autoclaves-de-laboratorio/1.jpg",
+      "public/img/categorias/balanzas-de-laboratorio/1.jpg",
+      "public/img/categorias/baños-de-laboratorio/1.jpg",
+      "public/img/categorias/baños-de-laboratorio/2.jpg",
+      "public/img/categorias/baños-de-laboratorio/3.jpg",
+      "public/img/categorias/baños-ultrasónicos/1.jpg",
+      "public/img/categorias/baños-ultrasónicos/2.jpg",
+      "public/img/categorias/baños-ultrasónicos/3.jpg",
+      "public/img/categorias/biorreactores/1.jpg",
+      "public/img/categorias/biorreactores/2.jpg",
+      "public/img/categorias/bombas-y-compresores-de-laboratorio/1.jpg",
+      "public/img/categorias/bombas-y-compresores-de-laboratorio/2.jpg",
+      "public/img/categorias/buretas-y-dispensadores/1.jpg",
+      "public/img/categorias/cabinas-de-ventilación-de-laboratorio/1.jpg",
+      "public/img/categorias/calorímetros/1.jpg",
+      "public/img/categorias/calorímetros/2.jpg",
+      "public/img/categorias/campanas-extractoras/1.jpg",
+      "public/img/categorias/campanas-extractoras/2.jpg",
+      "public/img/categorias/centrífugas/1.jpg",
+      "public/img/categorias/centrífugas/2.jpg",
+      "public/img/categorias/certificados-de-calibración-acreditado/1.jpg",
+      "public/img/categorias/certificados-de-calibración-trazable/1.jpg",
+      "public/img/categorias/congeladores-de-laboratorio/1.jpg",
+      "public/img/categorias/consumibles-de-laboratorio/1.jpg",
+      "public/img/categorias/consumibles-de-laboratorio/2.jpg",
+      "public/img/categorias/consumibles-de-laboratorio/3.jpg",
+      "public/img/categorias/contadores-de-colonias/1.jpg",
+      "public/img/categorias/criostatos/1.jpg",
+      "public/img/categorias/cámaras-climáticas-de-laboratorio/1.jpg",
+      "public/img/categorias/cámaras-climáticas-de-laboratorio/2.jpg",
+      "public/img/categorias/cámaras-climáticas-de-laboratorio/3.jpg",
+      "public/img/categorias/densímetros/1.jpg",
+      "public/img/categorias/destiladores-de-agua/1.jpg",
+      "public/img/categorias/destiladores-de-agua/2.jpg",
+      "public/img/categorias/dispersores-de-laboratorios/1.jpg",
+      "public/img/categorias/dispersores-de-laboratorios/2.jpg",
+      "public/img/categorias/dispersores-de-laboratorios/3.jpg",
+      "public/img/categorias/electroquímica/1.jpg",
+      "public/img/categorias/electroquímica/2.jpg",
+      "public/img/categorias/espectroscopios/1.jpg",
+      "public/img/categorias/espectroscopios/2.jpg",
+      "public/img/categorias/espectroscopía/1.jpg",
+      "public/img/categorias/espectroscopía/2.jpg",
+      "public/img/categorias/espectroscopía/3.jpg",
+      "public/img/categorias/esterilizadores-de-laboratorio/1.jpg",
+      "public/img/categorias/esterilizadores-de-laboratorio/2.jpg",
+      "public/img/categorias/estufas-de-laboratorio/1.jpg",
+      "public/img/categorias/fotómetros/1.jpg",
+      "public/img/categorias/generadores-de-laboratorio/1.jpg",
+      "public/img/categorias/homogenizador-de-laboratorio/1.jpg",
+      "public/img/categorias/hornos/1.jpg",
+      "public/img/categorias/hornos/2.jpg",
+      "public/img/categorias/hornos/3.jpg",
+      "public/img/categorias/incubadoras-de-laboratorio/1.jpg",
+      "public/img/categorias/instrumentos-analíticos/1.jpg",
+      "public/img/categorias/lavadores-de-microplacas/1.jpg",
+      "public/img/categorias/limpiadores-a-vapor/1.jpg",
+      "public/img/categorias/limpiadores-a-vapor/2.jpg",
+      "public/img/categorias/liofilizadores-para-laboratorio/1.jpg",
+      "public/img/categorias/lámparas-de-análisis-uv/1.jpg",
+      "public/img/categorias/maquinas-laser/1.jpg",
+      "public/img/categorias/maquinas-laser/2.jpg",
+      "public/img/categorias/materiales-de-laboratorio/1.jpg",
+      "public/img/categorias/medidores-de-punto-de-fusión/1.jpg",
+      "public/img/categorias/medidores-de-punto-de-fusión/2.jpg",
+      "public/img/categorias/microscopios/1.jpg",
+      "public/img/categorias/microscopios/2.jpg",
+      "public/img/categorias/microscopios/3.jpg",
+      "public/img/categorias/mobiliarios-de-laboratorio/1.jpg",
+      "public/img/categorias/molinos/1.jpg",
+      "public/img/categorias/molinos/2.jpg",
+      "public/img/categorias/molinos/3.jpg",
+      "public/img/categorias/máquina-de-limpieza-de-relojes/1.jpg",
+      "public/img/categorias/máquina-de-limpieza-de-relojes/2.jpg",
+      "public/img/categorias/máquina-de-limpieza-de-relojes/3.jpg",
+      "public/img/categorias/pesas-patrón/1.jpg",
+      "public/img/categorias/pesas-patrón/2.jpg",
+      "public/img/categorias/pesas-patrón/3.jpg",
+      "public/img/categorias/pipetas-de-laboratorio/1.jpg",
+      "public/img/categorias/pipetas-de-laboratorio/2.jpg",
+      "public/img/categorias/placas-de-calentamiento/1.jpg",
+      "public/img/categorias/polarímetros/1.jpg",
+      "public/img/categorias/polarímetros/2.jpg",
+      "public/img/categorias/reactores-de-alta-viscosidad/1.jpg",
+      "public/img/categorias/reactores-de-alta-viscosidad/2.jpg",
+      "public/img/categorias/reactores-de-síntesis/1.jpg",
+      "public/img/categorias/refractómetros/1.jpg",
+      "public/img/categorias/refractómetros/2.jpg",
+      "public/img/categorias/refractómetros/3.jpg",
+      "public/img/categorias/refrigeradores-de-laboratorio/1.jpg",
+      "public/img/categorias/refrigeradores-de-laboratorio/2.jpg",
+      "public/img/categorias/reómetros/1.jpg",
+      "public/img/categorias/reómetros/2.jpg",
+      "public/img/categorias/reómetros/3.jpg",
+      "public/img/categorias/rotavapores/1.jpg",
+      "public/img/categorias/rotavapores/2.jpg",
+      "public/img/categorias/servicio-de-mantenimiento-equipos-de-laboratorio/1.jpg",
+      "public/img/categorias/sistema-de-histotecnologia/1.jpg",
+      "public/img/categorias/sistema-de-histotecnologia/2.jpg",
+      "public/img/categorias/sistemas-de-extracción-de-adn-arn-y-purificación-de-proteínas/1.jpg",
+      "public/img/categorias/sistemas-de-histotecnología/1.jpg",
+      "public/img/categorias/sistemas-de-limpieza-uv/1.jpg",
+      "public/img/categorias/software-de-laboratorio/1.jpg",
+      "public/img/categorias/termobloques/1.jpg",
+      "public/img/categorias/termostatos-de-laboratorio/1.jpg",
+      "public/img/categorias/termostatos-de-laboratorio/2.jpg",
+      "public/img/categorias/termostatos-de-laboratorio/3.jpg",
+      "public/img/categorias/ubicacion/1.jpg",
+      "public/img/categorias/viscosimetros/1.jpg",
+      "public/img/categorias/viscosimetros/2.jpg",
+      "public/img/categorias/viscosimetros/3.jpg",
+      "public/img/nuestros clientes/alicorp.jpg",
+      "public/img/nuestros clientes/amazonas.jpg",
+      "public/img/nuestros clientes/aris.jpg",
+      "public/img/nuestros clientes/cartavio.jpg",
+      "public/img/nuestros clientes/cartavio_rum_company.jpg",
+      "public/img/nuestros clientes/cayetano_heredia.jpg",
+      "public/img/nuestros clientes/celima_trebol.jpg",
+      "public/img/nuestros clientes/cfg_investment.jpg",
+      "public/img/nuestros clientes/chinalco.jpg",
+      "public/img/nuestros clientes/cori_puno.jpg",
+      "public/img/nuestros clientes/eternit.jpg",
+      "public/img/nuestros clientes/geopark.jpg",
+      "public/img/nuestros clientes/gloria.jpg",
+      "public/img/nuestros clientes/grand-invest.jpg",
+      "public/img/nuestros clientes/herbi.jpg",
+      "public/img/nuestros clientes/hospital_sergio_e_bernales.jpg",
+      "public/img/nuestros clientes/imarpe.jpg",
+      "public/img/nuestros clientes/impala.jpg",
+      "public/img/nuestros clientes/ipen.jpg",
+      "public/img/nuestros clientes/itp.jpg",
+      "public/img/nuestros clientes/la_calera.jpg",
+      "public/img/nuestros clientes/la_casa.jpg",
+      "public/img/nuestros clientes/metalpren.jpg",
+      "public/img/nuestros clientes/orica.jpg",
+      "public/img/nuestros clientes/poderosa.jpg",
+      "public/img/nuestros clientes/portugal.jpg",
+      "public/img/nuestros clientes/pronis.jpg",
+      "public/img/nuestros clientes/proquinsa.jpg",
+      "public/img/nuestros clientes/ransa.jpg",
+      "public/img/nuestros clientes/redondos.jpg",
+      "public/img/nuestros clientes/san_fernando.jpg",
+      "public/img/nuestros clientes/senasa.jpg",
+      "public/img/nuestros clientes/senati.jpg",
+      "public/img/nuestros clientes/sol_de_laredo.jpg",
+      "public/img/nuestros clientes/summa_gold.jpg",
+      "public/img/nuestros clientes/superconcreto_del _peru.jpg",
+      "public/img/nuestros clientes/tasa.jpg",
+      "public/img/nuestros clientes/trupal_s_a.jpg",
+      "public/img/nuestros clientes/unique.jpg",
+      "public/img/nuestros clientes/universidad _catolica.jpg",
+      "public/img/nuestros clientes/universidad_de_lima.jpg",
+      "public/img/nuestros clientes/universidad_nacional_agraria_la_molina.jpg",
+      "public/img/nuestros clientes/universidad_nacional_de_ingenieria.jpg",
+      "public/img/nuestros clientes/unmsm.jpg",
+      "public/img/nuestros clientes/viru.jpg",
+      "public/img/marcas/7_ealway.jpg",
+      "public/img/marcas/accumax.jpg",
+      "public/img/marcas/aczet.jpg",
+      "public/img/marcas/adam.jpg",
+      "public/img/marcas/alp.jpg",
+      "public/img/marcas/and _discover-precision.jpg",
+      "public/img/marcas/aralab.jpg",
+      "public/img/marcas/asecos.jpg",
+      "public/img/marcas/axis.jpg",
+      "public/img/marcas/beger.jpg",
+      "public/img/marcas/biobase.jpg",
+      "public/img/marcas/biosan.jpg",
+      "public/img/marcas/copair.jpg",
+      "public/img/marcas/draglab.jpg",
+      "public/img/marcas/elma.jpg",
+      "public/img/marcas/equinlab.jpg",
+      "public/img/marcas/eyela.jpg",
+      "public/img/marcas/filtra.jpg",
+      "public/img/marcas/grant.jpg",
+      "public/img/marcas/hanon.jpg",
+      "public/img/marcas/harry_gestigkeit_gmbh.jpg",
+      "public/img/marcas/hirschmann.jpg",
+      "public/img/marcas/horiba.jpg",
+      "public/img/marcas/ika.jpg",
+      "public/img/marcas/jisico.jpg",
+      "public/img/marcas/kern.jpg",
+      "public/img/marcas/kruss.jpg",
+      "public/img/marcas/labtech.jpg",
+      "public/img/marcas/lamy_rheology.jpg",
+      "public/img/marcas/mag.jpg",
+      "public/img/marcas/memmert.jpg",
+      "public/img/marcas/mpw.jpg",
+      "public/img/marcas/nickel_electrolto.jpg",
+      "public/img/marcas/nk.jpg",
+      "public/img/marcas/nuve.jpg",
+      "public/img/marcas/ovan.jpg",
+      "public/img/marcas/pobel.jpg",
+      "public/img/marcas/poleko.jpg",
+      "public/img/marcas/polyscience.jpg",
+      "public/img/marcas/schuett-biotec_de.jpg",
+      "public/img/marcas/termo_fisher.jpg",
+      "public/img/marcas/vibra.jpg",
+      "public/img/marcas/wld_tec.jpg"
+    ],
+    "css": [
+      "assets/Welcome-CmcN9niw.css"
+    ]
+  },
+  "resources/js/app.jsx": {
+    "file": "assets/app-Cglb1nKu.js",
+    "name": "app",
+    "src": "resources/js/app.jsx",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/Pages/Categoria.jsx",
+      "resources/js/Pages/Crear.jsx",
+      "resources/js/Pages/Product.jsx",
+      "resources/js/Pages/Subcategorias.jsx",
+      "resources/js/Pages/Welcome.jsx"
+    ],
+    "css": [
+      "assets/app-rKtDEcXf.css"
+    ]
+  }
+}
