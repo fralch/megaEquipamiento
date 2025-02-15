@@ -6,14 +6,16 @@ import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
 
-export default function Subcategoria({ subcategoriaId }) {
+export default function Subcategoria({ productos }) {
     const [isOpen, setIsOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [openCategories, setOpenCategories] = useState({});
     const [activeCategory, setActiveCategory] = useState(null);
-    const [products, setProducts] = useState([]);
+
+    console.log("Productos recibidos:", productos); // Verifica los productos recibidos
 
     useEffect(() => {
+        // Cargar categorías desde localStorage o desde la API
         const storedData = localStorage.getItem('categoriasCompleta');
         if (storedData) {
             setCategoriasArray(JSON.parse(storedData));
@@ -27,20 +29,6 @@ export default function Subcategoria({ subcategoriaId }) {
                 .catch((error) => console.error('Error fetching data:', error));
         }
     }, []);
-
-    useEffect(() => {
-        if (subcategoriaId) {
-            const requestOptions = {
-                method: "GET",
-                redirect: "follow"
-            };
-
-            fetch(`http://127.0.0.1:8000/product/subcategoria/${subcategoriaId}`, requestOptions)
-                .then((response) => response.json())
-                .then((data) => setProducts(data))
-                .catch((error) => console.error('Error fetching products:', error));
-        }
-    }, [subcategoriaId]);
 
     const toggleCategory = (categoriaNombre) => {
         setOpenCategories((prevState) => ({
@@ -92,7 +80,7 @@ export default function Subcategoria({ subcategoriaId }) {
                     ))}
                 </nav>
                 <div className="flex-1 p-4">
-                    <ProductGrid products={products} />
+                    <ProductGrid products={productos} />
                 </div>
             </div>
             <Footer />

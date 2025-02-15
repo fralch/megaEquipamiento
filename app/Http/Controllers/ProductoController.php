@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use  Inertia\Inertia;
 use App\Models\Producto;
 use App\Models\Subcategoria;
 use App\Models\Marca;
@@ -126,4 +127,12 @@ class ProductoController extends Controller
     }
          
      
+
+    public function subCategoriaView(Request $request, $subcategoria_id)
+    {
+        $id = $request->id;
+        $productos = Producto::where('id_subcategoria', $id)->get();
+        return Inertia::render('Subcategorias',  compact('productos'));
+
+    }
 }

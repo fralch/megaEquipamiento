@@ -14,7 +14,7 @@ use Inertia\Inertia;
 Route::get('/', function () { return Inertia::render('Welcome');});
 Route::get('/categorias', function () {return Inertia::render('Categoria'); });
 // Route::get('/subcategorias', function () {return Inertia::render('Subcategorias'); });
-Route::get('/subcategoria/{id}', function ($id) { return Inertia::render('Subcategorias', ['subcategoriaId' => $id]);});
+Route::get('/subcategoria/{id}', [ProductoController::class, 'subCategoriaView']);
 
 Route::get('/producto', function () { return Inertia::render('Product'); });
 Route::get('/crear', function () {return Inertia::render('Crear');});
