@@ -41,7 +41,7 @@ export default function Tienda() {
 
     return (
         <div>
-            <Head title="Tienda" />
+            <Head title="Categorias" />
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />

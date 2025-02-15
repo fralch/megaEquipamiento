@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
-const ProductGrid = () => {
-  const [products, setProducts] = useState([]);
+const ProductGrid = ({ products: initialProducts }) => {
+  const [products, setProducts] = useState(initialProducts || []);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 24;
 
-  // Mapeo de nombres de países a códigos de país
   const countryCodeMap = {
     'afganistán': 'af',
     'albania': 'al',
@@ -185,36 +184,57 @@ const ProductGrid = () => {
   };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch('http://127.0.0.1:8000/product/all');
-        const data = await response.json();
+    if (!initialProducts || initialProducts.length === 0) {
+      const fetchProducts = async () => {
+        try {
+          const response = await fetch('http://127.0.0.1:8000/product/all');
+          const data = await response.json();
 
-        const transformedProducts = data.map(item => {
-          const countryName = item.pais.toLowerCase(); // Convertir a minúsculas
-          const countryCode = countryCodeMap[countryName] || 'unknown'; // Obtener el código del país
-          return {
-            id: item.id_producto,
-            title: item.nombre,
-            diameter: item.caracteristicas?.Dimensiones || 'N/A',
-            material: item.caracteristicas?.Marca || 'N/A',
-            brand: item.caracteristicas?.Marca || 'N/A',
-            origin: item.pais,
-            price: parseFloat(item.precio_igv),
-            image: item.imagen,
-            flag: `https://flagcdn.com/w320/${countryCode}.png`, // URL de la bandera
-            description: item.descripcion
-          };
-        });
+          const transformedProducts = data.map(item => {
+            const countryName = item.pais.toLowerCase();
+            const countryCode = countryCodeMap[countryName] || 'unknown';
+            return {
+              id: item.id_producto,
+              title: item.nombre,
+              diameter: item.caracteristicas?.Dimensiones || 'N/A',
+              material: item.caracteristicas?.Marca || 'N/A',
+              brand: item.caracteristicas?.Marca || 'N/A',
+              origin: item.pais,
+              price: parseFloat(item.precio_igv),
+              image: item.imagen,
+              flag: `https://flagcdn.com/w320/${countryCode}.png`,
+              description: item.descripcion
+            };
+          });
 
-        setProducts(transformedProducts);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
+          setProducts(transformedProducts);
+        } catch (error) {
+          console.error('Error fetching products:', error);
+        }
+      };
 
-    fetchProducts();
-  }, []);
+      fetchProducts();
+    } else {
+      const transformedProducts = initialProducts.map(item => {
+        const countryName = item.pais.toLowerCase();
+        const countryCode = countryCodeMap[countryName] || 'unknown';
+        return {
+          id: item.id_producto,
+          title: item.nombre,
+          diameter: item.caracteristicas?.Dimensiones || 'N/A',
+          material: item.caracteristicas?.Marca || 'N/A',
+          brand: item.caracteristicas?.Marca || 'N/A',
+          origin: item.pais,
+          price: parseFloat(item.precio_igv),
+          image: item.imagen,
+          flag: `https://flagcdn.com/w320/${countryCode}.png`,
+          description: item.descripcion
+        };
+      });
+
+      setProducts(transformedProducts);
+    }
+  }, [initialProducts]);
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -274,7 +294,7 @@ const Card = ({ product }) => {
         </p>
         <div className="flex justify-between items-center mt-4">
           <span className="text-xl font-bold text-blue-600">
-            ${product.price.toFixed(2)}
+            ${product.price}
           </span>
           <img
             src={product.flag}
@@ -282,7 +302,7 @@ const Card = ({ product }) => {
             className="w-6 h-4 object-cover"
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = '/path/to/default-flag.png'; // Ruta a una imagen de bandera por defecto
+              e.target.src = '/path/to/default-flag.png';
             }}
           />
         </div>
@@ -320,6 +340,5 @@ const Card = ({ product }) => {
     </div>
   );
 };
-
 
 export default ProductGrid;

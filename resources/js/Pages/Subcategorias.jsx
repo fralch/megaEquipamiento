@@ -1,4 +1,4 @@
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
@@ -68,13 +68,13 @@ export default function Subcategoria({ productos }) {
                             {openCategories[categoria.nombre] &&
                                 categoria.subcategorias &&
                                 categoria.subcategorias.map((subcategoria) => (
-                                    <a
+                                    <Link
                                         key={subcategoria.id_subcategoria}
-                                        href="#"
+                                        href={`/subcategoria/${subcategoria.id_subcategoria}`}
                                         className="block p-2 pl-6 hover:bg-blue-100 bg-blue-50 rounded"
                                     >
                                         {subcategoria.nombre}
-                                    </a>
+                                    </Link>
                                 ))}
                         </div>
                     ))}
