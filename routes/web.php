@@ -13,7 +13,9 @@ use Inertia\Inertia;
 // rutas que retornan vistas
 Route::get('/', function () { return Inertia::render('Welcome');});
 Route::get('/categorias', function () {return Inertia::render('Categoria'); });
-Route::get('/subcategorias', function () {return Inertia::render('Subcategorias'); });
+// Route::get('/subcategorias', function () {return Inertia::render('Subcategorias'); });
+Route::get('/subcategoria/{id}', function ($id) { return Inertia::render('Subcategorias', ['subcategoriaId' => $id]);});
+
 Route::get('/producto', function () { return Inertia::render('Product'); });
 Route::get('/crear', function () {return Inertia::render('Crear');});
 
@@ -27,9 +29,7 @@ Route::get('/product/all', [ProductoController::class, 'getProductos']);
 Route::get('/product/all-imagen', [ProductoController::class, 'getProductosImagen']);
 Route::get('/product/show/{id}', [ProductoController::class, 'showProduct']);
 Route::get('/product/image/{id}', [ProductoController::class, 'getImagenProducto']);
-Route::get('/subcategoria/{id}', function ($id) {
-    return Inertia::render('Subcategoria', ['subcategoriaId' => $id]);
-})->name('subcategoria.show');
+Route::get('/product/subcategoria/{id}', [ProductoController::class, 'getProductosSubcategoria']);
 
 
 
