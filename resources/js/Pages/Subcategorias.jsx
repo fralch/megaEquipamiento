@@ -11,6 +11,7 @@ export default function Subcategoria({ productos }) {
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [openCategories, setOpenCategories] = useState({});
     const [activeCategory, setActiveCategory] = useState(null);
+    const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
 
     console.log("Productos recibidos:", productos); // Verifica los productos recibidos
 
@@ -28,6 +29,18 @@ export default function Subcategoria({ productos }) {
                 })
                 .catch((error) => console.error('Error fetching data:', error));
         }
+
+        // Obtener el ID de la subcategoría desde la URL
+        const urlParts = window.location.pathname.split('/');
+        const subcategoriaId = urlParts[urlParts.length - 1];
+
+        // Hacer una solicitud a la API para obtener los datos de la subcategoría
+        fetch(`http://127.0.0.1:8000/subcategoria_id/${subcategoriaId}`)
+            .then((response) => response.json())
+            .then((data) => {
+                setSubcategoriaNombre(data.nombre);
+            })
+            .catch((error) => console.error('Error fetching subcategoria data:', error));
     }, []);
 
     const toggleCategory = (categoriaNombre) => {
@@ -80,6 +93,7 @@ export default function Subcategoria({ productos }) {
                     ))}
                 </nav>
                 <div className="flex-1 p-4">
+                    <h1 className="text-2xl font-bold mb-4">{subcategoriaNombre}</h1>
                     <ProductGrid products={productos} />
                 </div>
             </div>

@@ -57,5 +57,11 @@ class SubcategoriaController extends Controller
         return response()->json($subcategorias);
     }
 
+
+    // obtener subcategoria por id
+    public function getSubcategoriaById($id_subcategoria){
+        $subcategoria = Subcategoria::find($id_subcategoria);
+        return response()->json($subcategoria);
+    }
   
 }
