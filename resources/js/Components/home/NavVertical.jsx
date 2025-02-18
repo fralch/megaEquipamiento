@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import URL_API from "../../env";
 
 const NavVertical = ({ isOpen, onClose }) => {
   const [categoriasArray, setCategoriasArray] = useState([]);
@@ -12,7 +13,7 @@ const NavVertical = ({ isOpen, onClose }) => {
       setCategoriasArray(JSON.parse(storedData));
     } else {
       // Si no están en el localStorage, haz la solicitud a la API
-      fetch('http://equipamientoindustriales.hpservidor.com/categorias-completa')
+      fetch(URL_API + '/categorias-completa')
         .then((response) => response.json())
         .then((data) => {
           setCategoriasArray(data);

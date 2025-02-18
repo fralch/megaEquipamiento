@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import URL_API from "../../env";
 
 const ProductGrid = ({ products: initialProducts }) => {
   const [products, setProducts] = useState(initialProducts || []);
@@ -187,7 +188,7 @@ const ProductGrid = ({ products: initialProducts }) => {
     if (!initialProducts || initialProducts.length === 0) {
       const fetchProducts = async () => {
         try {
-          const response = await fetch('http://equipamientoindustriales.hpservidor.com/product/all');
+          const response = await fetch( URL_API + "/product/all");
           const data = await response.json();
 
           const transformedProducts = data.map(item => {

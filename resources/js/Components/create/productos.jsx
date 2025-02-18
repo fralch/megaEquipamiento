@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import URL_API from "../../env";
 
 const Productos = ({ onSubmit }) => {
   const [productos, setProductos] = useState([]);
@@ -28,19 +29,19 @@ const Productos = ({ onSubmit }) => {
 
   useEffect(() => {
     // Fetch categorías
-    fetch('http://equipamientoindustriales.hpservidor.com/categorias-all')
+    fetch( URL_API + "/categorias-all") 
       .then(response => response.json())
       .then(data => setCategorias(data))
       .catch(error => console.error('Error fetching categorías:', error));
 
     // Fetch subcategorías
-    fetch('http://equipamientoindustriales.hpservidor.com/subcategoria/all')
+    fetch(+ URL_API + "/subcategoria/all")
       .then(response => response.json())
       .then(data => setSubcategorias(data))
       .catch(error => console.error('Error fetching subcategorías:', error));
 
     // Fetch marcas
-    fetch('http://equipamientoindustriales.hpservidor.com/marca/all')
+    fetch(  URL_API + "/marca/all")
       .then(response => response.json())
       .then(data => setMarcas(data))
       .catch(error => console.error('Error fetching marcas:', error));
@@ -85,7 +86,7 @@ const Productos = ({ onSubmit }) => {
     }
 
     try {
-      const response = await fetch('http://equipamientoindustriales.hpservidor.com/product/create', {
+      const response = await fetch(+ URL_API + "/product/create", {
         method: 'POST',
         body: formData,
         headers: {
