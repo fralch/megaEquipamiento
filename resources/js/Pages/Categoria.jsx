@@ -17,7 +17,7 @@ export default function Categoria() {
         if (storedData) {
             setCategoriasArray(JSON.parse(storedData));
         } else {
-            fetch('http://127.0.0.1:8000/categorias-completa')
+            fetch('http://equipamientoindustriales.hpservidor.com/categorias-completa')
                 .then((response) => response.json())
                 .then((data) => {
                     setCategoriasArray(data);

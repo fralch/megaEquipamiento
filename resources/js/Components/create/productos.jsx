@@ -28,19 +28,19 @@ const Productos = ({ onSubmit }) => {
 
   useEffect(() => {
     // Fetch categorías
-    fetch('http://127.0.0.1:8000/categorias-all')
+    fetch('http://equipamientoindustriales.hpservidor.com/categorias-all')
       .then(response => response.json())
       .then(data => setCategorias(data))
       .catch(error => console.error('Error fetching categorías:', error));
 
     // Fetch subcategorías
-    fetch('http://127.0.0.1:8000/subcategoria/all')
+    fetch('http://equipamientoindustriales.hpservidor.com/subcategoria/all')
       .then(response => response.json())
       .then(data => setSubcategorias(data))
       .catch(error => console.error('Error fetching subcategorías:', error));
 
     // Fetch marcas
-    fetch('http://127.0.0.1:8000/marca/all')
+    fetch('http://equipamientoindustriales.hpservidor.com/marca/all')
       .then(response => response.json())
       .then(data => setMarcas(data))
       .catch(error => console.error('Error fetching marcas:', error));
@@ -85,7 +85,7 @@ const Productos = ({ onSubmit }) => {
     }
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/product/create', {
+      const response = await fetch('http://equipamientoindustriales.hpservidor.com/product/create', {
         method: 'POST',
         body: formData,
         headers: {
