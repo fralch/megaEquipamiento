@@ -187,7 +187,7 @@ const ProductGrid = ({ products: initialProducts }) => {
     if (!initialProducts || initialProducts.length === 0) {
       const fetchProducts = async () => {
         try {
-          const response = await fetch('http://127.0.0.1:8000/product/all');
+          const response = await fetch('http://equipamientoindustriales.hpservidor.com/product/all');
           const data = await response.json();
 
           const transformedProducts = data.map(item => {

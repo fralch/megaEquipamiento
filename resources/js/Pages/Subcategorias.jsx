@@ -21,7 +21,7 @@ export default function Subcategoria({ productos }) {
         if (storedData) {
             setCategoriasArray(JSON.parse(storedData));
         } else {
-            fetch('http://127.0.0.1:8000/categorias-completa')
+            fetch('http://equipamientoindustriales.hpservidor.com/categorias-completa')
                 .then((response) => response.json())
                 .then((data) => {
                     setCategoriasArray(data);
@@ -35,7 +35,7 @@ export default function Subcategoria({ productos }) {
         const subcategoriaId = urlParts[urlParts.length - 1];
 
         // Hacer una solicitud a la API para obtener los datos de la subcategoría
-        fetch(`http://127.0.0.1:8000/subcategoria_id/${subcategoriaId}`)
+        fetch(`http://equipamientoindustriales.hpservidor.com/subcategoria_id/${subcategoriaId}`)
             .then((response) => response.json())
             .then((data) => {
                 setSubcategoriaNombre(data.nombre);

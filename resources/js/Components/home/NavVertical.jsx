@@ -12,7 +12,7 @@ const NavVertical = ({ isOpen, onClose }) => {
       setCategoriasArray(JSON.parse(storedData));
     } else {
       // Si no están en el localStorage, haz la solicitud a la API
-      fetch('http://127.0.0.1:8000/categorias-completa')
+      fetch('http://equipamientoindustriales.hpservidor.com/categorias-completa')
         .then((response) => response.json())
         .then((data) => {
           setCategoriasArray(data);
