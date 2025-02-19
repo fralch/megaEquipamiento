@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "@inertiajs/react";
-import URL_API from "../../../env";
+const URL_API = import.meta.env.VITE_API_URL;  
 // Importar todas las imágenes de la carpeta "public/img/categorias"
 const images = import.meta.glob('/public/img/categorias/**/*.{jpg,png}');
 

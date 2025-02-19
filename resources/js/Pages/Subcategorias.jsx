@@ -5,7 +5,7 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
-import URL_API from "../env";
+const URL_API = import.meta.env.VITE_API_URL;  
 
 export default function Subcategoria({ productos }) {
     const [isOpen, setIsOpen] = useState(false);

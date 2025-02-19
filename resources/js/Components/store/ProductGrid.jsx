@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import URL_API from "../../env";
+const URL_API = import.meta.env.VITE_API_URL;  
 
 const ProductGrid = ({ products: initialProducts }) => {
   const [products, setProducts] = useState(initialProducts || []);
