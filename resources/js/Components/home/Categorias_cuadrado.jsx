@@ -55,10 +55,14 @@ const CategoryCard = ({ title, items }) => {
 
         {/* Lista desplazable */}
         <div className="space-y-2 h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-300">
-          {items.map((item, index) => (
-            <p key={index} className="hover:bg-gray-700 p-2 rounded-md cursor-pointer">
+          {items.map((item) => (
+            <Link
+              key={item.id_subcategoria}
+              href={`/subcategoria/${item.id_subcategoria}`}
+              className="block hover:bg-gray-700 p-2 rounded-md cursor-pointer"
+            >
               {item.nombre}
-            </p>
+            </Link>
           ))}
         </div>
 
