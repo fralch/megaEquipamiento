@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-const URL_API = import.meta.env.VITE_API_URL;  
+import { Link } from "@inertiajs/react";
+const URL_API = import.meta.env.VITE_API_URL;
 
 const NavVertical = ({ isOpen, onClose }) => {
   const [categoriasArray, setCategoriasArray] = useState([]);
@@ -87,13 +88,13 @@ const NavVertical = ({ isOpen, onClose }) => {
               {openCategories[categoria.nombre] &&
                 categoria.subcategorias &&
                 categoria.subcategorias.map((subcategoria) => (
-                  <a
+                  <Link
                     key={subcategoria.id_subcategoria}
-                    href="#"
+                    href={`/subcategoria/${subcategoria.id_subcategoria}`}
                     className="block p-2 pl-6 hover:bg-blue-50 rounded"
                   >
                     {subcategoria.nombre}
-                  </a>
+                  </Link>
                 ))}
             </div>
           ))}
