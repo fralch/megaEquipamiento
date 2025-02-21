@@ -3,30 +3,55 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use App\Models\Categoria;
 use App\Models\Subcategoria;
+use App\Models\Producto;
 
 class CategoriaController extends Controller
 {
    
-    /**
-     * Obtener las categorías y subcategorías en el formato deseado.
-     */
-    public function getCategoriasConSubcategorias()
+    public function CategoriasWiew($id_categoria = null)
     {
-        // Obtener todas las categorías con sus subcategorías relacionadas
-        $categorias = Categoria::with('subcategorias')->get();
-
-        // Formatear los datos
-        $formattedData = [];
-        foreach ($categorias as $categoria) {
-            $subcategorias = $categoria->subcategorias->pluck('nombre')->toArray();
-            $formattedData[$categoria->nombre] = $subcategorias;
+        if ($id_categoria === null) {
+            // Si no se proporciona id_categoria, devolver un array vacío
+            $productos = [];
+            $categoria = null;
+            $subcategorias = [];
+            return Inertia::render('Categoria',  [
+                'productos' => $productos,
+                'categoria' => $categoria,
+                'subcategorias' => $subcategorias,
+            ]);
         }
 
-        return response()->json($formattedData);
+        // Obtener la categoría por su ID
+        $categoria = Categoria::find($id_categoria);
+
+        if (!$categoria) {
+            // Manejar el caso en que la categoría no se encuentre
+            return response()->json(['error' => 'Categoría no encontrada'], 404);
+        }
+
+        // Obtener las subcategorías asociadas a la categoría
+        $subcategorias = $categoria->subcategorias;
+
+        // Verificar los IDs de las subcategorías
+        $subcategoriaIds = $subcategorias->pluck('id_subcategoria')->toArray();
+        // \Log::info('Subcategoría IDs:', $subcategoriaIds);
+
+        // Obtener los productos que pertenecen a esas subcategorías
+        $productos = Producto::whereIn('id_subcategoria', $subcategoriaIds)->get();
+        // \Log::info('Productos obtenidos:', $productos->toArray());
+
+        // Devolver los productos en la vista usando Inertia
+        return Inertia::render('Categoria', [
+            'productos' => $productos,
+            'categoria' => $categoria,
+            'subcategorias' => $subcategorias,
+        ]);
     }
-    
+
 
 
     /*

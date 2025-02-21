@@ -15,6 +15,7 @@ export default function Subcategoria({ productos }) {
     const [activeCategory, setActiveCategory] = useState(null);
     const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
     const [categoriaNombre, setCategoriaNombre] = useState("");
+    const [categoriaId, setCategoriaId] = useState("");
 
     useEffect(() => {
         // Cargar categorías desde localStorage o desde la API
@@ -45,6 +46,7 @@ export default function Subcategoria({ productos }) {
                     .then((response) => response.json())
                     .then((data) => {
                         setCategoriaNombre(data.nombre_categoria);
+                        setCategoriaId(data.id_categoria);
                     })
                     .catch((error) => console.error('Error fetching categoria data:', error));
             })
@@ -101,7 +103,7 @@ export default function Subcategoria({ productos }) {
                     ))}
                 </nav>
                 <div className="flex-1 p-4">
-                    <h1 className="text-2xl font-bold mb-4"><span className="text-xl font-bold mb-4 text-gray-600">{categoriaNombre} /</span> {subcategoriaNombre}</h1>
+                    <h1 className="text-2xl font-bold mb-4"><Link href={`/categoria/${categoriaId}`}><span className="text-xl font-bold Link text-gray-600">{categoriaNombre} /</span></Link> {subcategoriaNombre}</h1>
                     <ProductGrid products={productos} />
                 </div>
             </div>

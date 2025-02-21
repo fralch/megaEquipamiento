@@ -79,6 +79,6 @@ class SubcategoriaController extends Controller
         $categoria = $subcategoria->categoria;
 
         // Devolver el nombre de la categoría
-        return response()->json(['nombre_categoria' => $categoria->nombre]);
+        return response()->json(['nombre_categoria' => $categoria->nombre, 'id_categoria' => $categoria->id_categoria]);
     }
 }

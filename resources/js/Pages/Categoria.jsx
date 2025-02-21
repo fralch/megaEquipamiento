@@ -5,9 +5,9 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
-const URL_API = import.meta.env.VITE_API_URL;  ;
+const URL_API = import.meta.env.VITE_API_URL;
 
-export default function Categoria() {
+export default function Categoria({ productos, categoria, subcategorias }) {
     const [isOpen, setIsOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [openCategories, setOpenCategories] = useState({});
@@ -18,7 +18,7 @@ export default function Categoria() {
         if (storedData) {
             setCategoriasArray(JSON.parse(storedData));
         } else {
-            fetch( URL_API + "/categorias-completa")
+            fetch(URL_API + "/categorias-completa")
                 .then((response) => response.json())
                 .then((data) => {
                     setCategoriasArray(data);
@@ -26,6 +26,16 @@ export default function Categoria() {
                 })
                 .catch((error) => console.error('Error fetching data:', error));
         }
+
+        // Obtener el ID de la categoría desde la URL
+        const urlParts = window.location.pathname.split('/');
+        const categoriaId = urlParts[urlParts.length - 1];
+        console.log(categoriaId);
+        console.log(productos);
+        console.log(subcategorias);
+        console.log(categoria);
+
+        // Hacer una solicitud a la API para obtener los datos de la categoría
     }, []);
 
     const toggleCategory = (categoriaNombre) => {
@@ -78,7 +88,11 @@ export default function Categoria() {
                     ))}
                 </nav>
                 <div className="flex-1 p-4">
-                    <ProductGrid />
+                    {productos && productos.length > 0 ? (
+                        <ProductGrid products={productos} />
+                    ) : (
+                        <ProductGrid />
+                    )}
                 </div>
             </div>
             <Footer />

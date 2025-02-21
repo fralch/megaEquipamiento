@@ -12,7 +12,7 @@ use Inertia\Inertia;
 
 // rutas que retornan vistas
 Route::get('/', function () { return Inertia::render('Welcome');});
-Route::get('/categorias', function () {return Inertia::render('Categoria'); });
+Route::get('/categorias/{id_categoria?}', [CategoriaController::class, 'CategoriasWiew']);
 // Route::get('/subcategorias', function () {return Inertia::render('Subcategorias'); });
 Route::get('/subcategoria/{id}', [ProductoController::class, 'subCategoriaView']);
 
@@ -40,6 +40,7 @@ Route::get('/categorias-con-subcategorias', [CategoriaController::class, 'getCat
 Route::get('/categorias-all', [CategoriaController::class, 'getCategorias']);
 Route::get('/categorias-con-subcategorias-con-id', [CategoriaController::class, 'getCategoriasConSubcategoriasConId']);
 Route::get('/categorias-completa', [CategoriaController::class, 'getCategoriasConSubcategoriasIds']);
+Route::get('/categoria/{id}', [CategoriaController::class, 'getCategoriaById']);
 
 
 // rutas para crear y mostrar subcategorias
