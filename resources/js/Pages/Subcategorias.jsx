@@ -36,9 +36,10 @@ export default function Subcategoria({ productos }) {
         const subcategoriaId = urlParts[urlParts.length - 1];
 
         // Hacer una solicitud a la API para obtener los datos de la subcategoría
-        fetch(`${URL_API}/subcategoria/${subcategoriaId}`)
+        fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`)
             .then((response) => response.json())
             .then((data) => {
+                console.log(data.nombre);
                 setSubcategoriaNombre(data.nombre);
             })
             .catch((error) => console.error('Error fetching subcategoria data:', error));
