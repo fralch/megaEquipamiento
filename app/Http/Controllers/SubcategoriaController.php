@@ -64,4 +64,21 @@ class SubcategoriaController extends Controller
         return response()->json($subcategoria);
     }
   
+
+    // obtener nombre categoria de una subcategoria
+    public function getCatBySub($idSubcategoria){
+        // Buscar la subcategoría por su ID
+        $subcategoria = Subcategoria::find($idSubcategoria);
+
+        // Verificar si la subcategoría existe
+        if (!$subcategoria) {
+            return response()->json(['error' => 'Subcategoría no encontrada'], 404);
+        }
+
+        // Obtener la categoría relacionada
+        $categoria = $subcategoria->categoria;
+
+        // Devolver el nombre de la categoría
+        return response()->json(['nombre_categoria' => $categoria->nombre]);
+    }
 }

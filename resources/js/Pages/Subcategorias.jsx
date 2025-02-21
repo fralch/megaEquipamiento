@@ -5,7 +5,8 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
-const URL_API = import.meta.env.VITE_API_URL;  
+
+const URL_API = import.meta.env.VITE_API_URL;
 
 export default function Subcategoria({ productos }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -13,8 +14,7 @@ export default function Subcategoria({ productos }) {
     const [openCategories, setOpenCategories] = useState({});
     const [activeCategory, setActiveCategory] = useState(null);
     const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
-
-    console.log("Productos recibidos:", productos); // Verifica los productos recibidos
+    const [categoriaNombre, setCategoriaNombre] = useState("");
 
     useEffect(() => {
         // Cargar categorías desde localStorage o desde la API
@@ -22,7 +22,7 @@ export default function Subcategoria({ productos }) {
         if (storedData) {
             setCategoriasArray(JSON.parse(storedData));
         } else {
-            fetch( URL_API + "/categorias-completa")
+            fetch(URL_API + "/categorias-completa")
                 .then((response) => response.json())
                 .then((data) => {
                     setCategoriasArray(data);
@@ -39,8 +39,14 @@ export default function Subcategoria({ productos }) {
         fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data.nombre);
                 setSubcategoriaNombre(data.nombre);
+                // Obtener el nombre de la categoría
+                fetch(`${URL_API}/subcategoria/cat/${subcategoriaId}`)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        setCategoriaNombre(data.nombre_categoria);
+                    })
+                    .catch((error) => console.error('Error fetching categoria data:', error));
             })
             .catch((error) => console.error('Error fetching subcategoria data:', error));
     }, []);
@@ -95,7 +101,7 @@ export default function Subcategoria({ productos }) {
                     ))}
                 </nav>
                 <div className="flex-1 p-4">
-                    <h1 className="text-2xl font-bold mb-4">{subcategoriaNombre}</h1>
+                    <h1 className="text-2xl font-bold mb-4"><span className="text-xl font-bold mb-4 text-gray-600">{categoriaNombre} /</span> {subcategoriaNombre}</h1>
                     <ProductGrid products={productos} />
                 </div>
             </div>
