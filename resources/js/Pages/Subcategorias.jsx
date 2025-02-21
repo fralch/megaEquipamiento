@@ -35,6 +35,8 @@ export default function Subcategoria({ productos }) {
         // Obtener el ID de la subcategoría desde la URL
         const urlParts = window.location.pathname.split('/');
         const subcategoriaId = urlParts[urlParts.length - 1];
+        console.log("productos");
+        console.log(productos);
 
         // Hacer una solicitud a la API para obtener los datos de la subcategoría
         fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`)
@@ -103,8 +105,18 @@ export default function Subcategoria({ productos }) {
                     ))}
                 </nav>
                 <div className="flex-1 p-4">
-                    <h1 className="text-2xl font-bold mb-4"><Link href={`/categoria/${categoriaId}`}><span className="text-xl font-bold Link text-gray-600">{categoriaNombre} /</span></Link> {subcategoriaNombre}</h1>
-                    <ProductGrid products={productos} />
+                    
+                    {productos && productos.length > 0 ? (
+                        <>
+                          <h1 className="text-2xl font-bold mb-4"><Link href={`/categorias/${categoriaId}`}><span className="text-xl font-bold Link text-gray-600">{categoriaNombre} /</span></Link> {subcategoriaNombre}</h1>
+                          <ProductGrid products={productos} />
+                        </>
+                    ) : (
+                        <>
+                        <h1 className="text-2xl font-bold mb-4">Mostrando todos los productos</h1>
+                        <ProductGrid />
+                        </>
+                    )}
                 </div>
             </div>
             <Footer />

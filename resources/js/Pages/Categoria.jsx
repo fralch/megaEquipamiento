@@ -89,9 +89,15 @@ export default function Categoria({ productos, categoria, subcategorias }) {
                 </nav>
                 <div className="flex-1 p-4">
                     {productos && productos.length > 0 ? (
-                        <ProductGrid products={productos} />
+                        <>
+                          <h1 className="text-2xl font-bold mb-4">Categoría: {categoria.nombre}</h1>
+                          <ProductGrid products={productos} />
+                        </>
                     ) : (
+                        <>
+                        <h1 className="text-2xl font-bold mb-4">Mostrando todos los productos</h1>
                         <ProductGrid />
+                        </>
                     )}
                 </div>
             </div>
