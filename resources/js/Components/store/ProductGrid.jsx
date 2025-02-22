@@ -303,7 +303,7 @@ const Card = ({ product }) => {
             className="w-6 h-4 object-cover"
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = '/path/to/default-flag.png';
+              e.target.src = '';
             }}
           />
         </div>
