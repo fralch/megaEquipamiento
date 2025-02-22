@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-const URL_API = import.meta.env.VITE_API_URL;  
+const URL_API = import.meta.env.VITE_API_URL;
 
 const ProductGrid = ({ products: initialProducts }) => {
   const [products, setProducts] = useState(initialProducts || []);
@@ -188,7 +188,7 @@ const ProductGrid = ({ products: initialProducts }) => {
     if (!initialProducts || initialProducts.length === 0) {
       const fetchProducts = async () => {
         try {
-          const response = await fetch( URL_API + "/product/all");
+          const response = await fetch(URL_API + "/product/all");
           const data = await response.json();
 
           const transformedProducts = data.map(item => {
@@ -204,7 +204,10 @@ const ProductGrid = ({ products: initialProducts }) => {
               price: parseFloat(item.precio_igv),
               image: item.imagen,
               flag: `https://flagcdn.com/w320/${countryCode}.png`,
-              description: item.descripcion
+              description: {
+                ...item.caracteristicas,
+                ...item.datos_tecnicos
+              }
             };
           });
 
@@ -229,7 +232,10 @@ const ProductGrid = ({ products: initialProducts }) => {
           price: parseFloat(item.precio_igv),
           image: item.imagen,
           flag: `https://flagcdn.com/w320/${countryCode}.png`,
-          description: item.descripcion
+          description: {
+            ...item.caracteristicas,
+            ...item.datos_tecnicos
+          }
         };
       });
 
@@ -324,10 +330,13 @@ const Card = ({ product }) => {
           <p>
             <strong>Procedencia:</strong> {product.origin}
           </p>
-          <div
-            className="mb-4"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          ></div>
+          <div className="mb-4">
+            {product.description && Object.entries(product.description).map(([key, value], index) => (
+              <p key={index}>
+                <strong>{key}:</strong> {value}
+              </p>
+            ))}
+          </div>
         </div>
         <div className="flex space-x-4 mt-auto">
           <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">
