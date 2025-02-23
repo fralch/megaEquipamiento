@@ -44,12 +44,12 @@ Route::get('/categoria/{id}', [CategoriaController::class, 'getCategoriaById']);
 
 
 // rutas para crear y mostrar subcategorias
-Route::post('/subcategoria/create', [SubcategoriaController::class, 'store']);
-Route::post('/subcategoria/update/{id}', [SubcategoriaController::class, 'update']);
-Route::get('/subcategoria/all', [SubcategoriaController::class, 'getSubcategorias']);
-Route::get('/subcategoria/categoria/{id}', [SubcategoriaController::class, 'getSubcategoriasCategoria']);
+Route::post('/subcategoria_post/create', [SubcategoriaController::class, 'store']);
+Route::post('/subcategoria_post/update/{id}', [SubcategoriaController::class, 'update']);
+Route::get('/subcategoria-all', [SubcategoriaController::class, 'getSubcategorias']);
+Route::get('/subcategoria_get/categoria/{id}', [SubcategoriaController::class, 'getSubcategoriasCategoria']);
 Route::get('/subcategoria_id/{id}', [SubcategoriaController::class, 'getSubcategoriaById']);
-Route::get('/subcategoria/cat/{id}', [SubcategoriaController::class, 'getCatBySub']);
+Route::get('/subcategoria_get/cat/{id}', [SubcategoriaController::class, 'getCatBySub']);
 
 // rutas para crear y mostrar marcas 
 Route::post('/marca/create', [MarcaController::class, 'createMarca']);

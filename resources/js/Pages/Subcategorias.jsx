@@ -42,9 +42,10 @@ export default function Subcategoria({ productos }) {
         fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`)
             .then((response) => response.json())
             .then((data) => {
+                console.log(data);
                 setSubcategoriaNombre(data.nombre);
                 // Obtener el nombre de la categoría
-                fetch(`${URL_API}/subcategoria/cat/${subcategoriaId}`)
+                fetch(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`)
                     .then((response) => response.json())
                     .then((data) => {
                         setCategoriaNombre(data.nombre_categoria);

@@ -20,7 +20,6 @@ const Productos = ({ onSubmit }) => {
     soporte_tecnico: "",
     caracteristicas: "{}",
     datos_tecnicos: "{}",
-    archivos_adicionales: "{}", // Cambiado de 'documentos' a 'archivos_adicionales'
   });
 
   const [categorias, setCategorias] = useState([]);
@@ -36,7 +35,7 @@ const Productos = ({ onSubmit }) => {
       .catch(error => console.error('Error fetching categorías:', error));
 
     // Fetch subcategorías
-    fetch(+ URL_API + "/subcategoria/all")
+    fetch(URL_API + "/subcategoria-all")
       .then(response => response.json())
       .then(data => setSubcategorias(data))
       .catch(error => console.error('Error fetching subcategorías:', error));
@@ -87,7 +86,7 @@ const Productos = ({ onSubmit }) => {
     }
 
     try {
-      const response = await fetch(+ URL_API + "/product/create", {
+      const response = await fetch(URL_API + "/product/create", {
         method: 'POST',
         body: formData,
         headers: {
@@ -180,7 +179,7 @@ const Productos = ({ onSubmit }) => {
             { label: "Soporte Técnico", name: "soporte_tecnico", type: "text" },
             { label: "Características", name: "caracteristicas", type: "text" },
             { label: "Datos Técnicos", name: "datos_tecnicos", type: "text" },
-            { label: "Archivos Adicionales", name: "archivos_adicionales", type: "text" }, // Cambiado de 'Documentos' a 'Archivos Adicionales'
+            
           ].map(({ label, name, type, options, step }) => (
             <div key={name} className="mb-4">
               <label htmlFor={name} className="block text-sm font-medium text-gray-700">

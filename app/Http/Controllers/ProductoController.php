@@ -31,32 +31,29 @@ class ProductoController extends Controller
             'soporte_tecnico' => 'nullable|string|max:100',
             'caracteristicas' => 'nullable|json',
             'datos_tecnicos' => 'nullable|json',
-            'archivos_adicionales' => 'nullable|json', // Cambiado de 'documentos' a 'archivos_adicionales'
         ]);
-
+    
         // Procesar la imagen si se proporciona
         $imagePath = null;
-
+    
         if ($request->hasFile('imagen')) {
-            $image = $request->file('imagen');
-
-            // Nombre de la imagen con marca de tiempo para evitar conflictos de nombres
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-
-            // Ruta de destino donde se guardará la imagen
-            $imagePath = 'images/productos/' . $imageName;
-
-            // Mover la imagen a la ruta de destino
-            if (!move_uploaded_file($image->getPathname(), public_path($imagePath))) {
-                return response()->json(['error' => 'Error al mover el archivo.'], 500);
+            try {
+                $image = $request->file('imagen');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = 'productos/' . $imageName;
+                $image->move(public_path('productos'), $imageName);
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Error al subir la imagen.'], 500);
             }
         }
-
+    
         // Crear el producto
-        $producto = Producto::create(array_merge($request->all(), ['imagen' => $imagePath]));
-
+        $producto = Producto::create(array_merge($request->except('imagen'), ['imagen' => $imagePath]));
+    
         return response()->json($producto);
     }
+    
+    
 
     /**
      * Actualizar producto

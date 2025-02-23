@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 const URL_API = import.meta.env.VITE_API_URL;
 
 const ProductGrid = ({ products: initialProducts }) => {
@@ -185,43 +186,48 @@ const ProductGrid = ({ products: initialProducts }) => {
   };
 
   useEffect(() => {
-    if (!initialProducts || initialProducts.length === 0) {
-      const fetchProducts = async () => {
-        try {
-          const response = await fetch(URL_API + "/product/all");
-          const data = await response.json();
-
-          const transformedProducts = data.map(item => {
-            const countryName = item.pais.toLowerCase();
-            const countryCode = countryCodeMap[countryName] || 'unknown';
-            return {
-              id: item.id_producto,
-              title: item.nombre,
-              diameter: item.caracteristicas?.Dimensiones || 'N/A',
-              material: item.caracteristicas?.Marca || 'N/A',
-              brand: item.caracteristicas?.Marca || 'N/A',
-              origin: item.pais,
-              price: parseFloat(item.precio_igv),
-              image: item.imagen,
-              flag: `https://flagcdn.com/w320/${countryCode}.png`,
-              description: {
-                ...item.caracteristicas,
-                ...item.datos_tecnicos
-              }
-            };
-          });
-
-          setProducts(transformedProducts);
-        } catch (error) {
-          console.error('Error fetching products:', error);
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${URL_API}/product/all`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
-      };
+        const data = await response.json();
 
+        const transformedProducts = data.map(item => {
+          const countryName = item.pais.toLowerCase();
+          const countryCode = countryCodeMap[countryName] || 'unknown';
+          const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
+          return {
+            id: item.id_producto,
+            title: item.nombre,
+            diameter: item.caracteristicas?.Dimensiones || 'N/A',
+            material: item.caracteristicas?.Marca || 'N/A',
+            brand: item.caracteristicas?.Marca || 'N/A',
+            origin: item.pais,
+            price: parseFloat(item.precio_igv),
+            image,
+            flag: `https://flagcdn.com/w320/${countryCode}.png`,
+            description: {
+              ...item.caracteristicas,
+              ...item.datos_tecnicos
+            }
+          };
+        });
+
+        setProducts(transformedProducts);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    if (!initialProducts || initialProducts.length === 0) {
       fetchProducts();
     } else {
       const transformedProducts = initialProducts.map(item => {
         const countryName = item.pais.toLowerCase();
         const countryCode = countryCodeMap[countryName] || 'unknown';
+        const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
         return {
           id: item.id_producto,
           title: item.nombre,
@@ -230,7 +236,7 @@ const ProductGrid = ({ products: initialProducts }) => {
           brand: item.caracteristicas?.Marca || 'N/A',
           origin: item.pais,
           price: parseFloat(item.precio_igv),
-          image: item.imagen,
+          image,
           flag: `https://flagcdn.com/w320/${countryCode}.png`,
           description: {
             ...item.caracteristicas,
@@ -284,6 +290,10 @@ const Card = ({ product }) => {
         src={product.image}
         alt={product.title}
         className="w-full h-64 object-contain p-4"
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = 'path/to/fallback/image.png'; // Agrega una imagen de respaldo
+        }}
       />
       <div className="p-4">
         <h2 className="text-lg font-semibold text-gray-800">{product.title}</h2>
