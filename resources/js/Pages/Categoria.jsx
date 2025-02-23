@@ -99,6 +99,11 @@ export default function Categoria({ productos, categoria, subcategorias }) {
                         <ProductGrid />
                         </>
                     )}
+                     <div className="flex justify-center">
+                        <Link href="/crear"className="fixed bottom-8 right-8 w-14 h-14 bg-[#0c2249] hover:bg-blue-800 text-white rounded-full flex items-center justify-center shadow-lg text-2xl transition-all duration-200 hover:scale-110" >
+                            +
+                        </Link>
+                    </div>
                 </div>
             </div>
             <Footer />
