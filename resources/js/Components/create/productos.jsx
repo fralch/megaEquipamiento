@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+import Modal_Features from './modal_features'; // Asegúrate de que la ruta sea correcta
 
-const URL_API = import.meta.env.VITE_API_URL;  
+const URL_API = import.meta.env.VITE_API_URL;
 
 const Productos = ({ onSubmit }) => {
   const [productos, setProductos] = useState([]);
@@ -24,24 +25,23 @@ const Productos = ({ onSubmit }) => {
 
   const [categorias, setCategorias] = useState([]);
   const [subcategorias, setSubcategorias] = useState([]);
-  const [marcas, setMarcas] = useState([]); // Nuevo estado para las marcas
+  const [marcas, setMarcas] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState('');
 
   useEffect(() => {
-    // Fetch categorías
-    fetch( URL_API + "/categorias-all") 
+    fetch(URL_API + "/categorias-all")
       .then(response => response.json())
       .then(data => setCategorias(data))
       .catch(error => console.error('Error fetching categorías:', error));
 
-    // Fetch subcategorías
     fetch(URL_API + "/subcategoria-all")
       .then(response => response.json())
       .then(data => setSubcategorias(data))
       .catch(error => console.error('Error fetching subcategorías:', error));
 
-    // Fetch marcas
-    fetch(  URL_API + "/marca/all")
+    fetch(URL_API + "/marca/all")
       .then(response => response.json())
       .then(data => setMarcas(data))
       .catch(error => console.error('Error fetching marcas:', error));
@@ -59,7 +59,7 @@ const Productos = ({ onSubmit }) => {
 
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
-    setForm({ ...form, id_subcategoria: '' }); // Reset subcategoría al cambiar de categoría
+    setForm({ ...form, id_subcategoria: '' });
   };
 
   const handleSubmit = async (e) => {
@@ -80,7 +80,6 @@ const Productos = ({ onSubmit }) => {
     formData.append('soporte_tecnico', form.soporte_tecnico);
     formData.append('caracteristicas', form.caracteristicas);
     formData.append('datos_tecnicos', form.datos_tecnicos);
-    formData.append('archivos_adicionales', form.archivos_adicionales); // Cambiado de 'documentos' a 'archivos_adicionales'
     if (form.imagen) {
       formData.append('imagen', form.imagen);
     }
@@ -119,7 +118,6 @@ const Productos = ({ onSubmit }) => {
           soporte_tecnico: "",
           caracteristicas: "{}",
           datos_tecnicos: "{}",
-          archivos_adicionales: "{}", // Cambiado de 'documentos' a 'archivos_adicionales'
         });
       } else {
         console.error('Error al crear el producto:', response.statusText);
@@ -129,10 +127,31 @@ const Productos = ({ onSubmit }) => {
     }
   };
 
-  // Filtrar subcategorías basadas en la categoría seleccionada
   const filteredSubcategorias = subcategorias.filter(
     subcategory => subcategory.id_categoria === parseInt(selectedCategory)
   );
+
+  const openModal = (type) => {
+    setModalType(type);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const saveModalData = (value) => {
+    try {
+      // Ensure the value is properly stringified if it's an object
+      const jsonValue = typeof value === 'object' ? JSON.stringify(value) : value;
+      setForm({ ...form, [modalType]: jsonValue });
+    } catch (error) {
+      console.error('Error saving modal data:', error);
+      // Set a default empty object if there's an error
+      setForm({ ...form, [modalType]: '{}' });
+    }
+    closeModal();
+  };
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
@@ -177,9 +196,6 @@ const Productos = ({ onSubmit }) => {
             { label: "Video", name: "video", type: "text" },
             { label: "Envío", name: "envio", type: "text" },
             { label: "Soporte Técnico", name: "soporte_tecnico", type: "text" },
-            { label: "Características", name: "caracteristicas", type: "text" },
-            { label: "Datos Técnicos", name: "datos_tecnicos", type: "text" },
-            
           ].map(({ label, name, type, options, step }) => (
             <div key={name} className="mb-4">
               <label htmlFor={name} className="block text-sm font-medium text-gray-700">
@@ -215,6 +231,36 @@ const Productos = ({ onSubmit }) => {
               )}
             </div>
           ))}
+
+          <div className="mb-4">
+            <label htmlFor="caracteristicas" className="block text-sm font-medium text-gray-700">
+              Características
+            </label>
+            <button
+              type="button"
+              onClick={() => openModal('caracteristicas')}
+              className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+            >
+              {form.caracteristicas === '{}' ? 'Click para agregar características' : 
+                typeof form.caracteristicas === 'string' ? 
+                  form.caracteristicas : JSON.stringify(form.caracteristicas)}
+            </button>
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="datos_tecnicos" className="block text-sm font-medium text-gray-700">
+              Datos Técnicos
+            </label>
+            <button
+              type="button"
+              onClick={() => openModal('datos_tecnicos')}
+              className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+            >
+              {form.datos_tecnicos === '{}' ? 'Click para agregar datos técnicos' : 
+                typeof form.datos_tecnicos === 'string' ? 
+                  form.datos_tecnicos : JSON.stringify(form.datos_tecnicos)}
+            </button>
+          </div>
 
           <div className="mb-4">
             <label htmlFor="imagen" className="block text-sm font-medium text-gray-700">
@@ -296,6 +342,15 @@ const Productos = ({ onSubmit }) => {
           </table>
         </div>
       </div>
+
+      {modalVisible && (
+        <Modal_Features
+          product={form}
+          type={modalType}
+          onSave={saveModalData}
+          onClose={closeModal}
+        />
+      )}
     </div>
   );
 };
