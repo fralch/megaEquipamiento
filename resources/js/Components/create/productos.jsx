@@ -19,8 +19,8 @@ const Productos = ({ onSubmit }) => {
     video: "",
     envio: "",
     soporte_tecnico: "",
-    caracteristicas: "{}",
-    datos_tecnicos: "{}",
+    caracteristicas: {},
+    datos_tecnicos: {},
   });
 
   const [categorias, setCategorias] = useState([]);
@@ -78,8 +78,8 @@ const Productos = ({ onSubmit }) => {
     formData.append('video', form.video);
     formData.append('envio', form.envio);
     formData.append('soporte_tecnico', form.soporte_tecnico);
-    formData.append('caracteristicas', form.caracteristicas);
-    formData.append('datos_tecnicos', form.datos_tecnicos);
+    formData.append('caracteristicas', JSON.stringify(form.caracteristicas));
+    formData.append('datos_tecnicos', JSON.stringify(form.datos_tecnicos));
     if (form.imagen) {
       formData.append('imagen', form.imagen);
     }
@@ -116,8 +116,8 @@ const Productos = ({ onSubmit }) => {
           video: "",
           envio: "",
           soporte_tecnico: "",
-          caracteristicas: "{}",
-          datos_tecnicos: "{}",
+          caracteristicas: {},
+          datos_tecnicos: {},
         });
       } else {
         console.error('Error al crear el producto:', response.statusText);
@@ -142,13 +142,13 @@ const Productos = ({ onSubmit }) => {
 
   const saveModalData = (value) => {
     try {
-      // Ensure the value is properly stringified if it's an object
-      const jsonValue = typeof value === 'object' ? JSON.stringify(value) : value;
+      // Ensure the value is properly parsed if it's a string
+      const jsonValue = typeof value === 'string' ? JSON.parse(value) : value;
       setForm({ ...form, [modalType]: jsonValue });
     } catch (error) {
       console.error('Error saving modal data:', error);
       // Set a default empty object if there's an error
-      setForm({ ...form, [modalType]: '{}' });
+      setForm({ ...form, [modalType]: {} });
     }
     closeModal();
   };
@@ -241,9 +241,7 @@ const Productos = ({ onSubmit }) => {
               onClick={() => openModal('caracteristicas')}
               className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
             >
-              {form.caracteristicas === '{}' ? 'Click para agregar características' : 
-                typeof form.caracteristicas === 'string' ? 
-                  form.caracteristicas : JSON.stringify(form.caracteristicas)}
+              {Object.keys(form.caracteristicas).length === 0 ? 'Click para agregar características' : JSON.stringify(form.caracteristicas)}
             </button>
           </div>
 
@@ -256,9 +254,7 @@ const Productos = ({ onSubmit }) => {
               onClick={() => openModal('datos_tecnicos')}
               className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
             >
-              {form.datos_tecnicos === '{}' ? 'Click para agregar datos técnicos' : 
-                typeof form.datos_tecnicos === 'string' ? 
-                  form.datos_tecnicos : JSON.stringify(form.datos_tecnicos)}
+              {Object.keys(form.datos_tecnicos).length === 0 ? 'Click para agregar datos técnicos' : JSON.stringify(form.datos_tecnicos)}
             </button>
           </div>
 

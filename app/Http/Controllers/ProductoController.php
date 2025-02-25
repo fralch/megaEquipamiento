@@ -47,11 +47,20 @@ class ProductoController extends Controller
             }
         }
     
+        // Convertir caracteristicas y datos_tecnicos a arrays si son strings JSON
+        $caracteristicas = is_string($request->caracteristicas) ? json_decode($request->caracteristicas, true) : $request->caracteristicas;
+        $datos_tecnicos = is_string($request->datos_tecnicos) ? json_decode($request->datos_tecnicos, true) : $request->datos_tecnicos;
+    
         // Crear el producto
-        $producto = Producto::create(array_merge($request->except('imagen'), ['imagen' => $imagePath]));
+        $producto = Producto::create(array_merge($request->except('imagen'), [
+            'imagen' => $imagePath,
+            'caracteristicas' => $caracteristicas,
+            'datos_tecnicos' => $datos_tecnicos,
+        ]));
     
         return response()->json($producto);
     }
+    
     
     
 
