@@ -201,17 +201,12 @@ const ProductGrid = ({ products: initialProducts }) => {
           return {
             id: item.id_producto,
             title: item.nombre,
-            diameter: item.caracteristicas?.Dimensiones || 'N/A',
-            material: item.caracteristicas?.Marca || 'N/A',
-            brand: item.caracteristicas?.Marca || 'N/A',
+            summary: item.caracteristicas || {},
+            technicalData: item.datos_tecnicos || {},
             origin: item.pais,
             price: parseFloat(item.precio_igv),
             image,
-            flag: `https://flagcdn.com/w320/${countryCode}.png`,
-            description: {
-              ...item.caracteristicas,
-              ...item.datos_tecnicos
-            }
+            flag: `https://flagcdn.com/w320/${countryCode}.png`
           };
         });
 
@@ -231,17 +226,12 @@ const ProductGrid = ({ products: initialProducts }) => {
         return {
           id: item.id_producto,
           title: item.nombre,
-          diameter: item.caracteristicas?.Dimensiones || 'N/A',
-          material: item.caracteristicas?.Marca || 'N/A',
-          brand: item.caracteristicas?.Marca || 'N/A',
+          summary: item.caracteristicas || {},
+          technicalData: item.datos_tecnicos || {},
           origin: item.pais,
           price: parseFloat(item.precio_igv),
           image,
-          flag: `https://flagcdn.com/w320/${countryCode}.png`,
-          description: {
-            ...item.caracteristicas,
-            ...item.datos_tecnicos
-          }
+          flag: `https://flagcdn.com/w320/${countryCode}.png`
         };
       });
 
@@ -297,18 +287,11 @@ const Card = ({ product }) => {
       />
       <div className="p-4">
         <h2 className="text-lg font-semibold text-gray-800">{product.title}</h2>
-        <p className="text-sm text-gray-600">
-          <strong>Diámetro:</strong> {product.diameter}
-        </p>
-        <p className="text-sm text-gray-600">
-          <strong>Material:</strong> {product.material}
-        </p>
-        <p className="text-sm text-gray-600">
-          <strong>Marca:</strong> {product.brand}
-        </p>
-        <p className="text-sm text-gray-600">
-          <strong>Procedencia:</strong> {product.origin}
-        </p>
+        {product.summary && Object.entries(product.summary).map(([key, value], index) => (
+          <p key={index} className="text-sm text-gray-600">
+            <strong>{key}:</strong> {value}
+          </p>
+        ))}
         <div className="flex justify-between items-center mt-4">
           <span className="text-xl font-bold text-blue-600">
             ${product.price}
@@ -328,25 +311,11 @@ const Card = ({ product }) => {
       <div className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 p-4 overflow-y-auto max-h-full">
         <h2 className="text-2xl font-semibold mb-4 text-center">{product.title}</h2>
         <div className="text-sm text-gray-300 mb-2 space-y-2">
-          <p>
-            <strong>Diámetro:</strong> {product.diameter}
-          </p>
-          <p>
-            <strong>Material:</strong> {product.material}
-          </p>
-          <p>
-            <strong>Marca:</strong> {product.brand}
-          </p>
-          <p>
-            <strong>Procedencia:</strong> {product.origin}
-          </p>
-          <div className="mb-4">
-            {product.description && Object.entries(product.description).map(([key, value], index) => (
-              <p key={index}>
-                <strong>{key}:</strong> {value}
-              </p>
-            ))}
-          </div>
+          {product.technicalData && Object.entries(product.technicalData).map(([key, value], index) => (
+            <p key={index}>
+              <strong>{key}:</strong> {value}
+            </p>
+          ))}
         </div>
         <div className="flex space-x-4 mt-auto">
           <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">
