@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Head } from "@inertiajs/react";
+import { Link } from "@inertiajs/react";
 import Productos from "../Components/create/productos";
 import Categorias from "../Components/create/categoria";
 import Subcategorias from "../Components/create/subcategoria";
@@ -57,11 +58,13 @@ const CrearProducto = () => {
                 <Head title="Crear" />
                 <div className="w-full md:w-1/4 bg-blue-50 border-r border-blue-200 p-4">
                     <div className="mb-8">
-                        <img
-                            src="/img/logo2.png"
-                            alt="Logo"
-                            className="mb-4 w-3/5 mx-auto"
-                        />
+                        <Link href="/"> {/* Add this line */}
+                            <img
+                                src="/img/logo2.png"
+                                alt="Logo"
+                                className="mb-4 w-3/5 mx-auto"
+                            />
+                        </Link> {/* Add this line */}
                         <h2 className="text-xl font-bold text-blue-600 text-center">
                             Elige el registro que deseas crear
                         </h2>
