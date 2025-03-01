@@ -135,7 +135,7 @@ const Card = ({ product }) => {
         ))}
         <div className="flex justify-between items-center mt-2">
           <span className="text-xl font-bold text-blue-600">
-            ${product.price.toFixed(2)}
+            ${product.price}
           </span>
         </div>
       </div>
