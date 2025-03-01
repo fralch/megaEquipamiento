@@ -5,7 +5,7 @@ const ClientSlider = () => {
   const [clients, setClients] = useState([]);
 
   useEffect(() => {
-    const images = import.meta.glob('/public/img/nuestros clientes/**/*.{jpg,png}');
+    const images = import.meta.glob('/public/img/nuestros_clientes/**/*.{jpg,png}');
     const clientsData = Object.keys(images).map((path) => {
       const name = path.split('/').pop().split('.').shift();
       const adjustedPath = path.replace('/public', '');
