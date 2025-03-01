@@ -64,7 +64,7 @@ export default function Categoria({ productos, categoria, subcategorias }) {
                                 onClick={() => toggleCategory(categoria.nombre)}
                                 className={`block w-full text-left p-2 rounded ${
                                     activeCategory === categoria.nombre
-                                        ? 'bg-[#0c2249] text-blue-200'
+                                        ? 'bg-[#184f96] text-blue-200'
                                         : 'bg-gray-200 hover:bg-white'
                                 }`}
                             >
@@ -100,7 +100,7 @@ export default function Categoria({ productos, categoria, subcategorias }) {
                         </>
                     )}
                      <div className="flex justify-center">
-                        <Link href="/crear"className="fixed bottom-8 right-8 w-14 h-14 bg-[#0c2249] hover:bg-blue-800 text-white rounded-full flex items-center justify-center shadow-lg text-2xl transition-all duration-200 hover:scale-110" >
+                        <Link href="/crear"className="fixed bottom-8 right-8 w-14 h-14 bg-[#184f96] hover:bg-blue-800 text-white rounded-full flex items-center justify-center shadow-lg text-2xl transition-all duration-200 hover:scale-110" >
                             +
                         </Link>
                     </div>
