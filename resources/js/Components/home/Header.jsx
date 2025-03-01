@@ -6,8 +6,8 @@ const Header = () => {
     return (
         <header className="bg-white">
             <div className="container mx-auto flex items-center px-8 py-8 md:px-12 max-w-full" id="">
-                {/* Logo */}
-                <a href="/" className="mr-auto w-6/12 flex-shrink-0 sm:w-1/12 md:w-1/6 pr-4 ml-10">
+                {/* Logo - Modified for larger size */}
+                <a href="/" className="mr-auto w-7/12 flex-shrink-0 sm:w-2/12 md:w-1/5 pr-4 ml-10">
                     <img
                         className="w-full object-contain"
                         src="/img/logo2.jpg"

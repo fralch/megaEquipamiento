@@ -7,8 +7,6 @@ const ProductGrid = ({ products: initialProducts }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 24;
 
-  
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -99,42 +97,53 @@ const ProductGrid = ({ products: initialProducts }) => {
 
 const Card = ({ product }) => {
   return (
-    <div className="max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden border min-h-[400px] relative group">
-      <img
-        src={product.image}
-        alt={product.title}
-        className="w-full h-64 object-contain p-4"
-        onError={(e) => {
-          e.target.onerror = null;
-          e.target.src = 'path/to/fallback/image.png'; // Agrega una imagen de respaldo
-        }}
-      />
-      <div className="p-4">
-        <h2 className="text-lg font-semibold text-gray-800">{product.title}</h2>
-        {product.summary && Object.entries(product.summary).map(([key, value], index) => (
+    <div className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-128 relative group flex flex-col transition-all duration-300 hover:shadow-xl">
+      {/* Área de imagen (60% del card) */}
+      <div className="flex items-center justify-center p-4 h-3/5">
+        <img
+          src={product.image}
+          alt={product.title}
+          className="max-w-full max-h-full object-contain"
+          onError={(e) => {
+            e.target.onerror = null; // Evita bucles infinitos si la imagen de respaldo falla
+            e.target.src = 'https://megaequipamiento.com/wp-content/uploads/2024/08/MEGA-LOGO.webp'; // Imagen de respaldo
+          }}
+        />
+      </div>
+      
+      {/* Bandera */}
+      <div className="flex items-center justify-center mb-2">
+        <img
+          src={product.flag}
+          alt={`Bandera de ${product.origin}`}
+          className="w-6 h-4 object-cover mr-2"
+          onError={(e) => {
+            e.target.onerror = null; // Evita bucles infinitos para la bandera
+            e.target.src = ''; // Imagen de respaldo para la bandera
+          }}
+        />
+        <span className="text-xs text-gray-600">{product.origin}</span>
+      </div>
+      
+      {/* Información del producto (40% restante) */}
+      <div className="p-4 flex-grow overflow-y-auto">
+        <h2 className="text-lg font-semibold text-gray-800 mb-2">{product.title}</h2>
+        {product.summary && Object.entries(product.summary).slice(0, 2).map(([key, value], index) => (
           <p key={index} className="text-sm text-gray-600">
             <strong>{key}:</strong> {value}
           </p>
         ))}
-        <div className="flex justify-between items-center mt-4">
+        <div className="flex justify-between items-center mt-2">
           <span className="text-xl font-bold text-blue-600">
-            ${product.price}
+            ${product.price.toFixed(2)}
           </span>
-          <img
-            src={product.flag}
-            alt={`Bandera de ${product.origin}`}
-            className="w-6 h-4 object-cover"
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = '';
-            }}
-          />
         </div>
       </div>
 
-      <div className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 p-4 overflow-y-auto max-h-full">
+      {/* Overlay con información detallada y botones */}
+      <div className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 p-4 overflow-y-auto">
         <h2 className="text-2xl font-semibold mb-4 text-center">{product.title}</h2>
-        <div className="text-sm text-gray-300 mb-2 space-y-2">
+        <div className="text-sm text-gray-300 mb-2 space-y-2 overflow-y-auto flex-grow">
           {product.technicalData && Object.entries(product.technicalData).map(([key, value], index) => (
             <p key={index}>
               <strong>{key}:</strong> {value}
