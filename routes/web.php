@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 Route::get('/categorias/{id_categoria?}', [CategoriaController::class, 'CategoriasWiew']);
 Route::get('/subcategoria/{id}', [ProductoController::class, 'subCategoriaView']);
-Route::get('/producto', function () { return Inertia::render('Product'); });
+Route::get('/producto/{id}', [ProductoController::class, 'ProductView']);
 Route::get('/crear', function () { return Inertia::render('Crear');});
 
 // Rutas para crear y mostrar productos

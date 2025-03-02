@@ -10,6 +10,30 @@ use App\Models\Marca;
 
 class ProductoController extends Controller
 {
+     /* Vista de productos */
+     public function ProductView(Request $request, $producto_id)
+     {
+        // Obtener el producto desde la solicitud
+        $producto = Producto::with('marca')->find($producto_id);
+    
+        // Renderizar la vista con Inertia y pasar el producto
+        return Inertia::render('Product', compact('producto'));
+     }
+
+     /* vista de subcategoria */
+     public function subCategoriaView(Request $request, $subcategoria_id)
+    {
+        // Obtener el ID de la subcategoría desde la solicitud
+        $id = $request->id;
+    
+        // Obtener los productos de la subcategoría y cargar la relación 'marca'
+        $productos = Producto::with('marca')->where('id_subcategoria', $id)->get();
+    
+        // Renderizar la vista con Inertia y pasar los productos
+        return Inertia::render('Subcategorias', compact('productos'));
+    }
+
+
     /**
      * Crear producto
      */
@@ -118,8 +142,12 @@ class ProductoController extends Controller
     }
 
     // Obtener un producto
-    public function showProduct(Producto $producto)
+    public function showProduct($producto_id)
     {
+        // Obtener el producto desde la solicitud
+        $producto = Producto::with('marca')->find($producto_id);
+
+        // Devolver el producto con los datos de la marca
         return response()->json($producto);
     }
 
@@ -139,16 +167,6 @@ class ProductoController extends Controller
         return response()->json($productos);
     }
 
-    public function subCategoriaView(Request $request, $subcategoria_id)
-    {
-        // Obtener el ID de la subcategoría desde la solicitud
-        $id = $request->id;
     
-        // Obtener los productos de la subcategoría y cargar la relación 'marca'
-        $productos = Producto::with('marca')->where('id_subcategoria', $id)->get();
-    
-        // Renderizar la vista con Inertia y pasar los productos
-        return Inertia::render('Subcategorias', compact('productos'));
-    }
     
 }
