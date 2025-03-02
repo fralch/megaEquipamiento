@@ -28,7 +28,9 @@ const ProductGrid = ({ products: initialProducts }) => {
             origin: item.pais,
             price: parseFloat(item.precio_igv),
             image,
-            flag: `https://flagcdn.com/w320/${countryCode}.png`
+            flag: `https://flagcdn.com/w320/${countryCode}.png`,
+            marca: item.marca.imagen,
+            nombre_marca: item.marca.nombre
           };
         });
 
@@ -53,7 +55,9 @@ const ProductGrid = ({ products: initialProducts }) => {
           origin: item.pais,
           price: parseFloat(item.precio_igv),
           image,
-          flag: `https://flagcdn.com/w320/${countryCode}.png`
+          flag: `https://flagcdn.com/w320/${countryCode}.png`, 
+          marca: item.marca.imagen,
+          nombre_marca: item.marca.nombre
         };
       });
 
@@ -112,18 +116,28 @@ const Card = ({ product }) => {
       </div>
       
       {/* Bandera */}
-      <div className="flex items-center justify-center mb-2">
+      <div className="flex items-center justify-between px-8 mb-2">
+        <img
+          src={product.marca}
+          alt={`Marca de ${product.nombre_marca}`}
+          className=" h-4 object-cover"
+          onError={(e) => {
+            e.target.onerror = null; // Evita bucles infinitos para la imagen
+            e.target.src = ''; // Imagen de respaldo
+          }}
+        />
         <img
           src={product.flag}
           alt={`Bandera de ${product.origin}`}
-          className="w-6 h-4 object-cover mr-2"
+          className="w-6 h-4 object-cover"
           onError={(e) => {
-            e.target.onerror = null; // Evita bucles infinitos para la bandera
-            e.target.src = ''; // Imagen de respaldo para la bandera
+            e.target.onerror = null; // Evita bucles infinitos para la imagen
+            e.target.src = ''; // Imagen de respaldo
           }}
         />
-        <span className="text-xs text-gray-600">{product.origin}</span>
       </div>
+
+
       
       {/* Información del producto (40% restante) */}
       <div className="p-4 flex-grow overflow-y-auto">

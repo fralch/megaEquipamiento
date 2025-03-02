@@ -23,6 +23,7 @@ class Subcategoria extends Model
         'nombre',
         'descripcion',
         'id_categoria',
+        'id_marca', // Agregar el campo id_marca
     ];
 
     // Definir los campos que deben ser ocultados en arrays
@@ -42,4 +43,11 @@ class Subcategoria extends Model
     {
         return $this->belongsTo(Categoria::class, 'id_categoria');
     }
+
+    // Definir la relación con el modelo Marca
+    public function marca()
+    {
+        return $this->belongsTo(Marca::class, 'id_marca');
+    }
 }
+

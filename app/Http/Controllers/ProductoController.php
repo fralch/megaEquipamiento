@@ -102,9 +102,13 @@ class ProductoController extends Controller
     // Obtener todos los productos
     public function getProductos()
     {
-        $productos = Producto::all();
+        // Obtener todos los productos y cargar la relación 'marca'
+        $productos = Producto::with('marca')->get();
+
+        // Devolver los productos con los datos de la marca
         return response()->json($productos);
     }
+
 
     // Obtener todos los productos con su imagen
     public function getProductosImagen()
@@ -128,17 +132,23 @@ class ProductoController extends Controller
     // Obtener producto por subcategoria id
     public function getProductosSubcategoria($subcategoria_id)
     {
-        $productos = Producto::where('id_subcategoria', $subcategoria_id)->get();
+        // Obtener los productos de la subcategoría y cargar la relación 'marca'
+        $productos = Producto::with('marca')->where('id_subcategoria', $subcategoria_id)->get();
+
+        // Devolver los productos con los datos de la marca
         return response()->json($productos);
     }
-         
-     
 
     public function subCategoriaView(Request $request, $subcategoria_id)
     {
+        // Obtener el ID de la subcategoría desde la solicitud
         $id = $request->id;
-        $productos = Producto::where('id_subcategoria', $id)->get();
-        return Inertia::render('Subcategorias',  compact('productos'));
-
+    
+        // Obtener los productos de la subcategoría y cargar la relación 'marca'
+        $productos = Producto::with('marca')->where('id_subcategoria', $id)->get();
+    
+        // Renderizar la vista con Inertia y pasar los productos
+        return Inertia::render('Subcategorias', compact('productos'));
     }
+    
 }

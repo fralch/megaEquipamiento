@@ -18,7 +18,7 @@ class CategoriaController extends Controller
             $productos = [];
             $categoria = null;
             $subcategorias = [];
-            return Inertia::render('Categoria',  [
+            return Inertia::render('Categoria', [
                 'productos' => $productos,
                 'categoria' => $categoria,
                 'subcategorias' => $subcategorias,
@@ -38,11 +38,9 @@ class CategoriaController extends Controller
 
         // Verificar los IDs de las subcategorías
         $subcategoriaIds = $subcategorias->pluck('id_subcategoria')->toArray();
-        // \Log::info('Subcategoría IDs:', $subcategoriaIds);
 
-        // Obtener los productos que pertenecen a esas subcategorías
-        $productos = Producto::whereIn('id_subcategoria', $subcategoriaIds)->get();
-        // \Log::info('Productos obtenidos:', $productos->toArray());
+        // Obtener los productos que pertenecen a esas subcategorías y cargar la relación 'marca'
+        $productos = Producto::with('marca')->whereIn('id_subcategoria', $subcategoriaIds)->get();
 
         // Devolver los productos en la vista usando Inertia
         return Inertia::render('Categoria', [
@@ -51,6 +49,7 @@ class CategoriaController extends Controller
             'subcategorias' => $subcategorias,
         ]);
     }
+
 
 
 
