@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "@inertiajs/react";
-const URL_API = import.meta.env.VITE_API_URL;  
 
 // Importar todas las imágenes de la carpeta "public/img/categorias"
 const images = import.meta.glob('/public/img/categorias/**/*.{jpg,png}');
@@ -87,7 +86,7 @@ const Categories = () => {
       setCategories(JSON.parse(storedData));
     } else {
       // Si no están en el localStorage, haz la solicitud a la API
-      fetch( URL_API + "/categorias-completa")
+      fetch( 'http://equipamientoindustriales.hpservidor.com' + "/categorias-completa")
         .then((response) => response.json())
         .then((data) => {
           setCategories(data);

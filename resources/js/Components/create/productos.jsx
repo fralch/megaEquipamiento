@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Modal_Features from './modal_features'; // Asegúrate de que la ruta sea correcta
 
-const URL_API = import.meta.env.VITE_API_URL;
 
 const Productos = ({ onSubmit }) => {
   const [productos, setProductos] = useState([]);
@@ -31,17 +30,17 @@ const Productos = ({ onSubmit }) => {
   const [modalType, setModalType] = useState('');
 
   useEffect(() => {
-    fetch(URL_API + "/categorias-all")
+    fetch('http://equipamientoindustriales.hpservidor.com' + "/categorias-all")
       .then(response => response.json())
       .then(data => setCategorias(data))
       .catch(error => console.error('Error fetching categorías:', error));
 
-    fetch(URL_API + "/subcategoria-all")
+    fetch('http://equipamientoindustriales.hpservidor.com' + "/subcategoria-all")
       .then(response => response.json())
       .then(data => setSubcategorias(data))
       .catch(error => console.error('Error fetching subcategorías:', error));
 
-    fetch(URL_API + "/marca/all")
+    fetch('http://equipamientoindustriales.hpservidor.com' + "/marca/all")
       .then(response => response.json())
       .then(data => setMarcas(data))
       .catch(error => console.error('Error fetching marcas:', error));
@@ -85,7 +84,7 @@ const Productos = ({ onSubmit }) => {
     }
 
     try {
-      const response = await fetch(URL_API + "/product/create", {
+      const response = await fetch('http://equipamientoindustriales.hpservidor.com' + "/product/create", {
         method: 'POST',
         body: formData,
         headers: {

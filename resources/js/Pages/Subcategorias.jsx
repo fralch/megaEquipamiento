@@ -6,7 +6,6 @@ import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
 
-const URL_API = import.meta.env.VITE_API_URL;
 
 export default function Subcategoria({ productos }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +22,7 @@ export default function Subcategoria({ productos }) {
         if (storedData) {
             setCategoriasArray(JSON.parse(storedData));
         } else {
-            fetch(URL_API + "/categorias-completa")
+            fetch('http://equipamientoindustriales.hpservidor.com' + "/categorias-completa")
                 .then((response) => response.json())
                 .then((data) => {
                     setCategoriasArray(data);
@@ -39,13 +38,13 @@ export default function Subcategoria({ productos }) {
         console.log(productos);
 
         // Hacer una solicitud a la API para obtener los datos de la subcategoría
-        fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`)
+        fetch(`${'http://equipamientoindustriales.hpservidor.com'}/subcategoria_id/${subcategoriaId}`)
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
                 setSubcategoriaNombre(data.nombre);
                 // Obtener el nombre de la categoría
-                fetch(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`)
+                fetch(`${'http://equipamientoindustriales.hpservidor.com'}/subcategoria_get/cat/${subcategoriaId}`)
                     .then((response) => response.json())
                     .then((data) => {
                         setCategoriaNombre(data.nombre_categoria);

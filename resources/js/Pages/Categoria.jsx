@@ -5,7 +5,6 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
-const URL_API = import.meta.env.VITE_API_URL;
 
 export default function Categoria({ productos, categoria, subcategorias }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -18,7 +17,7 @@ export default function Categoria({ productos, categoria, subcategorias }) {
         if (storedData) {
             setCategoriasArray(JSON.parse(storedData));
         } else {
-            fetch(URL_API + "/categorias-completa")
+            fetch('http://equipamientoindustriales.hpservidor.com' + "/categorias-completa")
                 .then((response) => response.json())
                 .then((data) => {
                     setCategoriasArray(data);
