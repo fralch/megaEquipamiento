@@ -16,7 +16,7 @@ const ProductGrid = ({ products: initialProducts }) => {
         const storedTimestamp = localStorage.getItem('productsTimestamp');
         const currentTime = Date.now();
         const oneDay = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
-        
+
         // Usar datos del localStorage si existen y no son más antiguos que un día
         if (storedData && storedTimestamp && (currentTime - parseInt(storedTimestamp)) < oneDay) {
           setProducts(JSON.parse(storedData));
@@ -42,7 +42,8 @@ const ProductGrid = ({ products: initialProducts }) => {
               image,
               flag: `https://flagcdn.com/w320/${countryCode}.png`,
               marca: item.marca.imagen,
-              nombre_marca: item.marca.nombre
+              nombre_marca: item.marca.nombre,
+              link: `/producto/${item.id_producto}` // Agrega el enlace del producto
             };
           });
 
@@ -78,9 +79,10 @@ const ProductGrid = ({ products: initialProducts }) => {
           origin: item.pais,
           price: parseFloat(item.precio_igv),
           image,
-          flag: `https://flagcdn.com/w320/${countryCode}.png`, 
+          flag: `https://flagcdn.com/w320/${countryCode}.png`,
           marca: item.marca.imagen,
-          nombre_marca: item.marca.nombre
+          nombre_marca: item.marca.nombre,
+          link: `/producto/${item.id_producto}` // Agrega el enlace del producto
         };
       });
 
@@ -113,7 +115,9 @@ const ProductGrid = ({ products: initialProducts }) => {
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
         {currentProducts.map((product) => (
-          <Card key={product.id} product={product} />
+          <a key={product.id} href={product.link} className="block">
+            <Card product={product} />
+          </a>
         ))}
       </div>
       <div className="flex justify-center space-x-2 mt-4">
@@ -149,11 +153,11 @@ const Card = ({ product }) => {
       },
       { threshold: 0.1 } // Trigger when at least 10% of the element is visible
     );
-    
+
     if (cardRef.current) {
       observer.observe(cardRef.current);
     }
-    
+
     return () => {
       if (cardRef.current) {
         observer.disconnect();
@@ -162,12 +166,12 @@ const Card = ({ product }) => {
   }, []);
 
   return (
-    <div 
+    <div
       ref={cardRef}
       className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-128 relative group flex flex-col transition-all duration-300 hover:shadow-xl"
     >
       {/* Placeholder mientras carga */}
-      <div 
+      <div
         className={`absolute inset-0 bg-gray-200 transition-opacity duration-300 ${imageLoaded && isVisible ? 'opacity-0' : 'opacity-100'}`}
         style={{ zIndex: 1 }}
       >
@@ -175,7 +179,7 @@ const Card = ({ product }) => {
           <div className="animate-pulse h-8 w-8 bg-gray-400 rounded-full"></div>
         </div>
       </div>
-      
+
       {/* Área de imagen (60% del card) */}
       <div className="flex items-center justify-center p-4 h-3/5">
         {isVisible && (
@@ -193,7 +197,7 @@ const Card = ({ product }) => {
           />
         )}
       </div>
-      
+
       {/* Bandera */}
       <div className="flex items-center justify-between px-8 mb-2">
         {isVisible && (
@@ -223,7 +227,7 @@ const Card = ({ product }) => {
           </>
         )}
       </div>
-      
+
       {/* Información del producto (40% restante) */}
       <div className="p-4 flex-grow overflow-y-auto">
         <h2 className="text-lg font-semibold text-gray-800 mb-2">{product.title}</h2>
