@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import countryCodeMap from './countryJSON.json';
-const URL_API = import.meta.env.VITE_API_URL;
 
 const ProductGrid = ({ products: initialProducts }) => {
   const [products, setProducts] = useState(initialProducts || []);
@@ -22,7 +21,7 @@ const ProductGrid = ({ products: initialProducts }) => {
           setProducts(JSON.parse(storedData));
           setLoading(false);
         } else {
-          const response = await fetch(`${URL_API}/product/all`);
+          const response = await fetch(`${'http://equipamientoindustriales.hpservidor.com'}/product/all`);
           if (!response.ok) {
             throw new Error('Network response was not ok');
           }
@@ -31,7 +30,7 @@ const ProductGrid = ({ products: initialProducts }) => {
           const transformedProducts = data.map(item => {
             const countryName = item.pais.toLowerCase();
             const countryCode = countryCodeMap[countryName] || 'unknown';
-            const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
+            const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${'http://equipamientoindustriales.hpservidor.com'}/${item.imagen}`;
             return {
               id: item.id_producto,
               title: item.nombre,
@@ -70,7 +69,7 @@ const ProductGrid = ({ products: initialProducts }) => {
       const transformedProducts = initialProducts.map(item => {
         const countryName = item.pais.toLowerCase();
         const countryCode = countryCodeMap[countryName] || 'unknown';
-        const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
+        const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${'http://equipamientoindustriales.hpservidor.com'}/${item.imagen}`;
         return {
           id: item.id_producto,
           title: item.nombre,

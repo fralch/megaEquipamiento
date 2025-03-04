@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "@inertiajs/react";
-const URL_API = import.meta.env.VITE_API_URL;  
 
 const CategoryCard = ({ title, items }) => {
   const [imagePaths, setImagePaths] = useState([]);
@@ -144,7 +143,7 @@ const Categories = () => {
       setLoading(false);
     } else {
       // Si no están en el localStorage o son viejos, hacer la solicitud a la API
-      fetch(URL_API + "/categorias-completa")
+      fetch('http://equipamientoindustriales.hpservidor.com' + "/categorias-completa")
         .then((response) => response.json())
         .then((data) => {
           setCategories(data);
