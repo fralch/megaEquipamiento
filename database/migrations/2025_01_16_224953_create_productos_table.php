@@ -25,9 +25,10 @@ return new class extends Migration
             $table->text('descripcion')->nullable(); // Descripción del producto (opcional)
             $table->string('video', 255)->nullable(); // URL del video (opcional)
             $table->string('envio', 100)->nullable(); // Información de envío (opcional)
-            $table->string('soporte_tecnico', 255)->nullable(); // Soporte técnico (opcional)
+            $table->longText('soporte_tecnico')->nullable(); // Soporte técnico (opcional)
             $table->json('caracteristicas')->nullable(); // Características en formato JSON (opcional)
             $table->json('datos_tecnicos')->nullable(); // Datos técnicos en formato JSON (opcional)
+            $table->longText('especificaciones_tecnicas')->nullable(); // Especificaciones (opcional)
             $table->json('archivos_adicionales')->nullable(); // Archivos adicionales en formato JSON (opcional)
 
             // Claves foráneas
