@@ -52,9 +52,10 @@ class ProductoController extends Controller
             'descripcion' => 'nullable|string',
             'video' => 'nullable|string|max:255',
             'envio' => 'nullable|string|max:100',
-            'soporte_tecnico' => 'nullable|string|max:100',
+            'soporte_tecnico' => 'nullable|string',
             'caracteristicas' => 'nullable|json',
             'datos_tecnicos' => 'nullable|json',
+            "especificaciones_tecnicas" => 'nullable|string|json', 
         ]);
     
         // Procesar la imagen si se proporciona
@@ -106,10 +107,11 @@ class ProductoController extends Controller
             'descripcion' => 'nullable|string',
             'video' => 'nullable|string|max:255',
             'envio' => 'nullable|string|max:100',
-            'soporte_tecnico' => 'nullable|string|max:100',
+            'soporte_tecnico' => 'nullable|string',
             'caracteristicas' => 'nullable|json',
             'datos_tecnicos' => 'nullable|json',
             'archivos_adicionales' => 'nullable|json', // Cambiado de 'documentos' a 'archivos_adicionales'
+            "especificaciones_tecnicas" => 'nullable|string|json',
         ]);
 
         if ($request->hasFile('imagen')) {

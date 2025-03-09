@@ -35,6 +35,7 @@ class Producto extends Model
         'soporte_tecnico',
         'caracteristicas',
         'datos_tecnicos',
+        'especificaciones_tecnicas',
         'archivos_adicionales', // Cambiado de 'documentos' a 'archivos_adicionales'
     ];
 
