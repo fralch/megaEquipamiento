@@ -181,7 +181,7 @@ const ProductPage = ({ producto }) => {
                     <div className="p-4">{renderContent()}</div>
                 </div>
                 {/* Accessories Section */}
-                <section className="mt-12">
+                {/* <section className="mt-12">
                     <h2 className="text-2xl font-bold mb-6">Accesorios</h2>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[...Array(8)].map((_, i) => (
@@ -203,10 +203,10 @@ const ProductPage = ({ producto }) => {
                             </div>
                         ))}
                     </div>
-                </section>
+                </section> */}
 
                 {/* Related Products Section */}
-                <section className="mt-12">
+                {/* <section className="mt-12">
                     <h2 className="text-2xl font-bold mb-6">
                         Productos relacionados
                     </h2>
@@ -230,7 +230,7 @@ const ProductPage = ({ producto }) => {
                             </div>
                         ))}
                     </div>
-                </section>
+                </section> */}
             </main>
             <Footer />
         </div>
