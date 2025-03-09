@@ -148,7 +148,7 @@ const ProductPage = ({ producto }) => {
                             </button>
                         </div>
 
-                        {/* Video */}
+                        {/* El video tiene que ser la version acortada de youtube como por ejemplo: https://youtu.be/X9IgxlivjO8?si=QaCVPCuos-VrSP4R */}
                         <div className="mt-6">
                             <iframe
                                 className="w-full h-96 rounded-md shadow-lg"
