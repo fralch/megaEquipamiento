@@ -95,7 +95,7 @@ const ProductPage = ({ producto }) => {
                 {/* Product Section */}
                 <section className="grid md:grid-cols-2 gap-8">
                     {/* Product Image */}
-                    <ZoomImage imageSrc={producto.imagen} />
+                    <ZoomImage imageSrc={producto.imagen.startsWith('http') ? producto.imagen : `/${producto.imagen}`} />
 
                     {/* Product Details */}
                     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
