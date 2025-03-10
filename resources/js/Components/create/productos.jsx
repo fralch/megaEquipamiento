@@ -21,6 +21,7 @@ const Productos = ({ onSubmit }) => {
     soporte_tecnico: "",
     caracteristicas: {},
     datos_tecnicos: {},
+    especificaciones_tecnicas: "", // Añadido aquí
   });
 
   const [categorias, setCategorias] = useState([]);
@@ -80,6 +81,7 @@ const Productos = ({ onSubmit }) => {
     formData.append('soporte_tecnico', form.soporte_tecnico);
     formData.append('caracteristicas', JSON.stringify(form.caracteristicas));
     formData.append('datos_tecnicos', JSON.stringify(form.datos_tecnicos));
+    formData.append('especificaciones_tecnicas', form.especificaciones_tecnicas); // Añadido aquí
     if (form.imagen) {
       formData.append('imagen', form.imagen);
     }
@@ -118,6 +120,7 @@ const Productos = ({ onSubmit }) => {
           soporte_tecnico: "",
           caracteristicas: {},
           datos_tecnicos: {},
+          especificaciones_tecnicas: "", // Añadido aquí
         });
       } else {
         console.error('Error al crear el producto:', response.statusText);
@@ -196,6 +199,7 @@ const Productos = ({ onSubmit }) => {
             { label: "Video", name: "video", type: "text" },
             { label: "Envío", name: "envio", type: "text" },
             { label: "Soporte Técnico", name: "soporte_tecnico", type: "text" },
+            { label: "Especificaciones Técnicas", name: "especificaciones_tecnicas", type: "text" }, // Añadido aquí
           ].map(({ label, name, type, options, step }) => (
             <div key={name} className="mb-4">
               <label htmlFor={name} className="block text-sm font-medium text-gray-700">
