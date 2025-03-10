@@ -34,6 +34,7 @@ function TablaPegada() {
     }
   };
   
+  
   // Estilo CSS para la tabla
   const estiloTabla = {
     border: '1px solid black',
