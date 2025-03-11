@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Modal_Features from './modal_features'; // Asegúrate de que la ruta sea correcta
+import Modal_Features from './modal_features';
+import TablaEditor from './assets/tablaPegada';
 
 const URL_API = import.meta.env.VITE_API_URL;
 
@@ -21,7 +22,7 @@ const Productos = ({ onSubmit }) => {
     soporte_tecnico: "",
     caracteristicas: {},
     datos_tecnicos: {},
-    especificaciones_tecnicas: "", // Añadido aquí
+    especificaciones_tecnicas: "", // Esto ahora será un JSON string de la tabla
   });
 
   const [categorias, setCategorias] = useState([]);
@@ -63,6 +64,10 @@ const Productos = ({ onSubmit }) => {
     setForm({ ...form, id_subcategoria: '' });
   };
 
+  const handleTableChange = (value) => {
+    setForm({ ...form, especificaciones_tecnicas: value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -81,7 +86,7 @@ const Productos = ({ onSubmit }) => {
     formData.append('soporte_tecnico', form.soporte_tecnico);
     formData.append('caracteristicas', JSON.stringify(form.caracteristicas));
     formData.append('datos_tecnicos', JSON.stringify(form.datos_tecnicos));
-    formData.append('especificaciones_tecnicas', form.especificaciones_tecnicas); // Añadido aquí
+    formData.append('especificaciones_tecnicas', form.especificaciones_tecnicas);
     if (form.imagen) {
       formData.append('imagen', form.imagen);
     }
@@ -120,7 +125,7 @@ const Productos = ({ onSubmit }) => {
           soporte_tecnico: "",
           caracteristicas: {},
           datos_tecnicos: {},
-          especificaciones_tecnicas: "", // Añadido aquí
+          especificaciones_tecnicas: "",
         });
       } else {
         console.error('Error al crear el producto:', response.statusText);
@@ -156,6 +161,23 @@ const Productos = ({ onSubmit }) => {
     closeModal();
   };
 
+  // Función para renderizar el valor de la tabla en la lista de productos
+  const renderTablaPreview = (jsonStr) => {
+    try {
+      const tabla = JSON.parse(jsonStr);
+      if (Array.isArray(tabla) && tabla.length > 0) {
+        return (
+          <div className="text-xs">
+            <span className="text-blue-500">Tabla: {tabla.length} filas × {tabla[0].length} columnas</span>
+          </div>
+        );
+      }
+      return <span className="text-gray-500">Sin datos</span>;
+    } catch (error) {
+      return <span className="text-gray-500">{jsonStr || "Sin datos"}</span>;
+    }
+  };
+
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
       <h1 className="text-2xl font-bold mb-4">Crear Producto</h1>
@@ -163,8 +185,8 @@ const Productos = ({ onSubmit }) => {
         <h2 className="text-lg font-bold mb-4">Agregar / Editar Producto</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { label: "SKU", name: "sku", type: "text" },
-            { label: "Nombre", name: "nombre", type: "text" },
+            { label: "SKU", name: "sku", type: "text", placeholder: "Ingrese el código SKU del producto" },
+            { label: "Nombre", name: "nombre", type: "text", placeholder: "Ingrese el nombre del producto" },
             {
               label: "Categoría",
               name: "categoria",
@@ -172,7 +194,8 @@ const Productos = ({ onSubmit }) => {
               options: categorias.map(category => ({
                 value: category.id_categoria,
                 label: category.nombre
-              }))
+              })),
+              placeholder: "Seleccione una categoría"
             },
             {
               label: "Subcategoría",
@@ -181,7 +204,8 @@ const Productos = ({ onSubmit }) => {
               options: filteredSubcategorias.map(subcategory => ({
                 value: subcategory.id_subcategoria,
                 label: subcategory.nombre
-              }))
+              })),
+              placeholder: "Seleccione una subcategoría"
             },
             {
               label: "Marca",
@@ -190,17 +214,17 @@ const Productos = ({ onSubmit }) => {
               options: marcas.map(marca => ({
                 value: marca.id_marca,
                 label: marca.nombre
-              }))
+              })),
+              placeholder: "Seleccione una marca"
             },
-            { label: "País", name: "pais", type: "text" },
-            { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01" },
-            { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01" },
-            { label: "Precio IGV", name: "precio_igv", type: "number", step: "0.01" },
-            { label: "Video", name: "video", type: "text" },
-            { label: "Envío", name: "envio", type: "text" },
-            { label: "Soporte Técnico", name: "soporte_tecnico", type: "text" },
-            { label: "Especificaciones Técnicas", name: "especificaciones_tecnicas", type: "text" }, // Añadido aquí
-          ].map(({ label, name, type, options, step }) => (
+            { label: "País", name: "pais", type: "text", placeholder: "Ingrese el país de origen" },
+            { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
+            { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
+            { label: "Precio IGV", name: "precio_igv", type: "number", step: "0.01", placeholder: "0.00" },
+            { label: "Video", name: "video", type: "text", placeholder: "URL del video del producto" },
+            { label: "Envío", name: "envio", type: "text", placeholder: "Información de envío" },
+            { label: "Soporte Técnico", name: "soporte_tecnico", type: "text", placeholder: "Información de soporte técnico" },
+          ].map(({ label, name, type, options, step, placeholder }) => (
             <div key={name} className="mb-4">
               <label htmlFor={name} className="block text-sm font-medium text-gray-700">
                 {label}
@@ -214,7 +238,7 @@ const Productos = ({ onSubmit }) => {
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   required={name === "id_subcategoria" || name === "marca_id"}
                 >
-                  <option value="">--Selecciona una opción--</option>
+                  <option value="">{placeholder}</option>
                   {options && options.map(({ value, label }) => (
                     <option key={value} value={value}>
                       {label}
@@ -230,11 +254,25 @@ const Productos = ({ onSubmit }) => {
                   onChange={handleChange}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   step={step}
+                  placeholder={placeholder}
                   required={name === "sku" || name === "nombre" || name === "id_subcategoria" || name === "marca_id"}
                 />
               )}
             </div>
           ))}
+
+          {/* Editor de Especificaciones Técnicas con Tabla */}
+          <div className="mb-4 col-span-1 md:col-span-2">
+            <label htmlFor="especificaciones_tecnicas" className="block text-sm font-medium text-gray-700">
+              Especificaciones Técnicas
+            </label>
+            <div className="mt-1">
+              <TablaEditor 
+                initialValue={form.especificaciones_tecnicas} 
+                onChange={handleTableChange}
+              />
+            </div>
+          </div>
 
           <div className="mb-4">
             <label htmlFor="caracteristicas" className="block text-sm font-medium text-gray-700">
@@ -293,6 +331,7 @@ const Productos = ({ onSubmit }) => {
               name="descripcion"
               value={form.descripcion}
               onChange={handleChange}
+              placeholder="Ingrese una descripción detallada del producto"
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
           </div>
@@ -305,7 +344,7 @@ const Productos = ({ onSubmit }) => {
         </button>
       </form>
 
-      <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
+      <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto mt-8">
         <h2 className="text-lg font-bold mb-4">Productos Totales</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -317,6 +356,7 @@ const Productos = ({ onSubmit }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">País</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Especificaciones</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagen</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
               </tr>
@@ -330,6 +370,9 @@ const Productos = ({ onSubmit }) => {
                   <td className="px-6 py-4 whitespace-nowrap">{producto.marca_id}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{producto.pais}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{producto.precio_sin_ganancia}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {renderTablaPreview(producto.especificaciones_tecnicas)}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {producto.imagen && (
                       <img src={producto.imagen} alt="Producto" className="h-10 w-10 object-cover rounded-full" />
