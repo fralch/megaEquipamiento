@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Modal_Features from './modal_features';
-import TablaEditor from './assets/tablaPegada';
 
 const URL_API = import.meta.env.VITE_API_URL;
 
@@ -31,6 +30,12 @@ const Productos = ({ onSubmit }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
+  
+  // Estado para la funcionalidad de TablaPegada
+  const [contenidoTabla, setContenidoTabla] = useState({
+    tipo: null, // 'tabla' o 'texto'
+    datos: []
+  });
 
   useEffect(() => {
     fetch(URL_API + "/categorias-all")
@@ -49,6 +54,32 @@ const Productos = ({ onSubmit }) => {
       .catch(error => console.error('Error fetching marcas:', error));
   }, []);
 
+  // Inicializar el componente TablaPegada con valor existente si lo hay
+  useEffect(() => {
+    if (form.especificaciones_tecnicas) {
+      try {
+        const parsedValue = JSON.parse(form.especificaciones_tecnicas);
+        if (Array.isArray(parsedValue) && parsedValue.length > 0) {
+          setContenidoTabla({
+            tipo: 'tabla',
+            datos: parsedValue
+          });
+        } else {
+          setContenidoTabla({
+            tipo: 'texto',
+            datos: [form.especificaciones_tecnicas]
+          });
+        }
+      } catch (e) {
+        // Si no es JSON válido, tratarlo como texto
+        setContenidoTabla({
+          tipo: 'texto',
+          datos: [form.especificaciones_tecnicas]
+        });
+      }
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
@@ -64,8 +95,86 @@ const Productos = ({ onSubmit }) => {
     setForm({ ...form, id_subcategoria: '' });
   };
 
-  const handleTableChange = (value) => {
-    setForm({ ...form, especificaciones_tecnicas: value });
+  // Función para detectar el tipo de contenido pegado
+  const detectarTipoContenido = (texto) => {
+    // Verifica si hay tabulaciones y múltiples líneas
+    const tieneTab = texto.includes('\t');
+    const tieneMultilineas = texto.trim().split('\n').length > 1;
+    
+    return tieneTab && tieneMultilineas ? 'tabla' : 'texto';
+  };
+
+  // Función para manejar el evento de pegar en la tabla
+  const handleTablaPaste = (event) => {
+    event.preventDefault();
+    const textoPegado = event.clipboardData.getData('text');
+    const tipo = detectarTipoContenido(textoPegado);
+    
+    let nuevoContenido;
+    if (tipo === 'tabla') {
+      const filas = textoPegado.trim().split('\n');
+      const datosTabla = filas
+        .filter(fila => fila.trim() !== '')
+        .map((fila) => fila.split('\t'));
+      
+      nuevoContenido = {
+        tipo: 'tabla',
+        datos: datosTabla
+      };
+    } else {
+      nuevoContenido = {
+        tipo: 'texto',
+        datos: [textoPegado]
+      };
+    }
+    
+    setContenidoTabla(nuevoContenido);
+    
+    // Actualizar el formulario con los datos en formato JSON
+    const jsonData = nuevoContenido.tipo === 'tabla' 
+      ? JSON.stringify(nuevoContenido.datos)
+      : JSON.stringify(nuevoContenido.datos[0]);
+    
+    setForm({ ...form, especificaciones_tecnicas: jsonData });
+  };
+
+  // Función para manejar cambios en el textarea
+  const handleTablaTextChange = (e) => {
+    const texto = e.target.value;
+    const tipo = detectarTipoContenido(texto);
+    
+    let nuevoContenido;
+    if (tipo === 'tabla') {
+      const filas = texto.trim().split('\n');
+      const datosTabla = filas
+        .filter(fila => fila.trim() !== '')
+        .map((fila) => fila.split('\t'));
+      
+      nuevoContenido = {
+        tipo: 'tabla',
+        datos: datosTabla
+      };
+    } else {
+      nuevoContenido = {
+        tipo: 'texto',
+        datos: [texto]
+      };
+    }
+    
+    setContenidoTabla(nuevoContenido);
+    
+    // Actualizar el formulario con los datos en formato JSON
+    const jsonData = nuevoContenido.tipo === 'tabla' 
+      ? JSON.stringify(nuevoContenido.datos)
+      : JSON.stringify(texto);
+    
+    setForm({ ...form, especificaciones_tecnicas: jsonData });
+  };
+
+  // Función para limpiar la tabla
+  const limpiarTabla = () => {
+    setContenidoTabla({ tipo: null, datos: [] });
+    setForm({ ...form, especificaciones_tecnicas: "" });
   };
 
   const handleSubmit = async (e) => {
@@ -127,6 +236,9 @@ const Productos = ({ onSubmit }) => {
           datos_tecnicos: {},
           especificaciones_tecnicas: "",
         });
+        
+        // Limpiar la tabla después de enviar
+        setContenidoTabla({ tipo: null, datos: [] });
       } else {
         console.error('Error al crear el producto:', response.statusText);
       }
@@ -163,6 +275,8 @@ const Productos = ({ onSubmit }) => {
 
   // Función para renderizar el valor de la tabla en la lista de productos
   const renderTablaPreview = (jsonStr) => {
+    if (!jsonStr) return <span className="text-gray-500">Sin datos</span>;
+    
     try {
       const tabla = JSON.parse(jsonStr);
       if (Array.isArray(tabla) && tabla.length > 0) {
@@ -171,11 +285,42 @@ const Productos = ({ onSubmit }) => {
             <span className="text-blue-500">Tabla: {tabla.length} filas × {tabla[0].length} columnas</span>
           </div>
         );
+      } else {
+        // Es un texto
+        return <span className="text-gray-500">Texto: {String(tabla).substring(0, 20)}...</span>;
       }
-      return <span className="text-gray-500">Sin datos</span>;
     } catch (error) {
-      return <span className="text-gray-500">{jsonStr || "Sin datos"}</span>;
+      return <span className="text-gray-500">{String(jsonStr).substring(0, 20)}...</span>;
     }
+  };
+
+  // Estilos para la tabla de TablaPegada
+  const estiloTabla = {
+    border: '1px solid #e5e7eb',
+    borderCollapse: 'collapse',
+    width: '100%',
+    marginTop: '10px'
+  };
+  
+  const estiloCelda = {
+    border: '1px solid #e5e7eb',
+    padding: '8px',
+    fontSize: '14px'
+  };
+  
+  const estiloEncabezado = {
+    ...estiloCelda,
+    backgroundColor: '#f3f4f6',
+    fontWeight: 'bold'
+  };
+
+  const estiloTexto = {
+    padding: '10px',
+    border: '1px solid #e5e7eb',
+    borderRadius: '4px',
+    backgroundColor: '#f9fafb',
+    marginTop: '10px',
+    fontSize: '14px'
   };
 
   return (
@@ -261,16 +406,74 @@ const Productos = ({ onSubmit }) => {
             </div>
           ))}
 
-          {/* Editor de Especificaciones Técnicas con Tabla */}
+          {/* Componente TablaPegada integrado directamente */}
           <div className="mb-4 col-span-1 md:col-span-2">
             <label htmlFor="especificaciones_tecnicas" className="block text-sm font-medium text-gray-700">
               Especificaciones Técnicas
             </label>
-            <div className="mt-1">
-              <TablaEditor 
-                initialValue={form.especificaciones_tecnicas} 
-                onChange={handleTableChange}
+            <div className="mt-1 w-full">
+              <div className="mb-2 text-sm text-gray-500">
+                Pega una tabla desde Excel, Google Sheets o cualquier fuente tabular. 
+                También puedes ingresar texto simple.
+              </div>
+              <textarea 
+                id="especificaciones_tecnicas"
+                onPaste={handleTablaPaste}
+                onChange={handleTablaTextChange}
+                value={contenidoTabla.tipo === 'texto' ? contenidoTabla.datos[0] || '' : ''}
+                placeholder="Pega el contenido aquí (tabla o texto)" 
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                style={{ minHeight: '100px' }}
               />
+              
+              {contenidoTabla.tipo === 'tabla' && contenidoTabla.datos.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Vista previa:</h3>
+                  <table style={estiloTabla} className="border-collapse border border-gray-300">
+                    <thead>
+                      <tr>
+                        {contenidoTabla.datos[0].map((celda, indexCelda) => (
+                          <th key={indexCelda} style={estiloEncabezado} className="bg-gray-100">
+                            {celda}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {contenidoTabla.datos.slice(1).map((fila, indexFila) => (
+                        <tr key={indexFila} className={indexFila % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          {fila.map((celda, indexCelda) => (
+                            <td key={indexCelda} style={estiloCelda} className="border border-gray-300">
+                              {celda}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  
+                  <div className="mt-2 text-sm text-gray-600">
+                    {contenidoTabla.datos.length} filas × {contenidoTabla.datos[0]?.length || 0} columnas
+                  </div>
+                  
+                  <button 
+                    type="button"
+                    onClick={limpiarTabla}
+                    className="mt-2 px-3 py-1 text-xs text-red-600 hover:text-red-800 focus:outline-none"
+                  >
+                    Limpiar tabla
+                  </button>
+                </div>
+              )}
+              
+              {contenidoTabla.tipo === 'texto' && contenidoTabla.datos.length > 0 && contenidoTabla.datos[0] && (
+                <div style={estiloTexto} className="mt-4 p-3 bg-gray-50 rounded text-sm">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Vista previa:</h3>
+                  <div className="whitespace-pre-wrap">
+                    {contenidoTabla.datos[0]}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
