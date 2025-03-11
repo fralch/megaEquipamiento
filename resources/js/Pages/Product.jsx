@@ -18,10 +18,25 @@ const ProductPage = ({ producto }) => {
         console.log(producto);
     }, [producto]);
 
+    // Parse especificaciones_tecnicas if it exists and is a string
+    const parseEspecificacionesTecnicas = () => {
+        if (!producto.especificaciones_tecnicas) return null;
+        
+        try {
+            return JSON.parse(producto.especificaciones_tecnicas);
+        } catch (error) {
+            console.error("Error parsing especificaciones_tecnicas:", error);
+            return null;
+        }
+    };
+
+    const especificacionesArray = parseEspecificacionesTecnicas();
+
     const tabs = [
         { id: 'descripcion', label: 'Descripción' },
         { id: 'caracteristicas', label: 'Características' },
         { id: 'datos', label: 'Datos Técnicos' },
+        { id: 'especificaciones', label: 'Especificaciones Técnicas' },
         { id: 'documentos', label: 'Documentos/Descargas' },
         { id: 'contenido', label: 'Contenido de Envío' },
         { id: 'soporte', label: 'Soporte Técnico' },
@@ -38,21 +53,56 @@ const ProductPage = ({ producto }) => {
             case 'caracteristicas':
                 return (
                     <div className="p-4">
-                        <ul>
-                            {Object.entries(producto.caracteristicas).map(([key, value]) => (
-                                <li key={key}>{key}: {value}</li>
-                            ))}
-                        </ul>
+                        {producto.caracteristicas && Object.keys(producto.caracteristicas).length > 0 ? (
+                            <ul>
+                                {Object.entries(producto.caracteristicas).map(([key, value]) => (
+                                    <li key={key}>{key}: {value}</li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No hay características disponibles.</p>
+                        )}
                     </div>
                 );
             case 'datos':
                 return (
                     <div className="p-4">
-                        <ul>
-                            {Object.entries(producto.datos_tecnicos).map(([key, value]) => (
-                                <li key={key}>{key}: {value}</li>
-                            ))}
-                        </ul>
+                        {producto.datos_tecnicos && Object.keys(producto.datos_tecnicos).length > 0 ? (
+                            <ul>
+                                {Object.entries(producto.datos_tecnicos).map(([key, value]) => (
+                                    <li key={key}>{key}: {value}</li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No hay datos técnicos disponibles.</p>
+                        )}
+                    </div>
+                );
+            case 'especificaciones':
+                return (
+                    <div className="p-4">
+                        {especificacionesArray && especificacionesArray.length > 0 ? (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full border-collapse border border-gray-300">
+                                    <tbody>
+                                        {especificacionesArray.map((row, rowIndex) => (
+                                            <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                                                {row.map((cell, cellIndex) => (
+                                                    <td 
+                                                        key={cellIndex} 
+                                                        className={`border border-gray-300 px-4 py-2 ${cellIndex === 0 ? 'font-semibold bg-gray-100' : ''}`}
+                                                    >
+                                                        {cell}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <p>No hay especificaciones técnicas disponibles.</p>
+                        )}
                     </div>
                 );
             case 'documentos':
@@ -149,24 +199,26 @@ const ProductPage = ({ producto }) => {
                         </div>
 
                         {/* El video tiene que ser la version acortada de youtube como por ejemplo: https://youtu.be/X9IgxlivjO8?si=QaCVPCuos-VrSP4R */}
-                        <div className="mt-6">
-                            <iframe
-                                className="w-full h-96 rounded-md shadow-lg"
-                                src={producto.video.replace("youtu.be", "www.youtube.com/embed")}
-                                title="Explora las Propiedades Texturales"
-                                allowFullScreen
-                            ></iframe>
-                        </div>
+                        {producto.video && (
+                            <div className="mt-6">
+                                <iframe
+                                    className="w-full h-96 rounded-md shadow-lg"
+                                    src={producto.video.replace("youtu.be", "www.youtube.com/embed")}
+                                    title="Explora las Propiedades Texturales"
+                                    allowFullScreen
+                                ></iframe>
+                            </div>
+                        )}
                     </div>
                 </section>
                 <div className="w-full bg-white shadow-md rounded-md mt-10">
                     {/* Tabs */}
-                    <div className="flex border-b">
+                    <div className="flex overflow-x-auto border-b">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className={`px-4 py-2 text-sm font-medium border-b-2 ${
+                                className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap ${
                                     activeTab === tab.id
                                         ? 'border-blue-500 text-blue-500'
                                         : 'border-transparent text-gray-600 hover:text-blue-500 hover:border-blue-500'
@@ -180,57 +232,6 @@ const ProductPage = ({ producto }) => {
                     {/* Content */}
                     <div className="p-4">{renderContent()}</div>
                 </div>
-                {/* Accessories Section */}
-                {/* <section className="mt-12">
-                    <h2 className="text-2xl font-bold mb-6">Accesorios</h2>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[...Array(8)].map((_, i) => (
-                            <div
-                                key={i}
-                                className="border rounded-lg p-4 hover:shadow-lg transition"
-                            >
-                                <img
-                                    src="/accessory-image.png"
-                                    alt="Accesorio"
-                                    className="w-full mb-4"
-                                />
-                                <h3 className="font-bold text-center">
-                                    Sonda Esférica (Ø 18 mm)
-                                </h3>
-                                <p className="text-center text-gray-500 mt-2">
-                                    $400.00
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </section> */}
-
-                {/* Related Products Section */}
-                {/* <section className="mt-12">
-                    <h2 className="text-2xl font-bold mb-6">
-                        Productos relacionados
-                    </h2>
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[...Array(4)].map((_, i) => (
-                            <div
-                                key={i}
-                                className="border rounded-lg p-4 hover:shadow-lg transition"
-                            >
-                                <img
-                                    src="/related-product.png"
-                                    alt="Producto relacionado"
-                                    className="w-full mb-4"
-                                />
-                                <h3 className="font-bold text-center">
-                                    Analizador de texturas TX-700
-                                </h3>
-                                <p className="text-center text-gray-500 mt-2">
-                                    $14,370.83
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </section> */}
             </main>
             <Footer />
         </div>
