@@ -5,6 +5,7 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ZoomImage from "../Components/store/ZoomImage";
 import Footer from "../Components/home/Footer";
+import { Link } from "@inertiajs/react";
 
 const ProductPage = ({ producto }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -60,7 +61,12 @@ const ProductPage = ({ producto }) => {
                                 ))}
                             </ul>
                         ) : (
-                            <p>No hay características disponibles.</p>
+                            <div>
+                                <p>No hay características disponibles.</p>
+                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                    Agregar características
+                                </Link>
+                            </div>
                         )}
                     </div>
                 );
@@ -74,7 +80,12 @@ const ProductPage = ({ producto }) => {
                                 ))}
                             </ul>
                         ) : (
-                            <p>No hay datos técnicos disponibles.</p>
+                            <div>
+                                <p>No hay datos técnicos disponibles.</p>
+                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                    Agregar datos técnicos
+                                </Link>
+                            </div>
                         )}
                     </div>
                 );
@@ -101,7 +112,12 @@ const ProductPage = ({ producto }) => {
                                 </table>
                             </div>
                         ) : (
-                            <p>No hay especificaciones técnicas disponibles.</p>
+                            <div>
+                                <p>No hay especificaciones técnicas disponibles.</p>
+                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                    Agregar especificaciones técnicas
+                                </Link>
+                            </div>
                         )}
                     </div>
                 );
@@ -113,20 +129,43 @@ const ProductPage = ({ producto }) => {
                                 Descargar documentos adicionales
                             </a>
                         ) : (
-                            <p>No hay documentos adicionales disponibles.</p>
+                            <div>
+                                <p>No hay documentos adicionales disponibles.</p>
+                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                    Agregar documentos
+                                </Link>
+                            </div>
                         )}
                     </div>
                 );
             case 'contenido':
                 return (
                     <div className="p-4">
-                        <p>{producto.envio}</p>
+                        {producto.envio ? (
+                            <p>{producto.envio}</p>
+                        ) : (
+                            <div>
+                                <p>No hay información de envío disponible.</p>
+                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                    Agregar información de envío
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 );
             case 'soporte':
                 return (
                     <div className="p-4">
-                        <p>{producto.soporte_tecnico}</p>
+                        {producto.soporte_tecnico ? (
+                            <p>{producto.soporte_tecnico}</p>
+                        ) : (
+                            <div>
+                                <p>No hay información de soporte técnico disponible.</p>
+                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                    Agregar información de soporte
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 );
             default:
