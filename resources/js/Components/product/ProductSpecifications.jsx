@@ -15,14 +15,20 @@ const ProductSpecifications = ({ specifications }) => {
             <div className="p-4">
                 <div className="overflow-x-auto">
                     <table className="min-w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr className="bg-gray-100">
+                                {specifications[0]?.map((header, index) => (
+                                    <th key={index} className="border border-gray-300 px-4 py-2 font-semibold text-left">
+                                        {header}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
                         <tbody>
-                            {specifications.map((row, rowIndex) => (
+                            {specifications.slice(1).map((row, rowIndex) => (
                                 <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                                     {row.map((cell, cellIndex) => (
-                                        <td 
-                                            key={cellIndex} 
-                                            className={`border border-gray-300 px-4 py-2 ${cellIndex === 0 ? 'font-semibold bg-gray-100' : ''}`}
-                                        >
+                                        <td key={cellIndex} className="border border-gray-300 px-4 py-2">
                                             {cell}
                                         </td>
                                     ))}
@@ -43,14 +49,20 @@ const ProductSpecifications = ({ specifications }) => {
                     {seccion.tipo === 'tabla' ? (
                         <div className="overflow-x-auto">
                             <table className="min-w-full border-collapse border border-gray-300">
+                                <thead>
+                                    <tr className="bg-gray-100">
+                                        {seccion.datos[0]?.map((header, index) => (
+                                            <th key={index} className="border border-gray-300 px-4 py-2 font-semibold text-left">
+                                                {header?.replace?.(/\\r$/, '') || header}
+                                            </th>
+                                        ))}
+                                    </tr>
+                                </thead>
                                 <tbody>
-                                    {seccion.datos.map((row, rowIndex) => (
+                                    {seccion.datos.slice(1).map((row, rowIndex) => (
                                         <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                                             {row.map((cell, cellIndex) => (
-                                                <td 
-                                                    key={cellIndex} 
-                                                    className={`border border-gray-300 px-4 py-2 ${cellIndex === 0 ? 'font-semibold bg-gray-100' : ''}`}
-                                                >
+                                                <td key={cellIndex} className="border border-gray-300 px-4 py-2">
                                                     {cell?.replace?.(/\\r$/, '') || cell}
                                                 </td>
                                             ))}
