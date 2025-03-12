@@ -31,9 +31,9 @@ class AuthController extends Controller
             ]);
         }
 
-        Auth::login($usuario); // esto guarda el usuario en la sesión 
+        Auth::login($usuario);
 
-        return redirect()->intended('/dashboard');
+        return redirect()->route('welcome');
     }
 
     public function register(Request $request)
@@ -58,7 +58,7 @@ class AuthController extends Controller
 
         Auth::login($usuario);
 
-        return redirect('/dashboard');
+        return redirect()->route('welcome');
     }
 
     public function logout(Request $request)
@@ -67,6 +67,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect()->route('welcome');
     }
 }

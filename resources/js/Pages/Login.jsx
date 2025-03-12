@@ -24,7 +24,7 @@ export default function Login() {
 
     const handleLoginSubmit = (e) => {
         e.preventDefault();
-        loginForm.post(route('login'));
+        loginForm.post(route('login.submit'));
     };
 
     const handleRegisterSubmit = (e) => {
