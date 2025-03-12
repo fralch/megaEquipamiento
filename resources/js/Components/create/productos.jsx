@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Modal_Features from './assets/modal_features';
+import EspecificacionesTecnicas from './assets/especificacionesTecnicas';
 
 const URL_API = import.meta.env.VITE_API_URL;
 
 const Productos = ({ onSubmit }) => {
-  // Main states
-  const [productos, setProductos] = useState([]);
-  const [form, setForm] = useState({
+  const especificacionesRef = useRef();
+  const initialForm = {
     sku: "",
     nombre: "",
     id_subcategoria: "",
@@ -23,9 +23,10 @@ const Productos = ({ onSubmit }) => {
     caracteristicas: {},
     datos_tecnicos: {},
     especificaciones_tecnicas: "",
-  });
-
-  // UI states
+  };
+  
+  // States
+  const [form, setForm] = useState(initialForm);
   const [categorias, setCategorias] = useState([]);
   const [subcategorias, setSubcategorias] = useState([]);
   const [marcas, setMarcas] = useState([]);
@@ -33,13 +34,7 @@ const Productos = ({ onSubmit }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
   
-  // Updated state for multiple tables and text blocks
-  const [contenidoTabla, setContenidoTabla] = useState({
-    secciones: [],
-    textoActual: ""
-  });
-
-  // Fetch data on component mount
+  // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -49,9 +44,11 @@ const Productos = ({ onSubmit }) => {
           fetch(`${URL_API}/marca/all`)
         ]);
         
-        const categoriasData = await categoriasRes.json();
-        const subcategoriasData = await subcategoriasRes.json();
-        const marcasData = await marcasRes.json();
+        const [categoriasData, subcategoriasData, marcasData] = await Promise.all([
+          categoriasRes.json(),
+          subcategoriasRes.json(),
+          marcasRes.json()
+        ]);
         
         setCategorias(categoriasData);
         setSubcategorias(subcategoriasData);
@@ -62,38 +59,6 @@ const Productos = ({ onSubmit }) => {
     };
     
     fetchData();
-  }, []);
-
-  // Initialize table component with existing value if present
-  useEffect(() => {
-    if (!form.especificaciones_tecnicas) return;
-    
-    try {
-      const parsedValue = JSON.parse(form.especificaciones_tecnicas);
-      
-      // Check if the parsed value is already in our multi-section format
-      if (parsedValue && Array.isArray(parsedValue.secciones)) {
-        setContenidoTabla(parsedValue);
-      } else if (Array.isArray(parsedValue) && parsedValue.length > 0) {
-        // Handle old format (single table)
-        setContenidoTabla({
-          secciones: [{ tipo: 'tabla', datos: parsedValue }],
-          textoActual: ""
-        });
-      } else {
-        // Handle old format (single text)
-        setContenidoTabla({
-          secciones: [{ tipo: 'texto', datos: [form.especificaciones_tecnicas] }],
-          textoActual: ""
-        });
-      }
-    } catch (e) {
-      // If not valid JSON, treat as text
-      setContenidoTabla({
-        secciones: [{ tipo: 'texto', datos: [form.especificaciones_tecnicas] }],
-        textoActual: ""
-      });
-    }
   }, []);
 
   // Event handlers
@@ -111,116 +76,23 @@ const Productos = ({ onSubmit }) => {
     setForm(prev => ({ ...prev, id_subcategoria: '' }));
   };
 
-  // Table paste handler - detects and formats pasted content
-  const handleTablaPaste = (event) => {
-    event.preventDefault();
-    const textoPegado = event.clipboardData.getData('text');
-    processTableContent(textoPegado);
-  };
-  
-  const handleTablaTextChange = (e) => {
-    setContenidoTabla(prev => ({
-      ...prev,
-      textoActual: e.target.value
-    }));
-  };
-  
-  // Process and add content to sections
-  const processTableContent = (texto) => {
-    const tieneTab = texto.includes('\t');
-    const tieneMultilineas = texto.trim().split('\n').length > 1;
-    const tipo = tieneTab && tieneMultilineas ? 'tabla' : 'texto';
-    
-    let nuevaSeccion;
-    if (tipo === 'tabla') {
-      const filas = texto.trim().split('\n');
-      const datosTabla = filas
-        .filter(fila => fila.trim() !== '')
-        .map((fila) => fila.split('\t'));
-      
-      nuevaSeccion = { tipo: 'tabla', datos: datosTabla };
-    } else {
-      nuevaSeccion = { tipo: 'texto', datos: [texto] };
-    }
-    
-    // Add the new section to our content
-    const nuevasSecciones = [...contenidoTabla.secciones, nuevaSeccion];
-    const nuevoContenido = {
-      secciones: nuevasSecciones,
-      textoActual: ""
-    };
-    
-    setContenidoTabla(nuevoContenido);
-    
-    // Update the form with the stringified multi-section content
-    setForm(prev => ({ 
-      ...prev, 
-      especificaciones_tecnicas: JSON.stringify(nuevoContenido) 
-    }));
-  };
-
-  // Add current text as a new section
-  const agregarTextoActual = () => {
-    if (!contenidoTabla.textoActual.trim()) return;
-    
-    const nuevaSeccion = { 
-      tipo: 'texto', 
-      datos: [contenidoTabla.textoActual.trim()] 
-    };
-    
-    const nuevasSecciones = [...contenidoTabla.secciones, nuevaSeccion];
-    const nuevoContenido = {
-      secciones: nuevasSecciones,
-      textoActual: ""
-    };
-    
-    setContenidoTabla(nuevoContenido);
-    
-    // Update the form with the stringified multi-section content
-    setForm(prev => ({ 
-      ...prev, 
-      especificaciones_tecnicas: JSON.stringify(nuevoContenido) 
-    }));
-  };
-
-  const limpiarTabla = () => {
-    setContenidoTabla({ secciones: [], textoActual: "" });
-    setForm(prev => ({ ...prev, especificaciones_tecnicas: "" }));
-  };
-
-  // Remove a specific section by index
-  const eliminarSeccion = (index) => {
-    const nuevasSecciones = contenidoTabla.secciones.filter((_, i) => i !== index);
-    const nuevoContenido = {
-      secciones: nuevasSecciones,
-      textoActual: contenidoTabla.textoActual
-    };
-    
-    setContenidoTabla(nuevoContenido);
-    
-    // Update the form with the stringified multi-section content
-    setForm(prev => ({ 
-      ...prev, 
-      especificaciones_tecnicas: JSON.stringify(nuevoContenido) 
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Make sure any pending text is added before submitting
-    if (contenidoTabla.textoActual.trim()) {
-      agregarTextoActual();
+    // Save pending text in specifications
+    if (especificacionesRef.current) {
+      especificacionesRef.current.saveText();
     }
 
     const formData = new FormData();
-    // Add all form fields to FormData
+    
+    // Add form fields to FormData
     Object.entries(form).forEach(([key, value]) => {
       if (key === 'imagen' && value) {
         formData.append(key, value);
-      } else if (key === 'caracteristicas' || key === 'datos_tecnicos') {
+      } else if ((key === 'caracteristicas' || key === 'datos_tecnicos') && value) {
         formData.append(key, JSON.stringify(value));
-      } else if (value !== null) {
+      } else if (value !== null && value !== undefined) {
         formData.append(key, value);
       }
     });
@@ -237,38 +109,9 @@ const Productos = ({ onSubmit }) => {
       if (response.ok) {
         const result = await response.json();
         console.log('Producto creado:', result);
-
-        // Add new product to list
-        setProductos(prev => [
-          ...prev, 
-          {
-            ...form,
-            imagen: form.imagen ? URL.createObjectURL(form.imagen) : ''
-          }
-        ]);
-
-        // Reset form
-        setForm({
-          sku: "",
-          nombre: "",
-          id_subcategoria: "",
-          marca_id: "",
-          pais: "",
-          precio_sin_ganancia: "",
-          precio_ganancia: "",
-          precio_igv: "",
-          imagen: null,
-          descripcion: "",
-          video: "",
-          envio: "",
-          soporte_tecnico: "",
-          caracteristicas: {},
-          datos_tecnicos: {},
-          especificaciones_tecnicas: "",
-        });
-        
-        // Clear table
-        setContenidoTabla({ secciones: [], textoActual: "" });
+        alert('¡Producto creado exitosamente!');
+        setForm(initialForm);
+        setSelectedCategory('');
       } else {
         console.error('Error al crear el producto:', response.statusText);
       }
@@ -278,13 +121,9 @@ const Productos = ({ onSubmit }) => {
   };
 
   // Modal handlers
-  const openModal = (type) => {
+  const toggleModal = (type = '') => {
     setModalType(type);
-    setModalVisible(true);
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
+    setModalVisible(!!type);
   };
 
   const saveModalData = (value) => {
@@ -295,43 +134,7 @@ const Productos = ({ onSubmit }) => {
       console.error('Error saving modal data:', error);
       setForm(prev => ({ ...prev, [modalType]: {} }));
     }
-    closeModal();
-  };
-
-  // Helper functions
-  const renderTablaPreview = (jsonStr) => {
-    if (!jsonStr) return <span className="text-gray-500">Sin datos</span>;
-    
-    try {
-      const contenido = JSON.parse(jsonStr);
-      
-      if (contenido.secciones && Array.isArray(contenido.secciones)) {
-        // New multi-section format
-        return (
-          <div className="text-xs">
-            <span className="text-blue-500">
-              {contenido.secciones.length} secciones: {
-                contenido.secciones.filter(s => s.tipo === 'tabla').length
-              } tablas, {
-                contenido.secciones.filter(s => s.tipo === 'texto').length
-              } textos
-            </span>
-          </div>
-        );
-      } else if (Array.isArray(contenido) && contenido.length > 0) {
-        // Old format (single table)
-        return (
-          <div className="text-xs">
-            <span className="text-blue-500">Tabla: {contenido.length} filas × {contenido[0].length} columnas</span>
-          </div>
-        );
-      } else {
-        // Old format (single text)
-        return <span className="text-gray-500">Texto: {String(contenido).substring(0, 20)}...</span>;
-      }
-    } catch (error) {
-      return <span className="text-gray-500">{String(jsonStr).substring(0, 20)}...</span>;
-    }
+    toggleModal();
   };
 
   // Filter subcategories based on selected category
@@ -341,39 +144,14 @@ const Productos = ({ onSubmit }) => {
 
   // Styles for table
   const tableStyles = {
-    container: {
-      border: '1px solid #e5e7eb',
-      borderCollapse: 'collapse',
-      width: '100%',
-      marginTop: '10px'
-    },
-    cell: {
-      border: '1px solid #e5e7eb',
-      padding: '8px',
-      fontSize: '14px'
-    },
-    header: {
-      border: '1px solid #e5e7eb',
-      padding: '8px',
-      fontSize: '14px',
-      backgroundColor: '#f3f4f6',
-      fontWeight: 'bold'
-    },
-    text: {
-      padding: '10px',
-      border: '1px solid #e5e7eb',
-      borderRadius: '4px',
-      backgroundColor: '#f9fafb',
-      marginTop: '10px',
-      fontSize: '14px'
-    },
-    seccion: {
-      marginBottom: '20px',
-      position: 'relative'
-    }
+    container: { border: '1px solid #e5e7eb', borderCollapse: 'collapse', width: '100%', marginTop: '10px' },
+    cell: { border: '1px solid #e5e7eb', padding: '8px', fontSize: '14px' },
+    header: { border: '1px solid #e5e7eb', padding: '8px', fontSize: '14px', backgroundColor: '#f3f4f6', fontWeight: 'bold' },
+    text: { padding: '10px', border: '1px solid #e5e7eb', borderRadius: '4px', backgroundColor: '#f9fafb', marginTop: '10px', fontSize: '14px' },
+    seccion: { marginBottom: '20px', position: 'relative' }
   };
 
-  // Form field definitions for reuse
+  // Form field definitions
   const formFields = [
     { label: "SKU", name: "sku", type: "text", placeholder: "Ingrese el código SKU del producto", required: true },
     { label: "Nombre", name: "nombre", type: "text", placeholder: "Ingrese el nombre del producto", required: true },
@@ -381,9 +159,9 @@ const Productos = ({ onSubmit }) => {
       label: "Categoría",
       name: "categoria",
       type: "select",
-      options: categorias.map(category => ({
-        value: category.id_categoria,
-        label: category.nombre
+      options: categorias.map(({ id_categoria, nombre }) => ({
+        value: id_categoria,
+        label: nombre
       })),
       placeholder: "Seleccione una categoría"
     },
@@ -391,9 +169,9 @@ const Productos = ({ onSubmit }) => {
       label: "Subcategoría",
       name: "id_subcategoria",
       type: "select",
-      options: filteredSubcategorias.map(subcategory => ({
-        value: subcategory.id_subcategoria,
-        label: subcategory.nombre
+      options: filteredSubcategorias.map(({ id_subcategoria, nombre }) => ({
+        value: id_subcategoria,
+        label: nombre
       })),
       placeholder: "Seleccione una subcategoría",
       required: true
@@ -402,9 +180,9 @@ const Productos = ({ onSubmit }) => {
       label: "Marca",
       name: "marca_id",
       type: "select",
-      options: marcas.map(marca => ({
-        value: marca.id_marca,
-        label: marca.nombre
+      options: marcas.map(({ id_marca, nombre }) => ({
+        value: id_marca,
+        label: nombre
       })),
       placeholder: "Seleccione una marca",
       required: true
@@ -418,7 +196,7 @@ const Productos = ({ onSubmit }) => {
     { label: "Soporte Técnico", name: "soporte_tecnico", type: "text", placeholder: "Información de soporte técnico" },
   ];
 
-  // Render form fields dynamically
+  // Render form fields
   const renderFormField = ({ label, name, type, options, step, placeholder, required }) => (
     <div key={name} className="mb-4">
       <label htmlFor={name} className="block text-sm font-medium text-gray-700">
@@ -434,10 +212,8 @@ const Productos = ({ onSubmit }) => {
           required={required}
         >
           <option value="">{placeholder}</option>
-          {options && options.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
+          {options?.map(({ value, label }) => (
+            <option key={value} value={value}>{label}</option>
           ))}
         </select>
       ) : (
@@ -462,150 +238,46 @@ const Productos = ({ onSubmit }) => {
       <form onSubmit={handleSubmit}>
         <h2 className="text-lg font-bold mb-4">Agregar / Editar Producto</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Render all form fields */}
+          {/* Render form fields */}
           {formFields.map(renderFormField)}
 
-          {/* Tabla component */}
-          <div className="mb-4 col-span-1 md:col-span-2">
-            <label htmlFor="especificaciones_tecnicas" className="block text-sm font-medium text-gray-700">
-              Especificaciones Técnicas
-            </label>
-            <div className="mt-1 w-full">
-              <div className="mb-2 text-sm text-gray-500">
-                Pega una tabla desde Excel, pdf, o de cualquier pagina web  
-                También puedes ingresar texto simple y combinar múltiples tablas y textos.
-              </div>
-              
-              {/* New content input */}
-              <div className="mb-2">
-                <textarea 
-                  id="especificaciones_tecnicas_input"
-                  onPaste={handleTablaPaste}
-                  onChange={handleTablaTextChange}
-                  value={contenidoTabla.textoActual}
-                  placeholder="Pega el contenido aquí (tabla o texto)" 
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  style={{ minHeight: '100px' }}
-                />
-                
-                <div className="flex justify-between mt-2">
-                  <button
-                    type="button"
-                    onClick={agregarTextoActual}
-                    disabled={!contenidoTabla.textoActual.trim()}
-                    className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Agregar como texto
-                  </button>
-                  
-                  {contenidoTabla.secciones.length > 0 && (
-                    <button 
-                      type="button"
-                      onClick={limpiarTabla}
-                      className="px-3 py-1 text-sm text-red-600 hover:text-red-800 focus:outline-none"
-                    >
-                      Limpiar todo
-                    </button>
-                  )}
-                </div>
-              </div>
+          <EspecificacionesTecnicas
+            ref={especificacionesRef}
+            form={form}
+            setForm={setForm}
+            tableStyles={tableStyles}
+          />
 
-              {/* Display existing sections */}
-              {contenidoTabla.secciones.length > 0 && (
-                <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Contenido actual:</h3>
-                  
-                  {contenidoTabla.secciones.map((seccion, seccionIndex) => (
-                    <div key={seccionIndex} style={tableStyles.seccion} className="mb-6 border-b pb-4 pt-2">
-                      {/* Section type label */}
-                      <div className="flex justify-between items-center mb-2">
-                        <h4 className="text-sm font-medium text-gray-700">
-                          Sección {seccionIndex + 1}: {seccion.tipo === 'tabla' ? 'Tabla' : 'Texto'}
-                        </h4>
-                        <button 
-                          type="button"
-                          onClick={() => eliminarSeccion(seccionIndex)}
-                          className="text-red-600 hover:text-red-800 text-sm"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                      
-                      {/* Table content */}
-                      {seccion.tipo === 'tabla' && (
-                        <table style={tableStyles.container} className="border-collapse border border-gray-300">
-                          <thead>
-                            <tr>
-                              {seccion.datos[0].map((celda, idx) => (
-                                <th key={idx} style={tableStyles.header} className="bg-gray-100">
-                                  {celda}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {seccion.datos.slice(1).map((fila, rowIdx) => (
-                              <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                {fila.map((celda, cellIdx) => (
-                                  <td key={cellIdx} style={tableStyles.cell} className="border border-gray-300">
-                                    {celda}
-                                  </td>
-                                ))}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      )}
-                      
-                      {/* Text content */}
-                      {seccion.tipo === 'texto' && (
-                        <div style={tableStyles.text} className="p-3 bg-gray-50 rounded text-sm">
-                          <div className="whitespace-pre-wrap">
-                            {seccion.datos[0]}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              
-            </div>
-          </div>
-
-          {/* Características and Datos Técnicos buttons */}
+          {/* Feature buttons */}
           <div className="mb-4">
-            <label htmlFor="caracteristicas" className="block text-sm font-medium text-gray-700">
-              Características
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Características</label>
             <button
               type="button"
-              onClick={() => openModal('caracteristicas')}
+              onClick={() => toggleModal('caracteristicas')}
               className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
             >
-              {Object.keys(form.caracteristicas).length === 0 ? 'Click para agregar características' : JSON.stringify(form.caracteristicas)}
+              {Object.keys(form.caracteristicas || {}).length === 0 
+                ? 'Click para agregar características' 
+                : JSON.stringify(form.caracteristicas)}
             </button>
           </div>
 
           <div className="mb-4">
-            <label htmlFor="datos_tecnicos" className="block text-sm font-medium text-gray-700">
-              Datos Técnicos
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Datos Técnicos</label>
             <button
               type="button"
-              onClick={() => openModal('datos_tecnicos')}
+              onClick={() => toggleModal('datos_tecnicos')}
               className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
             >
-              {Object.keys(form.datos_tecnicos).length === 0 ? 'Click para agregar datos técnicos' : JSON.stringify(form.datos_tecnicos)}
+              {Object.keys(form.datos_tecnicos || {}).length === 0 
+                ? 'Click para agregar datos técnicos' 
+                : JSON.stringify(form.datos_tecnicos)}
             </button>
           </div>
 
           {/* Image upload */}
           <div className="mb-4">
-            <label htmlFor="imagen" className="block text-sm font-medium text-gray-700">
-              Imagen
-            </label>
+            <label htmlFor="imagen" className="block text-sm font-medium text-gray-700">Imagen</label>
             <div className="mt-1 block w-full">
               <input
                 type="file"
@@ -621,14 +293,13 @@ const Productos = ({ onSubmit }) => {
               >
                 Seleccionar archivo
               </label>
+              {form.imagen && <p className="mt-1 text-sm text-gray-500">{form.imagen.name}</p>}
             </div>
           </div>
 
           {/* Description */}
           <div className="mb-4">
-            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
-              Descripción
-            </label>
+            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
             <textarea
               id="descripcion"
               name="descripcion"
@@ -636,6 +307,7 @@ const Productos = ({ onSubmit }) => {
               onChange={handleChange}
               placeholder="Ingrese una descripción detallada del producto"
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              rows={4}
             />
           </div>
         </div>
@@ -649,56 +321,13 @@ const Productos = ({ onSubmit }) => {
         </button>
       </form>
 
-      {/* Products table */}
-      <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto mt-8">
-        <h2 className="text-lg font-bold mb-4">Productos Totales</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategoría</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">País</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Especificaciones</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagen</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {productos.map((producto, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap">{producto.sku}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{producto.nombre}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{producto.id_subcategoria}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{producto.marca_id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{producto.pais}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{producto.precio_sin_ganancia}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {renderTablaPreview(producto.especificaciones_tecnicas)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {producto.imagen && (
-                      <img src={producto.imagen} alt="Producto" className="h-10 w-10 object-cover rounded-full" />
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{producto.descripcion}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       {/* Modal */}
       {modalVisible && (
         <Modal_Features
           product={form}
           type={modalType}
           onSave={saveModalData}
-          onClose={closeModal}
+          onClose={() => toggleModal()}
         />
       )}
     </div>
