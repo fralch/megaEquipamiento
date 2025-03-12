@@ -13,12 +13,18 @@ const ProductPage = ({ producto }) => {
     const [activeTab, setActiveTab] = useState('descripcion');
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState(null);
+    const [editMode, setEditMode] = useState({});
+    const [tempInputs, setTempInputs] = useState({});
     
     // State to track updated product data
     const [productData, setProductData] = useState({
         ...producto,
         caracteristicas: producto.caracteristicas || {},
-        datos_tecnicos: producto.datos_tecnicos || {}
+        datos_tecnicos: producto.datos_tecnicos || {},
+        descripcion: producto.descripcion || '',
+        documentos: producto.documentos || [],
+        contenido_envio: producto.contenido_envio || '',
+        soporte_tecnico: producto.soporte_tecnico || ''
     });
 
     const toggleMenu = () => {
@@ -35,11 +41,41 @@ const ProductPage = ({ producto }) => {
         setModalType(null);
     };
 
+    const toggleEditMode = (field) => {
+        setEditMode(prev => ({
+            ...prev,
+            [field]: !prev[field]
+        }));
+        setTempInputs(prev => ({
+            ...prev,
+            [field]: productData[field]
+        }));
+    };
+
+    const handleInputChange = (field, value) => {
+        setTempInputs(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleSave = (field) => {
+        setProductData(prev => ({
+            ...prev,
+            [field]: tempInputs[field]
+        }));
+        setEditMode(prev => ({
+            ...prev,
+            [field]: false
+        }));
+        // Aquí se podría agregar la lógica para guardar en el backend
+        console.log(`Guardando ${field}:`, tempInputs[field]);
+    };
+
     const handleSaveFeatures = (jsonData) => {
         try {
             const parsedData = JSON.parse(jsonData);
             
-            // Update the appropriate part of product data based on modal type
             if (modalType === 'caracteristicas') {
                 setProductData(prevData => ({
                     ...prevData,
@@ -52,10 +88,6 @@ const ProductPage = ({ producto }) => {
                 }));
             }
             
-            // Here you would typically send this data to your backend
-            console.log("Saved data:", parsedData);
-            
-            // Close the modal
             handleCloseModal();
         } catch (error) {
             console.error("Error parsing data:", error);
@@ -66,11 +98,6 @@ const ProductPage = ({ producto }) => {
         setActiveTab(tabId);
     };
 
-    useEffect(() => {
-        console.log(producto);
-    }, [producto]);
-
-    // Parse especificaciones_tecnicas if it exists and is a string
     const parseEspecificacionesTecnicas = () => {
         if (!producto.especificaciones_tecnicas) return null;
         
@@ -99,7 +126,80 @@ const ProductPage = ({ producto }) => {
             case 'descripcion':
                 return (
                     <div className="p-4">
-                        <p>{producto.descripcion}</p>
+                        {productData.descripcion ? (
+                            <div>
+                                {editMode.descripcion ? (
+                                    <div>
+                                        <textarea
+                                            className="w-full p-2 border rounded"
+                                            value={tempInputs.descripcion}
+                                            onChange={(e) => handleInputChange('descripcion', e.target.value)}
+                                        />
+                                        <div className="mt-2">
+                                            <button 
+                                                onClick={() => handleSave('descripcion')}
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button 
+                                                onClick={() => toggleEditMode('descripcion')}
+                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p>{productData.descripcion}</p>
+                                        <button 
+                                            onClick={() => toggleEditMode('descripcion')}
+                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                        >
+                                            Editar descripción
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div>
+                                {editMode.descripcion ? (
+                                    <div>
+                                        <textarea
+                                            className="w-full p-2 border rounded"
+                                            value={tempInputs.descripcion}
+                                            onChange={(e) => handleInputChange('descripcion', e.target.value)}
+                                            placeholder="Ingrese la descripción del producto"
+                                        />
+                                        <div className="mt-2">
+                                            <button 
+                                                onClick={() => handleSave('descripcion')}
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button 
+                                                onClick={() => toggleEditMode('descripcion')}
+                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p>No hay descripción disponible.</p>
+                                        <button 
+                                            onClick={() => toggleEditMode('descripcion')}
+                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                        >
+                                            Agregar descripción
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 );
             case 'caracteristicas':
@@ -199,14 +299,81 @@ const ProductPage = ({ producto }) => {
             case 'documentos':
                 return (
                     <div className="p-4">
-                        {producto.archivos_adicionales ? (
-                            <a href={producto.archivos_adicionales} target="_blank" rel="noopener noreferrer">
-                                Descargar documentos adicionales
-                            </a>
+                        {productData.documentos && productData.documentos.length > 0 ? (
+                            <div>
+                                <ul className="list-disc pl-5">
+                                    {productData.documentos.map((doc, index) => (
+                                        <li key={index} className="mb-2">{doc}</li>
+                                    ))}
+                                </ul>
+                                {editMode.documentos ? (
+                                    <div className="mt-4">
+                                        <textarea
+                                            className="w-full p-2 border rounded"
+                                            value={tempInputs.documentos}
+                                            onChange={(e) => handleInputChange('documentos', e.target.value)}
+                                            placeholder="Ingrese los documentos (uno por línea)"
+                                        />
+                                        <div className="mt-2">
+                                            <button 
+                                                onClick={() => handleSave('documentos')}
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button 
+                                                onClick={() => toggleEditMode('documentos')}
+                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button 
+                                        onClick={() => toggleEditMode('documentos')}
+                                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        Editar documentos
+                                    </button>
+                                )}
+                            </div>
                         ) : (
                             <div>
-                                <p>No hay documentos adicionales disponibles.</p>
-                                {/* Add file upload functionality here if needed */}
+                                {editMode.documentos ? (
+                                    <div>
+                                        <textarea
+                                            className="w-full p-2 border rounded"
+                                            value={tempInputs.documentos}
+                                            onChange={(e) => handleInputChange('documentos', e.target.value)}
+                                            placeholder="Ingrese los documentos (uno por línea)"
+                                        />
+                                        <div className="mt-2">
+                                            <button 
+                                                onClick={() => handleSave('documentos')}
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button 
+                                                onClick={() => toggleEditMode('documentos')}
+                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p>No hay documentos disponibles.</p>
+                                        <button 
+                                            onClick={() => toggleEditMode('documentos')}
+                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                        >
+                                            Agregar documentos
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -214,12 +381,78 @@ const ProductPage = ({ producto }) => {
             case 'contenido':
                 return (
                     <div className="p-4">
-                        {producto.envio ? (
-                            <p>{producto.envio}</p>
+                        {productData.contenido_envio ? (
+                            <div>
+                                {editMode.contenido_envio ? (
+                                    <div>
+                                        <textarea
+                                            className="w-full p-2 border rounded"
+                                            value={tempInputs.contenido_envio}
+                                            onChange={(e) => handleInputChange('contenido_envio', e.target.value)}
+                                        />
+                                        <div className="mt-2">
+                                            <button 
+                                                onClick={() => handleSave('contenido_envio')}
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button 
+                                                onClick={() => toggleEditMode('contenido_envio')}
+                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p>{productData.contenido_envio}</p>
+                                        <button 
+                                            onClick={() => toggleEditMode('contenido_envio')}
+                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                        >
+                                            Editar contenido de envío
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             <div>
-                                <p>No hay información de envío disponible.</p>
-                                {/* Add input for shipping info if needed */}
+                                {editMode.contenido_envio ? (
+                                    <div>
+                                        <textarea
+                                            className="w-full p-2 border rounded"
+                                            value={tempInputs.contenido_envio}
+                                            onChange={(e) => handleInputChange('contenido_envio', e.target.value)}
+                                            placeholder="Ingrese el contenido de envío"
+                                        />
+                                        <div className="mt-2">
+                                            <button 
+                                                onClick={() => handleSave('contenido_envio')}
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button 
+                                                onClick={() => toggleEditMode('contenido_envio')}
+                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p>No hay información sobre el contenido de envío.</p>
+                                        <button 
+                                            onClick={() => toggleEditMode('contenido_envio')}
+                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                        >
+                                            Agregar contenido de envío
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -227,12 +460,78 @@ const ProductPage = ({ producto }) => {
             case 'soporte':
                 return (
                     <div className="p-4">
-                        {producto.soporte_tecnico ? (
-                            <p>{producto.soporte_tecnico}</p>
+                        {productData.soporte_tecnico ? (
+                            <div>
+                                {editMode.soporte_tecnico ? (
+                                    <div>
+                                        <textarea
+                                            className="w-full p-2 border rounded"
+                                            value={tempInputs.soporte_tecnico}
+                                            onChange={(e) => handleInputChange('soporte_tecnico', e.target.value)}
+                                        />
+                                        <div className="mt-2">
+                                            <button 
+                                                onClick={() => handleSave('soporte_tecnico')}
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button 
+                                                onClick={() => toggleEditMode('soporte_tecnico')}
+                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p>{productData.soporte_tecnico}</p>
+                                        <button 
+                                            onClick={() => toggleEditMode('soporte_tecnico')}
+                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                        >
+                                            Editar soporte técnico
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         ) : (
                             <div>
-                                <p>No hay información de soporte técnico disponible.</p>
-                                {/* Add input for support info if needed */}
+                                {editMode.soporte_tecnico ? (
+                                    <div>
+                                        <textarea
+                                            className="w-full p-2 border rounded"
+                                            value={tempInputs.soporte_tecnico}
+                                            onChange={(e) => handleInputChange('soporte_tecnico', e.target.value)}
+                                            placeholder="Ingrese la información de soporte técnico"
+                                        />
+                                        <div className="mt-2">
+                                            <button 
+                                                onClick={() => handleSave('soporte_tecnico')}
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button 
+                                                onClick={() => toggleEditMode('soporte_tecnico')}
+                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p>No hay información de soporte técnico disponible.</p>
+                                        <button 
+                                            onClick={() => toggleEditMode('soporte_tecnico')}
+                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                        >
+                                            Agregar soporte técnico
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
