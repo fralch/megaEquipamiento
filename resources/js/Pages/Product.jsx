@@ -9,6 +9,7 @@ import Modal_Features from "./assets/modal_features";
 import { Link } from "@inertiajs/react";
 
 const ProductPage = ({ producto }) => {
+    console.log(producto);
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('descripcion');
     const [showModal, setShowModal] = useState(false);
@@ -323,7 +324,8 @@ const ProductPage = ({ producto }) => {
             case 'especificaciones':
                 return (
                     <div className="p-4">
-                        <div>
+                        {/* Input para nuevas especificaciones */}
+                        <div className="mb-6">
                             <div className="mb-4">
                                 <p className="mb-2 font-medium">Pega una tabla o texto para las especificaciones técnicas:</p>
                                 <textarea 
@@ -366,40 +368,52 @@ const ProductPage = ({ producto }) => {
                                     </div>
                                 </div>
                             )}
-                            
+
                             {especificacionesPegadas.tipo && (
-                                <div className="mt-4">
-                                    <button 
-                                        onClick={guardarEspecificacionesPegadas}
-                                        className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
-                                    >
-                                        Guardar Especificaciones
-                                    </button>
-                                </div>
+                                <button 
+                                    onClick={guardarEspecificacionesPegadas}
+                                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                >
+                                    Guardar especificaciones
+                                </button>
                             )}
                         </div>
 
-                        {/* Mostrar especificaciones guardadas si existen */}
-                        {especificacionesArray && especificacionesArray.length > 0 && (
-                            <div className="mt-8">
-                                <h3 className="font-medium mb-2">Especificaciones Guardadas:</h3>
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full border-collapse border border-gray-300">
-                                        <tbody>
-                                            {especificacionesArray.map((row, rowIndex) => (
-                                                <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                                                    {row.map((cell, cellIndex) => (
-                                                        <td 
-                                                            key={cellIndex} 
-                                                            className={`border border-gray-300 px-4 py-2 ${cellIndex === 0 ? 'font-semibold bg-gray-100' : ''}`}
-                                                        >
-                                                            {cell}
-                                                        </td>
+                        {/* Mostrar especificaciones existentes */}
+                        {especificacionesArray && (
+                            <div className="mt-6">
+                                <h3 className="text-lg font-semibold mb-4">Especificaciones Técnicas Actuales</h3>
+                                <div className="space-y-6">
+                                    {especificacionesArray.secciones.map((seccion, index) => (
+                                        <div key={index} className="border rounded-lg p-4 bg-white shadow-sm">
+                                            {seccion.tipo === 'tabla' ? (
+                                                <div className="overflow-x-auto">
+                                                    <table className="min-w-full border-collapse border border-gray-300">
+                                                        <tbody>
+                                                            {seccion.datos.map((fila, indexFila) => (
+                                                                <tr key={indexFila} className={indexFila % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                                                                    {fila.map((celda, indexCelda) => (
+                                                                        <td 
+                                                                            key={indexCelda} 
+                                                                            className={`border border-gray-300 px-4 py-2 ${indexCelda === 0 ? 'font-semibold bg-gray-100' : ''}`}
+                                                                        >
+                                                                            {celda.replace('\\r', '')}
+                                                                        </td>
+                                                                    ))}
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            ) : (
+                                                <div className="prose max-w-none">
+                                                    {seccion.datos.map((texto, textoIndex) => (
+                                                        <p key={textoIndex} className="mb-2">{texto}</p>
                                                     ))}
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}

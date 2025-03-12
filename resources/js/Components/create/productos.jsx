@@ -32,9 +32,11 @@ const Productos = ({ onSubmit }) => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
+  
+  // Updated state for multiple tables and text blocks
   const [contenidoTabla, setContenidoTabla] = useState({
-    tipo: null,
-    datos: []
+    secciones: [],
+    textoActual: ""
   });
 
   // Fetch data on component mount
@@ -68,15 +70,28 @@ const Productos = ({ onSubmit }) => {
     
     try {
       const parsedValue = JSON.parse(form.especificaciones_tecnicas);
-      setContenidoTabla({
-        tipo: Array.isArray(parsedValue) && parsedValue.length > 0 ? 'tabla' : 'texto',
-        datos: Array.isArray(parsedValue) ? parsedValue : [form.especificaciones_tecnicas]
-      });
+      
+      // Check if the parsed value is already in our multi-section format
+      if (parsedValue && Array.isArray(parsedValue.secciones)) {
+        setContenidoTabla(parsedValue);
+      } else if (Array.isArray(parsedValue) && parsedValue.length > 0) {
+        // Handle old format (single table)
+        setContenidoTabla({
+          secciones: [{ tipo: 'tabla', datos: parsedValue }],
+          textoActual: ""
+        });
+      } else {
+        // Handle old format (single text)
+        setContenidoTabla({
+          secciones: [{ tipo: 'texto', datos: [form.especificaciones_tecnicas] }],
+          textoActual: ""
+        });
+      }
     } catch (e) {
       // If not valid JSON, treat as text
       setContenidoTabla({
-        tipo: 'texto',
-        datos: [form.especificaciones_tecnicas]
+        secciones: [{ tipo: 'texto', datos: [form.especificaciones_tecnicas] }],
+        textoActual: ""
       });
     }
   }, []);
@@ -104,47 +119,99 @@ const Productos = ({ onSubmit }) => {
   };
   
   const handleTablaTextChange = (e) => {
-    const texto = e.target.value;
-    processTableContent(texto);
+    setContenidoTabla(prev => ({
+      ...prev,
+      textoActual: e.target.value
+    }));
   };
   
+  // Process and add content to sections
   const processTableContent = (texto) => {
     const tieneTab = texto.includes('\t');
     const tieneMultilineas = texto.trim().split('\n').length > 1;
     const tipo = tieneTab && tieneMultilineas ? 'tabla' : 'texto';
     
-    let nuevoContenido;
+    let nuevaSeccion;
     if (tipo === 'tabla') {
       const filas = texto.trim().split('\n');
       const datosTabla = filas
         .filter(fila => fila.trim() !== '')
         .map((fila) => fila.split('\t'));
       
-      nuevoContenido = { tipo: 'tabla', datos: datosTabla };
-      
-      setForm(prev => ({ 
-        ...prev, 
-        especificaciones_tecnicas: JSON.stringify(datosTabla) 
-      }));
+      nuevaSeccion = { tipo: 'tabla', datos: datosTabla };
     } else {
-      nuevoContenido = { tipo: 'texto', datos: [texto] };
-      
-      setForm(prev => ({ 
-        ...prev, 
-        especificaciones_tecnicas: JSON.stringify(texto) 
-      }));
+      nuevaSeccion = { tipo: 'texto', datos: [texto] };
     }
     
+    // Add the new section to our content
+    const nuevasSecciones = [...contenidoTabla.secciones, nuevaSeccion];
+    const nuevoContenido = {
+      secciones: nuevasSecciones,
+      textoActual: ""
+    };
+    
     setContenidoTabla(nuevoContenido);
+    
+    // Update the form with the stringified multi-section content
+    setForm(prev => ({ 
+      ...prev, 
+      especificaciones_tecnicas: JSON.stringify(nuevoContenido) 
+    }));
+  };
+
+  // Add current text as a new section
+  const agregarTextoActual = () => {
+    if (!contenidoTabla.textoActual.trim()) return;
+    
+    const nuevaSeccion = { 
+      tipo: 'texto', 
+      datos: [contenidoTabla.textoActual.trim()] 
+    };
+    
+    const nuevasSecciones = [...contenidoTabla.secciones, nuevaSeccion];
+    const nuevoContenido = {
+      secciones: nuevasSecciones,
+      textoActual: ""
+    };
+    
+    setContenidoTabla(nuevoContenido);
+    
+    // Update the form with the stringified multi-section content
+    setForm(prev => ({ 
+      ...prev, 
+      especificaciones_tecnicas: JSON.stringify(nuevoContenido) 
+    }));
   };
 
   const limpiarTabla = () => {
-    setContenidoTabla({ tipo: null, datos: [] });
+    setContenidoTabla({ secciones: [], textoActual: "" });
     setForm(prev => ({ ...prev, especificaciones_tecnicas: "" }));
+  };
+
+  // Remove a specific section by index
+  const eliminarSeccion = (index) => {
+    const nuevasSecciones = contenidoTabla.secciones.filter((_, i) => i !== index);
+    const nuevoContenido = {
+      secciones: nuevasSecciones,
+      textoActual: contenidoTabla.textoActual
+    };
+    
+    setContenidoTabla(nuevoContenido);
+    
+    // Update the form with the stringified multi-section content
+    setForm(prev => ({ 
+      ...prev, 
+      especificaciones_tecnicas: JSON.stringify(nuevoContenido) 
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Make sure any pending text is added before submitting
+    if (contenidoTabla.textoActual.trim()) {
+      agregarTextoActual();
+    }
 
     const formData = new FormData();
     // Add all form fields to FormData
@@ -201,7 +268,7 @@ const Productos = ({ onSubmit }) => {
         });
         
         // Clear table
-        setContenidoTabla({ tipo: null, datos: [] });
+        setContenidoTabla({ secciones: [], textoActual: "" });
       } else {
         console.error('Error al crear el producto:', response.statusText);
       }
@@ -236,15 +303,31 @@ const Productos = ({ onSubmit }) => {
     if (!jsonStr) return <span className="text-gray-500">Sin datos</span>;
     
     try {
-      const tabla = JSON.parse(jsonStr);
-      if (Array.isArray(tabla) && tabla.length > 0) {
+      const contenido = JSON.parse(jsonStr);
+      
+      if (contenido.secciones && Array.isArray(contenido.secciones)) {
+        // New multi-section format
         return (
           <div className="text-xs">
-            <span className="text-blue-500">Tabla: {tabla.length} filas × {tabla[0].length} columnas</span>
+            <span className="text-blue-500">
+              {contenido.secciones.length} secciones: {
+                contenido.secciones.filter(s => s.tipo === 'tabla').length
+              } tablas, {
+                contenido.secciones.filter(s => s.tipo === 'texto').length
+              } textos
+            </span>
+          </div>
+        );
+      } else if (Array.isArray(contenido) && contenido.length > 0) {
+        // Old format (single table)
+        return (
+          <div className="text-xs">
+            <span className="text-blue-500">Tabla: {contenido.length} filas × {contenido[0].length} columnas</span>
           </div>
         );
       } else {
-        return <span className="text-gray-500">Texto: {String(tabla).substring(0, 20)}...</span>;
+        // Old format (single text)
+        return <span className="text-gray-500">Texto: {String(contenido).substring(0, 20)}...</span>;
       }
     } catch (error) {
       return <span className="text-gray-500">{String(jsonStr).substring(0, 20)}...</span>;
@@ -283,6 +366,10 @@ const Productos = ({ onSubmit }) => {
       backgroundColor: '#f9fafb',
       marginTop: '10px',
       fontSize: '14px'
+    },
+    seccion: {
+      marginBottom: '20px',
+      position: 'relative'
     }
   };
 
@@ -386,68 +473,102 @@ const Productos = ({ onSubmit }) => {
             <div className="mt-1 w-full">
               <div className="mb-2 text-sm text-gray-500">
                 Pega una tabla desde Excel, Google Sheets o cualquier fuente tabular. 
-                También puedes ingresar texto simple.
+                También puedes ingresar texto simple y combinar múltiples tablas y textos.
               </div>
-              <textarea 
-                id="especificaciones_tecnicas"
-                onPaste={handleTablaPaste}
-                onChange={handleTablaTextChange}
-                value={contenidoTabla.tipo === 'texto' ? contenidoTabla.datos[0] || '' : ''}
-                placeholder="Pega el contenido aquí (tabla o texto)" 
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                style={{ minHeight: '100px' }}
-              />
               
-              {/* Table preview */}
-              {contenidoTabla.tipo === 'tabla' && contenidoTabla.datos.length > 0 && (
-                <div className="mt-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Vista previa:</h3>
-                  <table style={tableStyles.container} className="border-collapse border border-gray-300">
-                    <thead>
-                      <tr>
-                        {contenidoTabla.datos[0].map((celda, idx) => (
-                          <th key={idx} style={tableStyles.header} className="bg-gray-100">
-                            {celda}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {contenidoTabla.datos.slice(1).map((fila, rowIdx) => (
-                        <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                          {fila.map((celda, cellIdx) => (
-                            <td key={cellIdx} style={tableStyles.cell} className="border border-gray-300">
-                              {celda}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              {/* Display existing sections */}
+              {contenidoTabla.secciones.length > 0 && (
+                <div className="mb-4">
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Contenido actual:</h3>
                   
-                  <div className="mt-2 text-sm text-gray-600">
-                    {contenidoTabla.datos.length} filas × {contenidoTabla.datos[0]?.length || 0} columnas
-                  </div>
-                  
-                  <button 
+                  {contenidoTabla.secciones.map((seccion, seccionIndex) => (
+                    <div key={seccionIndex} style={tableStyles.seccion} className="mb-6 border-b pb-4 pt-2">
+                      {/* Section type label */}
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="text-sm font-medium text-gray-700">
+                          Sección {seccionIndex + 1}: {seccion.tipo === 'tabla' ? 'Tabla' : 'Texto'}
+                        </h4>
+                        <button 
+                          type="button"
+                          onClick={() => eliminarSeccion(seccionIndex)}
+                          className="text-red-600 hover:text-red-800 text-sm"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                      
+                      {/* Table content */}
+                      {seccion.tipo === 'tabla' && (
+                        <table style={tableStyles.container} className="border-collapse border border-gray-300">
+                          <thead>
+                            <tr>
+                              {seccion.datos[0].map((celda, idx) => (
+                                <th key={idx} style={tableStyles.header} className="bg-gray-100">
+                                  {celda}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {seccion.datos.slice(1).map((fila, rowIdx) => (
+                              <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                {fila.map((celda, cellIdx) => (
+                                  <td key={cellIdx} style={tableStyles.cell} className="border border-gray-300">
+                                    {celda}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                      
+                      {/* Text content */}
+                      {seccion.tipo === 'texto' && (
+                        <div style={tableStyles.text} className="p-3 bg-gray-50 rounded text-sm">
+                          <div className="whitespace-pre-wrap">
+                            {seccion.datos[0]}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* New content input */}
+              <div className="mb-2">
+                <textarea 
+                  id="especificaciones_tecnicas_input"
+                  onPaste={handleTablaPaste}
+                  onChange={handleTablaTextChange}
+                  value={contenidoTabla.textoActual}
+                  placeholder="Pega el contenido aquí (tabla o texto)" 
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  style={{ minHeight: '100px' }}
+                />
+                
+                <div className="flex justify-between mt-2">
+                  <button
                     type="button"
-                    onClick={limpiarTabla}
-                    className="mt-2 px-3 py-1 text-xs text-red-600 hover:text-red-800 focus:outline-none"
+                    onClick={agregarTextoActual}
+                    disabled={!contenidoTabla.textoActual.trim()}
+                    className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Limpiar tabla
+                    Agregar como texto
                   </button>
+                  
+                  {contenidoTabla.secciones.length > 0 && (
+                    <button 
+                      type="button"
+                      onClick={limpiarTabla}
+                      className="px-3 py-1 text-sm text-red-600 hover:text-red-800 focus:outline-none"
+                    >
+                      Limpiar todo
+                    </button>
+                  )}
                 </div>
-              )}
-              
-              {/* Text preview */}
-              {contenidoTabla.tipo === 'texto' && contenidoTabla.datos.length > 0 && contenidoTabla.datos[0] && (
-                <div style={tableStyles.text} className="mt-4 p-3 bg-gray-50 rounded text-sm">
-                  <h3 className="text-sm font-medium text-gray-700 mb-2">Vista previa:</h3>
-                  <div className="whitespace-pre-wrap">
-                    {contenidoTabla.datos[0]}
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           </div>
 
