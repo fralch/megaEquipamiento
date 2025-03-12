@@ -7,20 +7,14 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations. 
-     ALTER TABLE mega_equipamiento.productos ADD especificaciones_tecnicas LONGTEXT NULL;
-
-     php artisan make:migration add_especificaciones_tecnicas_to_productos_table --table=productos
-     php artisan migrate
-     
+     * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('productos', function (Blueprint $table) {
-            $table->longText('especificaciones_tecnicas')->nullable();
+            //
         });
     }
-
 
     /**
      * Reverse the migrations.
@@ -28,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('productos', function (Blueprint $table) {
-            $table->dropColumn('especificaciones_tecnicas');
+            //
         });
     }
 };

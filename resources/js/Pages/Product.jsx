@@ -10,9 +10,35 @@ import { Link } from "@inertiajs/react";
 const ProductPage = ({ producto }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('descripcion');
+    const [showInput, setShowInput] = useState(false);
+    const [inputValue, setInputValue] = useState("");
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
+    };
+
+    const handleInputToggle = () => {
+        setShowInput(!showInput);
+        setInputValue("");
+    };
+
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+    };
+
+    const handleInputSubmit = (e) => {
+        e.preventDefault();
+        console.log("Input submitted:", inputValue);
+        setShowInput(false);
+        setInputValue("");
+        // Here you would handle the actual submission logic
+    };
+
+    const handleTabChange = (tabId) => {
+        setActiveTab(tabId);
+        // Reset the input state when changing tabs
+        setShowInput(false);
+        setInputValue("");
     };
 
     useEffect(() => {
@@ -63,9 +89,38 @@ const ProductPage = ({ producto }) => {
                         ) : (
                             <div>
                                 <p>No hay características disponibles.</p>
-                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                    Agregar características
-                                </Link>
+                                {showInput ? (
+                                    <form onSubmit={handleInputSubmit} className="mt-2">
+                                        <input
+                                            type="text"
+                                            value={inputValue}
+                                            onChange={handleInputChange}
+                                            placeholder="Agregar características"
+                                            className="px-4 py-2 border rounded mr-2"
+                                            autoFocus
+                                        />
+                                        <button 
+                                            type="submit" 
+                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                        >
+                                            Guardar
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleInputToggle}
+                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <button 
+                                        onClick={handleInputToggle} 
+                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        Agregar características
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -82,9 +137,38 @@ const ProductPage = ({ producto }) => {
                         ) : (
                             <div>
                                 <p>No hay datos técnicos disponibles.</p>
-                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                    Agregar datos técnicos
-                                </Link>
+                                {showInput ? (
+                                    <form onSubmit={handleInputSubmit} className="mt-2">
+                                        <input
+                                            type="text"
+                                            value={inputValue}
+                                            onChange={handleInputChange}
+                                            placeholder="Agregar datos técnicos"
+                                            className="px-4 py-2 border rounded mr-2"
+                                            autoFocus
+                                        />
+                                        <button 
+                                            type="submit" 
+                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                        >
+                                            Guardar
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleInputToggle}
+                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <button 
+                                        onClick={handleInputToggle} 
+                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        Agregar datos técnicos
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -114,9 +198,38 @@ const ProductPage = ({ producto }) => {
                         ) : (
                             <div>
                                 <p>No hay especificaciones técnicas disponibles.</p>
-                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                    Agregar especificaciones técnicas
-                                </Link>
+                                {showInput ? (
+                                    <form onSubmit={handleInputSubmit} className="mt-2">
+                                        <input
+                                            type="text"
+                                            value={inputValue}
+                                            onChange={handleInputChange}
+                                            placeholder="Agregar especificaciones técnicas"
+                                            className="px-4 py-2 border rounded mr-2"
+                                            autoFocus
+                                        />
+                                        <button 
+                                            type="submit" 
+                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                        >
+                                            Guardar
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleInputToggle}
+                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <button 
+                                        onClick={handleInputToggle} 
+                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        Agregar especificaciones técnicas
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -131,9 +244,38 @@ const ProductPage = ({ producto }) => {
                         ) : (
                             <div>
                                 <p>No hay documentos adicionales disponibles.</p>
-                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                    Agregar documentos
-                                </Link>
+                                {showInput ? (
+                                    <form onSubmit={handleInputSubmit} className="mt-2">
+                                        <input
+                                            type="text"
+                                            value={inputValue}
+                                            onChange={handleInputChange}
+                                            placeholder="Agregar documentos"
+                                            className="px-4 py-2 border rounded mr-2"
+                                            autoFocus
+                                        />
+                                        <button 
+                                            type="submit" 
+                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                        >
+                                            Guardar
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleInputToggle}
+                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <button 
+                                        onClick={handleInputToggle} 
+                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        Agregar documentos
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -146,9 +288,38 @@ const ProductPage = ({ producto }) => {
                         ) : (
                             <div>
                                 <p>No hay información de envío disponible.</p>
-                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                    Agregar información de envío
-                                </Link>
+                                {showInput ? (
+                                    <form onSubmit={handleInputSubmit} className="mt-2">
+                                        <input
+                                            type="text"
+                                            value={inputValue}
+                                            onChange={handleInputChange}
+                                            placeholder="Agregar información de envío"
+                                            className="px-4 py-2 border rounded mr-2"
+                                            autoFocus
+                                        />
+                                        <button 
+                                            type="submit" 
+                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                        >
+                                            Guardar
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleInputToggle}
+                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <button 
+                                        onClick={handleInputToggle} 
+                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        Agregar información de envío
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -161,9 +332,38 @@ const ProductPage = ({ producto }) => {
                         ) : (
                             <div>
                                 <p>No hay información de soporte técnico disponible.</p>
-                                <Link href={`/productos/${producto.id}/edit`} className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                                    Agregar información de soporte
-                                </Link>
+                                {showInput ? (
+                                    <form onSubmit={handleInputSubmit} className="mt-2">
+                                        <input
+                                            type="text"
+                                            value={inputValue}
+                                            onChange={handleInputChange}
+                                            placeholder="Agregar información de soporte"
+                                            className="px-4 py-2 border rounded mr-2"
+                                            autoFocus
+                                        />
+                                        <button 
+                                            type="submit" 
+                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                        >
+                                            Guardar
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            onClick={handleInputToggle}
+                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </form>
+                                ) : (
+                                    <button 
+                                        onClick={handleInputToggle} 
+                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        Agregar información de soporte
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -256,7 +456,7 @@ const ProductPage = ({ producto }) => {
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
+                                onClick={() => handleTabChange(tab.id)}
                                 className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap ${
                                     activeTab === tab.id
                                         ? 'border-blue-500 text-blue-500'
