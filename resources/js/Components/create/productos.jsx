@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Modal_Features from './modal_features';
+import Modal_Features from './assets/modal_features';
 
 const URL_API = import.meta.env.VITE_API_URL;
 
