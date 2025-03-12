@@ -8,6 +8,14 @@ import Footer from "../Components/home/Footer";
 import Modal_Features from "./assets/modal_features";
 import { Link } from "@inertiajs/react";
 
+// Importar componentes modulares
+import ProductDescription from "../Components/product/ProductDescription";
+import ProductFeatures from "../Components/product/ProductFeatures";
+import ProductTechnicalData from "../Components/product/ProductTechnicalData";
+import ProductSpecifications from "../Components/product/ProductSpecifications";
+import ProductDocuments from "../Components/product/ProductDocuments";
+import ProductTabs from "../Components/product/ProductTabs";
+
 const ProductPage = ({ producto }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('descripcion');
@@ -125,258 +133,45 @@ const ProductPage = ({ producto }) => {
         switch (activeTab) {
             case 'descripcion':
                 return (
-                    <div className="p-4">
-                        {productData.descripcion ? (
-                            <div>
-                                {editMode.descripcion ? (
-                                    <div>
-                                        <textarea
-                                            className="w-full p-2 border rounded"
-                                            value={tempInputs.descripcion}
-                                            onChange={(e) => handleInputChange('descripcion', e.target.value)}
-                                        />
-                                        <div className="mt-2">
-                                            <button 
-                                                onClick={() => handleSave('descripcion')}
-                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
-                                            >
-                                                Guardar
-                                            </button>
-                                            <button 
-                                                onClick={() => toggleEditMode('descripcion')}
-                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                            >
-                                                Cancelar
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <p>{productData.descripcion}</p>
-                                        <button 
-                                            onClick={() => toggleEditMode('descripcion')}
-                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        >
-                                            Editar descripción
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div>
-                                {editMode.descripcion ? (
-                                    <div>
-                                        <textarea
-                                            className="w-full p-2 border rounded"
-                                            value={tempInputs.descripcion}
-                                            onChange={(e) => handleInputChange('descripcion', e.target.value)}
-                                            placeholder="Ingrese la descripción del producto"
-                                        />
-                                        <div className="mt-2">
-                                            <button 
-                                                onClick={() => handleSave('descripcion')}
-                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
-                                            >
-                                                Guardar
-                                            </button>
-                                            <button 
-                                                onClick={() => toggleEditMode('descripcion')}
-                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                            >
-                                                Cancelar
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <p>No hay descripción disponible.</p>
-                                        <button 
-                                            onClick={() => toggleEditMode('descripcion')}
-                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        >
-                                            Agregar descripción
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                    <ProductDescription
+                        description={productData.descripcion}
+                        editMode={editMode.descripcion}
+                        tempInputs={tempInputs.descripcion}
+                        handleInputChange={(value) => handleInputChange('descripcion', value)}
+                        handleSave={() => handleSave('descripcion')}
+                        toggleEditMode={() => toggleEditMode('descripcion')}
+                    />
                 );
             case 'caracteristicas':
                 return (
-                    <div className="p-4">
-                        {productData.caracteristicas && Object.keys(productData.caracteristicas).length > 0 ? (
-                            <div>
-                                <ul className="list-disc pl-5">
-                                    {Object.entries(productData.caracteristicas).map(([key, value]) => (
-                                        <li key={key} className="mb-2">
-                                            <span className="font-semibold">{key}:</span> {value}
-                                        </li>
-                                    ))}
-                                </ul>
-                                <button 
-                                    onClick={() => handleOpenModal('caracteristicas')} 
-                                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                >
-                                    Editar características
-                                </button>
-                            </div>
-                        ) : (
-                            <div>
-                                <p>No hay características disponibles.</p>
-                                <button 
-                                    onClick={() => handleOpenModal('caracteristicas')} 
-                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                >
-                                    Agregar características
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                    <ProductFeatures
+                        features={productData.caracteristicas}
+                        handleOpenModal={handleOpenModal}
+                    />
                 );
             case 'datos':
                 return (
-                    <div className="p-4">
-                        {productData.datos_tecnicos && Object.keys(productData.datos_tecnicos).length > 0 ? (
-                            <div>
-                                <ul className="list-disc pl-5">
-                                    {Object.entries(productData.datos_tecnicos).map(([key, value]) => (
-                                        <li key={key} className="mb-2">
-                                            <span className="font-semibold">{key}:</span> {value}
-                                        </li>
-                                    ))}
-                                </ul>
-                                <button 
-                                    onClick={() => handleOpenModal('datos_tecnicos')} 
-                                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                >
-                                    Editar datos técnicos
-                                </button>
-                            </div>
-                        ) : (
-                            <div>
-                                <p>No hay datos técnicos disponibles.</p>
-                                <button 
-                                    onClick={() => handleOpenModal('datos_tecnicos')} 
-                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                >
-                                    Agregar datos técnicos
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                    <ProductTechnicalData
+                        technicalData={productData.datos_tecnicos}
+                        handleOpenModal={handleOpenModal}
+                    />
                 );
             case 'especificaciones':
                 return (
-                    <div className="p-4">
-                        {especificacionesArray && especificacionesArray.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full border-collapse border border-gray-300">
-                                    <tbody>
-                                        {especificacionesArray.map((row, rowIndex) => (
-                                            <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                                                {row.map((cell, cellIndex) => (
-                                                    <td 
-                                                        key={cellIndex} 
-                                                        className={`border border-gray-300 px-4 py-2 ${cellIndex === 0 ? 'font-semibold bg-gray-100' : ''}`}
-                                                    >
-                                                        {cell}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <div>
-                                <p>No hay especificaciones técnicas disponibles.</p>
-                                {/* Add button for especificaciones if needed */}
-                            </div>
-                        )}
-                    </div>
+                    <ProductSpecifications
+                        specifications={especificacionesArray}
+                    />
                 );
             case 'documentos':
                 return (
-                    <div className="p-4">
-                        {productData.documentos && productData.documentos.length > 0 ? (
-                            <div>
-                                <ul className="list-disc pl-5">
-                                    {productData.documentos.map((doc, index) => (
-                                        <li key={index} className="mb-2">{doc}</li>
-                                    ))}
-                                </ul>
-                                {editMode.documentos ? (
-                                    <div className="mt-4">
-                                        <textarea
-                                            className="w-full p-2 border rounded"
-                                            value={tempInputs.documentos}
-                                            onChange={(e) => handleInputChange('documentos', e.target.value)}
-                                            placeholder="Ingrese los documentos (uno por línea)"
-                                        />
-                                        <div className="mt-2">
-                                            <button 
-                                                onClick={() => handleSave('documentos')}
-                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
-                                            >
-                                                Guardar
-                                            </button>
-                                            <button 
-                                                onClick={() => toggleEditMode('documentos')}
-                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                            >
-                                                Cancelar
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <button 
-                                        onClick={() => toggleEditMode('documentos')}
-                                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                        Editar documentos
-                                    </button>
-                                )}
-                            </div>
-                        ) : (
-                            <div>
-                                {editMode.documentos ? (
-                                    <div>
-                                        <textarea
-                                            className="w-full p-2 border rounded"
-                                            value={tempInputs.documentos}
-                                            onChange={(e) => handleInputChange('documentos', e.target.value)}
-                                            placeholder="Ingrese los documentos (uno por línea)"
-                                        />
-                                        <div className="mt-2">
-                                            <button 
-                                                onClick={() => handleSave('documentos')}
-                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
-                                            >
-                                                Guardar
-                                            </button>
-                                            <button 
-                                                onClick={() => toggleEditMode('documentos')}
-                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                            >
-                                                Cancelar
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <p>No hay documentos disponibles.</p>
-                                        <button 
-                                            onClick={() => toggleEditMode('documentos')}
-                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        >
-                                            Agregar documentos
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                    <ProductDocuments
+                        documents={productData.documentos}
+                        editMode={editMode.documentos}
+                        tempInputs={tempInputs.documentos}
+                        handleInputChange={(value) => handleInputChange('documentos', value)}
+                        handleSave={() => handleSave('documentos')}
+                        toggleEditMode={() => toggleEditMode('documentos')}
+                    />
                 );
             case 'contenido':
                 return (
@@ -632,22 +427,11 @@ const ProductPage = ({ producto }) => {
                     </div>
                 </section>
                 <div className="w-full bg-white shadow-md rounded-md mt-10">
-                    {/* Tabs */}
-                    <div className="flex overflow-x-auto border-b">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => handleTabChange(tab.id)}
-                                className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap ${
-                                    activeTab === tab.id
-                                        ? 'border-blue-500 text-blue-500'
-                                        : 'border-transparent text-gray-600 hover:text-blue-500 hover:border-blue-500'
-                                }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
-                    </div>
+                    <ProductTabs
+                        tabs={tabs}
+                        activeTab={activeTab}
+                        handleTabChange={handleTabChange}
+                    />
 
                     {/* Content */}
                     <div className="p-4">{renderContent()}</div>

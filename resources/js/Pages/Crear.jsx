@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Head } from "@inertiajs/react";
 import { Link } from "@inertiajs/react";
-import Productos from "../Components/create/productos";
-import Categorias from "../Components/create/categoria";
-import Subcategorias from "../Components/create/subcategoria";
-import Marcas from "../Components/create/marca";
+import Productos from "../Components/create/createProductos";
+import Categorias from "../Components/create/createCategoria";
+import Subcategorias from "../Components/create/createSubcategoria";
+import Marcas from "../Components/create/createMarca";
 
 const CrearProducto = () => {
     const [crearProducto, setCrearProducto] = useState(true);
