@@ -5,40 +5,65 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ZoomImage from "../Components/store/ZoomImage";
 import Footer from "../Components/home/Footer";
+import Modal_Features from "./assets/modal_features";
 import { Link } from "@inertiajs/react";
 
 const ProductPage = ({ producto }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('descripcion');
-    const [showInput, setShowInput] = useState(false);
-    const [inputValue, setInputValue] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const [modalType, setModalType] = useState(null);
+    
+    // State to track updated product data
+    const [productData, setProductData] = useState({
+        ...producto,
+        caracteristicas: producto.caracteristicas || {},
+        datos_tecnicos: producto.datos_tecnicos || {}
+    });
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
 
-    const handleInputToggle = () => {
-        setShowInput(!showInput);
-        setInputValue("");
+    const handleOpenModal = (type) => {
+        setModalType(type);
+        setShowModal(true);
     };
 
-    const handleInputChange = (e) => {
-        setInputValue(e.target.value);
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setModalType(null);
     };
 
-    const handleInputSubmit = (e) => {
-        e.preventDefault();
-        console.log("Input submitted:", inputValue);
-        setShowInput(false);
-        setInputValue("");
-        // Here you would handle the actual submission logic
+    const handleSaveFeatures = (jsonData) => {
+        try {
+            const parsedData = JSON.parse(jsonData);
+            
+            // Update the appropriate part of product data based on modal type
+            if (modalType === 'caracteristicas') {
+                setProductData(prevData => ({
+                    ...prevData,
+                    caracteristicas: parsedData
+                }));
+            } else if (modalType === 'datos_tecnicos') {
+                setProductData(prevData => ({
+                    ...prevData,
+                    datos_tecnicos: parsedData
+                }));
+            }
+            
+            // Here you would typically send this data to your backend
+            console.log("Saved data:", parsedData);
+            
+            // Close the modal
+            handleCloseModal();
+        } catch (error) {
+            console.error("Error parsing data:", error);
+        }
     };
 
     const handleTabChange = (tabId) => {
         setActiveTab(tabId);
-        // Reset the input state when changing tabs
-        setShowInput(false);
-        setInputValue("");
     };
 
     useEffect(() => {
@@ -80,47 +105,31 @@ const ProductPage = ({ producto }) => {
             case 'caracteristicas':
                 return (
                     <div className="p-4">
-                        {producto.caracteristicas && Object.keys(producto.caracteristicas).length > 0 ? (
-                            <ul>
-                                {Object.entries(producto.caracteristicas).map(([key, value]) => (
-                                    <li key={key}>{key}: {value}</li>
-                                ))}
-                            </ul>
+                        {productData.caracteristicas && Object.keys(productData.caracteristicas).length > 0 ? (
+                            <div>
+                                <ul className="list-disc pl-5">
+                                    {Object.entries(productData.caracteristicas).map(([key, value]) => (
+                                        <li key={key} className="mb-2">
+                                            <span className="font-semibold">{key}:</span> {value}
+                                        </li>
+                                    ))}
+                                </ul>
+                                <button 
+                                    onClick={() => handleOpenModal('caracteristicas')} 
+                                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    Editar características
+                                </button>
+                            </div>
                         ) : (
                             <div>
                                 <p>No hay características disponibles.</p>
-                                {showInput ? (
-                                    <form onSubmit={handleInputSubmit} className="mt-2">
-                                        <input
-                                            type="text"
-                                            value={inputValue}
-                                            onChange={handleInputChange}
-                                            placeholder="Agregar características"
-                                            className="px-4 py-2 border rounded mr-2"
-                                            autoFocus
-                                        />
-                                        <button 
-                                            type="submit" 
-                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                        >
-                                            Guardar
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            onClick={handleInputToggle}
-                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </form>
-                                ) : (
-                                    <button 
-                                        onClick={handleInputToggle} 
-                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                        Agregar características
-                                    </button>
-                                )}
+                                <button 
+                                    onClick={() => handleOpenModal('caracteristicas')} 
+                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    Agregar características
+                                </button>
                             </div>
                         )}
                     </div>
@@ -128,47 +137,31 @@ const ProductPage = ({ producto }) => {
             case 'datos':
                 return (
                     <div className="p-4">
-                        {producto.datos_tecnicos && Object.keys(producto.datos_tecnicos).length > 0 ? (
-                            <ul>
-                                {Object.entries(producto.datos_tecnicos).map(([key, value]) => (
-                                    <li key={key}>{key}: {value}</li>
-                                ))}
-                            </ul>
+                        {productData.datos_tecnicos && Object.keys(productData.datos_tecnicos).length > 0 ? (
+                            <div>
+                                <ul className="list-disc pl-5">
+                                    {Object.entries(productData.datos_tecnicos).map(([key, value]) => (
+                                        <li key={key} className="mb-2">
+                                            <span className="font-semibold">{key}:</span> {value}
+                                        </li>
+                                    ))}
+                                </ul>
+                                <button 
+                                    onClick={() => handleOpenModal('datos_tecnicos')} 
+                                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    Editar datos técnicos
+                                </button>
+                            </div>
                         ) : (
                             <div>
                                 <p>No hay datos técnicos disponibles.</p>
-                                {showInput ? (
-                                    <form onSubmit={handleInputSubmit} className="mt-2">
-                                        <input
-                                            type="text"
-                                            value={inputValue}
-                                            onChange={handleInputChange}
-                                            placeholder="Agregar datos técnicos"
-                                            className="px-4 py-2 border rounded mr-2"
-                                            autoFocus
-                                        />
-                                        <button 
-                                            type="submit" 
-                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                        >
-                                            Guardar
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            onClick={handleInputToggle}
-                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </form>
-                                ) : (
-                                    <button 
-                                        onClick={handleInputToggle} 
-                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                        Agregar datos técnicos
-                                    </button>
-                                )}
+                                <button 
+                                    onClick={() => handleOpenModal('datos_tecnicos')} 
+                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    Agregar datos técnicos
+                                </button>
                             </div>
                         )}
                     </div>
@@ -198,38 +191,7 @@ const ProductPage = ({ producto }) => {
                         ) : (
                             <div>
                                 <p>No hay especificaciones técnicas disponibles.</p>
-                                {showInput ? (
-                                    <form onSubmit={handleInputSubmit} className="mt-2">
-                                        <input
-                                            type="text"
-                                            value={inputValue}
-                                            onChange={handleInputChange}
-                                            placeholder="Agregar especificaciones técnicas"
-                                            className="px-4 py-2 border rounded mr-2"
-                                            autoFocus
-                                        />
-                                        <button 
-                                            type="submit" 
-                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                        >
-                                            Guardar
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            onClick={handleInputToggle}
-                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </form>
-                                ) : (
-                                    <button 
-                                        onClick={handleInputToggle} 
-                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                        Agregar especificaciones técnicas
-                                    </button>
-                                )}
+                                {/* Add button for especificaciones if needed */}
                             </div>
                         )}
                     </div>
@@ -244,38 +206,7 @@ const ProductPage = ({ producto }) => {
                         ) : (
                             <div>
                                 <p>No hay documentos adicionales disponibles.</p>
-                                {showInput ? (
-                                    <form onSubmit={handleInputSubmit} className="mt-2">
-                                        <input
-                                            type="text"
-                                            value={inputValue}
-                                            onChange={handleInputChange}
-                                            placeholder="Agregar documentos"
-                                            className="px-4 py-2 border rounded mr-2"
-                                            autoFocus
-                                        />
-                                        <button 
-                                            type="submit" 
-                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                        >
-                                            Guardar
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            onClick={handleInputToggle}
-                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </form>
-                                ) : (
-                                    <button 
-                                        onClick={handleInputToggle} 
-                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                        Agregar documentos
-                                    </button>
-                                )}
+                                {/* Add file upload functionality here if needed */}
                             </div>
                         )}
                     </div>
@@ -288,38 +219,7 @@ const ProductPage = ({ producto }) => {
                         ) : (
                             <div>
                                 <p>No hay información de envío disponible.</p>
-                                {showInput ? (
-                                    <form onSubmit={handleInputSubmit} className="mt-2">
-                                        <input
-                                            type="text"
-                                            value={inputValue}
-                                            onChange={handleInputChange}
-                                            placeholder="Agregar información de envío"
-                                            className="px-4 py-2 border rounded mr-2"
-                                            autoFocus
-                                        />
-                                        <button 
-                                            type="submit" 
-                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                        >
-                                            Guardar
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            onClick={handleInputToggle}
-                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </form>
-                                ) : (
-                                    <button 
-                                        onClick={handleInputToggle} 
-                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                        Agregar información de envío
-                                    </button>
-                                )}
+                                {/* Add input for shipping info if needed */}
                             </div>
                         )}
                     </div>
@@ -332,38 +232,7 @@ const ProductPage = ({ producto }) => {
                         ) : (
                             <div>
                                 <p>No hay información de soporte técnico disponible.</p>
-                                {showInput ? (
-                                    <form onSubmit={handleInputSubmit} className="mt-2">
-                                        <input
-                                            type="text"
-                                            value={inputValue}
-                                            onChange={handleInputChange}
-                                            placeholder="Agregar información de soporte"
-                                            className="px-4 py-2 border rounded mr-2"
-                                            autoFocus
-                                        />
-                                        <button 
-                                            type="submit" 
-                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                        >
-                                            Guardar
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            onClick={handleInputToggle}
-                                            className="px-4 py-2 ml-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </form>
-                                ) : (
-                                    <button 
-                                        onClick={handleInputToggle} 
-                                        className="inline-block mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                        Agregar información de soporte
-                                    </button>
-                                )}
+                                {/* Add input for support info if needed */}
                             </div>
                         )}
                     </div>
@@ -379,6 +248,20 @@ const ProductPage = ({ producto }) => {
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
+            
+            {/* Modal for Features */}
+            {showModal && (
+                <Modal_Features
+                    product={producto}
+                    type={modalType}
+                    onSave={handleSaveFeatures}
+                    onClose={handleCloseModal}
+                    initialData={modalType === 'caracteristicas' 
+                        ? productData.caracteristicas 
+                        : productData.datos_tecnicos}
+                />
+            )}
+            
             {/* Main Content */}
             <main className="p-6">
                 {/* Product Section */}
@@ -414,7 +297,6 @@ const ProductPage = ({ producto }) => {
                                 </div>
                                 <div className="text-sm text-gray-600">
                                     <p>SKU: {producto.sku}</p>
-                                  
                                     <p>Fabricante: {producto.marca.nombre}</p>
                                     <p>
                                         Plazo de entrega: 1-3 días (Salvo fin
