@@ -472,10 +472,44 @@ const Productos = ({ onSubmit }) => {
             </label>
             <div className="mt-1 w-full">
               <div className="mb-2 text-sm text-gray-500">
-                Pega una tabla desde Excel, Google Sheets o cualquier fuente tabular. 
+                Pega una tabla desde Excel, pdf, o de cualquier pagina web  
                 También puedes ingresar texto simple y combinar múltiples tablas y textos.
               </div>
               
+              {/* New content input */}
+              <div className="mb-2">
+                <textarea 
+                  id="especificaciones_tecnicas_input"
+                  onPaste={handleTablaPaste}
+                  onChange={handleTablaTextChange}
+                  value={contenidoTabla.textoActual}
+                  placeholder="Pega el contenido aquí (tabla o texto)" 
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  style={{ minHeight: '100px' }}
+                />
+                
+                <div className="flex justify-between mt-2">
+                  <button
+                    type="button"
+                    onClick={agregarTextoActual}
+                    disabled={!contenidoTabla.textoActual.trim()}
+                    className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Agregar como texto
+                  </button>
+                  
+                  {contenidoTabla.secciones.length > 0 && (
+                    <button 
+                      type="button"
+                      onClick={limpiarTabla}
+                      className="px-3 py-1 text-sm text-red-600 hover:text-red-800 focus:outline-none"
+                    >
+                      Limpiar todo
+                    </button>
+                  )}
+                </div>
+              </div>
+
               {/* Display existing sections */}
               {contenidoTabla.secciones.length > 0 && (
                 <div className="mb-4">
@@ -536,39 +570,7 @@ const Productos = ({ onSubmit }) => {
                 </div>
               )}
               
-              {/* New content input */}
-              <div className="mb-2">
-                <textarea 
-                  id="especificaciones_tecnicas_input"
-                  onPaste={handleTablaPaste}
-                  onChange={handleTablaTextChange}
-                  value={contenidoTabla.textoActual}
-                  placeholder="Pega el contenido aquí (tabla o texto)" 
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  style={{ minHeight: '100px' }}
-                />
-                
-                <div className="flex justify-between mt-2">
-                  <button
-                    type="button"
-                    onClick={agregarTextoActual}
-                    disabled={!contenidoTabla.textoActual.trim()}
-                    className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Agregar como texto
-                  </button>
-                  
-                  {contenidoTabla.secciones.length > 0 && (
-                    <button 
-                      type="button"
-                      onClick={limpiarTabla}
-                      className="px-3 py-1 text-sm text-red-600 hover:text-red-800 focus:outline-none"
-                    >
-                      Limpiar todo
-                    </button>
-                  )}
-                </div>
-              </div>
+              
             </div>
           </div>
 
