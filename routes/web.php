@@ -6,9 +6,16 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\SubcategoriaController;
 use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+// Rutas de autenticación
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Rutas que retornan vistas
 Route::get('/', function () {
@@ -29,7 +36,6 @@ Route::get('/product/image/{id}', [ProductoController::class, 'getImagenProducto
 Route::get('/product/subcategoria/{id}', [ProductoController::class, 'getProductosSubcategoria']);
 
 // Rutas para usuarios
-Route::post('/login', [UsuarioController::class, 'login']);
 Route::apiResource('usuarios', UsuarioController::class);
 
 // Rutas para categorías
