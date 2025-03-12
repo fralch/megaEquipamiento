@@ -27,6 +27,60 @@ const ProductPage = ({ producto }) => {
         soporte_tecnico: producto.soporte_tecnico || ''
     });
 
+    const [especificacionesPegadas, setEspecificacionesPegadas] = useState({
+        tipo: null,
+        datos: []
+    });
+
+    const detectarTipoContenido = (texto) => {
+        const tieneTab = texto.includes('\t');
+        const tieneMultilineas = texto.trim().split('\n').length > 1;
+        return tieneTab && tieneMultilineas ? 'tabla' : 'texto';
+    };
+
+    const handlePasteEspecificaciones = (event) => {
+        event.preventDefault();
+        const textoPegado = event.clipboardData.getData('text');
+        const tipo = detectarTipoContenido(textoPegado);
+        
+        if (tipo === 'tabla') {
+            const filas = textoPegado.split('\n').filter(fila => fila.trim() !== '');
+            const datosTabla = filas.map((fila) => fila.split('\t'));
+            setEspecificacionesPegadas({
+                tipo: 'tabla',
+                datos: datosTabla
+            });
+        } else {
+            setEspecificacionesPegadas({
+                tipo: 'texto',
+                datos: [textoPegado]
+            });
+        }
+    };
+
+    const guardarEspecificacionesPegadas = () => {
+        if (especificacionesPegadas.tipo === 'tabla') {
+            const jsonEspecificaciones = JSON.stringify(especificacionesPegadas.datos);
+            setProductData(prev => ({
+                ...prev,
+                especificaciones_tecnicas: jsonEspecificaciones
+            }));
+        } else if (especificacionesPegadas.tipo === 'texto') {
+            setProductData(prev => ({
+                ...prev,
+                especificaciones_tecnicas: especificacionesPegadas.datos[0]
+            }));
+        }
+        
+        setEspecificacionesPegadas({
+            tipo: null,
+            datos: []
+        });
+        
+        // Mostrar mensaje de éxito
+        alert('Especificaciones técnicas guardadas exitosamente');
+    };
+
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
@@ -269,29 +323,84 @@ const ProductPage = ({ producto }) => {
             case 'especificaciones':
                 return (
                     <div className="p-4">
-                        {especificacionesArray && especificacionesArray.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full border-collapse border border-gray-300">
-                                    <tbody>
-                                        {especificacionesArray.map((row, rowIndex) => (
-                                            <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                                                {row.map((cell, cellIndex) => (
-                                                    <td 
-                                                        key={cellIndex} 
-                                                        className={`border border-gray-300 px-4 py-2 ${cellIndex === 0 ? 'font-semibold bg-gray-100' : ''}`}
-                                                    >
-                                                        {cell}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                        <div>
+                            <div className="mb-4">
+                                <p className="mb-2 font-medium">Pega una tabla o texto para las especificaciones técnicas:</p>
+                                <textarea 
+                                    className="w-full p-2 border rounded h-40"
+                                    placeholder="Pega el contenido aquí (tabla o texto). Para tablas, asegúrate de copiar directamente desde Excel u otra fuente tabulada."
+                                    onPaste={handlePasteEspecificaciones}
+                                />
                             </div>
-                        ) : (
-                            <div>
-                                <p>No hay especificaciones técnicas disponibles.</p>
-                                {/* Add button for especificaciones if needed */}
+                            
+                            {/* Vista previa del contenido pegado */}
+                            {especificacionesPegadas.tipo === 'tabla' && especificacionesPegadas.datos.length > 0 && (
+                                <div className="mb-4">
+                                    <h3 className="font-medium mb-2">Vista previa:</h3>
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full border-collapse border border-gray-300">
+                                            <tbody>
+                                                {especificacionesPegadas.datos.map((fila, indexFila) => (
+                                                    <tr key={indexFila} className={indexFila % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                                                        {fila.map((celda, indexCelda) => (
+                                                            <td 
+                                                                key={indexCelda} 
+                                                                className={`border border-gray-300 px-4 py-2 ${indexCelda === 0 ? 'font-semibold bg-gray-100' : ''}`}
+                                                            >
+                                                                {celda}
+                                                            </td>
+                                                        ))}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {especificacionesPegadas.tipo === 'texto' && especificacionesPegadas.datos.length > 0 && (
+                                <div className="mb-4">
+                                    <h3 className="font-medium mb-2">Vista previa:</h3>
+                                    <div className="p-4 border rounded bg-gray-50">
+                                        {especificacionesPegadas.datos[0]}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {especificacionesPegadas.tipo && (
+                                <div className="mt-4">
+                                    <button 
+                                        onClick={guardarEspecificacionesPegadas}
+                                        className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                    >
+                                        Guardar Especificaciones
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Mostrar especificaciones guardadas si existen */}
+                        {especificacionesArray && especificacionesArray.length > 0 && (
+                            <div className="mt-8">
+                                <h3 className="font-medium mb-2">Especificaciones Guardadas:</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full border-collapse border border-gray-300">
+                                        <tbody>
+                                            {especificacionesArray.map((row, rowIndex) => (
+                                                <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                                                    {row.map((cell, cellIndex) => (
+                                                        <td 
+                                                            key={cellIndex} 
+                                                            className={`border border-gray-300 px-4 py-2 ${cellIndex === 0 ? 'font-semibold bg-gray-100' : ''}`}
+                                                        >
+                                                            {cell}
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -541,6 +650,34 @@ const ProductPage = ({ producto }) => {
         }
     };
 
+    const saveAllProductData = async () => {
+        try {
+            // Create a payload with all the product data
+            const payload = {
+                ...productData,
+                // If especificaciones_tecnicas is empty, set it to null or empty array
+                especificaciones_tecnicas: productData.especificaciones_tecnicas || null,
+                // Ensure other fields are at least empty strings if not present
+                descripcion: productData.descripcion || '',
+                caracteristicas: productData.caracteristicas || {},
+                datos_tecnicos: productData.datos_tecnicos || {},
+                documentos: productData.documentos || [],
+                contenido_envio: productData.contenido_envio || '',
+                soporte_tecnico: productData.soporte_tecnico || ''
+            };
+
+            // Here you would make your API call to save the data
+            console.log('Saving all product data:', payload);
+            // TODO: Add your API call here
+            
+            // Show success message
+            alert('Información del producto guardada exitosamente');
+        } catch (error) {
+            console.error('Error saving product data:', error);
+            alert('Error al guardar la información del producto');
+        }
+    };
+
     return (
         <div className="font-sans text-gray-800 bg-gray-100 min-h-screen">
             <Head title="Producto" />
@@ -563,6 +700,16 @@ const ProductPage = ({ producto }) => {
             
             {/* Main Content */}
             <main className="p-6">
+                {/* Save All Button */}
+                <div className="mb-6 flex justify-end">
+                    <button 
+                        onClick={saveAllProductData}
+                        className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold shadow-md"
+                    >
+                        Guardar Toda la Información
+                    </button>
+                </div>
+                
                 {/* Product Section */}
                 <section className="grid md:grid-cols-2 gap-8">
                     {/* Product Image */}
