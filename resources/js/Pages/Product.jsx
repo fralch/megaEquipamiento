@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
@@ -15,6 +15,7 @@ import ProductTechnicalData from "../Components/product/ProductTechnicalData";
 import ProductSpecifications from "../Components/product/ProductSpecifications";
 import ProductDocuments from "../Components/product/ProductDocuments";
 import ProductTabs from "../Components/product/ProductTabs";
+import EspecificacionesTecnicas from "../Components/create/assets/especificacionesTecnicas";
 
 const ProductPage = ({ producto }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +24,9 @@ const ProductPage = ({ producto }) => {
     const [modalType, setModalType] = useState(null);
     const [editMode, setEditMode] = useState({});
     const [tempInputs, setTempInputs] = useState({});
+    const especificacionesRef = useRef();
     
+    console.log(producto);
     // State to track updated product data
     const [productData, setProductData] = useState({
         ...producto,
@@ -32,7 +35,8 @@ const ProductPage = ({ producto }) => {
         descripcion: producto.descripcion || '',
         documentos: producto.documentos || [],
         contenido_envio: producto.contenido_envio || '',
-        soporte_tecnico: producto.soporte_tecnico || ''
+        soporte_tecnico: producto.soporte_tecnico || '',
+        especificaciones_tecnicas: producto.especificaciones_tecnicas || ''
     });
 
     const toggleMenu = () => {
@@ -106,18 +110,24 @@ const ProductPage = ({ producto }) => {
         setActiveTab(tabId);
     };
 
-    const parseEspecificacionesTecnicas = () => {
-        if (!producto.especificaciones_tecnicas) return null;
+    const parseEspecificacionesTecnicas = (data) => {
+        if (!data) return null;
         
         try {
-            return JSON.parse(producto.especificaciones_tecnicas);
+            // Handle case where data is already an object
+            if (typeof data === 'object') return data;
+            
+            // Parse the JSON string
+            const parsed = JSON.parse(data);
+            return parsed;
         } catch (error) {
             console.error("Error parsing especificaciones_tecnicas:", error);
             return null;
         }
     };
 
-    const especificacionesArray = parseEspecificacionesTecnicas();
+    const especificacionesData = parseEspecificacionesTecnicas(productData.especificaciones_tecnicas);
+    console.log("Especificaciones Data:", especificacionesData); // Debug log
 
     const tabs = [
         { id: 'descripcion', label: 'Descripción' },
@@ -158,9 +168,60 @@ const ProductPage = ({ producto }) => {
                 );
             case 'especificaciones':
                 return (
-                    <ProductSpecifications
-                        specifications={especificacionesArray}
-                    />
+                    <div className="p-4">
+                        {editMode.especificaciones_tecnicas ? (
+                            <div>
+                                <EspecificacionesTecnicas
+                                    ref={especificacionesRef}
+                                    form={{
+                                        especificaciones_tecnicas: productData.especificaciones_tecnicas
+                                    }}
+                                    setForm={(newForm) => {
+                                        setTempInputs(prev => ({
+                                            ...prev,
+                                            especificaciones_tecnicas: newForm.especificaciones_tecnicas
+                                        }));
+                                    }}
+                                    tableStyles={{
+                                        container: { width: '100%' },
+                                        header: { padding: '8px', backgroundColor: '#f3f4f6' },
+                                        cell: { padding: '8px' },
+                                        text: { marginBottom: '1rem' },
+                                        seccion: { marginBottom: '1rem' }
+                                    }}
+                                />
+                                <div className="mt-4 flex space-x-2">
+                                    <button
+                                        onClick={() => {
+                                            especificacionesRef.current?.saveText();
+                                            handleSave('especificaciones_tecnicas');
+                                        }}
+                                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                    >
+                                        Guardar
+                                    </button>
+                                    <button
+                                        onClick={() => toggleEditMode('especificaciones_tecnicas')}
+                                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                <ProductSpecifications
+                                    specifications={especificacionesData}
+                                />
+                                <button
+                                    onClick={() => toggleEditMode('especificaciones_tecnicas')}
+                                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    {productData.especificaciones_tecnicas ? 'Editar' : 'Agregar'} especificaciones técnicas
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 );
             case 'documentos':
                 return (
