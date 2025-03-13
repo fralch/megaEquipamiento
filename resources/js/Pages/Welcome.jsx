@@ -1,4 +1,4 @@
-import { Head, usePage, router } from "@inertiajs/react";
+import { Head, usePage, router, Link } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import Slider from "@/Components/home/Slider";
 import Sectores from "@/Components/home/Sectores";
@@ -8,8 +8,8 @@ import Menu from "@/Components/home/Menu";
 import ClientSlider from "@/Components/home/ClientSlider";
 import BrandSection from "@/Components/home/BrandSection";
 import Footer from "@/Components/home/Footer";
-import Header from "@/Components/home/Header"; // Import the new Header component
-import LabEquipmentSection from "@/Components/home/LabEquipmentSection"; // Import the new LabEquipmentSection component
+import Header from "@/Components/home/Header";
+import LabEquipmentSection from "@/Components/home/LabEquipmentSection";
 import ErrorBoundary from "@/Components/ErrorBoundary";
 
 export default function Welcome() {
@@ -17,14 +17,6 @@ export default function Welcome() {
     const [showUIElements, setShowUIElements] = useState(false);
     const [activeSubMenu, setActiveSubMenu] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
-
-    // Verificar si el usuario está autenticado
-    useEffect(() => {
-        if (!auth.user) {
-            // El usuario no está autenticado
-            window.location.href = '/login';
-        }
-    }, [auth]);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -59,57 +51,62 @@ export default function Welcome() {
             <Head title="MegaEquipamiento"  />
 
             <div>
-                <Header /> {/* Use the new Header component */}
+                <Header />
 
-                {auth.user && (
+                {auth.user ? (
                     <button
                         onClick={handleLogout}
                         className="fixed top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow-md transition duration-300 ease-in-out z-50"
                     >
                         Cerrar Sesión
                     </button>
+                ) : (
+                    <Link
+                        href="/login"
+                        className="fixed top-4 right-4 bg-[#184f96] hover:bg-[#123d75] text-white px-4 py-2 rounded-md shadow-md transition duration-300 ease-in-out z-50"
+                    >
+                        Iniciar Sesión
+                    </Link>
                 )}
 
-                {auth.user ? (
-                    <div
-                        className="min-w-screen min-h-screen bg-gray-200"
-                        style={{ marginTop: "-20px" }}
-                    >
-                        <Menu toggleMenu={toggleMenu} />
+                <div
+                    className="min-w-screen min-h-screen bg-gray-200"
+                    style={{ marginTop: "-20px" }}
+                >
+                    <Menu toggleMenu={toggleMenu} />
+                    <ErrorBoundary>
+                        <NavVertical isOpen={isOpen} onClose={toggleMenu} />
+                    </ErrorBoundary>
+                    <main className="mt-0 w-full">
                         <ErrorBoundary>
-                            <NavVertical isOpen={isOpen} onClose={toggleMenu} />
+                            <Slider />
                         </ErrorBoundary>
-                        <main className="mt-0 w-full">
-                            <ErrorBoundary>
-                                <Slider />
-                            </ErrorBoundary>
 
-                            <ErrorBoundary>
-                                <LabEquipmentSection /> {/* Use the new LabEquipmentSection component */}
-                            </ErrorBoundary>
+                        <ErrorBoundary>
+                            <LabEquipmentSection />
+                        </ErrorBoundary>
 
-                            {/* ------------- */}
-                            <ErrorBoundary>
-                                <Sectores />
-                            </ErrorBoundary>
+                        {/* ------------- */}
+                        <ErrorBoundary>
+                            <Sectores />
+                        </ErrorBoundary>
 
-                            {/* ------------- */}
-                            <ErrorBoundary>
-                                <Categorias_cuadrado />
-                            </ErrorBoundary>
+                        {/* ------------- */}
+                        <ErrorBoundary>
+                            <Categorias_cuadrado />
+                        </ErrorBoundary>
 
-                            {/* ------------- */}
-                            <ErrorBoundary>
-                                <BrandSection />
-                            </ErrorBoundary>
+                        {/* ------------- */}
+                        <ErrorBoundary>
+                            <BrandSection />
+                        </ErrorBoundary>
 
-                            <ErrorBoundary>
-                                <ClientSlider />
-                            </ErrorBoundary>
-                        </main>
-                        <Footer />
-                    </div>
-                ) : null}
+                        <ErrorBoundary>
+                            <ClientSlider />
+                        </ErrorBoundary>
+                    </main>
+                    <Footer />
+                </div>
             </div>
         </>
     );

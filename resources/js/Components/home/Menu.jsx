@@ -1,8 +1,11 @@
 // Menu.jsx
 import React from "react";
-import { mdiChevronDown, mdiGauge, mdiLayersOutline, mdiWidgetsOutline } from "@mdi/js";
+import { mdiChevronDown, mdiGauge, mdiLayersOutline, mdiWidgetsOutline, mdiPlus } from "@mdi/js";
+import { Link, usePage } from "@inertiajs/react";
 
 const Menu = ({ toggleMenu }) => {
+    const { auth } = usePage().props;
+
     return (
         <div className="rounded bg-white px-5 py-3 shadow-xl pb-5" id="menu">
             <div className="-mx-1 flex flex-col md:flex-row items-center justify-between">
@@ -45,6 +48,21 @@ const Menu = ({ toggleMenu }) => {
                             </span>
                         </a>
                     </li>
+                    {auth.user && (
+                        <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0">
+                            <Link
+                                href="/crear"
+                                className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
+                            >
+                                <span className="mr-3 text-xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d={mdiPlus} />
+                                    </svg>
+                                </span>
+                                <span>Crear</span>
+                            </Link>
+                        </li>
+                    )}
                     <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0">
                         <a
                             href="#"

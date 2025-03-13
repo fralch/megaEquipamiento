@@ -24,7 +24,7 @@ Route::get('/', function () {
 Route::get('/categorias/{id_categoria?}', [CategoriaController::class, 'CategoriasWiew'])->name('categorias.view');
 Route::get('/subcategoria/{id}', [ProductoController::class, 'subCategoriaView'])->name('subcategoria.view');
 Route::get('/producto/{id}', [ProductoController::class, 'ProductView'])->name('producto.view');
-Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view');
+Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
 
 // Rutas para crear y mostrar productos
 Route::post('/product/create', [ProductoController::class, 'createProduct'])->name('product.create');
