@@ -18,16 +18,17 @@ import ProductTabs from "../Components/product/ProductTabs";
 import EspecificacionesTecnicas from "../Components/create/assets/especificacionesTecnicas";
 
 const ProductPage = ({ producto }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState('descripcion');
-    const [showModal, setShowModal] = useState(false);
-    const [modalType, setModalType] = useState(null);
-    const [editMode, setEditMode] = useState({});
-    const [tempInputs, setTempInputs] = useState({});
-    const especificacionesRef = useRef();
-    
-    console.log(producto);
-    // State to track updated product data
+    const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el menú está abierto vertical
+    const [activeTab, setActiveTab] = useState('descripcion'); // Estado para controlar la pestaña activa de los tabs
+    const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal para las características y datos técnicos en formato JSON
+    const [modalType, setModalType] = useState(null); // Estado para almacenar el tipo de modal (caracteristicas o datos_tecnicos) 
+    const [editMode, setEditMode] = useState({}); // Estado para controlar el modo de edición de campos (descripcion, caracteristicas, datos_tecnicos, etc.)
+    const [tempInputs, setTempInputs] = useState({}); // Estado para almacenar temporalmente los inputs
+    const especificacionesRef = useRef(); // Referencia para el componente de especificaciones técnicas
+
+    console.log(producto); // Imprimir el producto en la consola para depuración
+
+    // Estado para rastrear los datos actualizados del producto
     const [productData, setProductData] = useState({
         ...producto,
         caracteristicas: producto.caracteristicas || {},
@@ -40,45 +41,45 @@ const ProductPage = ({ producto }) => {
     });
 
     const toggleMenu = () => {
-        setIsOpen(!isOpen);
+        setIsOpen(!isOpen); // Alternar el estado del menú
     };
 
     const handleOpenModal = (type) => {
-        setModalType(type);
-        setShowModal(true);
+        setModalType(type); // Establecer el tipo de modal
+        setShowModal(true); // Mostrar el modal
     };
 
     const handleCloseModal = () => {
-        setShowModal(false);
-        setModalType(null);
+        setShowModal(false); // Ocultar el modal
+        setModalType(null); // Restablecer el tipo de modal
     };
 
     const toggleEditMode = (field) => {
         setEditMode(prev => ({
             ...prev,
-            [field]: !prev[field]
+            [field]: !prev[field] // Alternar el modo de edición para el campo especificado
         }));
         setTempInputs(prev => ({
             ...prev,
-            [field]: productData[field]
+            [field]: productData[field] // Almacenar temporalmente el valor actual del campo
         }));
     };
 
     const handleInputChange = (field, value) => {
         setTempInputs(prev => ({
             ...prev,
-            [field]: value
+            [field]: value // Actualizar el valor temporal del campo
         }));
     };
 
     const handleSave = (field) => {
         setProductData(prev => ({
             ...prev,
-            [field]: tempInputs[field]
+            [field]: tempInputs[field] // Guardar el valor temporal en los datos del producto
         }));
         setEditMode(prev => ({
             ...prev,
-            [field]: false
+            [field]: false // Desactivar el modo de edición para el campo
         }));
         // Aquí se podría agregar la lógica para guardar en el backend
         console.log(`Guardando ${field}:`, tempInputs[field]);
@@ -86,48 +87,48 @@ const ProductPage = ({ producto }) => {
 
     const handleSaveFeatures = (jsonData) => {
         try {
-            const parsedData = JSON.parse(jsonData);
-            
+            const parsedData = JSON.parse(jsonData); // Analizar los datos JSON
+
             if (modalType === 'caracteristicas') {
                 setProductData(prevData => ({
                     ...prevData,
-                    caracteristicas: parsedData
+                    caracteristicas: parsedData // Actualizar las características del producto
                 }));
             } else if (modalType === 'datos_tecnicos') {
                 setProductData(prevData => ({
                     ...prevData,
-                    datos_tecnicos: parsedData
+                    datos_tecnicos: parsedData // Actualizar los datos técnicos del producto
                 }));
             }
-            
-            handleCloseModal();
+
+            handleCloseModal(); // Cerrar el modal después de guardar
         } catch (error) {
-            console.error("Error parsing data:", error);
+            console.error("Error parsing data:", error); // Manejar errores de análisis
         }
     };
 
     const handleTabChange = (tabId) => {
-        setActiveTab(tabId);
+        setActiveTab(tabId); // Cambiar la pestaña activa
     };
 
     const parseEspecificacionesTecnicas = (data) => {
-        if (!data) return null;
-        
+        if (!data) return null; // Si no hay datos, retornar null
+
         try {
-            // Handle case where data is already an object
+            // Manejar el caso en que los datos ya sean un objeto
             if (typeof data === 'object') return data;
-            
-            // Parse the JSON string
+
+            // Analizar la cadena JSON
             const parsed = JSON.parse(data);
             return parsed;
         } catch (error) {
-            console.error("Error parsing especificaciones_tecnicas:", error);
+            console.error("Error parsing especificaciones_tecnicas:", error); // Manejar errores de análisis
             return null;
         }
     };
 
     const especificacionesData = parseEspecificacionesTecnicas(productData.especificaciones_tecnicas);
-    console.log("Especificaciones Data:", especificacionesData); // Debug log
+    console.log("Especificaciones Data:", especificacionesData); // Imprimir las especificaciones técnicas en la consola
 
     const tabs = [
         { id: 'descripcion', label: 'Descripción' },
@@ -247,13 +248,13 @@ const ProductPage = ({ producto }) => {
                                             onChange={(e) => handleInputChange('contenido_envio', e.target.value)}
                                         />
                                         <div className="mt-2">
-                                            <button 
+                                            <button
                                                 onClick={() => handleSave('contenido_envio')}
                                                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
                                             >
                                                 Guardar
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => toggleEditMode('contenido_envio')}
                                                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                                             >
@@ -264,7 +265,7 @@ const ProductPage = ({ producto }) => {
                                 ) : (
                                     <div>
                                         <p>{productData.contenido_envio}</p>
-                                        <button 
+                                        <button
                                             onClick={() => toggleEditMode('contenido_envio')}
                                             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                                         >
@@ -284,13 +285,13 @@ const ProductPage = ({ producto }) => {
                                             placeholder="Ingrese el contenido de envío"
                                         />
                                         <div className="mt-2">
-                                            <button 
+                                            <button
                                                 onClick={() => handleSave('contenido_envio')}
                                                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
                                             >
                                                 Guardar
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => toggleEditMode('contenido_envio')}
                                                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                                             >
@@ -301,7 +302,7 @@ const ProductPage = ({ producto }) => {
                                 ) : (
                                     <div>
                                         <p>No hay información sobre el contenido de envío.</p>
-                                        <button 
+                                        <button
                                             onClick={() => toggleEditMode('contenido_envio')}
                                             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                                         >
@@ -326,13 +327,13 @@ const ProductPage = ({ producto }) => {
                                             onChange={(e) => handleInputChange('soporte_tecnico', e.target.value)}
                                         />
                                         <div className="mt-2">
-                                            <button 
+                                            <button
                                                 onClick={() => handleSave('soporte_tecnico')}
                                                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
                                             >
                                                 Guardar
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => toggleEditMode('soporte_tecnico')}
                                                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                                             >
@@ -343,7 +344,7 @@ const ProductPage = ({ producto }) => {
                                 ) : (
                                     <div>
                                         <p>{productData.soporte_tecnico}</p>
-                                        <button 
+                                        <button
                                             onClick={() => toggleEditMode('soporte_tecnico')}
                                             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                                         >
@@ -363,13 +364,13 @@ const ProductPage = ({ producto }) => {
                                             placeholder="Ingrese la información de soporte técnico"
                                         />
                                         <div className="mt-2">
-                                            <button 
+                                            <button
                                                 onClick={() => handleSave('soporte_tecnico')}
                                                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
                                             >
                                                 Guardar
                                             </button>
-                                            <button 
+                                            <button
                                                 onClick={() => toggleEditMode('soporte_tecnico')}
                                                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                                             >
@@ -380,7 +381,7 @@ const ProductPage = ({ producto }) => {
                                 ) : (
                                     <div>
                                         <p>No hay información de soporte técnico disponible.</p>
-                                        <button 
+                                        <button
                                             onClick={() => toggleEditMode('soporte_tecnico')}
                                             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                                         >
@@ -403,28 +404,28 @@ const ProductPage = ({ producto }) => {
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
-            
-            {/* Modal for Features */}
+
+            {/* Modal para características */}
             {showModal && (
                 <Modal_Features
                     product={producto}
                     type={modalType}
                     onSave={handleSaveFeatures}
                     onClose={handleCloseModal}
-                    initialData={modalType === 'caracteristicas' 
-                        ? productData.caracteristicas 
+                    initialData={modalType === 'caracteristicas'
+                        ? productData.caracteristicas
                         : productData.datos_tecnicos}
                 />
             )}
-            
-            {/* Main Content */}
+
+            {/* Contenido principal */}
             <main className="p-6">
-                {/* Product Section */}
+                {/* Sección del producto */}
                 <section className="grid md:grid-cols-2 gap-8">
-                    {/* Product Image */}
+                    {/* Imagen del producto */}
                     <ZoomImage imageSrc={producto.imagen.startsWith('http') ? producto.imagen : `/${producto.imagen}`} />
 
-                    {/* Product Details */}
+                    {/* Detalles del producto */}
                     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
                         {/* Encabezado */}
                         <div className="flex flex-col space-y-4">
@@ -474,7 +475,7 @@ const ProductPage = ({ producto }) => {
                             </button>
                         </div>
 
-                        {/* El video tiene que ser la version acortada de youtube como por ejemplo: https://youtu.be/X9IgxlivjO8?si=QaCVPCuos-VrSP4R */}
+                        {/* Video del producto */}
                         {producto.video && (
                             <div className="mt-6">
                                 <iframe
@@ -494,7 +495,7 @@ const ProductPage = ({ producto }) => {
                         handleTabChange={handleTabChange}
                     />
 
-                    {/* Content */}
+                    {/* Contenido */}
                     <div className="p-4">{renderContent()}</div>
                 </div>
             </main>
