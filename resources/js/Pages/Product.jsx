@@ -26,7 +26,7 @@ const ProductPage = ({ producto }) => {
     const [tempInputs, setTempInputs] = useState({}); // Estado para almacenar temporalmente los inputs
     const especificacionesRef = useRef(); // Referencia para el componente de especificaciones técnicas
 
-    console.log(producto); // Imprimir el producto en la consola para depuración
+    // console.log(producto); // Imprimir el producto en la consola para depuración
 
     // Estado para rastrear los datos actualizados del producto
     const [productData, setProductData] = useState({
@@ -34,7 +34,7 @@ const ProductPage = ({ producto }) => {
         caracteristicas: producto.caracteristicas || {},
         datos_tecnicos: producto.datos_tecnicos || {},
         descripcion: producto.descripcion || '',
-        documentos: producto.documentos || [],
+        documentos: producto.documentos || [], // Asegurarse que sea un array
         contenido_envio: producto.contenido_envio || '',
         soporte_tecnico: producto.soporte_tecnico || '',
         especificaciones_tecnicas: producto.especificaciones_tecnicas || ''
@@ -57,12 +57,28 @@ const ProductPage = ({ producto }) => {
     const toggleEditMode = (field) => {
         setEditMode(prev => ({
             ...prev,
-            [field]: !prev[field] // Alternar el modo de edición para el campo especificado
+            [field]: !prev[field]
         }));
-        setTempInputs(prev => ({
-            ...prev,
-            [field]: productData[field] // Almacenar temporalmente el valor actual del campo
-        }));
+        
+        if (field === 'documentos') {
+            // Para documentos, si es array convertirlo a string para edición
+            if (Array.isArray(productData[field])) {
+                setTempInputs(prev => ({
+                    ...prev,
+                    [field]: productData[field].join('\n')
+                }));
+            } else {
+                setTempInputs(prev => ({
+                    ...prev,
+                    [field]: ''
+                }));
+            }
+        } else {
+            setTempInputs(prev => ({
+                ...prev,
+                [field]: productData[field]
+            }));
+        }
     };
 
     const handleInputChange = (field, value) => {
@@ -73,17 +89,32 @@ const ProductPage = ({ producto }) => {
     };
 
     const handleSave = (field) => {
-        setProductData(prev => ({
-            ...prev,
-            [field]: tempInputs[field] // Guardar el valor temporal en los datos del producto
-        }));
+        if (field === 'documentos') {
+            // Convertir el texto de documentos a array
+            const docsArray = tempInputs[field].split('\n')
+                .map(line => line.trim())
+                .filter(line => line !== '');
+                
+            setProductData(prev => ({
+                ...prev,
+                [field]: docsArray
+            }));
+        } else {
+            setProductData(prev => ({
+                ...prev,
+                [field]: tempInputs[field]
+            }));
+        }
+        
         setEditMode(prev => ({
             ...prev,
-            [field]: false // Desactivar el modo de edición para el campo
+            [field]: false
         }));
-        // Aquí se podría agregar la lógica para guardar en el backend
-        console.log(`Guardando ${field}:`, tempInputs[field]);
     };
+    
+    useEffect(() => {
+        console.log("productData actualizado:", productData);
+    }, [productData]);
 
     const handleSaveFeatures = (jsonData) => {
         try {
@@ -128,7 +159,7 @@ const ProductPage = ({ producto }) => {
     };
 
     const especificacionesData = parseEspecificacionesTecnicas(productData.especificaciones_tecnicas);
-    console.log("Especificaciones Data:", especificacionesData); // Imprimir las especificaciones técnicas en la consola
+    // console.log("Especificaciones Data:", especificacionesData); // Imprimir las especificaciones técnicas en la consola
 
     const tabs = [
         { id: 'descripcion', label: 'Descripción' },
