@@ -110,6 +110,10 @@ const ProductPage = ({ producto }) => {
             ...prev,
             [field]: false
         }));
+
+        if (field === 'especificaciones_tecnicas') {
+            // agregar la logica para guardar las especificaciones técnicas
+        }
     };
     
     useEffect(() => {
@@ -159,7 +163,7 @@ const ProductPage = ({ producto }) => {
     };
 
     const especificacionesData = parseEspecificacionesTecnicas(productData.especificaciones_tecnicas);
-    // console.log("Especificaciones Data:", especificacionesData); // Imprimir las especificaciones técnicas en la consola
+    console.log("Especificaciones Data:", especificacionesData); // Imprimir las especificaciones técnicas en la consola
 
     const tabs = [
         { id: 'descripcion', label: 'Descripción' },
