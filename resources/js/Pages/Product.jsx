@@ -132,6 +132,7 @@ const ProductPage = ({ producto }) => {
     };
 
     useEffect(() => {
+        //console.log("productData actualizado:", productData.id_producto);
         console.log("productData actualizado:", productData);
     }, [productData]);
 

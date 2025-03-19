@@ -94,35 +94,79 @@ class ProductoController extends Controller
      */
     public function updateProduct(Request $request, Producto $producto)
     {
-        $request->validate([
-            'sku' => 'required|max:100',
-            'nombre' => 'required|max:100',
-            'id_subcategoria' => 'required|exists:subcategorias,id_subcategoria',
-            'marca_id' => 'required|exists:marcas,id_marca',
-            'pais' => 'nullable|max:100',
-            'precio_sin_ganancia' => 'nullable|numeric',
-            'precio_ganancia' => 'nullable|numeric',
-            'precio_igv' => 'nullable|numeric',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'descripcion' => 'nullable|string',
-            'video' => 'nullable|string|max:255',
-            'envio' => 'nullable|string|max:100',
-            'soporte_tecnico' => 'nullable|string',
-            'caracteristicas' => 'nullable|json',
-            'datos_tecnicos' => 'nullable|json',
-            'archivos_adicionales' => 'nullable|json', // Cambiado de 'documentos' a 'archivos_adicionales'
-            "especificaciones_tecnicas" => 'nullable|string|json',
-        ]);
-
+        // Reglas de validación basadas en los campos presentes
+        $rules = [];
+        
+        // Solo añadir reglas para los campos que están presentes en la solicitud
+        if ($request->has('sku')) {
+            $rules['sku'] = 'required|max:100';
+        }
+        if ($request->has('nombre')) {
+            $rules['nombre'] = 'required|max:100';
+        }
+        if ($request->has('id_subcategoria')) {
+            $rules['id_subcategoria'] = 'required|exists:subcategorias,id_subcategoria';
+        }
+        if ($request->has('marca_id')) {
+            $rules['marca_id'] = 'required|exists:marcas,id_marca';
+        }
+        if ($request->has('pais')) {
+            $rules['pais'] = 'nullable|max:100';
+        }
+        if ($request->has('precio_sin_ganancia')) {
+            $rules['precio_sin_ganancia'] = 'nullable|numeric';
+        }
+        if ($request->has('precio_ganancia')) {
+            $rules['precio_ganancia'] = 'nullable|numeric';
+        }
+        if ($request->has('precio_igv')) {
+            $rules['precio_igv'] = 'nullable|numeric';
+        }
+        if ($request->hasFile('imagen')) {
+            $rules['imagen'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048';
+        }
+        if ($request->has('descripcion')) {
+            $rules['descripcion'] = 'nullable|string';
+        }
+        if ($request->has('video')) {
+            $rules['video'] = 'nullable|string|max:255';
+        }
+        if ($request->has('envio')) {
+            $rules['envio'] = 'nullable|string|max:100';
+        }
+        if ($request->has('soporte_tecnico')) {
+            $rules['soporte_tecnico'] = 'nullable|string';
+        }
+        if ($request->has('caracteristicas')) {
+            $rules['caracteristicas'] = 'nullable|json';
+        }
+        if ($request->has('datos_tecnicos')) {
+            $rules['datos_tecnicos'] = 'nullable|json';
+        }
+        if ($request->has('archivos_adicionales')) {
+            $rules['archivos_adicionales'] = 'nullable|json';
+        }
+        if ($request->has('especificaciones_tecnicas')) {
+            $rules['especificaciones_tecnicas'] = 'nullable|string|json';
+        }
+        
+        // Validar solo los campos presentes
+        $request->validate($rules);
+        
+        // Preparar datos para actualizar
+        $dataToUpdate = $request->only(array_keys($rules));
+        
+        // Manejar imagen si está presente
         if ($request->hasFile('imagen')) {
             $imagePath = $request->file('imagen')->store('productos', 'public');
-            $request->merge(['imagen' => $imagePath]);
+            $dataToUpdate['imagen'] = $imagePath;
         }
-
-        $producto->update($request->all());
-
+        
+        // Actualizar solo los campos proporcionados
+        $producto->update($dataToUpdate);
+        
         return redirect()->route('productos.index')
-                         ->with('success', 'Producto actualizado exitosamente.');
+                        ->with('success', 'Producto actualizado exitosamente.');
     }
 
     // Obtener todos los productos
