@@ -28,7 +28,37 @@ const ProductPage = ({ producto }) => {
         textoActual: ""
     });
 
-    // Estado para rastrear los datos actualizados del producto
+    /* Estado para rastrear los datos actualizados del producto por ejemplo : 
+        {
+            "id_producto": 5988,
+            "sku": "58084847448734543",
+            "nombre": "Producto de prueba 2",
+            "id_subcategoria": 1,
+            "marca_id": 1,
+            "pais": "Perú",
+            "precio_sin_ganancia": "354.00",
+            "precio_ganancia": "43543.00",
+            "precio_igv": "423.00",
+            "imagen": "productos/1742350897.jpg",
+            "descripcion": "",
+            "video": "https://youtu.be/BIXZHS6Gm9A?si=DepF1-olYLvE3_f7",
+            "envio": null,
+            "soporte_tecnico": "",
+            "caracteristicas": [],
+            "datos_tecnicos": [],
+            "archivos_adicionales": null,
+            "especificaciones_tecnicas": "{\"secciones\":[{\"tipo\":\"tabla\",\"datos\":[[\"Reino de España\",\"Madrid\",\"Euro\\r\"],[\"Reino de Dinamarca\",\"Copenhague\",\"Corona danesa\\r\"],[\"Estados Unidos Mexicanos\",\"Ciudad de México\",\"Peso\\r\"],[\"República Argentina\",\"Buenos Aires\",\"Peso\"]]}],\"textoActual\":\"\"}",
+            "marca": {
+                "id_marca": 1,
+                "nombre": "7_ealway",
+                "descripcion": "Descripción de 7_ealway",
+                "imagen": "/img/marcas/7_ealway.jpg"
+            },
+            "documentos": [],
+            "contenido_envio": ""
+        }
+    */
+
     const [productData, setProductData] = useState({
         ...producto,
         caracteristicas: producto.caracteristicas || {},
@@ -40,96 +70,86 @@ const ProductPage = ({ producto }) => {
         especificaciones_tecnicas: producto.especificaciones_tecnicas || ''
     });
 
-    const toggleMenu = () => {
+    const toggleMenu = () => { // ToggleMenu: Alternar el estado del menú vertical de categorías
         setIsOpen(!isOpen); // Alternar el estado del menú
     };
 
-    const handleOpenModal = (type) => {
+    const handleOpenModal = (type) => { // HandleOpenModal: Manejar el apertura del modal para características y datos técnicos
         setModalType(type); // Establecer el tipo de modal
         setShowModal(true); // Mostrar el modal
     };
 
-    const handleCloseModal = () => {
+    const handleCloseModal = () => { // HandleCloseModal: Manejar el cierre del modal para características y datos técnicos
         setShowModal(false); // Ocultar el modal
         setModalType(null); // Restablecer el tipo de modal
     };
 
-    const toggleEditMode = (field) => {
-        setEditMode(prev => ({
+    /* 
+        La función toggleEditMode se utiliza para alternar el estado de edición de un campo específico en el componente. 
+        Esto significa que si un campo está en modo de edición, se desactivará, y si no lo está, se activará. Además, 
+        la función también prepara los valores temporales (tempInputs) para la edición.
+    */
+    const toggleEditMode = (field) => { // ToggleEditMode: Alternar o desactivar la edición de un campo
+        setEditMode(prev => ({ // SetEditMode: Establecer el estado de edición por ejemplo: { descripcion: true }
             ...prev,
             [field]: !prev[field]
         }));
 
-        if (field === 'documentos') {
-            // Para documentos, si es array convertirlo a string para edición
-            if (Array.isArray(productData[field])) {
-                setTempInputs(prev => ({
-                    ...prev,
-                    [field]: productData[field].join('\n')
-                }));
-            } else {
-                setTempInputs(prev => ({
-                    ...prev,
-                    [field]: ''
-                }));
-            }
-        } else {
-            setTempInputs(prev => ({
-                ...prev,
-                [field]: productData[field]
-            }));
-        }
-    };
-
-    const handleInputChange = (field, value) => {
-        setTempInputs(prev => ({
+        setTempInputs(prev => ({ // SetTempInputs: Establecer el valor temporal del campo, por ejemplo: { descripcion: "Nueva descripción" }
             ...prev,
-            [field]: value // Actualizar el valor temporal del campo
+            [field]: productData[field] // copiar el valor del campo del producto para que pueda ser editado
         }));
     };
 
-    const handleSave = (field) => {
-        if (field === 'documentos') {
-            // Convertir el texto de documentos a array
-            const docsArray = tempInputs[field].split('\n')
-                .map(line => line.trim())
-                .filter(line => line !== '');
-
-            setProductData(prev => ({
-                ...prev,
-                [field]: docsArray
-            }));
-        } else {
-            setProductData(prev => ({
-                ...prev,
-                [field]: tempInputs[field]
-            }));
-        }
-
-        setEditMode(prev => ({
+    /* 
+        La función handleInputChange se utiliza para manejar los cambios en los campos de entrada (inputs) del formulario. 
+        Cuando el usuario modifica el valor de un campo, esta función actualiza el estado temporal (tempInputs) con el nuevo valor.
+    */
+    const handleInputChange = (field, value) => { // HandleInputChange: Manejar el cambio de un campo
+        setTempInputs(prev => ({ // SetTempInputs: Establecer el valor temporal del campo, por ejemplo: { descripcion: "Nueva descripción" }
             ...prev,
-            [field]: false
+            [field]: value // Actualizar el valor temporal del campo en otra palabras sobre escribir el valor del campo de tempInputs
+        }));
+    };
+
+    /* 
+        La función handleSave se utiliza para guardar los cambios realizados en un campo específico. 
+        Cuando el usuario completa la edición de un campo, esta función actualiza el estado 
+        del producto (productData) con el nuevo valor y desactiva el modo de edición.
+    */
+    const handleSave = (field) => { // HandleSave: Guardar los cambios realizados en un campo en el estado del producto
+        setProductData(prev => ({ // SetProductData: Establecer el valor del campo del producto
+            ...prev,
+            [field]: tempInputs[field] // Actualizar el valor del campo del producto 
         }));
 
-        if (field === 'especificaciones_tecnicas') {
-            // agregar la logica para guardar las especificaciones técnicas
-        }
+        setEditMode(prev => ({ // SetEditMode: Establecer el estado de edición por ejemplo: { descripcion: true }
+            ...prev,
+            [field]: false  // Desactivar el modo de edición
+        }));
+
+        
     };
 
     useEffect(() => {
         console.log("productData actualizado:", productData);
     }, [productData]);
 
-    const handleSaveFeatures = (jsonData) => {
+    /* 
+        La función handleSaveFeatures se utiliza para guardar los cambios realizados en los campos de características y datos técnicos. 
+        Cuando el usuario completa la edición de los campos, esta función actualiza el estado 
+        del producto (productData) con el nuevo valor y desactiva el modo de edición.
+    */
+    const handleSaveFeatures = (jsonData) => { // HandleSaveFeatures: Guardar los cambios realizados en los campos de características y datos técnicos
         try {
             const parsedData = JSON.parse(jsonData); // Analizar los datos JSON
 
-            if (modalType === 'caracteristicas') {
+            if (modalType === 'caracteristicas') { // Si el tipo de modal es características
                 setProductData(prevData => ({
                     ...prevData,
-                    caracteristicas: parsedData // Actualizar las características del producto
+                    caracteristicas: parsedData // Actualizar las características del producto 
                 }));
-            } else if (modalType === 'datos_tecnicos') {
+            } else if (modalType === 'datos_tecnicos') { // Si el tipo de modal es datos técnicos
                 setProductData(prevData => ({
                     ...prevData,
                     datos_tecnicos: parsedData // Actualizar los datos técnicos del producto
@@ -142,10 +162,21 @@ const ProductPage = ({ producto }) => {
         }
     };
 
+    /* 
+        La función handleTabChange se utiliza para cambiar la pestaña activa. 
+        Cuando el usuario selecciona una pestaña, esta función actualiza el estado 
+        de la pestaña activa (activeTab) con el ID de la pestaña seleccionada.
+    */
     const handleTabChange = (tabId) => {
         setActiveTab(tabId); // Cambiar la pestaña activa
     };
 
+    /* 
+        La función parseEspecificacionesTecnicas se utiliza para analizar y convertir 
+        los datos de especificaciones técnicas en un formato JSON válido. 
+        Si los datos ya son un objeto, se retorna directamente. 
+        Si los datos son una cadena JSON, se analiza y se retorna el objeto resultante.
+    */
     const parseEspecificacionesTecnicas = (data) => {
         if (!data) return null; // Si no hay datos, retornar null
 
