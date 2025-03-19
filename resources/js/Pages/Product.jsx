@@ -118,59 +118,40 @@ const ProductPage = ({ producto }) => {
         Cuando el usuario completa la edición de un campo, esta función actualiza el estado 
         del producto (productData) con el nuevo valor y desactiva el modo de edición.
     */
-    const handleSave = (field) => { // HandleSave: Guardar los cambios realizados en un campo en el estado del producto
-        setProductData(prev => ({ // SetProductData: Establecer el valor del campo del producto
+    const handleSave = async (field) => { // HandleSave: Guardar los cambios realizados en un campo en el estado del producto
+        // Update product state
+        setProductData(prev => ({
             ...prev,
-            [field]: tempInputs[field] // Actualizar el valor del campo del producto 
-        }));
-
-        setEditMode(prev => ({ // SetEditMode: Establecer el estado de edición por ejemplo: { descripcion: true }
-            ...prev,
-            [field]: false  // Desactivar el modo de edición
-        }));
-
-        console.log("field actualizado:", field);
-        console.log("tempInputs:", tempInputs[field]);
-
-        // Actualizar el estado del producto en la base de datos
-        const url = `/product/update`; // Adjust this URL to match your Laravel API endpoint
-        updateProduct(url, {
-            id_producto: producto.id_producto,
             [field]: tempInputs[field]
-        });
-        
-        // Limpiar el estado de edición 
-        setTempInputs({});
+        }));
+
+        // Disable edit mode
         setEditMode(prev => ({
             ...prev,
             [field]: false
         }));
-    };
 
-    const updateProduct = (url, data) => {
-        console.log("url:", url);
-        console.log("data:", data);
-        axios.post(url, data, {
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-            }
-        })
-        .then(response => {
+        // Clear temp inputs
+        setTempInputs({});
+
+        try {
+            // Update product in database
+            const response = await axios.post('/product/update', {
+                id_producto: producto.id_producto,
+                [field]: tempInputs[field]
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+
             console.log("Product updated successfully:", response.data);
-            // You can add a success notification here if needed
-        })
-        .catch(error => {
+        } catch (error) {
             console.error("Error updating product:", error);
-            // You can add error handling here
-        });
+        }
     };
-
-    useEffect(() => {
-        //console.log("productData actualizado:", productData.id_producto);
-        console.log("productData actualizado:", productData);
-    }, [productData]);
 
     /* 
         La función handleSaveFeatures se utiliza para guardar los cambios realizados en los campos de características y datos técnicos. 
