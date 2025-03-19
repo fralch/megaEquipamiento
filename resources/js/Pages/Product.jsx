@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import { useEffect, useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
@@ -15,18 +15,18 @@ import ProductTechnicalData from "../Components/product/ProductTechnicalData";
 import ProductSpecifications from "../Components/product/ProductSpecifications";
 import ProductDocuments from "../Components/product/ProductDocuments";
 import ProductTabs from "../Components/product/ProductTabs";
-import EspecificacionesTecnicas from "../Components/create/assets/especificacionesTecnicas";
 
 const ProductPage = ({ producto }) => {
     const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el menú está abierto vertical
     const [activeTab, setActiveTab] = useState('descripcion'); // Estado para controlar la pestaña activa de los tabs
     const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal para las características y datos técnicos en formato JSON
-    const [modalType, setModalType] = useState(null); // Estado para almacenar el tipo de modal (caracteristicas o datos_tecnicos) 
+    const [modalType, setModalType] = useState(null); // Estado para almacenar el tipo de modal (caracteristicas o datos_tecnicos)
     const [editMode, setEditMode] = useState({}); // Estado para controlar el modo de edición de campos (descripcion, caracteristicas, datos_tecnicos, etc.)
     const [tempInputs, setTempInputs] = useState({}); // Estado para almacenar temporalmente los inputs
-    const especificacionesRef = useRef(); // Referencia para el componente de especificaciones técnicas
-
-    // console.log(producto); // Imprimir el producto en la consola para depuración
+    const [contenidoTabla, setContenidoTabla] = useState({
+        secciones: [],
+        textoActual: ""
+    });
 
     // Estado para rastrear los datos actualizados del producto
     const [productData, setProductData] = useState({
@@ -59,7 +59,7 @@ const ProductPage = ({ producto }) => {
             ...prev,
             [field]: !prev[field]
         }));
-        
+
         if (field === 'documentos') {
             // Para documentos, si es array convertirlo a string para edición
             if (Array.isArray(productData[field])) {
@@ -94,7 +94,7 @@ const ProductPage = ({ producto }) => {
             const docsArray = tempInputs[field].split('\n')
                 .map(line => line.trim())
                 .filter(line => line !== '');
-                
+
             setProductData(prev => ({
                 ...prev,
                 [field]: docsArray
@@ -105,7 +105,7 @@ const ProductPage = ({ producto }) => {
                 [field]: tempInputs[field]
             }));
         }
-        
+
         setEditMode(prev => ({
             ...prev,
             [field]: false
@@ -115,7 +115,7 @@ const ProductPage = ({ producto }) => {
             // agregar la logica para guardar las especificaciones técnicas
         }
     };
-    
+
     useEffect(() => {
         console.log("productData actualizado:", productData);
     }, [productData]);
@@ -175,6 +175,148 @@ const ProductPage = ({ producto }) => {
         { id: 'soporte', label: 'Soporte Técnico' },
     ];
 
+    // Guardar texto pendiente cuando el componente se desmonta
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            if (contenidoTabla.textoActual?.trim()) {
+                saveText();
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [contenidoTabla.textoActual]);
+
+    // Inicializar con el valor existente
+    useEffect(() => {
+        if (!productData.especificaciones_tecnicas) return;
+
+        try {
+            const parsedValue = JSON.parse(productData.especificaciones_tecnicas);
+
+            if (parsedValue?.secciones && Array.isArray(parsedValue.secciones)) {
+                setContenidoTabla(parsedValue);
+            } else if (Array.isArray(parsedValue) && parsedValue.length > 0) {
+                setContenidoTabla({
+                    secciones: [{ tipo: 'tabla', datos: parsedValue }],
+                    textoActual: ""
+                });
+            } else {
+                setContenidoTabla({
+                    secciones: [{ tipo: 'texto', datos: [productData.especificaciones_tecnicas] }],
+                    textoActual: ""
+                });
+            }
+        } catch (e) {
+            setContenidoTabla({
+                secciones: [{ tipo: 'texto', datos: [productData.especificaciones_tecnicas] }],
+                textoActual: ""
+            });
+        }
+    }, [productData.especificaciones_tecnicas]);
+
+    // Manejadores de eventos
+    const handleTablaPaste = (event) => {
+        event.preventDefault();
+        const textoPegado = event.clipboardData.getData('text');
+        processTableContent(textoPegado);
+    };
+
+    const handleTablaTextChange = (e) => {
+        setContenidoTabla(prev => ({
+            ...prev,
+            textoActual: e.target.value
+        }));
+    };
+
+    // Procesar y añadir contenido a las secciones
+    const processTableContent = (texto) => {
+        if (!texto.trim()) return;
+
+        const tieneTab = texto.includes('\t');
+        const tieneMultilineas = texto.trim().split('\n').length > 1;
+        const tipo = tieneTab && tieneMultilineas ? 'tabla' : 'texto';
+
+        let nuevaSeccion;
+        if (tipo === 'tabla') {
+            const filas = texto.trim().split('\n');
+            const datosTabla = filas
+                .filter(fila => fila.trim() !== '')
+                .map(fila => fila.split('\t'));
+
+            nuevaSeccion = { tipo: 'tabla', datos: datosTabla };
+        } else {
+            nuevaSeccion = { tipo: 'texto', datos: [texto] };
+        }
+
+        updateContent([...contenidoTabla.secciones, nuevaSeccion], "");
+    };
+
+    const saveText = () => {
+        if (!contenidoTabla.textoActual?.trim()) return;
+
+        const nuevaSeccion = {
+            tipo: 'texto',
+            datos: [contenidoTabla.textoActual.trim()]
+        };
+
+        updateContent([...contenidoTabla.secciones, nuevaSeccion], "");
+        handleSave('especificaciones_tecnicas'); // Notificar al padre que el texto ha sido guardado
+    };
+
+    const updateContent = (secciones, textoActual) => {
+        const nuevoContenido = { secciones, textoActual };
+
+        setContenidoTabla(nuevoContenido);
+        setProductData(prev => ({
+            ...prev,
+            especificaciones_tecnicas: JSON.stringify(nuevoContenido)
+        }));
+    };
+
+    const limpiarTabla = () => {
+        updateContent([], "");
+    };
+
+    const eliminarSeccion = (index) => {
+        const nuevasSecciones = contenidoTabla.secciones.filter((_, i) => i !== index);
+        updateContent(nuevasSecciones, contenidoTabla.textoActual);
+    };
+
+    // Renderizar componentes
+    const renderTabla = (seccion) => (
+        <table style={{ width: '100%' }} className="border-collapse border border-gray-300">
+            <thead>
+                <tr>
+                    {seccion.datos[0].map((celda, idx) => (
+                        <th key={idx} style={{ padding: '8px', backgroundColor: '#f3f4f6' }} className="bg-gray-100">
+                            {celda}
+                        </th>
+                    ))}
+                </tr>
+            </thead>
+            <tbody>
+                {seccion.datos.slice(1).map((fila, rowIdx) => (
+                    <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        {fila.map((celda, cellIdx) => (
+                            <td key={cellIdx} style={{ padding: '8px' }} className="border border-gray-300">
+                                {celda}
+                            </td>
+                        ))}
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    );
+
+    const renderTexto = (seccion) => (
+        <div style={{ marginBottom: '1rem' }} className="p-3 bg-gray-50 rounded text-sm">
+            <div className="whitespace-pre-wrap">
+                {seccion.datos[0]}
+            </div>
+        </div>
+    );
+
     const renderContent = () => {
         switch (activeTab) {
             case 'descripcion':
@@ -207,31 +349,82 @@ const ProductPage = ({ producto }) => {
                     <div className="p-4">
                         {editMode.especificaciones_tecnicas ? (
                             <div>
-                                <EspecificacionesTecnicas
-                                    ref={especificacionesRef}
-                                    form={{
-                                        especificaciones_tecnicas: productData.especificaciones_tecnicas
-                                    }}
-                                    setForm={(newForm) => {
-                                        setTempInputs(prev => ({
-                                            ...prev,
-                                            especificaciones_tecnicas: newForm.especificaciones_tecnicas
-                                        }));
-                                    }}
-                                    tableStyles={{
-                                        container: { width: '100%' },
-                                        header: { padding: '8px', backgroundColor: '#f3f4f6' },
-                                        cell: { padding: '8px' },
-                                        text: { marginBottom: '1rem' },
-                                        seccion: { marginBottom: '1rem' }
-                                    }}
-                                />
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Especificaciones Técnicas
+                                </label>
+                                <div className="mt-1 w-full">
+                                    <div className="mb-2 text-sm text-gray-500">
+                                        Pega una tabla desde Excel, PDF, o de cualquier página web.
+                                        También puedes ingresar texto simple y combinar múltiples tablas y textos.
+                                    </div>
+
+                                    {/* Input para nuevo contenido */}
+                                    <div className="mb-2">
+                                        <textarea
+                                            onPaste={handleTablaPaste}
+                                            onChange={handleTablaTextChange}
+                                            value={contenidoTabla.textoActual}
+                                            placeholder="Pega el contenido aquí (tabla o texto)"
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                            style={{ minHeight: '100px' }}
+                                        />
+
+                                        <div className="flex justify-between mt-2">
+                                            <button
+                                                type="button"
+                                                onClick={saveText}
+                                                disabled={!contenidoTabla.textoActual?.trim()}
+                                                className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                Agregar como texto
+                                            </button>
+
+                                            {contenidoTabla.secciones.length > 0 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={limpiarTabla}
+                                                    className="px-3 py-1 text-sm text-red-600 hover:text-red-800 focus:outline-none"
+                                                >
+                                                    Limpiar todo
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Mostrar secciones existentes */}
+                                    {contenidoTabla.secciones.length > 0 && (
+                                        <div className="mb-4">
+                                            <h3 className="text-sm font-medium text-gray-700 mb-2">Contenido actual:</h3>
+
+                                            {contenidoTabla.secciones.map((seccion, index) => (
+                                                <div key={index} style={{ marginBottom: '1rem' }} className="mb-6 border-b pb-4 pt-2">
+                                                    {/* Encabezado de la sección */}
+                                                    <div className="flex justify-between items-center mb-2">
+                                                        <h4 className="text-sm font-medium text-gray-700">
+                                                            Sección {index + 1}: {seccion.tipo === 'tabla' ? 'Tabla' : 'Texto'}
+                                                        </h4>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => eliminarSeccion(index)}
+                                                            className="text-red-600 hover:text-red-800 text-sm"
+                                                        >
+                                                            Eliminar
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Contenido basado en el tipo */}
+                                                    {seccion.tipo === 'tabla'
+                                                        ? renderTabla(seccion)
+                                                        : renderTexto(seccion)
+                                                    }
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="mt-4 flex space-x-2">
                                     <button
-                                        onClick={() => {
-                                            especificacionesRef.current?.saveText();
-                                            handleSave('especificaciones_tecnicas');
-                                        }}
+                                        onClick={() => handleSave('especificaciones_tecnicas')}
                                         className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                                     >
                                         Guardar
