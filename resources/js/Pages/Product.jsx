@@ -148,6 +148,8 @@ const ProductPage = ({ producto }) => {
             });
 
             console.log("Product updated successfully:", response.data);
+            // actualizar el producto
+            setProductData(response.data);
         } catch (error) {
             console.error("Error updating product:", error);
         }
