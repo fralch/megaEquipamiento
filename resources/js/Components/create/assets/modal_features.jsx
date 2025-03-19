@@ -1,3 +1,4 @@
+// ESTE MODAL ES PRINCIPALMENTE PARA LA GESTIÓN DE CARACTERÍSTICAS Y DATOS TÉCNICOS
 import React, { useState, useEffect } from 'react';
 
 const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {

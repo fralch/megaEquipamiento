@@ -1,3 +1,4 @@
+// ESTE COMPONENTE ES PRINCIPALMENTE PARA LA GESTIÓN DE CARACTERÍSTICAS Y DATOS TÉCNICOS
 import React from 'react';
 
 const ProductFeatures = ({ features, handleOpenModal }) => {

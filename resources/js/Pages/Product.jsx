@@ -159,6 +159,7 @@ const ProductPage = ({ producto }) => {
         La función handleSaveFeatures se utiliza para guardar los cambios realizados en los campos de características y datos técnicos. 
         Cuando el usuario completa la edición de los campos, esta función actualiza el estado 
         del producto (productData) con el nuevo valor y desactiva el modo de edición.
+        ESTA FUNCIÓN ES PRINCIPALMENTE PARA CARACTERÍSTICAS Y DATOS TÉCNICOS
     */
     const handleSaveFeatures = async (jsonData) => { // HandleSaveFeatures: Guardar los cambios realizados en los campos de características y datos técnicos
         try {
