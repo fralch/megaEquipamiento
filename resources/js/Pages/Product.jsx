@@ -62,15 +62,15 @@ const ProductPage = ({ producto }) => {
 
     const [productData, setProductData] = useState({
         ...producto,
-        caracteristicas: producto.caracteristicas || {},
-        datos_tecnicos: producto.datos_tecnicos || {},
+        caracteristicas: typeof producto.caracteristicas === 'string' ? JSON.parse(producto.caracteristicas) : producto.caracteristicas || {},
+        datos_tecnicos: typeof producto.datos_tecnicos === 'string' ? JSON.parse(producto.datos_tecnicos) : producto.datos_tecnicos || {},
         descripcion: producto.descripcion || '',
         documentos: producto.documentos || [], // Asegurarse que sea un array
         contenido_envio: producto.contenido_envio || '',
         soporte_tecnico: producto.soporte_tecnico || '',
         especificaciones_tecnicas: producto.especificaciones_tecnicas || ''
     });
-
+    console.log(productData);
     const toggleMenu = () => { // ToggleMenu: Alternar el estado del menú vertical de categorías
         setIsOpen(!isOpen); // Alternar el estado del menú
     };
@@ -160,7 +160,7 @@ const ProductPage = ({ producto }) => {
         Cuando el usuario completa la edición de los campos, esta función actualiza el estado 
         del producto (productData) con el nuevo valor y desactiva el modo de edición.
     */
-    const handleSaveFeatures = (jsonData) => { // HandleSaveFeatures: Guardar los cambios realizados en los campos de características y datos técnicos
+    const handleSaveFeatures = async (jsonData) => { // HandleSaveFeatures: Guardar los cambios realizados en los campos de características y datos técnicos
         try {
             const parsedData = JSON.parse(jsonData); // Analizar los datos JSON
 
@@ -169,11 +169,33 @@ const ProductPage = ({ producto }) => {
                     ...prevData,
                     caracteristicas: parsedData // Actualizar las características del producto 
                 }));
+                console.log("caracteristicas", parsedData);
             } else if (modalType === 'datos_tecnicos') { // Si el tipo de modal es datos técnicos
                 setProductData(prevData => ({
                     ...prevData,
                     datos_tecnicos: parsedData // Actualizar los datos técnicos del producto
                 }));
+                console.log("datos_tecnicos", parsedData);
+            }
+            
+            // Update product in database
+            try {
+                const response = await axios.post('/product/update', {
+                    id_producto: producto.id_producto,
+                    [modalType]: parsedData
+                }, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                console.log("Product updated successfully:", response.data);
+                // actualizar el producto
+                setProductData(response.data);
+            } catch (error) {
+                console.error("Error updating product:", error);
             }
 
             handleCloseModal(); // Cerrar el modal después de guardar
