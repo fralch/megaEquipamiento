@@ -28,7 +28,7 @@ Route::get('/crear', function () { return Inertia::render('Crear');})->name('cre
 
 // Rutas para crear y mostrar productos
 Route::post('/product/create', [ProductoController::class, 'createProduct'])->name('product.create');
-Route::post('/product/update/{id}', [ProductoController::class, 'updateProduct'])->name('product.update');
+Route::post('/product/update', [ProductoController::class, 'updateProduct'])->name('product.update');
 Route::get('/product/all', [ProductoController::class, 'getProductos'])->name('product.all');
 Route::get('/product/all-imagen', [ProductoController::class, 'getProductosImagen'])->name('product.all-imagen');
 Route::get('/product/show/{id}', [ProductoController::class, 'showProduct'])->name('product.show');
