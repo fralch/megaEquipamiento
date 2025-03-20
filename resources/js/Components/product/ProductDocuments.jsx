@@ -5,13 +5,8 @@ const ProductDocuments = ({ documents, editMode, tempInputs, handleInputChange, 
         <div className="p-4">
             {documents && documents.length > 0 ? (
                 <div>
-                    <ul className="list-disc pl-5">
-                        {documents.map((doc, index) => (
-                            <li key={index} className="mb-2">{doc}</li>
-                        ))}
-                    </ul>
                     {editMode ? (
-                        <div className="mt-4">
+                        <div>
                             <textarea
                                 className="w-full p-2 border rounded"
                                 value={tempInputs}
@@ -34,12 +29,19 @@ const ProductDocuments = ({ documents, editMode, tempInputs, handleInputChange, 
                             </div>
                         </div>
                     ) : (
-                        <button 
-                            onClick={toggleEditMode}
-                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                        >
-                            Editar documentos
-                        </button>
+                        <div>
+                            <ul className="list-disc pl-5">
+                                {documents.map((doc, index) => (
+                                    <li key={index} className="mb-2">{doc}</li>
+                                ))}
+                            </ul>
+                            <button 
+                                onClick={toggleEditMode}
+                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            >
+                                Editar documentos
+                            </button>
+                        </div>
                     )}
                 </div>
             ) : (

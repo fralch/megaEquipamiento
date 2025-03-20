@@ -65,8 +65,8 @@ const ProductPage = ({ producto }) => {
         caracteristicas: typeof producto.caracteristicas === 'string' ? JSON.parse(producto.caracteristicas) : producto.caracteristicas || {},
         datos_tecnicos: typeof producto.datos_tecnicos === 'string' ? JSON.parse(producto.datos_tecnicos) : producto.datos_tecnicos || {},
         descripcion: producto.descripcion || '',
-        documentos: producto.documentos || [], // Asegurarse que sea un array
-        contenido_envio: producto.contenido_envio || '',
+        documentos: producto.documentos || '', // Asegurarse que sea un array
+        envio: producto.envio || '',
         soporte_tecnico: producto.soporte_tecnico || '',
         especificaciones_tecnicas: producto.especificaciones_tecnicas || ''
     });
@@ -111,6 +111,7 @@ const ProductPage = ({ producto }) => {
             ...prev,
             [field]: value // Actualizar el valor temporal del campo en otra palabras sobre escribir el valor del campo de tempInputs
         }));
+
     };
 
     /* 
@@ -133,6 +134,9 @@ const ProductPage = ({ producto }) => {
 
         // Clear temp inputs
         setTempInputs({});
+
+        console.log(field);
+        console.log(tempInputs[field]);
 
         try {
             // Update product in database
@@ -245,7 +249,7 @@ const ProductPage = ({ producto }) => {
         { id: 'datos', label: 'Datos Técnicos' },
         { id: 'especificaciones', label: 'Especificaciones Técnicas' },
         { id: 'documentos', label: 'Documentos/Descargas' },
-        { id: 'contenido', label: 'Contenido de Envío' },
+        { id: 'envio', label: 'Contenido de Envío' },
         { id: 'soporte', label: 'Soporte Técnico' },
     ];
 
@@ -528,8 +532,8 @@ const ProductPage = ({ producto }) => {
                 );
             case 'documentos':
                 return (
-                    <ProductDocuments
-                        documents={productData.documentos}
+                     <ProductDocuments
+                        description={productData.documentos}
                         editMode={editMode.documentos}
                         tempInputs={tempInputs.documentos}
                         handleInputChange={(value) => handleInputChange('documentos', value)}
@@ -537,27 +541,27 @@ const ProductPage = ({ producto }) => {
                         toggleEditMode={() => toggleEditMode('documentos')}
                     />
                 );
-            case 'contenido':
+            case 'envio':
                 return (
                     <div className="p-4">
-                        {productData.contenido_envio ? (
+                        {productData.envio ? (
                             <div>
-                                {editMode.contenido_envio ? (
+                                {editMode.envio ? (
                                     <div>
                                         <textarea
                                             className="w-full p-2 border rounded"
-                                            value={tempInputs.contenido_envio}
-                                            onChange={(e) => handleInputChange('contenido_envio', e.target.value)}
+                                            value={tempInputs.envio}
+                                            onChange={(e) => handleInputChange('envio', e.target.value)}
                                         />
                                         <div className="mt-2">
                                             <button
-                                                onClick={() => handleSave('contenido_envio')}
+                                                onClick={() => handleSave('envio')}
                                                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
                                             >
                                                 Guardar
                                             </button>
                                             <button
-                                                onClick={() => toggleEditMode('contenido_envio')}
+                                                onClick={() => toggleEditMode('envio')}
                                                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                                             >
                                                 Cancelar
@@ -566,9 +570,9 @@ const ProductPage = ({ producto }) => {
                                     </div>
                                 ) : (
                                     <div>
-                                        <p>{productData.contenido_envio}</p>
+                                        <p>{productData.envio}</p>
                                         <button
-                                            onClick={() => toggleEditMode('contenido_envio')}
+                                            onClick={() => toggleEditMode('envio')}
                                             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                                         >
                                             Editar contenido de envío
@@ -578,23 +582,23 @@ const ProductPage = ({ producto }) => {
                             </div>
                         ) : (
                             <div>
-                                {editMode.contenido_envio ? (
+                                {editMode.envio ? (
                                     <div>
                                         <textarea
                                             className="w-full p-2 border rounded"
-                                            value={tempInputs.contenido_envio}
-                                            onChange={(e) => handleInputChange('contenido_envio', e.target.value)}
+                                            value={tempInputs.envio}
+                                            onChange={(e) => handleInputChange('envio', e.target.value)}
                                             placeholder="Ingrese el contenido de envío"
                                         />
                                         <div className="mt-2">
                                             <button
-                                                onClick={() => handleSave('contenido_envio')}
+                                                onClick={() => handleSave('envio')}
                                                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
                                             >
                                                 Guardar
                                             </button>
                                             <button
-                                                onClick={() => toggleEditMode('contenido_envio')}
+                                                onClick={() => toggleEditMode('envio')}
                                                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                                             >
                                                 Cancelar
@@ -605,7 +609,7 @@ const ProductPage = ({ producto }) => {
                                     <div>
                                         <p>No hay información sobre el contenido de envío.</p>
                                         <button
-                                            onClick={() => toggleEditMode('contenido_envio')}
+                                            onClick={() => toggleEditMode('envio')}
                                             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                                         >
                                             Agregar contenido de envío
