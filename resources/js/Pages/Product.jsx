@@ -18,6 +18,7 @@ import ProductDocuments from "../Components/product/ProductDocuments";
 import ProductTabs from "../Components/product/ProductTabs";
 
 const ProductPage = ({ producto }) => {
+    console.log(producto);
     const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el menú está abierto vertical
     const [activeTab, setActiveTab] = useState('descripcion'); // Estado para controlar la pestaña activa de los tabs
     const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal para las características y datos técnicos en formato JSON
@@ -65,7 +66,7 @@ const ProductPage = ({ producto }) => {
         caracteristicas: typeof producto.caracteristicas === 'string' ? JSON.parse(producto.caracteristicas) : producto.caracteristicas || {},
         datos_tecnicos: typeof producto.datos_tecnicos === 'string' ? JSON.parse(producto.datos_tecnicos) : producto.datos_tecnicos || {},
         descripcion: producto.descripcion || '',
-        documentos: producto.documentos || '', // Asegurarse que sea un array
+        archivos_adicionales: producto.archivos_adicionales || '', // Asegurarse que sea un array
         envio: producto.envio || '',
         soporte_tecnico: producto.soporte_tecnico || '',
         especificaciones_tecnicas: producto.especificaciones_tecnicas || ''
@@ -135,6 +136,7 @@ const ProductPage = ({ producto }) => {
         // Clear temp inputs
         setTempInputs({});
 
+        console.log("Guardando campos");
         console.log(field);
         console.log(tempInputs[field]);
 
@@ -248,7 +250,7 @@ const ProductPage = ({ producto }) => {
         { id: 'caracteristicas', label: 'Características' },
         { id: 'datos', label: 'Datos Técnicos' },
         { id: 'especificaciones', label: 'Especificaciones Técnicas' },
-        { id: 'documentos', label: 'Documentos/Descargas' },
+        { id: 'archivos_adicionales', label: 'Documentos/Descargas' },
         { id: 'envio', label: 'Contenido de Envío' },
         { id: 'soporte', label: 'Soporte Técnico' },
     ];
@@ -530,15 +532,15 @@ const ProductPage = ({ producto }) => {
                         )}
                     </div>
                 );
-            case 'documentos':
+            case 'archivos_adicionales':
                 return (
                      <ProductDocuments
-                        description={productData.documentos}
-                        editMode={editMode.documentos}
-                        tempInputs={tempInputs.documentos}
-                        handleInputChange={(value) => handleInputChange('documentos', value)}
-                        handleSave={() => handleSave('documentos')}
-                        toggleEditMode={() => toggleEditMode('documentos')}
+                        documents={productData.archivos_adicionales}
+                        editMode={editMode.archivos_adicionales}
+                        tempInputs={tempInputs.archivos_adicionales}
+                        handleInputChange={(value) => handleInputChange('archivos_adicionales', value)}
+                        handleSave={() => handleSave('archivos_adicionales')}
+                        toggleEditMode={() => toggleEditMode('archivos_adicionales')}
                     />
                 );
             case 'envio':
