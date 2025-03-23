@@ -17,6 +17,7 @@ import ProductSpecifications from "../Components/product/ProductSpecifications";
 import ProductDocuments from "../Components/product/ProductDocuments";
 import ProductTabs from "../Components/product/ProductTabs";
 
+
 const ProductPage = ({ producto }) => {
     console.log(producto);
     const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el menú está abierto vertical
@@ -302,7 +303,7 @@ const ProductPage = ({ producto }) => {
         processTableContent(textoPegado);
     };
 
-    const handleTablaTextChange = (e) => {
+    const handleTablaTextChange = (e) => {               
         setContenidoTabla(prev => ({
             ...prev,
             textoActual: e.target.value
@@ -344,14 +345,43 @@ const ProductPage = ({ producto }) => {
         handleSave('especificaciones_tecnicas'); // Notificar al padre que el texto ha sido guardado
     };
 
-    const updateContent = (secciones, textoActual) => {
+    const updateContent =  async (secciones, textoActual) => {
         const nuevoContenido = { secciones, textoActual };
+        console.log("nuevoContenido", JSON.stringify(nuevoContenido));
 
         setContenidoTabla(nuevoContenido);
         setProductData(prev => ({
             ...prev,
             especificaciones_tecnicas: JSON.stringify(nuevoContenido)
         }));
+    };
+
+    const sendTableToServer = async () => {
+        try {
+            const response = await axios.post('/product/update', {
+                id_producto: producto.id_producto,
+                especificaciones_tecnicas: JSON.stringify(contenidoTabla)
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+    
+            console.log("Especificaciones de tecnicas enviadas a servidor:", response.data);
+            // actualizar el producto
+            setProductData(response.data);
+            // limpiar edit mode
+            setEditMode(prev => ({
+                ...prev,
+                especificaciones_tecnicas: false
+            }));
+            
+
+        } catch (error) {
+            console.error("Error enviando especificaciones de tecnicas al servidor:", error);
+        }
     };
 
     const limpiarTabla = () => {
@@ -504,7 +534,7 @@ const ProductPage = ({ producto }) => {
                                 </div>
                                 <div className="mt-4 flex space-x-2">
                                     <button
-                                        onClick={() => handleSave('especificaciones_tecnicas')}
+                                        onClick={() => sendTableToServer('especificaciones_tecnicas')}
                                         className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                                     >
                                         Guardar
