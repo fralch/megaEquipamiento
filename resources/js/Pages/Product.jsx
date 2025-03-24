@@ -767,23 +767,106 @@ const ProductPage = ({ producto }) => {
                     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
                         {/* Encabezado */}
                         <div className="flex flex-col space-y-4">
-                            <h1 className="text-3xl font-bold text-gray-900">
-                                {producto.nombre}
-                            </h1>
+                            <div>
+                                {editMode.nombre ? (
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            className="text-3xl font-bold text-gray-900 border rounded px-2 py-1 w-full"
+                                            value={tempInputs.nombre || producto.nombre}
+                                            onChange={(e) => handleInputChange('nombre', e.target.value)}
+                                            autoFocus
+                                        />
+                                        <button
+                                            onClick={() => handleSave('nombre')}
+                                            className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                                        >
+                                            ✓
+                                        </button>
+                                        <button
+                                            onClick={() => toggleEditMode('nombre')}
+                                            className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <h1 
+                                        className="text-3xl font-bold text-gray-900 cursor-pointer" 
+                                        onDoubleClick={() => toggleEditMode('nombre')}
+                                    >
+                                        {producto.nombre}
+                                    </h1>
+                                )}
+                            </div>
                             <div className="grid grid-cols-2 gap-8">
                                 <div className="flex text-left space-x-4 flex-col">
                                     <div className="ml-3">
-                                        <p className="text-2xl font-semibold text-green-600">
-                                            S/ {producto.precio_sin_ganancia}
-                                        </p>
+                                        {editMode.precio_sin_ganancia ? (
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="number"
+                                                    className="text-2xl font-semibold text-green-600 border rounded px-2 py-1"
+                                                    value={tempInputs.precio_sin_ganancia || producto.precio_sin_ganancia}
+                                                    onChange={(e) => handleInputChange('precio_sin_ganancia', e.target.value)}
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={() => handleSave('precio_sin_ganancia')}
+                                                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                                                >
+                                                    ✓
+                                                </button>
+                                                <button
+                                                    onClick={() => toggleEditMode('precio_sin_ganancia')}
+                                                    className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <p 
+                                                className="text-2xl font-semibold text-green-600 cursor-pointer"
+                                                onDoubleClick={() => toggleEditMode('precio_sin_ganancia')}
+                                            >
+                                                S/ {producto.precio_sin_ganancia}
+                                            </p>
+                                        )}
                                         <p className="text-gray-500">
                                             (sin IGV)
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-2xl font-semibold text-gray-800">
-                                            S/ {producto.precio_igv}
-                                        </p>
+                                        {editMode.precio_igv ? (
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="number"
+                                                    className="text-2xl font-semibold text-gray-800 border rounded px-2 py-1"
+                                                    value={tempInputs.precio_igv || producto.precio_igv}
+                                                    onChange={(e) => handleInputChange('precio_igv', e.target.value)}
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={() => handleSave('precio_igv')}
+                                                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                                                >
+                                                    ✓
+                                                </button>
+                                                <button
+                                                    onClick={() => toggleEditMode('precio_igv')}
+                                                    className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <p 
+                                                className="text-2xl font-semibold text-gray-800 cursor-pointer"
+                                                onDoubleClick={() => toggleEditMode('precio_igv')}
+                                            >
+                                                S/ {producto.precio_igv}
+                                            </p>
+                                        )}
                                         <p className="text-gray-500">
                                             (con IGV)
                                         </p>
