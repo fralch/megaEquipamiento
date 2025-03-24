@@ -873,8 +873,70 @@ const ProductPage = ({ producto }) => {
                                     </div>
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                    <p>SKU: {producto.sku}</p>
-                                    <p>Fabricante: {producto.marca.nombre}</p>
+                                    <div>
+                                        {editMode.sku ? (
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    className="text-sm text-gray-600 border rounded px-2 py-1"
+                                                    value={tempInputs.sku || producto.sku}
+                                                    onChange={(e) => handleInputChange('sku', e.target.value)}
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={() => handleSave('sku')}
+                                                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+                                                >
+                                                    ✓
+                                                </button>
+                                                <button
+                                                    onClick={() => toggleEditMode('sku')}
+                                                    className="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <p 
+                                                className="text-sm text-gray-600 cursor-pointer"
+                                                onDoubleClick={() => toggleEditMode('sku')}
+                                            >
+                                                SKU: {producto.sku}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        {editMode.marca_nombre ? (
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    className="text-sm text-gray-600 border rounded px-2 py-1"
+                                                    value={tempInputs.marca_nombre || producto.marca.nombre}
+                                                    onChange={(e) => handleInputChange('marca_nombre', e.target.value)}
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={() => handleSave('marca_nombre')}
+                                                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+                                                >
+                                                    ✓
+                                                </button>
+                                                <button
+                                                    onClick={() => toggleEditMode('marca_nombre')}
+                                                    className="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm"
+                                                >
+                                                    ✕
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <p 
+                                                className="text-sm text-gray-600 cursor-pointer"
+                                                onDoubleClick={() => toggleEditMode('marca_nombre')}
+                                            >
+                                                Fabricante: {producto.marca.nombre}
+                                            </p>
+                                        )}
+                                    </div>
                                     <p>
                                         Plazo de entrega: 1-3 días (Salvo fin
                                         Stock)
