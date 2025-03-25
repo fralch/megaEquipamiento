@@ -31,37 +31,6 @@ const ProductPage = ({ producto }) => {
         textoActual: ""
     });
 
-    /* Estado para rastrear los datos actualizados del producto por ejemplo : 
-        {
-            "id_producto": 5988,
-            "sku": "58084847448734543",
-            "nombre": "Producto de prueba 2",
-            "id_subcategoria": 1,
-            "marca_id": 1,
-            "pais": "Perú",
-            "precio_sin_ganancia": "354.00",
-            "precio_ganancia": "43543.00",
-            "precio_igv": "423.00",
-            "imagen": "productos/1742350897.jpg",
-            "descripcion": "",
-            "video": "https://youtu.be/BIXZHS6Gm9A?si=DepF1-olYLvE3_f7",
-            "envio": null,
-            "soporte_tecnico": "",
-            "caracteristicas": [],
-            "datos_tecnicos": [],
-            "archivos_adicionales": null,
-            "especificaciones_tecnicas": "{\"secciones\":[{\"tipo\":\"tabla\",\"datos\":[[\"Reino de España\",\"Madrid\",\"Euro\\r\"],[\"Reino de Dinamarca\",\"Copenhague\",\"Corona danesa\\r\"],[\"Estados Unidos Mexicanos\",\"Ciudad de México\",\"Peso\\r\"],[\"República Argentina\",\"Buenos Aires\",\"Peso\"]]}],\"textoActual\":\"\"}",
-            "marca": {
-                "id_marca": 1,
-                "nombre": "7_ealway",
-                "descripcion": "Descripción de 7_ealway",
-                "imagen": "/img/marcas/7_ealway.jpg"
-            },
-            "documentos": [],
-            "contenido_envio": ""
-        }
-    */
-
     const [productData, setProductData] = useState({
         ...producto,
         caracteristicas: typeof producto.caracteristicas === 'string' ? JSON.parse(producto.caracteristicas) : producto.caracteristicas || {},
@@ -121,46 +90,60 @@ const ProductPage = ({ producto }) => {
         Cuando el usuario completa la edición de un campo, esta función actualiza el estado 
         del producto (productData) con el nuevo valor y desactiva el modo de edición.
     */
-    const handleSave = async (field) => { // HandleSave: Guardar los cambios realizados en un campo en el estado del producto
-        // Update product state
-        setProductData(prev => ({
-            ...prev,
-            [field]: tempInputs[field]
-        }));
+        const handleSave = async (field) => {
+            try {
+                // Update product state
+                setProductData(prev => ({
+                    ...prev,
+                    [field]: tempInputs[field]
+                }));
+        
+                // Disable edit mode
+                setEditMode(prev => ({
+                    ...prev,
+                    [field]: false
+                }));
+        
+                // Clear temp inputs
+                setTempInputs({});
+        
+                // Update product in database
+                const response = await axios.post('/product/update', {
+                    id_producto: producto.id_producto,
+                    [field]: tempInputs[field]
+                }, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
 
-        // Disable edit mode
-        setEditMode(prev => ({
-            ...prev,
-            [field]: false
-        }));
-
-        // Clear temp inputs
-        setTempInputs({});
-
-        console.log("Guardando campos");
-        console.log(field);
-        console.log(tempInputs[field]);
-
-        try {
-            // Update product in database
-            const response = await axios.post('/product/update', {
-                id_producto: producto.id_producto,
-                [field]: tempInputs[field]
-            }, {
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                
+                // Completely update the product data with the server response
+                if (response.data) {
+                    console.log("Product updated successfully:", response.data);
+                    setProductData(response.data);
                 }
-            });
-
-            console.log("Product updated successfully:", response.data);
-            // actualizar el producto
-            setProductData(response.data);
-        } catch (error) {
-            console.error("Error updating product:", error);
-        }
-    };
+        
+                // Optionally, show a success toast or notification
+                // toast.success('Campo actualizado correctamente');
+            } catch (error) {
+                console.error("Error updating product:", error);
+                // Optionally, show an error toast
+                // toast.error('No se pudo actualizar el campo');
+        
+                // Revert the local state changes if the server update fails
+                setProductData(prev => ({
+                    ...prev,
+                    [field]: producto[field]
+                }));
+                setEditMode(prev => ({
+                    ...prev,
+                    [field]: false
+                }));
+            }
+        };
 
     /* 
         La función handleSaveFeatures se utiliza para guardar los cambios realizados en los campos de características y datos técnicos. 
@@ -795,7 +778,7 @@ const ProductPage = ({ producto }) => {
                                         className="text-3xl font-bold text-gray-900 cursor-pointer" 
                                         onDoubleClick={() => toggleEditMode('nombre')}
                                     >
-                                        {producto.nombre}
+                                        {productData.nombre}
                                     </h1>
                                 )}
                             </div>
@@ -829,7 +812,7 @@ const ProductPage = ({ producto }) => {
                                                 className="text-2xl font-semibold text-green-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('precio_sin_ganancia')}
                                             >
-                                                S/ {producto.precio_sin_ganancia}
+                                                S/ {productData.precio_sin_ganancia}
                                             </p>
                                         )}
                                         <p className="text-gray-500">
@@ -864,7 +847,7 @@ const ProductPage = ({ producto }) => {
                                                 className="text-2xl font-semibold text-gray-800 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('precio_igv')}
                                             >
-                                                S/ {producto.precio_igv}
+                                                S/ {productData.precio_igv}
                                             </p>
                                         )}
                                         <p className="text-gray-500">
@@ -901,7 +884,7 @@ const ProductPage = ({ producto }) => {
                                                 className="text-sm text-gray-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('sku')}
                                             >
-                                                SKU: {producto.sku}
+                                                SKU: {productData.sku}
                                             </p>
                                         )}
                                     </div>
@@ -933,7 +916,7 @@ const ProductPage = ({ producto }) => {
                                                 className="text-sm text-gray-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('marca_nombre')}
                                             >
-                                                Fabricante: {producto.marca.nombre}
+                                                Fabricante: {productData.marca?.nombre}
                                             </p>
                                         )}
                                     </div>

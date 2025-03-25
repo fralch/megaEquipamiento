@@ -108,6 +108,9 @@ class ProductoController extends Controller
         // Actualizar el producto con el campo proporcionado
         $producto->update($dataToUpdate);
         
+        // Recargar el producto con la relación marca
+        $producto = $producto->fresh('marca');
+        
         return response()->json($producto);
     }
 
