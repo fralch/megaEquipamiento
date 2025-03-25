@@ -6,7 +6,7 @@ import NavVertical from "../Components/home/NavVertical";
 import ZoomImage from "../Components/store/ZoomImage";
 import Footer from "../Components/home/Footer";
 import Modal_Features from "./assets/modal_features";
-import axios from  "axios";
+import axios from "axios";
 
 
 // Importar componentes modulares
@@ -90,60 +90,60 @@ const ProductPage = ({ producto }) => {
         Cuando el usuario completa la edición de un campo, esta función actualiza el estado 
         del producto (productData) con el nuevo valor y desactiva el modo de edición.
     */
-        const handleSave = async (field) => {
-            try {
-                // Update product state
-                setProductData(prev => ({
-                    ...prev,
-                    [field]: tempInputs[field]
-                }));
-        
-                // Disable edit mode
-                setEditMode(prev => ({
-                    ...prev,
-                    [field]: false
-                }));
-        
-                // Clear temp inputs
-                setTempInputs({});
-        
-                // Update product in database
-                const response = await axios.post('/product/update', {
-                    id_producto: producto.id_producto,
-                    [field]: tempInputs[field]
-                }, {
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
+    const handleSave = async (field) => {
+        try {
+            // Update product state
+            setProductData(prev => ({
+                ...prev,
+                [field]: tempInputs[field]
+            }));
 
-                
-                // Completely update the product data with the server response
-                if (response.data) {
-                    console.log("Product updated successfully:", response.data);
-                    setProductData(response.data);
+            // Disable edit mode
+            setEditMode(prev => ({
+                ...prev,
+                [field]: false
+            }));
+
+            // Clear temp inputs
+            setTempInputs({});
+
+            // Update product in database
+            const response = await axios.post('/product/update', {
+                id_producto: producto.id_producto,
+                [field]: tempInputs[field]
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 }
-        
-                // Optionally, show a success toast or notification
-                // toast.success('Campo actualizado correctamente');
-            } catch (error) {
-                console.error("Error updating product:", error);
-                // Optionally, show an error toast
-                // toast.error('No se pudo actualizar el campo');
-        
-                // Revert the local state changes if the server update fails
-                setProductData(prev => ({
-                    ...prev,
-                    [field]: producto[field]
-                }));
-                setEditMode(prev => ({
-                    ...prev,
-                    [field]: false
-                }));
+            });
+
+
+            // Completely update the product data with the server response
+            if (response.data) {
+                console.log("Product updated successfully:", response.data);
+                setProductData(response.data);
             }
-        };
+
+            // Optionally, show a success toast or notification
+            // toast.success('Campo actualizado correctamente');
+        } catch (error) {
+            console.error("Error updating product:", error);
+            // Optionally, show an error toast
+            // toast.error('No se pudo actualizar el campo');
+
+            // Revert the local state changes if the server update fails
+            setProductData(prev => ({
+                ...prev,
+                [field]: producto[field]
+            }));
+            setEditMode(prev => ({
+                ...prev,
+                [field]: false
+            }));
+        }
+    };
 
     /* 
         La función handleSaveFeatures se utiliza para guardar los cambios realizados en los campos de características y datos técnicos. 
@@ -168,7 +168,7 @@ const ProductPage = ({ producto }) => {
                 }));
                 console.log("datos_tecnicos", parsedData);
             }
-            
+
             // Update product in database
             try {
                 const response = await axios.post('/product/update', {
@@ -286,7 +286,7 @@ const ProductPage = ({ producto }) => {
         processTableContent(textoPegado);
     };
 
-    const handleTablaTextChange = (e) => {               
+    const handleTablaTextChange = (e) => {
         setContenidoTabla(prev => ({
             ...prev,
             textoActual: e.target.value
@@ -328,7 +328,7 @@ const ProductPage = ({ producto }) => {
         handleSave('especificaciones_tecnicas'); // Notificar al padre que el texto ha sido guardado
     };
 
-    const updateContent =  async (secciones, textoActual) => {
+    const updateContent = async (secciones, textoActual) => {
         const nuevoContenido = { secciones, textoActual };
         console.log("nuevoContenido", JSON.stringify(nuevoContenido));
 
@@ -351,7 +351,7 @@ const ProductPage = ({ producto }) => {
                     'Accept': 'application/json'
                 }
             });
-    
+
             console.log("Especificaciones de tecnicas enviadas a servidor:", response.data);
             // actualizar el producto
             setProductData(response.data);
@@ -360,7 +360,7 @@ const ProductPage = ({ producto }) => {
                 ...prev,
                 especificaciones_tecnicas: false
             }));
-            
+
 
         } catch (error) {
             console.error("Error enviando especificaciones de tecnicas al servidor:", error);
@@ -547,7 +547,7 @@ const ProductPage = ({ producto }) => {
                 );
             case 'archivos_adicionales':
                 return (
-                     <ProductDocuments
+                    <ProductDocuments
                         documents={productData.archivos_adicionales}
                         editMode={editMode.archivos_adicionales}
                         tempInputs={tempInputs.archivos_adicionales}
@@ -774,8 +774,8 @@ const ProductPage = ({ producto }) => {
                                         </button>
                                     </div>
                                 ) : (
-                                    <h1 
-                                        className="text-3xl font-bold text-gray-900 cursor-pointer" 
+                                    <h1
+                                        className="text-3xl font-bold text-gray-900 cursor-pointer"
                                         onDoubleClick={() => toggleEditMode('nombre')}
                                     >
                                         {productData.nombre}
@@ -808,7 +808,7 @@ const ProductPage = ({ producto }) => {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <p 
+                                            <p
                                                 className="text-2xl font-semibold text-green-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('precio_sin_ganancia')}
                                             >
@@ -843,7 +843,7 @@ const ProductPage = ({ producto }) => {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <p 
+                                            <p
                                                 className="text-2xl font-semibold text-gray-800 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('precio_igv')}
                                             >
@@ -880,7 +880,7 @@ const ProductPage = ({ producto }) => {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <p 
+                                            <p
                                                 className="text-sm text-gray-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('sku')}
                                             >
@@ -889,36 +889,9 @@ const ProductPage = ({ producto }) => {
                                         )}
                                     </div>
                                     <div>
-                                        {editMode.marca_nombre ? (
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    type="text"
-                                                    className="text-sm text-gray-600 border rounded px-2 py-1"
-                                                    value={tempInputs.marca_nombre || producto.marca.nombre}
-                                                    onChange={(e) => handleInputChange('marca_nombre', e.target.value)}
-                                                    autoFocus
-                                                />
-                                                <button
-                                                    onClick={() => handleSave('marca_nombre')}
-                                                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
-                                                >
-                                                    ✓
-                                                </button>
-                                                <button
-                                                    onClick={() => toggleEditMode('marca_nombre')}
-                                                    className="px-2 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 text-sm"
-                                                >
-                                                    ✕
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <p 
-                                                className="text-sm text-gray-600 cursor-pointer"
-                                                onDoubleClick={() => toggleEditMode('marca_nombre')}
-                                            >
-                                                Fabricante: {productData.marca?.nombre}
-                                            </p>
-                                        )}
+                                        <p className="text-sm text-gray-600">
+                                            Fabricante: {productData.marca?.nombre}
+                                        </p>
                                     </div>
                                     <p>
                                         Plazo de entrega: 1-3 días (Salvo fin
