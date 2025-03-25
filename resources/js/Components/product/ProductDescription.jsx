@@ -1,6 +1,8 @@
 import React from 'react';
+import { Head, usePage, router, Link } from "@inertiajs/react";
 
 const ProductDescription = ({ description, editMode, tempInputs, handleInputChange, handleSave, toggleEditMode }) => {
+    const { auth } = usePage().props;
     return (
         <div className="p-4">
             {description ? (
@@ -30,12 +32,14 @@ const ProductDescription = ({ description, editMode, tempInputs, handleInputChan
                     ) : (
                         <div>
                             <p>{description}</p>
-                            <button 
-                                onClick={toggleEditMode}
-                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            >
-                                Editar descripción
-                            </button>
+                            {auth.user && (
+                                <button 
+                                    onClick={toggleEditMode}
+                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    Editar descripción
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -67,12 +71,14 @@ const ProductDescription = ({ description, editMode, tempInputs, handleInputChan
                     ) : (
                         <div>
                             <p>No hay descripción disponible.</p>
-                            <button 
-                                onClick={toggleEditMode}
-                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            >
-                                Agregar descripción
-                            </button>
+                            {auth.user && (
+                                <button 
+                                    onClick={toggleEditMode}
+                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    Agregar descripción
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>

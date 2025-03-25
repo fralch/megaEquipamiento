@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePage } from '@inertiajs/react';
 
 const ProductDocuments = ({ 
     documents, 
@@ -8,6 +9,7 @@ const ProductDocuments = ({
     handleSave, 
     toggleEditMode 
 }) => {
+    const { auth } = usePage().props;
     console.log("Documents");
     console.log(documents);
     
@@ -75,12 +77,14 @@ const ProductDocuments = ({
                     ) : (
                         <div>
                             {renderDocumentContent()}
-                            <button 
-                                onClick={toggleEditMode}
-                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            >
-                                Editar documentos
-                            </button>
+                            {auth.user && (
+                                <button 
+                                    onClick={toggleEditMode}
+                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    Editar documentos
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -112,12 +116,14 @@ const ProductDocuments = ({
                     ) : (
                         <div>
                             <p>No hay documentos disponibles.</p>
-                            <button 
-                                onClick={toggleEditMode}
-                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                            >
-                                Agregar documentos
-                            </button>
+                            {auth.user && (
+                                <button 
+                                    onClick={toggleEditMode}
+                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                    Agregar documentos
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>

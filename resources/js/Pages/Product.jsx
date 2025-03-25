@@ -1,4 +1,4 @@
-import { Head } from "@inertiajs/react";
+import { Head, usePage, router, Link } from "@inertiajs/react";
 import React, { useState, useEffect } from "react";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
@@ -19,7 +19,7 @@ import ProductTabs from "../Components/product/ProductTabs";
 
 
 const ProductPage = ({ producto }) => {
-    console.log(producto);
+    const { auth } = usePage().props;
     const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el menú está abierto vertical
     const [activeTab, setActiveTab] = useState('descripcion'); // Estado para controlar la pestaña activa de los tabs
     const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal para las características y datos técnicos en formato JSON
@@ -61,17 +61,23 @@ const ProductPage = ({ producto }) => {
         Esto significa que si un campo está en modo de edición, se desactivará, y si no lo está, se activará. Además, 
         la función también prepara los valores temporales (tempInputs) para la edición.
     */
-    const toggleEditMode = (field) => { // ToggleEditMode: Alternar o desactivar la edición de un campo
-        setEditMode(prev => ({ // SetEditMode: Establecer el estado de edición por ejemplo: { descripcion: true }
-            ...prev,
-            [field]: !prev[field]
-        }));
-
-        setTempInputs(prev => ({ // SetTempInputs: Establecer el valor temporal del campo, por ejemplo: { descripcion: "Nueva descripción" }
-            ...prev,
-            [field]: productData[field] // copiar el valor del campo del producto para que pueda ser editado
-        }));
-    };
+        const toggleEditMode = (field) => {
+            // Check if user is authenticated
+            if (!auth.user) {
+                alert('Debes iniciar sesión para editar este contenido.');
+                return;
+            }
+    
+            setEditMode(prev => ({
+                ...prev,
+                [field]: !prev[field]
+            }));
+    
+            setTempInputs(prev => ({
+                ...prev,
+                [field]: productData[field]
+            }));
+        };
 
     /* 
         La función handleInputChange se utiliza para manejar los cambios en los campos de entrada (inputs) del formulario. 
