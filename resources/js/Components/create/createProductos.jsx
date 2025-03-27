@@ -209,141 +209,142 @@ const Productos = ({ onSubmit }) => {
   ];
 
   return (
-    <div className="flex bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
-      {/* Left side: Product Image */}
-      <div className="w-1/2 pr-6">
-        <div className="border border-gray-300 rounded-lg p-4 mb-4 flex items-center justify-center h-[400px]">
-          {previewImage ? (
-            <img 
-              src={previewImage} 
-              alt="Product Preview" 
-              className="max-h-full max-w-full object-contain"
-            />
-          ) : (
-            <div className="text-gray-400 text-center">
-              Vista previa de imagen
-            </div>
-          )}
-        </div>
-
-        {/* Image Upload */}
-        <div className="mb-4">
-          <input
-            type="file"
-            id="imagen"
-            name="imagen"
-            onChange={handleImageChange}
-            accept="image/*"
-            className="hidden"
-          />
-          <label
-            htmlFor="imagen"
-            className="block w-full border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 cursor-pointer bg-white text-indigo-600 py-2 px-4 text-sm font-medium text-center transition duration-150 ease-in-out"
-          >
-            Seleccionar archivo
-          </label>
-          {form.imagen && <p className="mt-1 text-sm text-gray-500">{form.imagen.name}</p>}
-        </div>
-      </div>
-
-      {/* Right side: Product Details Form */}
-      <div className="w-1/2 pl-6">
-        <h1 className="text-2xl font-bold mb-4">Crear Producto</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Render form fields */}
-            {formFields.map(({ label, name, type, options, step, placeholder, required }) => (
-              <div key={name} className="mb-4">
-                <label htmlFor={name} className="block text-sm font-medium text-gray-700">
-                  {label}
-                </label>
-                {type === "select" ? (
-                  <select
-                    id={name}
-                    name={name}
-                    value={name === "categoria" ? selectedCategory : form[name]}
-                    onChange={name === "categoria" ? handleCategoryChange : handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    required={required}
-                  >
-                    <option value="">{placeholder}</option>
-                    {options?.map(({ value, label }) => (
-                      <option key={value} value={value}>{label}</option>
-                    ))}
-                  </select>
-                ) : (
-                  <input
-                    type={type}
-                    id={name}
-                    name={name}
-                    value={form[name]}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                    step={step}
-                    placeholder={placeholder}
-                    required={required}
-                  />
-                )}
-              </div>
-            ))}
-
-            <EspecificacionesTecnicas
-              ref={especificacionesRef}
-              form={form}
-              setForm={setForm}
-              tableStyles={tableStyles}
-            />
-
-            {/* Feature buttons */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Características</label>
-              <button
-                type="button"
-                onClick={() => toggleModal('caracteristicas')}
-                className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                {Object.keys(form.caracteristicas || {}).length === 0 
-                  ? 'Click para agregar características' 
-                  : JSON.stringify(form.caracteristicas)}
-              </button>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Datos Técnicos</label>
-              <button
-                type="button"
-                onClick={() => toggleModal('datos_tecnicos')}
-                className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-              >
-                {Object.keys(form.datos_tecnicos || {}).length === 0 
-                  ? 'Click para agregar datos técnicos' 
-                  : JSON.stringify(form.datos_tecnicos)}
-              </button>
-            </div>
-
-            {/* Description */}
-            <div className="mb-4 col-span-2">
-              <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
-              <textarea
-                id="descripcion"
-                name="descripcion"
-                value={form.descripcion}
-                onChange={handleChange}
-                placeholder="Ingrese una descripción detallada del producto"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                rows={4}
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex flex-col lg:flex-row bg-white shadow-md rounded-lg p-6 mb-8 w-full">
+        {/* Left side: Product Image */}
+        <div className="w-full lg:w-1/2 lg:pr-6 mb-6 lg:mb-0">
+          <div className="border border-gray-300 rounded-lg p-4 mb-4 flex items-center justify-center h-[300px] md:h-[400px]">
+            {previewImage ? (
+              <img 
+                src={previewImage} 
+                alt="Product Preview" 
+                className="max-h-full max-w-full object-contain"
               />
-            </div>
+            ) : (
+              <div className="text-gray-400 text-center">
+                Vista previa de imagen
+              </div>
+            )}
           </div>
-          
-          {/* Submit button */}
-          <button
-            type="submit"
-            className="mt-4 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 w-full"
-          >
-            Guardar Producto
-          </button>
-        </form>
+
+          {/* Image Upload */}
+          <div>
+            <input
+              type="file"
+              id="imagen"
+              name="imagen"
+              onChange={handleImageChange}
+              accept="image/*"
+              className="hidden"
+            />
+            <label
+              htmlFor="imagen"
+              className="block w-full border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 cursor-pointer bg-white text-indigo-600 py-2 px-4 text-sm font-medium text-center transition duration-150 ease-in-out"
+            >
+              Seleccionar archivo
+            </label>
+            {form.imagen && <p className="mt-1 text-sm text-gray-500 text-center">{form.imagen.name}</p>}
+          </div>
+        </div>
+
+        {/* Right side: Product Details Form */}
+        <div className="w-full lg:w-1/2 lg:pl-6">
+          <h1 className="text-2xl font-bold mb-4 text-center lg:text-left">Crear Producto</h1>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {formFields.map(({ label, name, type, options, step, placeholder, required }) => (
+                <div key={name} className="mb-4">
+                  <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+                    {label}
+                  </label>
+                  {type === "select" ? (
+                    <select
+                      id={name}
+                      name={name}
+                      value={name === "categoria" ? selectedCategory : form[name]}
+                      onChange={name === "categoria" ? handleCategoryChange : handleChange}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      required={required}
+                    >
+                      <option value="">{placeholder}</option>
+                      {options?.map(({ value, label }) => (
+                        <option key={value} value={value}>{label}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type={type}
+                      id={name}
+                      name={name}
+                      value={form[name]}
+                      onChange={handleChange}
+                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                      step={step}
+                      placeholder={placeholder}
+                      required={required}
+                    />
+                  )}
+                </div>
+              ))}
+
+              <EspecificacionesTecnicas
+                ref={especificacionesRef}
+                form={form}
+                setForm={setForm}
+                tableStyles={tableStyles}
+              />
+
+              {/* Feature buttons */}
+              <div className="mb-4 w-full">
+                <label className="block text-sm font-medium text-gray-700">Características</label>
+                <button
+                  type="button"
+                  onClick={() => toggleModal('caracteristicas')}
+                  className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                >
+                  {Object.keys(form.caracteristicas || {}).length === 0 
+                    ? 'Click para agregar características' 
+                    : JSON.stringify(form.caracteristicas)}
+                </button>
+              </div>
+
+              <div className="mb-4 w-full">
+                <label className="block text-sm font-medium text-gray-700">Datos Técnicos</label>
+                <button
+                  type="button"
+                  onClick={() => toggleModal('datos_tecnicos')}
+                  className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
+                >
+                  {Object.keys(form.datos_tecnicos || {}).length === 0 
+                    ? 'Click para agregar datos técnicos' 
+                    : JSON.stringify(form.datos_tecnicos)}
+                </button>
+              </div>
+
+              {/* Description */}
+              <div className="mb-4 col-span-2">
+                <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  value={form.descripcion}
+                  onChange={handleChange}
+                  placeholder="Ingrese una descripción detallada del producto"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  rows={4}
+                />
+              </div>
+            </div>
+            
+            {/* Submit button */}
+            <button
+              type="submit"
+              className="mt-4 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 w-full"
+            >
+              Guardar Producto
+            </button>
+          </form>
+        </div>
       </div>
 
       {/* Modal */}
