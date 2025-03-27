@@ -11,7 +11,7 @@ const CrearProducto = () => {
     const [crearCategoria, setCrearCategoria] = useState(false);
     const [crearSubcategoria, setCrearSubcategoria] = useState(false);
     const [crearMarca, setCrearMarca] = useState(false);
-
+    const [sidebarVisible, setSidebarVisible] = useState(false); // Changed to false
 
     const [form, setForm] = useState({
         sku: "",
@@ -32,17 +32,22 @@ const CrearProducto = () => {
     const handleCrearProductoClick = () => {
         setCrearProducto(true);
         setCrearCategoria(false);
+        setCrearSubcategoria(false);
+        setCrearMarca(false);
     };
 
     const handleCrearCategoriaClick = () => {
         setCrearProducto(false);
         setCrearCategoria(true);
+        setCrearSubcategoria(false);
+        setCrearMarca(false);
     };
 
     const handleCrearSubcategoriaClick = () => {
         setCrearProducto(false);
         setCrearCategoria(false);
         setCrearSubcategoria(true);
+        setCrearMarca(false);
     };
 
     const handleCrearMarcaClick = () => {
@@ -53,18 +58,28 @@ const CrearProducto = () => {
     };
 
     return (
-        <div className="w-full">
+        <div className="w-full relative">
             <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
                 <Head title="Crear" />
-                <div className="w-full md:w-1/4 bg-blue-50 border-r border-blue-200 p-4">
+                
+                {/* Updated toggle button */}
+                <button
+                    className="fixed top-4 left-4 z-20 bg-blue-500 text-white p-2 rounded-md shadow-md hover:bg-blue-600"
+                    onClick={() => setSidebarVisible(!sidebarVisible)}
+                >
+                    {sidebarVisible ? '←' : '→'}
+                </button>
+                
+                <div className={`${sidebarVisible ? 'block' : 'hidden'} 
+                    w-full md:w-1/4 bg-blue-50 border-r border-blue-200 p-4 min-h-screen`}>
                     <div className="mb-8">
-                        <Link href="/"> {/* Add this line */}
+                        <Link href="/"> 
                             <img
                                 src="/img/logo2.png"
                                 alt="Logo"
                                 className="mb-4 w-3/5 mx-auto"
                             />
-                        </Link> {/* Add this line */}
+                        </Link>
                         <h2 className="text-xl font-bold text-blue-600 text-center">
                             Elige el registro que deseas crear
                         </h2>
