@@ -166,10 +166,10 @@ const Productos = ({ onSubmit }) => {
   // Form field definitions
   // Update in formFields array - remove the video field
   const formFields = [
-      { label: "SKU", name: "sku", type: "text", placeholder: "Ingrese el código SKU del producto", required: true },
-      { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
       { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
+      { label: "SKU", name: "sku", type: "text", placeholder: "Ingrese el código SKU del producto", required: true },
       { label: "Precio IGV", name: "precio_igv", type: "number", step: "0.01", placeholder: "0.00" },
+      { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
       {
         label: "Categoría",
         name: "categoria",
@@ -316,19 +316,17 @@ const Productos = ({ onSubmit }) => {
                     name="video"
                     value={form.video}
                     onChange={handleChange}
-                    placeholder="URL del video de YouTube (ej: https://www.youtube.com/watch?v=...)"
+                    placeholder="URL del video de YouTube (ej:  https://youtu.be/-r687V8yqKY?si=z52uM8cBOsxBmue3 )"
                     className="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
                 {form.video && (
                   <div className="mt-2 aspect-video w-full">
                     <iframe
-                      src={form.video.includes('youtube') ? form.video.replace('watch?v=', 'embed/') : form.video}
-                      className="w-full h-[300px] rounded-md"
-                      title="Product Video"
+                      className="w-full h-96 rounded-md shadow-lg"
+                      src={form.video.replace("youtu.be", "www.youtube.com/embed")}
+                      title="Explora las Propiedades Texturales"
                       allowFullScreen
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     />
                   </div>
                 )}
