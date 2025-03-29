@@ -87,6 +87,42 @@ const CountryInput = ({ form, handleChange }) => (
   </div>
 );
 
+// Shipping Input Component
+const ShippingInput = ({ form, handleChange }) => (
+  <div className="mb-4">
+    <label htmlFor="envio" className="block text-sm font-medium text-gray-700">
+      Envío
+    </label>
+    <input
+      type="text"
+      id="envio"
+      name="envio"
+      value={form.envio}
+      onChange={handleChange}
+      placeholder="Información de envío"
+      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+    />
+  </div>
+);
+
+// Technical Support Input Component
+const TechnicalSupportInput = ({ form, handleChange }) => (
+  <div className="mb-4">
+    <label htmlFor="soporte_tecnico" className="block text-sm font-medium text-gray-700">
+      Soporte Técnico
+    </label>
+    <input
+      type="text"
+      id="soporte_tecnico"
+      name="soporte_tecnico"
+      value={form.soporte_tecnico}
+      onChange={handleChange}
+      placeholder="Información de soporte técnico"
+      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+    />
+  </div>
+);
+
 const Productos = ({ onSubmit }) => {
   const especificacionesRef = useRef();
   const initialForm = {
@@ -246,14 +282,12 @@ const Productos = ({ onSubmit }) => {
     seccion: { marginBottom: '20px', position: 'relative' }
   };
 
-  // Form field definitions for other fields (keeping those that are not going to be individual components)
+  // Form field definitions for other fields (removed the shipping and technical support fields)
   const remainingFormFields = [
     { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
     { label: "SKU", name: "sku", type: "text", placeholder: "Ingrese el código SKU del producto", required: true },
     { label: "Precio IGV", name: "precio_igv", type: "number", step: "0.01", placeholder: "0.00" },
-    { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
-    { label: "Envío", name: "envio", type: "text", placeholder: "Información de envío" },
-    { label: "Soporte Técnico", name: "soporte_tecnico", type: "text", placeholder: "Información de soporte técnico" }
+    { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01", placeholder: "0.00" }
   ];
 
   return (
@@ -337,6 +371,10 @@ const Productos = ({ onSubmit }) => {
                   />
                 </div>
               ))}
+              
+              {/* Shipping and Technical Support Components */}
+              <ShippingInput form={form} handleChange={handleChange} />
+              <TechnicalSupportInput form={form} handleChange={handleChange} />
 
               {/* Custom field components */}
               <div className="mb-4 col-span-2">
