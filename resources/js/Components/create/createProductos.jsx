@@ -4,7 +4,6 @@ import EspecificacionesTecnicas from './assets/especificacionesTecnicas';
 
 const URL_API = import.meta.env.VITE_API_URL;
 
-// Add this before the Form components
 const initialForm = {
   sku: "",
   nombre: "",
@@ -24,7 +23,6 @@ const initialForm = {
   especificaciones_tecnicas: "",
 };
 
-// Define priceFields
 const priceFields = [
   {
     label: "Precio sin Ganancia",
@@ -49,12 +47,28 @@ const priceFields = [
   },
 ];
 
-// Form components
+const tableStyles = {
+  container: { border: '1px solid #e5e7eb', borderCollapse: 'collapse', width: '100%', marginTop: '10px' },
+  cell: { border: '1px solid #e5e7eb', padding: '8px', fontSize: '14px' },
+  header: { border: '1px solid #e5e7eb', padding: '8px', fontSize: '14px', backgroundColor: '#f3f4f6', fontWeight: 'bold' },
+  text: { padding: '10px', border: '1px solid #e5e7eb', borderRadius: '4px', backgroundColor: '#f9fafb', marginTop: '10px', fontSize: '14px' },
+  seccion: { marginBottom: '20px', position: 'relative' }
+};
+
+const tabs = [
+  { id: 'tab1', label: 'Descripción' },
+  { id: 'tab2', label: 'Características' },
+  { id: 'tab3', label: 'Datos Técnicos' },
+  { id: 'tab4', label: 'Especificaciones Técnicas' },
+  { id: 'tab5', label: 'Documentos/Descargas' },
+  { id: 'tab6', label: 'Contenido de Envío' },
+  { id: 'tab7', label: 'Soporte Técnico' },
+  { id: 'tab8', label: 'Categorías' }
+];
+
 const FormInput = ({ label, id, name, value, onChange, type = "text", placeholder, required = false, step, className = "" }) => (
   <div className={`mb-4 ${className}`}>
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-      {label}
-    </label>
+    <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
     <input
       type={type}
       id={id}
@@ -86,9 +100,7 @@ const FormTextarea = ({ label, id, name, value, onChange, placeholder, rows = 4 
 
 const CategorySelect = ({ categorias, selectedCategory, handleCategoryChange }) => (
   <div className="mb-4">
-    <label htmlFor="categoria" className="block text-sm font-medium text-gray-700">
-      Categoría
-    </label>
+    <label htmlFor="categoria" className="block text-sm font-medium text-gray-700">Categoría</label>
     <select
       id="categoria"
       name="categoria"
@@ -106,9 +118,7 @@ const CategorySelect = ({ categorias, selectedCategory, handleCategoryChange }) 
 
 const SubcategorySelect = ({ filteredSubcategorias, value, onChange }) => (
   <div className="mb-4">
-    <label htmlFor="id_subcategoria" className="block text-sm font-medium text-gray-700">
-      Subcategoría
-    </label>
+    <label htmlFor="id_subcategoria" className="block text-sm font-medium text-gray-700">Subcategoría</label>
     <select
       id="id_subcategoria"
       name="id_subcategoria"
@@ -127,9 +137,7 @@ const SubcategorySelect = ({ filteredSubcategorias, value, onChange }) => (
 
 const BrandSelect = ({ marcas, value, onChange }) => (
   <div className="mb-4">
-    <label htmlFor="marca_id" className="block text-sm font-medium text-gray-700">
-      Marca
-    </label>
+    <label htmlFor="marca_id" className="block text-sm font-medium text-gray-700">Marca</label>
     <select
       id="marca_id"
       name="marca_id"
@@ -148,9 +156,7 @@ const BrandSelect = ({ marcas, value, onChange }) => (
 
 const VideoInput = ({ value, onChange }) => (
   <div className="mb-4 col-span-2">
-    <label htmlFor="video" className="block text-sm font-medium text-gray-700">
-      Video del Producto
-    </label>
+    <label htmlFor="video" className="block text-sm font-medium text-gray-700">Video del Producto</label>
     <div className="mt-1">
       <input
         type="text"
@@ -158,7 +164,7 @@ const VideoInput = ({ value, onChange }) => (
         name="video"
         value={value}
         onChange={onChange}
-        placeholder="URL del video de YouTube (ej: https://youtu.be/-r687V8yqKY?si=z52uM8cBOsxBmue3)"
+        placeholder="URL del video de YouTube"
         className="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
       />
     </div>
@@ -200,12 +206,9 @@ const ImageUpload = ({ previewImage, handleImageChange, imageName }) => (
           className="max-h-full max-w-full object-contain"
         />
       ) : (
-        <div className="text-gray-400 text-center">
-          Vista previa de imagen
-        </div>
+        <div className="text-gray-400 text-center">Vista previa de imagen</div>
       )}
     </div>
-
     <div>
       <input
         type="file"
@@ -226,21 +229,7 @@ const ImageUpload = ({ previewImage, handleImageChange, imageName }) => (
   </div>
 );
 
-// Main Component
 const Productos = ({ onSubmit }) => {
-  // Constants
-  const tableStyles = {
-    container: { border: '1px solid #e5e7eb', borderCollapse: 'collapse', width: '100%', marginTop: '10px' },
-    cell: { border: '1px solid #e5e7eb', padding: '8px', fontSize: '14px' },
-    header: { border: '1px solid #e5e7eb', padding: '8px', fontSize: '14px', backgroundColor: '#f3f4f6', fontWeight: 'bold' },
-    text: { padding: '10px', border: '1px solid #e5e7eb', borderRadius: '4px', backgroundColor: '#f9fafb', marginTop: '10px', fontSize: '14px' },
-    seccion: { marginBottom: '20px', position: 'relative' }
-  };
-
-  // Add this ref
-  const especificacionesRef = useRef(null);
-
-  // States
   const [activeTab, setActiveTab] = useState('tab1');
   const [form, setForm] = useState(initialForm);
   const [categorias, setCategorias] = useState([]);
@@ -250,132 +239,183 @@ const Productos = ({ onSubmit }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
+  const especificacionesRef = useRef(null);
 
-  // Add tabs configuration
-  const tabs = [
-    { id: 'tab1', label: 'Tab 1' },
-    { id: 'tab2', label: 'Tab 2' },
-    { id: 'tab3', label: 'Tab 3' },
-    { id: 'tab4', label: 'Tab 4' },
-    { id: 'tab5', label: 'Tab 5' }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [catRes, subRes, marRes] = await Promise.all([
+          fetch(`${URL_API}/categorias`),
+          fetch(`${URL_API}/subcategorias`),
+          fetch(`${URL_API}/marcas`)
+        ]);
+        
+        setCategorias(await catRes.json());
+        setSubcategorias(await subRes.json());
+        setMarcas(await marRes.json());
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
-  // Add tab content render function
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'tab1':
-        return (
-          <div className="p-4 bg-white rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Tab 1 Content</h2>
-            <p>This is the content for Tab 1. You can replace this with any component you need.</p>
-          </div>
-        );
-      case 'tab2':
-        return (
-          <div className="p-4 bg-white rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Tab 2 Content</h2>
-            <p>This is the content for Tab 2. You can replace this with any component you need.</p>
-          </div>
-        );
-      case 'tab3':
-        return (
-          <div className="p-4 bg-white rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Tab 3 Content</h2>
-            <p>This is the content for Tab 3. You can replace this with any component you need.</p>
-          </div>
-        );
-      case 'tab4':
-        return (
-          <div className="p-4 bg-white rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Tab 4 Content</h2>
-            <p>This is the content for Tab 4. You can replace this with any component you need.</p>
-          </div>
-        );
-      case 'tab5':
-        return (
-          <div className="p-4 bg-white rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Tab 5 Content</h2>
-            <p>This is the content for Tab 5. You can replace this with any component you need.</p>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  // Define handleImageChange function
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
+      reader.onloadend = () => setPreviewImage(reader.result);
       reader.readAsDataURL(file);
-      setForm({
-        ...form,
-        imagen: file,
-      });
+      setForm(prev => ({ ...prev, imagen: file }));
     }
   };
 
-  // Define handleChange function
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setForm({
-      ...form,
-      [name]: value,
-    });
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  // Define handleCategoryChange function
   const handleCategoryChange = (event) => {
-    const categoryId = event.target.value;
-    setSelectedCategory(categoryId);
-    // Aquí puedes agregar la lógica para filtrar las subcategorías según la categoría seleccionada
+    setSelectedCategory(event.target.value);
+    setForm(prev => ({ ...prev, id_subcategoria: "" }));
   };
 
-  // Define handleSubmit function
   const handleSubmit = (event) => {
     event.preventDefault();
     onSubmit(form);
+    setForm(initialForm);
+    setPreviewImage(null);
   };
 
-  // Define toggleModal function
   const toggleModal = (type = '') => {
     setModalType(type);
-    setModalVisible(!modalVisible);
+    setModalVisible(prev => !prev);
   };
 
-  // Define saveModalData function
   const saveModalData = (data) => {
-    setForm({
-      ...form,
-      [modalType]: data,
-    });
+    setForm(prev => ({ ...prev, [modalType]: data }));
     toggleModal();
   };
 
-  // Define filteredSubcategorias
   const filteredSubcategorias = subcategorias.filter(
-    (subcategoria) => subcategoria.id_categoria === selectedCategory
+    sub => sub.id_categoria === selectedCategory
   );
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'tab1': // Descripción
+        return (
+          <div className="space-y-4">
+            <FormTextarea
+              label="Descripción"
+              id="descripcion"
+              name="descripcion"
+              value={form.descripcion}
+              onChange={handleChange}
+              placeholder="Descripción detallada del producto"
+            />
+          </div>
+        );
+
+      case 'tab2': // Características
+        return (
+          <FeaturesButton
+            label="Características"
+            value={form.caracteristicas}
+            onClick={() => toggleModal('caracteristicas')}
+          />
+        );
+
+      case 'tab3': // Datos Técnicos
+        return (
+          <FeaturesButton
+            label="Datos Técnicos"
+            value={form.datos_tecnicos}
+            onClick={() => toggleModal('datos_tecnicos')}
+          />
+        );
+
+      case 'tab4': // Especificaciones Técnicas
+        return (
+          <EspecificacionesTecnicas
+            ref={especificacionesRef}
+            form={form}
+            setForm={setForm}
+            tableStyles={tableStyles}
+          />
+        );
+
+      case 'tab6': // Contenido de Envío
+        return (
+          <FormInput
+            label="Envío"
+            id="envio"
+            name="envio"
+            value={form.envio}
+            onChange={handleChange}
+            placeholder="Información de envío"
+          />
+        );
+
+      case 'tab7': // Soporte Técnico
+        return (
+          <FormInput
+            label="Soporte Técnico"
+            id="soporte_tecnico"
+            name="soporte_tecnico"
+            value={form.soporte_tecnico}
+            onChange={handleChange}
+            placeholder="Información de soporte"
+          />
+        );
+
+      case 'tab8': // Otros
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CategorySelect
+              categorias={categorias}
+              selectedCategory={selectedCategory}
+              handleCategoryChange={handleCategoryChange}
+            />
+            <SubcategorySelect
+              filteredSubcategorias={filteredSubcategorias}
+              value={form.id_subcategoria}
+              onChange={handleChange}
+            />
+            <BrandSelect
+              marcas={marcas}
+              value={form.marca_id}
+              onChange={handleChange}
+            />
+            <FormInput
+              label="País"
+              id="pais"
+              name="pais"
+              value={form.pais}
+              onChange={handleChange}
+              placeholder="País de origen"
+            />
+          </div>
+        );
+
+      default:
+        return <div className="p-4">Seleccione una pestaña para ver el contenido</div>;
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-4 text-center lg:text-left">Crear Producto</h1>
-      <div className="flex flex-col lg:flex-row bg-white shadow-md rounded-lg p-6 mb-8 w-full">
-        {/* Left side: Product Image */}
-        <ImageUpload
-          previewImage={previewImage}
-          handleImageChange={handleImageChange}
-          imageName={form.imagen?.name}
-        />
+      
+      <form onSubmit={handleSubmit}>
+        <div className="flex flex-col lg:flex-row bg-white shadow-md rounded-lg p-6 mb-8 w-full">
+          <ImageUpload
+            previewImage={previewImage}
+            handleImageChange={handleImageChange}
+            imageName={form.imagen?.name}
+          />
 
-        {/* Right side: Product Details Form */}
-        <div className="w-full lg:w-1/2 lg:pl-6">
-          <form onSubmit={handleSubmit}>
-            {/* Product Name - full width */}
+          <div className="w-full lg:w-1/2 lg:pl-6">
             <FormInput
               label="Nombre"
               id="nombre"
@@ -383,166 +423,71 @@ const Productos = ({ onSubmit }) => {
               value={form.nombre}
               onChange={handleChange}
               placeholder="Ingrese el nombre del producto"
-              required={true}
+              required
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* SKU */}
               <FormInput
                 label="SKU"
                 id="sku"
                 name="sku"
                 value={form.sku}
                 onChange={handleChange}
-                placeholder="Ingrese el código SKU del producto"
-                required={true}
+                placeholder="Ingrese el código SKU"
+                required
               />
 
-              {/* Price Fields */}
-              {priceFields.map((field) => (
+              {priceFields.map(field => (
                 <FormInput
                   key={field.name}
-                  label={field.label}
-                  id={field.name}
-                  name={field.name}
+                  {...field}
                   value={form[field.name]}
                   onChange={handleChange}
-                  type={field.type}
-                  step={field.step}
-                  placeholder={field.placeholder}
-                  className={field.className}
                 />
               ))}
 
-              {/* Shipping and Technical Support */}
-              <FormInput
-                label="Envío"
-                id="envio"
-                name="envio"
-                value={form.envio}
-                onChange={handleChange}
-                placeholder="Información de envío"
-              />
-
-              <FormInput
-                label="Soporte Técnico"
-                id="soporte_tecnico"
-                name="soporte_tecnico"
-                value={form.soporte_tecnico}
-                onChange={handleChange}
-                placeholder="Información de soporte técnico"
-              />
-
-              {/* Categories section */}
-              <div className="mb-4 col-span-2">
-                <CategorySelect
-                  categorias={categorias}
-                  selectedCategory={selectedCategory}
-                  handleCategoryChange={handleCategoryChange}
-                />
-
-                <SubcategorySelect
-                  filteredSubcategorias={filteredSubcategorias}
-                  value={form.id_subcategoria}
-                  onChange={handleChange}
-                />
-
-                <BrandSelect
-                  marcas={marcas}
-                  value={form.marca_id}
-                  onChange={handleChange}
-                />
-
-                <FormInput
-                  label="País"
-                  id="pais"
-                  name="pais"
-                  value={form.pais}
-                  onChange={handleChange}
-                  placeholder="Ingrese el país de origen"
-                />
-              </div>
-
-              {/* Video Input */}
-              <VideoInput
-                value={form.video}
-                onChange={handleChange}
-              />
-
-              {/* Technical Specifications */}
-              <EspecificacionesTecnicas
-                ref={especificacionesRef}
-                form={form}
-                setForm={setForm}
-                tableStyles={tableStyles}
-              />
-
-              {/* Feature buttons */}
-              <FeaturesButton
-                label="Características"
-                value={form.caracteristicas}
-                onClick={() => toggleModal('caracteristicas')}
-              />
-
-              <FeaturesButton
-                label="Datos Técnicos"
-                value={form.datos_tecnicos}
-                onClick={() => toggleModal('datos_tecnicos')}
-              />
-
-              {/* Description */}
-              <FormTextarea
-                label="Descripción"
-                id="descripcion"
-                name="descripcion"
-                value={form.descripcion}
-                onChange={handleChange}
-                placeholder="Ingrese una descripción detallada del producto"
-              />
+              <VideoInput value={form.video} onChange={handleChange} />
             </div>
-
-            {/* Submit button */}
-            <button
-              type="submit"
-              className="mt-4 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 w-full"
-            >
-              Guardar Producto
-            </button>
-          </form>
-        </div>
-      </div>
-
-      {/* Add this before the Modal */}
-      <div className="mt-8">
-        {/* Main content area */}
-        <div className="mb-6">
-          {renderTabContent()}
+          </div>
         </div>
 
-        {/* Tabs navigation */}
-        <div className="flex justify-center border-t border-gray-200 bg-white shadow-md rounded-md">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-3 text-sm font-medium transition-colors duration-150 ease-in-out flex-1 text-center
-                ${activeTab === tab.id
-                  ? 'text-blue-600 border-t-2 border-blue-600 -mt-px'
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div className="mt-8 bg-white shadow-md rounded-lg p-6">
+          <div className="flex overflow-x-auto border-b border-gray-200">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-3 text-sm font-medium transition-colors duration-150 ease-in-out whitespace-nowrap
+                  ${activeTab === tab.id 
+                    ? 'text-blue-600 border-b-2 border-blue-600' 
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          
+          <div className="p-4">
+            {renderTabContent()}
+          </div>
         </div>
-      </div>
 
-      {/* Modal */}
+        <div className="mt-6 text-right">
+          <button
+            type="submit"
+            className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
+          >
+            Guardar Producto
+          </button>
+        </div>
+      </form>
+
       {modalVisible && (
         <Modal_Features
           product={form}
           type={modalType}
           onSave={saveModalData}
-          onClose={() => toggleModal()}
+          onClose={toggleModal}
         />
       )}
     </div>
