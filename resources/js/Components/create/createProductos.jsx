@@ -4,6 +4,89 @@ import EspecificacionesTecnicas from './assets/especificacionesTecnicas';
 
 const URL_API = import.meta.env.VITE_API_URL;
 
+// Category Select Component
+const CategorySelect = ({ categorias, selectedCategory, handleCategoryChange }) => (
+  <div className="mb-4">
+    <label htmlFor="categoria" className="block text-sm font-medium text-gray-700">
+      Categoría
+    </label>
+    <select
+      id="categoria"
+      name="categoria"
+      value={selectedCategory}
+      onChange={handleCategoryChange}
+      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+    >
+      <option value="">Seleccione una categoría</option>
+      {categorias.map(({ id_categoria, nombre }) => (
+        <option key={id_categoria} value={id_categoria}>{nombre}</option>
+      ))}
+    </select>
+  </div>
+);
+
+// Subcategory Select Component
+const SubcategorySelect = ({ filteredSubcategorias, form, handleChange }) => (
+  <div className="mb-4">
+    <label htmlFor="id_subcategoria" className="block text-sm font-medium text-gray-700">
+      Subcategoría
+    </label>
+    <select
+      id="id_subcategoria"
+      name="id_subcategoria"
+      value={form.id_subcategoria}
+      onChange={handleChange}
+      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      required
+    >
+      <option value="">Seleccione una subcategoría</option>
+      {filteredSubcategorias.map(({ id_subcategoria, nombre }) => (
+        <option key={id_subcategoria} value={id_subcategoria}>{nombre}</option>
+      ))}
+    </select>
+  </div>
+);
+
+// Brand Select Component
+const BrandSelect = ({ marcas, form, handleChange }) => (
+  <div className="mb-4">
+    <label htmlFor="marca_id" className="block text-sm font-medium text-gray-700">
+      Marca
+    </label>
+    <select
+      id="marca_id"
+      name="marca_id"
+      value={form.marca_id}
+      onChange={handleChange}
+      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+      required
+    >
+      <option value="">Seleccione una marca</option>
+      {marcas.map(({ id_marca, nombre }) => (
+        <option key={id_marca} value={id_marca}>{nombre}</option>
+      ))}
+    </select>
+  </div>
+);
+
+// Country Input Component
+const CountryInput = ({ form, handleChange }) => (
+  <div className="mb-4">
+    <label htmlFor="pais" className="block text-sm font-medium text-gray-700">
+      País
+    </label>
+    <input
+      type="text"
+      id="pais"
+      name="pais"
+      value={form.pais}
+      onChange={handleChange}
+      placeholder="Ingrese el país de origen"
+      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+    />
+  </div>
+);
+
 const Productos = ({ onSubmit }) => {
   const especificacionesRef = useRef();
   const initialForm = {
@@ -163,48 +246,14 @@ const Productos = ({ onSubmit }) => {
     seccion: { marginBottom: '20px', position: 'relative' }
   };
 
-  // Form field definitions
-  // Update in formFields array - remove the video field
-  const formFields = [
-      { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
-      { label: "SKU", name: "sku", type: "text", placeholder: "Ingrese el código SKU del producto", required: true },
-      { label: "Precio IGV", name: "precio_igv", type: "number", step: "0.01", placeholder: "0.00" },
-      { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
-      {
-        label: "Categoría",
-        name: "categoria",
-        type: "select",
-        options: categorias.map(({ id_categoria, nombre }) => ({
-          value: id_categoria,
-          label: nombre
-        })),
-        placeholder: "Seleccione una categoría"
-      },
-      {
-        label: "Subcategoría",
-        name: "id_subcategoria",
-        type: "select",
-        options: filteredSubcategorias.map(({ id_subcategoria, nombre }) => ({
-          value: id_subcategoria,
-          label: nombre
-        })),
-        placeholder: "Seleccione una subcategoría",
-        required: true
-      },
-      {
-        label: "Marca",
-        name: "marca_id",
-        type: "select",
-        options: marcas.map(({ id_marca, nombre }) => ({
-          value: id_marca,
-          label: nombre
-        })),
-        placeholder: "Seleccione una marca",
-        required: true
-      },
-      { label: "País", name: "pais", type: "text", placeholder: "Ingrese el país de origen" },
-      { label: "Envío", name: "envio", type: "text", placeholder: "Información de envío" },
-      { label: "Soporte Técnico", name: "soporte_tecnico", type: "text", placeholder: "Información de soporte técnico" }
+  // Form field definitions for other fields (keeping those that are not going to be individual components)
+  const remainingFormFields = [
+    { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
+    { label: "SKU", name: "sku", type: "text", placeholder: "Ingrese el código SKU del producto", required: true },
+    { label: "Precio IGV", name: "precio_igv", type: "number", step: "0.01", placeholder: "0.00" },
+    { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
+    { label: "Envío", name: "envio", type: "text", placeholder: "Información de envío" },
+    { label: "Soporte Técnico", name: "soporte_tecnico", type: "text", placeholder: "Información de soporte técnico" }
   ];
 
   return (
@@ -269,40 +318,51 @@ const Productos = ({ onSubmit }) => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {formFields.map(({ label, name, type, options, step, placeholder, required }) => (
+              {/* Other form fields */}
+              {remainingFormFields.map(({ label, name, type, step, placeholder, required }) => (
                 <div key={name} className="mb-4">
                   <label htmlFor={name} className="block text-sm font-medium text-gray-700">
                     {label}
                   </label>
-                  {type === "select" ? (
-                    <select
-                      id={name}
-                      name={name}
-                      value={name === "categoria" ? selectedCategory : form[name]}
-                      onChange={name === "categoria" ? handleCategoryChange : handleChange}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                      required={required}
-                    >
-                      <option value="">{placeholder}</option>
-                      {options?.map(({ value, label }) => (
-                        <option key={value} value={value}>{label}</option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type={type}
-                      id={name}
-                      name={name}
-                      value={form[name]}
-                      onChange={handleChange}
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                      step={step}
-                      placeholder={placeholder}
-                      required={required}
-                    />
-                  )}
+                  <input
+                    type={type}
+                    id={name}
+                    name={name}
+                    value={form[name]}
+                    onChange={handleChange}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    step={step}
+                    placeholder={placeholder}
+                    required={required}
+                  />
                 </div>
               ))}
+
+              {/* Custom field components */}
+              <div className="mb-4 col-span-2">
+                <CategorySelect 
+                  categorias={categorias} 
+                  selectedCategory={selectedCategory} 
+                  handleCategoryChange={handleCategoryChange} 
+                />
+                
+                <SubcategorySelect 
+                  filteredSubcategorias={filteredSubcategorias} 
+                  form={form} 
+                  handleChange={handleChange} 
+                />
+                
+                <BrandSelect 
+                  marcas={marcas} 
+                  form={form} 
+                  handleChange={handleChange} 
+                />
+                
+                <CountryInput 
+                  form={form} 
+                  handleChange={handleChange} 
+                />
+              </div>
 
               {/* Add the video input here, before EspecificacionesTecnicas */}
               <div className="mb-4 col-span-2">
