@@ -164,52 +164,52 @@ const Productos = ({ onSubmit }) => {
   };
 
   // Form field definitions
+  // Update in formFields array - remove the video field
   const formFields = [
-    { label: "SKU", name: "sku", type: "text", placeholder: "Ingrese el código SKU del producto", required: true },
-    { label: "Nombre", name: "nombre", type: "text", placeholder: "Ingrese el nombre del producto", required: true },
-    {
-      label: "Categoría",
-      name: "categoria",
-      type: "select",
-      options: categorias.map(({ id_categoria, nombre }) => ({
-        value: id_categoria,
-        label: nombre
-      })),
-      placeholder: "Seleccione una categoría"
-    },
-    {
-      label: "Subcategoría",
-      name: "id_subcategoria",
-      type: "select",
-      options: filteredSubcategorias.map(({ id_subcategoria, nombre }) => ({
-        value: id_subcategoria,
-        label: nombre
-      })),
-      placeholder: "Seleccione una subcategoría",
-      required: true
-    },
-    {
-      label: "Marca",
-      name: "marca_id",
-      type: "select",
-      options: marcas.map(({ id_marca, nombre }) => ({
-        value: id_marca,
-        label: nombre
-      })),
-      placeholder: "Seleccione una marca",
-      required: true
-    },
-    { label: "País", name: "pais", type: "text", placeholder: "Ingrese el país de origen" },
-    { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
-    { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
-    { label: "Precio IGV", name: "precio_igv", type: "number", step: "0.01", placeholder: "0.00" },
-    { label: "Video", name: "video", type: "text", placeholder: "URL del video del producto" },
-    { label: "Envío", name: "envio", type: "text", placeholder: "Información de envío" },
-    { label: "Soporte Técnico", name: "soporte_tecnico", type: "text", placeholder: "Información de soporte técnico" },
+      { label: "SKU", name: "sku", type: "text", placeholder: "Ingrese el código SKU del producto", required: true },
+      { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
+      { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01", placeholder: "0.00" },
+      { label: "Precio IGV", name: "precio_igv", type: "number", step: "0.01", placeholder: "0.00" },
+      {
+        label: "Categoría",
+        name: "categoria",
+        type: "select",
+        options: categorias.map(({ id_categoria, nombre }) => ({
+          value: id_categoria,
+          label: nombre
+        })),
+        placeholder: "Seleccione una categoría"
+      },
+      {
+        label: "Subcategoría",
+        name: "id_subcategoria",
+        type: "select",
+        options: filteredSubcategorias.map(({ id_subcategoria, nombre }) => ({
+          value: id_subcategoria,
+          label: nombre
+        })),
+        placeholder: "Seleccione una subcategoría",
+        required: true
+      },
+      {
+        label: "Marca",
+        name: "marca_id",
+        type: "select",
+        options: marcas.map(({ id_marca, nombre }) => ({
+          value: id_marca,
+          label: nombre
+        })),
+        placeholder: "Seleccione una marca",
+        required: true
+      },
+      { label: "País", name: "pais", type: "text", placeholder: "Ingrese el país de origen" },
+      { label: "Envío", name: "envio", type: "text", placeholder: "Información de envío" },
+      { label: "Soporte Técnico", name: "soporte_tecnico", type: "text", placeholder: "Información de soporte técnico" }
   ];
 
   return (
     <div className="container mx-auto px-4 py-6">
+      <h1 className="text-2xl font-bold mb-4 text-center lg:text-left">Crear Producto</h1>
       <div className="flex flex-col lg:flex-row bg-white shadow-md rounded-lg p-6 mb-8 w-full">
         {/* Left side: Product Image */}
         <div className="w-full lg:w-1/2 lg:pr-6 mb-6 lg:mb-0">
@@ -246,11 +246,28 @@ const Productos = ({ onSubmit }) => {
             {form.imagen && <p className="mt-1 text-sm text-gray-500 text-center">{form.imagen.name}</p>}
           </div>
         </div>
+          
 
         {/* Right side: Product Details Form */}
         <div className="w-full lg:w-1/2 lg:pl-6">
-          <h1 className="text-2xl font-bold mb-4 text-center lg:text-left">Crear Producto</h1>
           <form onSubmit={handleSubmit}>
+            {/* Name field - full width */}
+            <div className="mb-4">
+              <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
+                Nombre
+              </label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                value={form.nombre}
+                onChange={handleChange}
+                placeholder="Ingrese el nombre del producto"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                required
+              />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {formFields.map(({ label, name, type, options, step, placeholder, required }) => (
                 <div key={name} className="mb-4">
@@ -286,6 +303,36 @@ const Productos = ({ onSubmit }) => {
                   )}
                 </div>
               ))}
+
+              {/* Add the video input here, before EspecificacionesTecnicas */}
+              <div className="mb-4 col-span-2">
+                <label htmlFor="video" className="block text-sm font-medium text-gray-700">
+                  Video del Producto
+                </label>
+                <div className="mt-1">
+                  <input
+                    type="text"
+                    id="video"
+                    name="video"
+                    value={form.video}
+                    onChange={handleChange}
+                    placeholder="URL del video de YouTube (ej: https://www.youtube.com/watch?v=...)"
+                    className="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                </div>
+                {form.video && (
+                  <div className="mt-2 aspect-video w-full">
+                    <iframe
+                      src={form.video.includes('youtube') ? form.video.replace('watch?v=', 'embed/') : form.video}
+                      className="w-full h-[300px] rounded-md"
+                      title="Product Video"
+                      allowFullScreen
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    />
+                  </div>
+                )}
+              </div>
 
               <EspecificacionesTecnicas
                 ref={especificacionesRef}

@@ -11,7 +11,7 @@ const CrearProducto = () => {
     const [crearCategoria, setCrearCategoria] = useState(false);
     const [crearSubcategoria, setCrearSubcategoria] = useState(false);
     const [crearMarca, setCrearMarca] = useState(false);
-    const [sidebarVisible, setSidebarVisible] = useState(false); // Changed to false
+    const [sidebarVisible, setSidebarVisible] = useState(window.innerWidth >= 768);
 
     const [form, setForm] = useState({
         sku: "",
@@ -62,16 +62,17 @@ const CrearProducto = () => {
             <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row">
                 <Head title="Crear" />
                 
-                {/* Updated toggle button */}
                 <button
-                    className="fixed top-4 left-4 z-20 bg-blue-500 text-white p-2 rounded-md shadow-md hover:bg-blue-600"
+                    className="fixed top-4 left-4 z-20 bg-blue-500 text-white p-2 rounded-md shadow-md hover:bg-blue-600 md:hidden"
                     onClick={() => setSidebarVisible(!sidebarVisible)}
                 >
                     {sidebarVisible ? '←' : '→'}
                 </button>
                 
-                <div className={`${sidebarVisible ? 'block' : 'hidden'} 
-                    w-full md:w-1/4 bg-blue-50 border-r border-blue-200 p-4 min-h-screen`}>
+                <div className={`${
+                    sidebarVisible ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+                } transition-transform duration-300 fixed md:static
+                    w-64 bg-blue-50 border-r border-blue-200 p-4 h-screen z-10`}>
                     <div className="mb-8">
                         <Link href="/"> 
                             <img
@@ -109,7 +110,7 @@ const CrearProducto = () => {
                         </button>
                     </div>
                 </div>
-                <div className="w-full md:w-3/4 p-4">
+                <div className="w-full p-4">
                     <div className={crearProducto ? "block" : "hidden"}>
                         <Productos onSubmit={handleSubmit} />
                     </div>
