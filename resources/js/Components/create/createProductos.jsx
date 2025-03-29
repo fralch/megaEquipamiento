@@ -4,6 +4,51 @@ import EspecificacionesTecnicas from './assets/especificacionesTecnicas';
 
 const URL_API = import.meta.env.VITE_API_URL;
 
+// Add this before the Form components
+const initialForm = {
+  sku: "",
+  nombre: "",
+  id_subcategoria: "",
+  marca_id: "",
+  pais: "",
+  precio_sin_ganancia: "",
+  precio_ganancia: "",
+  precio_igv: "",
+  imagen: null,
+  descripcion: "",
+  video: "",
+  envio: "",
+  soporte_tecnico: "",
+  caracteristicas: {},
+  datos_tecnicos: {},
+  especificaciones_tecnicas: "",
+};
+
+// Define priceFields
+const priceFields = [
+  {
+    label: "Precio sin Ganancia",
+    name: "precio_sin_ganancia",
+    type: "number",
+    step: "0.01",
+    placeholder: "Ingrese el precio sin ganancia",
+  },
+  {
+    label: "Precio con Ganancia",
+    name: "precio_ganancia",
+    type: "number",
+    step: "0.01",
+    placeholder: "Ingrese el precio con ganancia",
+  },
+  {
+    label: "Precio con IGV",
+    name: "precio_igv",
+    type: "number",
+    step: "0.01",
+    placeholder: "Ingrese el precio con IGV",
+  },
+];
+
 // Form components
 const FormInput = ({ label, id, name, value, onChange, type = "text", placeholder, required = false, step, className = "" }) => (
   <div className={`mb-4 ${className}`}>
@@ -138,8 +183,8 @@ const FeaturesButton = ({ label, value, onClick }) => (
       onClick={onClick}
       className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
     >
-      {Object.keys(value || {}).length === 0 
-        ? `Click para agregar ${label.toLowerCase()}` 
+      {Object.keys(value || {}).length === 0
+        ? `Click para agregar ${label.toLowerCase()}`
         : JSON.stringify(value)}
     </button>
   </div>
@@ -149,9 +194,9 @@ const ImageUpload = ({ previewImage, handleImageChange, imageName }) => (
   <div className="w-full lg:w-1/2 lg:pr-6 mb-6 lg:mb-0">
     <div className="border border-gray-300 rounded-lg p-4 mb-4 flex items-center justify-center h-[300px] md:h-[400px]">
       {previewImage ? (
-        <img 
-          src={previewImage} 
-          alt="Product Preview" 
+        <img
+          src={previewImage}
+          alt="Product Preview"
           className="max-h-full max-w-full object-contain"
         />
       ) : (
@@ -191,30 +236,12 @@ const Productos = ({ onSubmit }) => {
     text: { padding: '10px', border: '1px solid #e5e7eb', borderRadius: '4px', backgroundColor: '#f9fafb', marginTop: '10px', fontSize: '14px' },
     seccion: { marginBottom: '20px', position: 'relative' }
   };
-  
-  const initialForm = {
-    sku: "",
-    nombre: "",
-    id_subcategoria: "",
-    marca_id: "",
-    pais: "",
-    precio_sin_ganancia: "",
-    precio_ganancia: "",
-    precio_igv: "",
-    imagen: null,
-    descripcion: "",
-    video: "",
-    envio: "",
-    soporte_tecnico: "",
-    caracteristicas: {},
-    datos_tecnicos: {},
-    especificaciones_tecnicas: "",
-  };
-  
-  // Refs
-  const especificacionesRef = useRef();
-  
+
+  // Add this ref
+  const especificacionesRef = useRef(null);
+
   // States
+  const [activeTab, setActiveTab] = useState('tab1');
   const [form, setForm] = useState(initialForm);
   const [categorias, setCategorias] = useState([]);
   const [subcategorias, setSubcategorias] = useState([]);
@@ -223,158 +250,126 @@ const Productos = ({ onSubmit }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
-  
-  // Fetch data on mount
-  useEffect(() => {
-    fetchInitialData();
-  }, []);
 
-  // Data fetching function
-  const fetchInitialData = async () => {
-    try {
-      const [categoriasRes, subcategoriasRes, marcasRes] = await Promise.all([
-        fetch(`${URL_API}/categorias-all`),
-        fetch(`${URL_API}/subcategoria-all`),
-        fetch(`${URL_API}/marca/all`)
-      ]);
-      
-      const [categoriasData, subcategoriasData, marcasData] = await Promise.all([
-        categoriasRes.json(),
-        subcategoriasRes.json(),
-        marcasRes.json()
-      ]);
-      
-      setCategorias(categoriasData);
-      setSubcategorias(subcategoriasData);
-      setMarcas(marcasData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
+  // Add tabs configuration
+  const tabs = [
+    { id: 'tab1', label: 'Tab 1' },
+    { id: 'tab2', label: 'Tab 2' },
+    { id: 'tab3', label: 'Tab 3' },
+    { id: 'tab4', label: 'Tab 4' },
+    { id: 'tab5', label: 'Tab 5' }
+  ];
+
+  // Add tab content render function
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'tab1':
+        return (
+          <div className="p-4 bg-white rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Tab 1 Content</h2>
+            <p>This is the content for Tab 1. You can replace this with any component you need.</p>
+          </div>
+        );
+      case 'tab2':
+        return (
+          <div className="p-4 bg-white rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Tab 2 Content</h2>
+            <p>This is the content for Tab 2. You can replace this with any component you need.</p>
+          </div>
+        );
+      case 'tab3':
+        return (
+          <div className="p-4 bg-white rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Tab 3 Content</h2>
+            <p>This is the content for Tab 3. You can replace this with any component you need.</p>
+          </div>
+        );
+      case 'tab4':
+        return (
+          <div className="p-4 bg-white rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Tab 4 Content</h2>
+            <p>This is the content for Tab 4. You can replace this with any component you need.</p>
+          </div>
+        );
+      case 'tab5':
+        return (
+          <div className="p-4 bg-white rounded-lg shadow">
+            <h2 className="text-xl font-semibold mb-4">Tab 5 Content</h2>
+            <p>This is the content for Tab 5. You can replace this with any component you need.</p>
+          </div>
+        );
+      default:
+        return null;
     }
   };
 
-  // Event handlers
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setForm(prev => ({ ...prev, imagen: file }));
-    
-    // Create image preview
+  // Define handleImageChange function
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result);
       };
       reader.readAsDataURL(file);
+      setForm({
+        ...form,
+        imagen: file,
+      });
     }
   };
 
-  const handleCategoryChange = (e) => {
-    setSelectedCategory(e.target.value);
-    setForm(prev => ({ ...prev, id_subcategoria: '' }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Save pending text in specifications
-    if (especificacionesRef.current) {
-      especificacionesRef.current.saveText();
-    }
-
-    // Create form data for submission
-    const formData = createFormData();
-
-    try {
-      await submitProductData(formData);
-    } catch (error) {
-      console.error('Error en la solicitud:', error);
-    }
-  };
-
-  // Helper functions
-  const createFormData = () => {
-    const formData = new FormData();
-    
-    Object.entries(form).forEach(([key, value]) => {
-      if (key === 'imagen' && value) {
-        formData.append(key, value);
-      } else if ((key === 'caracteristicas' || key === 'datos_tecnicos') && value) {
-        formData.append(key, JSON.stringify(value));
-      } else if (value !== null && value !== undefined) {
-        formData.append(key, value);
-      }
+  // Define handleChange function
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setForm({
+      ...form,
+      [name]: value,
     });
-
-    return formData;
   };
 
-  const submitProductData = async (formData) => {
-    const response = await fetch(`${URL_API}/product/create`, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-      },
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      console.log('Producto creado:', result);
-      alert('¡Producto creado exitosamente!');
-      resetForm();
-    } else {
-      console.error('Error al crear el producto:', response.statusText);
-    }
+  // Define handleCategoryChange function
+  const handleCategoryChange = (event) => {
+    const categoryId = event.target.value;
+    setSelectedCategory(categoryId);
+    // Aquí puedes agregar la lógica para filtrar las subcategorías según la categoría seleccionada
   };
 
-  const resetForm = () => {
-    setForm(initialForm);
-    setSelectedCategory('');
-    setPreviewImage(null);
+  // Define handleSubmit function
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onSubmit(form);
   };
 
-  // Modal handlers
+  // Define toggleModal function
   const toggleModal = (type = '') => {
     setModalType(type);
-    setModalVisible(!!type);
+    setModalVisible(!modalVisible);
   };
 
-  const saveModalData = (value) => {
-    try {
-      const jsonValue = typeof value === 'string' ? JSON.parse(value) : value;
-      setForm(prev => ({ ...prev, [modalType]: jsonValue }));
-    } catch (error) {
-      console.error('Error saving modal data:', error);
-      setForm(prev => ({ ...prev, [modalType]: {} }));
-    }
+  // Define saveModalData function
+  const saveModalData = (data) => {
+    setForm({
+      ...form,
+      [modalType]: data,
+    });
     toggleModal();
   };
 
-  // Filter subcategories based on selected category
+  // Define filteredSubcategorias
   const filteredSubcategorias = subcategorias.filter(
-    subcategory => subcategory.id_categoria === parseInt(selectedCategory)
+    (subcategoria) => subcategoria.id_categoria === selectedCategory
   );
-
-  // Form field definitions
-  const priceFields = [
-    { label: "Precio sin Ganancia", name: "precio_sin_ganancia", type: "number", step: "0.01", placeholder: "0.00", className: "" },
-    { label: "Precio Ganancia", name: "precio_ganancia", type: "number", step: "0.01", placeholder: "0.00", className: "" },
-    { label: "Precio IGV", name: "precio_igv", type: "number", step: "0.01", placeholder: "0.00", className: "" },
-  ];
 
   return (
     <div className="container mx-auto px-4 py-6">
       <h1 className="text-2xl font-bold mb-4 text-center lg:text-left">Crear Producto</h1>
       <div className="flex flex-col lg:flex-row bg-white shadow-md rounded-lg p-6 mb-8 w-full">
         {/* Left side: Product Image */}
-        <ImageUpload 
-          previewImage={previewImage} 
-          handleImageChange={handleImageChange} 
-          imageName={form.imagen?.name} 
+        <ImageUpload
+          previewImage={previewImage}
+          handleImageChange={handleImageChange}
+          imageName={form.imagen?.name}
         />
 
         {/* Right side: Product Details Form */}
@@ -390,7 +385,7 @@ const Productos = ({ onSubmit }) => {
               placeholder="Ingrese el nombre del producto"
               required={true}
             />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* SKU */}
               <FormInput
@@ -402,7 +397,7 @@ const Productos = ({ onSubmit }) => {
                 placeholder="Ingrese el código SKU del producto"
                 required={true}
               />
-              
+
               {/* Price Fields */}
               {priceFields.map((field) => (
                 <FormInput
@@ -418,7 +413,7 @@ const Productos = ({ onSubmit }) => {
                   className={field.className}
                 />
               ))}
-              
+
               {/* Shipping and Technical Support */}
               <FormInput
                 label="Envío"
@@ -428,7 +423,7 @@ const Productos = ({ onSubmit }) => {
                 onChange={handleChange}
                 placeholder="Información de envío"
               />
-              
+
               <FormInput
                 label="Soporte Técnico"
                 id="soporte_tecnico"
@@ -440,24 +435,24 @@ const Productos = ({ onSubmit }) => {
 
               {/* Categories section */}
               <div className="mb-4 col-span-2">
-                <CategorySelect 
-                  categorias={categorias} 
-                  selectedCategory={selectedCategory} 
-                  handleCategoryChange={handleCategoryChange} 
+                <CategorySelect
+                  categorias={categorias}
+                  selectedCategory={selectedCategory}
+                  handleCategoryChange={handleCategoryChange}
                 />
-                
-                <SubcategorySelect 
-                  filteredSubcategorias={filteredSubcategorias} 
-                  value={form.id_subcategoria} 
-                  onChange={handleChange} 
+
+                <SubcategorySelect
+                  filteredSubcategorias={filteredSubcategorias}
+                  value={form.id_subcategoria}
+                  onChange={handleChange}
                 />
-                
-                <BrandSelect 
-                  marcas={marcas} 
-                  value={form.marca_id} 
-                  onChange={handleChange} 
+
+                <BrandSelect
+                  marcas={marcas}
+                  value={form.marca_id}
+                  onChange={handleChange}
                 />
-                
+
                 <FormInput
                   label="País"
                   id="pais"
@@ -469,9 +464,9 @@ const Productos = ({ onSubmit }) => {
               </div>
 
               {/* Video Input */}
-              <VideoInput 
-                value={form.video} 
-                onChange={handleChange} 
+              <VideoInput
+                value={form.video}
+                onChange={handleChange}
               />
 
               {/* Technical Specifications */}
@@ -483,16 +478,16 @@ const Productos = ({ onSubmit }) => {
               />
 
               {/* Feature buttons */}
-              <FeaturesButton 
-                label="Características" 
-                value={form.caracteristicas} 
-                onClick={() => toggleModal('caracteristicas')} 
+              <FeaturesButton
+                label="Características"
+                value={form.caracteristicas}
+                onClick={() => toggleModal('caracteristicas')}
               />
-              
-              <FeaturesButton 
-                label="Datos Técnicos" 
-                value={form.datos_tecnicos} 
-                onClick={() => toggleModal('datos_tecnicos')} 
+
+              <FeaturesButton
+                label="Datos Técnicos"
+                value={form.datos_tecnicos}
+                onClick={() => toggleModal('datos_tecnicos')}
               />
 
               {/* Description */}
@@ -505,7 +500,7 @@ const Productos = ({ onSubmit }) => {
                 placeholder="Ingrese una descripción detallada del producto"
               />
             </div>
-            
+
             {/* Submit button */}
             <button
               type="submit"
@@ -514,6 +509,30 @@ const Productos = ({ onSubmit }) => {
               Guardar Producto
             </button>
           </form>
+        </div>
+      </div>
+
+      {/* Add this before the Modal */}
+      <div className="mt-8">
+        {/* Main content area */}
+        <div className="mb-6">
+          {renderTabContent()}
+        </div>
+
+        {/* Tabs navigation */}
+        <div className="flex justify-center border-t border-gray-200 bg-white shadow-md rounded-md">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-3 text-sm font-medium transition-colors duration-150 ease-in-out flex-1 text-center
+                ${activeTab === tab.id
+                  ? 'text-blue-600 border-t-2 border-blue-600 -mt-px'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
