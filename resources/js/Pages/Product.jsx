@@ -541,12 +541,14 @@ const ProductPage = ({ producto }) => {
                                 <ProductSpecifications
                                     specifications={especificacionesData}
                                 />
-                                <button
-                                    onClick={() => toggleEditMode('especificaciones_tecnicas')}
-                                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                >
-                                    {productData.especificaciones_tecnicas ? 'Editar' : 'Agregar'} especificaciones técnicas
-                                </button>
+                                {auth.user && (
+                                    <button
+                                        onClick={() => toggleEditMode('especificaciones_tecnicas')}
+                                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        {productData.especificaciones_tecnicas ? 'Editar' : 'Agregar'} especificaciones técnicas
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -592,12 +594,14 @@ const ProductPage = ({ producto }) => {
                                 ) : (
                                     <div>
                                         <p>{productData.envio}</p>
-                                        <button
-                                            onClick={() => toggleEditMode('envio')}
-                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        >
-                                            Editar contenido de envío
-                                        </button>
+                                        {auth.user && (
+                                            <button
+                                                onClick={() => toggleEditMode('envio')}
+                                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                            >
+                                                Editar contenido de envío
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -671,12 +675,14 @@ const ProductPage = ({ producto }) => {
                                 ) : (
                                     <div>
                                         <p>{productData.soporte_tecnico}</p>
-                                        <button
-                                            onClick={() => toggleEditMode('soporte_tecnico')}
-                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        >
-                                            Editar soporte técnico
-                                        </button>
+                                        {auth.user && (
+                                            <button
+                                                onClick={() => toggleEditMode('soporte_tecnico')}
+                                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                            >
+                                                Editar soporte técnico
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                             </div>
