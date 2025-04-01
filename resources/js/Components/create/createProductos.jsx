@@ -181,7 +181,7 @@ const VideoInput = ({ value, onChange }) => (
   </div>
 );
 
-const FeaturesButton = ({ label, value, onClick }) => (
+const FeaturesButton = ({ label, value, onClick, onRemoveItem }) => (
   <div className="mb-4 w-full">
     <label className="block text-sm font-medium text-gray-700">{label}</label>
     <button
@@ -189,9 +189,33 @@ const FeaturesButton = ({ label, value, onClick }) => (
       onClick={onClick}
       className="mt-1 block w-full px-4 py-2 text-left border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
     >
-      {Object.keys(value || {}).length === 0
-        ? `Click para agregar ${label.toLowerCase()}`
-        : JSON.stringify(value)}
+      {Object.keys(value || {}).length === 0 ? (
+        `Click para agregar ${label.toLowerCase()}`
+      ) : (
+        <div className="max-h-60 overflow-y-auto">
+          <ul className="list-disc pl-5">
+            {Object.entries(value).map(([key, val]) => (
+              <li key={key} className="mb-1 group flex items-center justify-between">
+                <div>
+                  <span className="font-medium">{key}:</span> {val}
+                </div>
+                {onRemoveItem && (
+                  <button 
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveItem(key);
+                    }}
+                    className="text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ×
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </button>
   </div>
 );
@@ -339,7 +363,13 @@ const Productos = ({ onSubmit }) => {
   const saveModalData = (data) => {
     try {
       const jsonValue = typeof data === 'string' ? JSON.parse(data) : data;
-      setForm(prev => ({ ...prev, [modalType]: jsonValue }));
+      setForm(prev => ({ 
+        ...prev, 
+        [modalType]: { 
+          ...prev[modalType], // Mantiene los datos existentes
+          ...jsonValue         // Agrega los nuevos datos
+        } 
+      }));
     } catch (error) {
       console.error('Error saving modal data:', error);
       setForm(prev => ({ ...prev, [modalType]: {} }));
@@ -370,10 +400,11 @@ const Productos = ({ onSubmit }) => {
       case 'tab2': // Características
         return (
           <FeaturesButton
-            label="Características"
-            value={form.caracteristicas}
-            onClick={() => toggleModal('caracteristicas')}
-          />
+          label="Características"
+          value={form.caracteristicas}
+          onClick={() => toggleModal('caracteristicas')}
+          onRemoveItem={(key) => handleRemoveFeatureItem('caracteristicas', key)}
+        />
         );
 
       case 'tab3': // Datos Técnicos
@@ -451,6 +482,14 @@ const Productos = ({ onSubmit }) => {
       default:
         return <div className="p-4">Seleccione una pestaña para ver el contenido</div>;
     }
+  };
+
+  const handleRemoveFeatureItem = (key) => {
+    setForm(prev => {
+      const newFeatures = { ...prev[modalType] };
+      delete newFeatures[key];
+      return { ...prev, [modalType]: newFeatures };
+    });
   };
 
   return (
