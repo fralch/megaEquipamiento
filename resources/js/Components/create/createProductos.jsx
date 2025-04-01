@@ -245,14 +245,20 @@ const Productos = ({ onSubmit }) => {
     const fetchData = async () => {
       try {
         const [catRes, subRes, marRes] = await Promise.all([
-          fetch(`${URL_API}/categorias`),
-          fetch(`${URL_API}/subcategorias`),
-          fetch(`${URL_API}/marcas`)
+          fetch(`${URL_API}/categorias-all`),
+          fetch(`${URL_API}/subcategoria-all`),
+          fetch(`${URL_API}/marca/all`)
         ]);
         
-        setCategorias(await catRes.json());
-        setSubcategorias(await subRes.json());
-        setMarcas(await marRes.json());
+        const [categoriasData, subcategoriasData, marcasData] = await Promise.all([
+          catRes.json(),
+          subRes.json(),
+          marRes.json()
+        ]);
+        
+        setCategorias(categoriasData);
+        setSubcategorias(subcategoriasData);
+        setMarcas(marcasData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -280,25 +286,69 @@ const Productos = ({ onSubmit }) => {
     setForm(prev => ({ ...prev, id_subcategoria: "" }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    onSubmit(form);
-    setForm(initialForm);
-    setPreviewImage(null);
+
+    // Save pending text in specifications if needed
+    if (especificacionesRef.current) {
+      especificacionesRef.current.saveText();
+    }
+
+    const formData = new FormData();
+    
+    // Add form fields to FormData
+    Object.entries(form).forEach(([key, value]) => {
+      if (key === 'imagen' && value) {
+        formData.append(key, value);
+      } else if ((key === 'caracteristicas' || key === 'datos_tecnicos') && value) {
+        formData.append(key, JSON.stringify(value));
+      } else if (value !== null && value !== undefined) {
+        formData.append(key, value);
+      }
+    });
+
+    try {
+      const response = await fetch(`${URL_API}/product/create`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Producto creado:', result);
+        alert('¡Producto creado exitosamente!');
+        setForm(initialForm);
+        setSelectedCategory('');
+        setPreviewImage(null);
+      } else {
+        console.error('Error al crear el producto:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error en la solicitud:', error);
+    }
   };
 
   const toggleModal = (type = '') => {
     setModalType(type);
-    setModalVisible(prev => !prev);
+    setModalVisible(!!type);
   };
 
   const saveModalData = (data) => {
-    setForm(prev => ({ ...prev, [modalType]: data }));
+    try {
+      const jsonValue = typeof data === 'string' ? JSON.parse(data) : data;
+      setForm(prev => ({ ...prev, [modalType]: jsonValue }));
+    } catch (error) {
+      console.error('Error saving modal data:', error);
+      setForm(prev => ({ ...prev, [modalType]: {} }));
+    }
     toggleModal();
   };
 
   const filteredSubcategorias = subcategorias.filter(
-    sub => sub.id_categoria === selectedCategory
+    sub => sub.id_categoria === parseInt(selectedCategory)
   );
 
   const renderTabContent = () => {
@@ -456,6 +506,7 @@ const Productos = ({ onSubmit }) => {
             {tabs.map(tab => (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-3 text-sm font-medium transition-colors duration-150 ease-in-out whitespace-nowrap
                   ${activeTab === tab.id 
@@ -487,7 +538,7 @@ const Productos = ({ onSubmit }) => {
           product={form}
           type={modalType}
           onSave={saveModalData}
-          onClose={toggleModal}
+          onClose={() => toggleModal()}
         />
       )}
     </div>
