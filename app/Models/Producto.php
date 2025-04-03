@@ -69,4 +69,19 @@ class Producto extends Model
     {
         return $this->belongsTo(Marca::class, 'marca_id');
     }
+    
+     // Relación de muchos a muchos con atributos adicionales
+     public function productosRelacionados()
+     {
+         return $this->belongsToMany(Producto::class, 'producto_relaciones', 'producto_id', 'relacionado_id')
+                     ->withPivot('tipo')
+                     ->withTimestamps();
+     }
+ 
+     public function relacionadosComo()
+     {
+         return $this->belongsToMany(Producto::class, 'producto_relaciones', 'relacionado_id', 'producto_id')
+                     ->withPivot('tipo')
+                     ->withTimestamps();
+     }
 }
