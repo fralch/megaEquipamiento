@@ -34,6 +34,9 @@ Route::get('/product/all-imagen', [ProductoController::class, 'getProductosImage
 Route::get('/product/show/{id}', [ProductoController::class, 'showProduct'])->name('product.show');
 Route::get('/product/image/{id}', [ProductoController::class, 'getImagenProducto'])->name('product.image');
 Route::get('/product/subcategoria/{id}', [ProductoController::class, 'getProductosSubcategoria'])->name('product.by-subcategoria');
+Route::post('/product/agregar-relacion', [ProductoController::class, 'agregarRelacion'])->name('product.agregar-relacion');
+Route::get('/product/relacion/{id}', [ProductoController::class, 'obtenerRelacionados'])->name('product.obtener-relacionados');
+
 
 // Rutas para usuarios
 Route::apiResource('usuarios', UsuarioController::class);

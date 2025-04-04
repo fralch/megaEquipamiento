@@ -158,6 +158,29 @@ class ProductoController extends Controller
         return response()->json($productos);
     }
 
-    
+    /**
+     * Add a related product relationship
+     * 
+     * Example JSON request:
+     * {
+     *    "id": 1,              // ID of the main product
+     *    "relacionado_id": 2,  // ID of the product to relate
+     *    "tipo": "similar"     // Relationship type (e.g., "similar", "complementary", etc.)
+     * }
+     */
+    public function agregarRelacion(Request $request)
+    {
+        $producto = Producto::findOrFail($request->id);
+
+        $producto->productosRelacionados()->attach($request->relacionado_id, ['tipo' => $request->tipo]);
+
+        return response()->json(['message' => 'Relación agregada correctamente']);
+    }
+
+    public function obtenerRelacionados($id)
+    {
+        $producto = Producto::with('productosRelacionados')->findOrFail($id);
+        return response()->json($producto);
+    }
     
 }

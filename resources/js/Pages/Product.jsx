@@ -949,6 +949,14 @@ const ProductPage = ({ producto }) => {
                     {/* Contenido */}
                     <div className="p-4">{renderContent()}</div>
                 </div>
+                <div className="w-full bg-white shadow-md rounded-md mt-5 p-6">
+                    <div className="flex justify-center items-center">
+                        {/* agregar boton para poner los productos relacionados */}
+                        <button className="bg-blue-500 text-white w-12 h-12 rounded-full hover:bg-blue-700 shadow-md flex items-center justify-center">
+                            <span>+</span>
+                        </button>
+                    </div>
+                </div>
             </main>
             <Footer />
         </div>
