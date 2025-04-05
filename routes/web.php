@@ -36,7 +36,7 @@ Route::get('/product/image/{id}', [ProductoController::class, 'getImagenProducto
 Route::get('/product/subcategoria/{id}', [ProductoController::class, 'getProductosSubcategoria'])->name('product.by-subcategoria');
 Route::post('/product/agregar-relacion', [ProductoController::class, 'agregarRelacion'])->name('product.agregar-relacion');
 Route::get('/product/relacion/{id}', [ProductoController::class, 'obtenerRelacionados'])->name('product.obtener-relacionados');
-
+Route::post('/productos/buscar', [ProductoController::class, 'buscarPorIniciales'])->name('productos.buscar-iniciales');
 
 // Rutas para usuarios
 Route::apiResource('usuarios', UsuarioController::class);

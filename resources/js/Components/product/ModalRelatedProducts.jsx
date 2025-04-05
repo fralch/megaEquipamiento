@@ -23,10 +23,22 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
 
         setIsLoading(true);
         try {
-            const response = await axios.get(`/api/products/search?q=${term}`);
-            setSearchResults(response.data.filter(p => p.id !== productId));
+            const response = await axios.post('/productos/buscar', {
+                producto: term
+            });
+
+            // Verifica que la respuesta sea un array
+            if (Array.isArray(response.data)) {
+                const filteredResults = response.data.filter(p => p.id_producto !== productId);
+                setSearchResults(filteredResults);
+            } else {
+                console.error('La respuesta no es un array:', response.data);
+                setSearchResults([]);
+            }
+
         } catch (error) {
-            console.error('Error al buscar productos:', error);
+            console.error('Error en la búsqueda:', error);
+            setSearchResults([]);
         } finally {
             setIsLoading(false);
         }
@@ -101,23 +113,46 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                         className="w-full border rounded px-3 py-2"
                     />
                     
-                    {isLoading && (
+                    {/* Sección de resultados de búsqueda */}
+                    {isLoading ? (
                         <div className="text-sm text-gray-500 mt-2">Buscando...</div>
-                    )}
-
-                    {searchResults.length > 0 && (
-                        <div className="mt-2 border rounded-md max-h-60 overflow-y-auto">
-                            {searchResults.map(product => (
-                                <div
-                                    key={product.id}
-                                    className="p-2 hover:bg-gray-100 cursor-pointer border-b"
-                                    onClick={() => handleAddProduct(product)}
-                                >
-                                    <div className="font-medium">{product.nombre}</div>
-                                    <div className="text-sm text-gray-600">SKU: {product.sku}</div>
+                    ) : (
+                        <>
+                            {searchResults.length > 0 ? (
+                                <div className="mt-2 border rounded-md max-h-60 overflow-y-auto">
+                                    {searchResults.map(product => (
+                                        <div
+                                            key={product.id_producto}
+                                            className="p-2 hover:bg-gray-100 cursor-pointer border-b"
+                                            onClick={() => handleAddProduct({
+                                                id: product.id_producto,
+                                                nombre: product.nombre,
+                                                sku: product.sku
+                                            })}
+                                        >
+                                            <div className="font-medium">{product.nombre}</div>
+                                            <div className="text-sm text-gray-600">
+                                                SKU: {product.sku}
+                                                {product.marca && (
+                                                    <span className="ml-2">
+                                                        | Marca: {product.marca.nombre}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="text-sm text-gray-500">
+                                                Precio: S/. {product.precio_igv}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
+                            ) : (
+                                searchTerm.length >= 2 && (
+                                    <div className="text-sm text-gray-500 mt-2">
+                                        No se encontraron resultados para "{searchTerm}"
+                                    </div>
+                                )
+                            )}
+                        </>
                     )}
                 </div>
 

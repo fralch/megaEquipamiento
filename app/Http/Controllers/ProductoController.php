@@ -182,5 +182,33 @@ class ProductoController extends Controller
         $producto = Producto::with('productosRelacionados')->findOrFail($id);
         return response()->json($producto);
     }
+
+    /**
+     * Buscar productos por iniciales
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function buscarPorIniciales(Request $request)
+    {
+        \Log::info('Búsqueda recibida:', $request->all());
+
+        $request->validate([
+            'producto' => 'required|string|min:1'
+        ]);
+
+        $producto = $request->input('producto');
+        
+        \Log::info('Buscando producto:', ['término' => $producto]);
+
+        $productos = Producto::with('marca')
+            ->where('nombre', 'LIKE', '%' . $producto . '%')
+            ->orWhere('sku', 'LIKE', '%' . $producto . '%')
+            ->get();
+
+        \Log::info('Productos encontrados:', ['count' => $productos->count()]);
+
+        return response()->json($productos);
+    }
     
 }
