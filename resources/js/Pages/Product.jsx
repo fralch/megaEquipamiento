@@ -8,7 +8,6 @@ import Footer from "../Components/home/Footer";
 import Modal_Features from "./assets/modal_features";
 import axios from "axios";
 
-
 // Importar componentes modulares
 import ProductDescription from "../Components/product/ProductDescription";
 import ProductFeatures from "../Components/product/ProductFeatures";
@@ -16,104 +15,86 @@ import ProductTechnicalData from "../Components/product/ProductTechnicalData";
 import ProductSpecifications from "../Components/product/ProductSpecifications";
 import ProductDocuments from "../Components/product/ProductDocuments";
 import ProductTabs from "../Components/product/ProductTabs";
-
+import ModalRelatedProducts from "../Components/product/ModalRelatedProducts";
 
 const ProductPage = ({ producto }) => {
     const { auth } = usePage().props;
-    const [isOpen, setIsOpen] = useState(false); // Estado para controlar si el menú está abierto vertical
-    const [activeTab, setActiveTab] = useState('descripcion'); // Estado para controlar la pestaña activa de los tabs
-    const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal para las características y datos técnicos en formato JSON
-    const [modalType, setModalType] = useState(null); // Estado para almacenar el tipo de modal (caracteristicas o datos_tecnicos)
-    const [editMode, setEditMode] = useState({}); // Estado para controlar el modo de edición de campos (descripcion, caracteristicas, datos_tecnicos, etc.)
-    const [tempInputs, setTempInputs] = useState({}); // Estado para almacenar temporalmente los inputs
+    const [isOpen, setIsOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('descripcion');
+    const [showModal, setShowModal] = useState(false);
+    const [modalType, setModalType] = useState(null);
+    const [editMode, setEditMode] = useState({});
+    const [tempInputs, setTempInputs] = useState({});
     const [contenidoTabla, setContenidoTabla] = useState({
         secciones: [],
         textoActual: ""
     });
+    const [showRelatedModal, setShowRelatedModal] = useState(false); // Estado para el modal de productos relacionados
 
     const [productData, setProductData] = useState({
         ...producto,
         caracteristicas: typeof producto.caracteristicas === 'string' ? JSON.parse(producto.caracteristicas) : producto.caracteristicas || {},
         datos_tecnicos: typeof producto.datos_tecnicos === 'string' ? JSON.parse(producto.datos_tecnicos) : producto.datos_tecnicos || {},
         descripcion: producto.descripcion || '',
-        archivos_adicionales: producto.archivos_adicionales || '', // Asegurarse que sea un array
+        archivos_adicionales: producto.archivos_adicionales || '',
         envio: producto.envio || '',
         soporte_tecnico: producto.soporte_tecnico || '',
-        especificaciones_tecnicas: producto.especificaciones_tecnicas || ''
+        especificaciones_tecnicas: producto.especificaciones_tecnicas || '',
+        relatedProducts: producto.relatedProducts || [] // Se asume que vienen desde el servidor o se inicializa con un array vacío
     });
-    console.log(productData);
-    const toggleMenu = () => { // ToggleMenu: Alternar el estado del menú vertical de categorías
-        setIsOpen(!isOpen); // Alternar el estado del menú
+
+    const toggleMenu = () => {
+        setIsOpen(!isOpen);
     };
 
-    const handleOpenModal = (type) => { // HandleOpenModal: Manejar el apertura del modal para características y datos técnicos
-        setModalType(type); // Establecer el tipo de modal
-        setShowModal(true); // Mostrar el modal
+    const handleOpenModal = (type) => {
+        setModalType(type);
+        setShowModal(true);
     };
 
-    const handleCloseModal = () => { // HandleCloseModal: Manejar el cierre del modal para características y datos técnicos
-        setShowModal(false); // Ocultar el modal
-        setModalType(null); // Restablecer el tipo de modal
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setModalType(null);
     };
 
-    /* 
-        La función toggleEditMode se utiliza para alternar el estado de edición de un campo específico en el componente. 
-        Esto significa que si un campo está en modo de edición, se desactivará, y si no lo está, se activará. Además, 
-        la función también prepara los valores temporales (tempInputs) para la edición.
-    */
-        const toggleEditMode = (field) => {
-            // Check if user is authenticated
-            if (!auth.user) {
-                alert('Debes iniciar sesión para editar este contenido.');
-                return;
-            }
-    
-            setEditMode(prev => ({
-                ...prev,
-                [field]: !prev[field]
-            }));
-    
-            setTempInputs(prev => ({
-                ...prev,
-                [field]: productData[field]
-            }));
-        };
+    const toggleEditMode = (field) => {
+        if (!auth.user) {
+            alert('Debes iniciar sesión para editar este contenido.');
+            return;
+        }
 
-    /* 
-        La función handleInputChange se utiliza para manejar los cambios en los campos de entrada (inputs) del formulario. 
-        Cuando el usuario modifica el valor de un campo, esta función actualiza el estado temporal (tempInputs) con el nuevo valor.
-    */
-    const handleInputChange = (field, value) => { // HandleInputChange: Manejar el cambio de un campo
-        setTempInputs(prev => ({ // SetTempInputs: Establecer el valor temporal del campo, por ejemplo: { descripcion: "Nueva descripción" }
+        setEditMode(prev => ({
             ...prev,
-            [field]: value // Actualizar el valor temporal del campo en otra palabras sobre escribir el valor del campo de tempInputs
+            [field]: !prev[field]
         }));
 
+        setTempInputs(prev => ({
+            ...prev,
+            [field]: productData[field]
+        }));
     };
 
-    /* 
-        La función handleSave se utiliza para guardar los cambios realizados en un campo específico. 
-        Cuando el usuario completa la edición de un campo, esta función actualiza el estado 
-        del producto (productData) con el nuevo valor y desactiva el modo de edición.
-    */
+    const handleInputChange = (field, value) => {
+        setTempInputs(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
     const handleSave = async (field) => {
         try {
-            // Update product state
             setProductData(prev => ({
                 ...prev,
                 [field]: tempInputs[field]
             }));
 
-            // Disable edit mode
             setEditMode(prev => ({
                 ...prev,
                 [field]: false
             }));
 
-            // Clear temp inputs
             setTempInputs({});
 
-            // Update product in database
             const response = await axios.post('/product/update', {
                 id_producto: producto.id_producto,
                 [field]: tempInputs[field]
@@ -125,21 +106,13 @@ const ProductPage = ({ producto }) => {
                 }
             });
 
-
-            // Completely update the product data with the server response
             if (response.data) {
                 console.log("Product updated successfully:", response.data);
                 setProductData(response.data);
             }
-
-            // Optionally, show a success toast or notification
-            // toast.success('Campo actualizado correctamente');
         } catch (error) {
             console.error("Error updating product:", error);
-            // Optionally, show an error toast
-            // toast.error('No se pudo actualizar el campo');
 
-            // Revert the local state changes if the server update fails
             setProductData(prev => ({
                 ...prev,
                 [field]: producto[field]
@@ -151,31 +124,24 @@ const ProductPage = ({ producto }) => {
         }
     };
 
-    /* 
-        La función handleSaveFeatures se utiliza para guardar los cambios realizados en los campos de características y datos técnicos. 
-        Cuando el usuario completa la edición de los campos, esta función actualiza el estado 
-        del producto (productData) con el nuevo valor y desactiva el modo de edición.
-        ESTA FUNCIÓN ES PRINCIPALMENTE PARA CARACTERÍSTICAS Y DATOS TÉCNICOS
-    */
-    const handleSaveFeatures = async (jsonData) => { // HandleSaveFeatures: Guardar los cambios realizados en los campos de características y datos técnicos
+    const handleSaveFeatures = async (jsonData) => {
         try {
-            const parsedData = JSON.parse(jsonData); // Analizar los datos JSON
+            const parsedData = JSON.parse(jsonData);
 
-            if (modalType === 'caracteristicas') { // Si el tipo de modal es características
+            if (modalType === 'caracteristicas') {
                 setProductData(prevData => ({
                     ...prevData,
-                    caracteristicas: parsedData // Actualizar las características del producto 
+                    caracteristicas: parsedData
                 }));
                 console.log("caracteristicas", parsedData);
-            } else if (modalType === 'datos_tecnicos') { // Si el tipo de modal es datos técnicos
+            } else if (modalType === 'datos_tecnicos') {
                 setProductData(prevData => ({
                     ...prevData,
-                    datos_tecnicos: parsedData // Actualizar los datos técnicos del producto
+                    datos_tecnicos: parsedData
                 }));
                 console.log("datos_tecnicos", parsedData);
             }
 
-            // Update product in database
             try {
                 const response = await axios.post('/product/update', {
                     id_producto: producto.id_producto,
@@ -189,51 +155,37 @@ const ProductPage = ({ producto }) => {
                 });
 
                 console.log("Product updated successfully:", response.data);
-                // actualizar el producto
                 setProductData(response.data);
             } catch (error) {
                 console.error("Error updating product:", error);
             }
 
-            handleCloseModal(); // Cerrar el modal después de guardar
+            handleCloseModal();
         } catch (error) {
-            console.error("Error parsing data:", error); // Manejar errores de análisis
+            console.error("Error parsing data:", error);
         }
     };
 
-    /* 
-        La función handleTabChange se utiliza para cambiar la pestaña activa. 
-        Cuando el usuario selecciona una pestaña, esta función actualiza el estado 
-        de la pestaña activa (activeTab) con el ID de la pestaña seleccionada.
-    */
     const handleTabChange = (tabId) => {
-        setActiveTab(tabId); // Cambiar la pestaña activa
+        setActiveTab(tabId);
     };
 
-    /* 
-        La función parseEspecificacionesTecnicas se utiliza para analizar y convertir 
-        los datos de especificaciones técnicas en un formato JSON válido. 
-        Si los datos ya son un objeto, se retorna directamente. 
-        Si los datos son una cadena JSON, se analiza y se retorna el objeto resultante.
-    */
     const parseEspecificacionesTecnicas = (data) => {
-        if (!data) return null; // Si no hay datos, retornar null
+        if (!data) return null;
 
         try {
-            // Manejar el caso en que los datos ya sean un objeto
             if (typeof data === 'object') return data;
 
-            // Analizar la cadena JSON
             const parsed = JSON.parse(data);
             return parsed;
         } catch (error) {
-            console.error("Error parsing especificaciones_tecnicas:", error); // Manejar errores de análisis
+            console.error("Error parsing especificaciones_tecnicas:", error);
             return null;
         }
     };
 
     const especificacionesData = parseEspecificacionesTecnicas(productData.especificaciones_tecnicas);
-    console.log("Especificaciones Data:", especificacionesData); // Imprimir las especificaciones técnicas en la consola
+    console.log("Especificaciones Data:", especificacionesData);
 
     const tabs = [
         { id: 'descripcion', label: 'Descripción' },
@@ -245,7 +197,6 @@ const ProductPage = ({ producto }) => {
         { id: 'soporte', label: 'Soporte Técnico' },
     ];
 
-    // Guardar texto pendiente cuando el componente se desmonta
     useEffect(() => {
         const handleBeforeUnload = () => {
             if (contenidoTabla.textoActual?.trim()) {
@@ -257,7 +208,6 @@ const ProductPage = ({ producto }) => {
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [contenidoTabla.textoActual]);
 
-    // Inicializar con el valor existente
     useEffect(() => {
         if (!productData.especificaciones_tecnicas) return;
 
@@ -285,7 +235,6 @@ const ProductPage = ({ producto }) => {
         }
     }, [productData.especificaciones_tecnicas]);
 
-    // Manejadores de eventos
     const handleTablaPaste = (event) => {
         event.preventDefault();
         const textoPegado = event.clipboardData.getData('text');
@@ -299,7 +248,6 @@ const ProductPage = ({ producto }) => {
         }));
     };
 
-    // Procesar y añadir contenido a las secciones
     const processTableContent = (texto) => {
         if (!texto.trim()) return;
 
@@ -331,7 +279,7 @@ const ProductPage = ({ producto }) => {
         };
 
         updateContent([...contenidoTabla.secciones, nuevaSeccion], "");
-        handleSave('especificaciones_tecnicas'); // Notificar al padre que el texto ha sido guardado
+        handleSave('especificaciones_tecnicas');
     };
 
     const updateContent = async (secciones, textoActual) => {
@@ -359,15 +307,11 @@ const ProductPage = ({ producto }) => {
             });
 
             console.log("Especificaciones de tecnicas enviadas a servidor:", response.data);
-            // actualizar el producto
             setProductData(response.data);
-            // limpiar edit mode
             setEditMode(prev => ({
                 ...prev,
                 especificaciones_tecnicas: false
             }));
-
-
         } catch (error) {
             console.error("Error enviando especificaciones de tecnicas al servidor:", error);
         }
@@ -382,7 +326,6 @@ const ProductPage = ({ producto }) => {
         updateContent(nuevasSecciones, contenidoTabla.textoActual);
     };
 
-    // Renderizar componentes
     const renderTabla = (seccion) => (
         <table style={{ width: '100%' }} className="border-collapse border border-gray-300">
             <thead>
@@ -457,7 +400,6 @@ const ProductPage = ({ producto }) => {
                                         También puedes ingresar texto simple y combinar múltiples tablas y textos.
                                     </div>
 
-                                    {/* Input para nuevo contenido */}
                                     <div className="mb-2">
                                         <textarea
                                             onPaste={handleTablaPaste}
@@ -490,14 +432,12 @@ const ProductPage = ({ producto }) => {
                                         </div>
                                     </div>
 
-                                    {/* Mostrar secciones existentes */}
                                     {contenidoTabla.secciones.length > 0 && (
                                         <div className="mb-4">
                                             <h3 className="text-sm font-medium text-gray-700 mb-2">Contenido actual:</h3>
 
                                             {contenidoTabla.secciones.map((seccion, index) => (
                                                 <div key={index} style={{ marginBottom: '1rem' }} className="mb-6 border-b pb-4 pt-2">
-                                                    {/* Encabezado de la sección */}
                                                     <div className="flex justify-between items-center mb-2">
                                                         <h4 className="text-sm font-medium text-gray-700">
                                                             Sección {index + 1}: {seccion.tipo === 'tabla' ? 'Tabla' : 'Texto'}
@@ -511,7 +451,6 @@ const ProductPage = ({ producto }) => {
                                                         </button>
                                                     </div>
 
-                                                    {/* Contenido basado en el tipo */}
                                                     {seccion.tipo === 'tabla'
                                                         ? renderTabla(seccion)
                                                         : renderTexto(seccion)
@@ -751,16 +690,23 @@ const ProductPage = ({ producto }) => {
                 />
             )}
 
-            {/* Contenido principal */}
+            {/* Modal para productos relacionados */}
+            {showRelatedModal && (
+                <ModalRelatedProducts
+                    initialRelated={productData.relatedProducts}
+                    onSave={(related) => {
+                        setProductData(prev => ({ ...prev, relatedProducts: related }));
+                        setShowRelatedModal(false);
+                    }}
+                    onClose={() => setShowRelatedModal(false)}
+                />
+            )}
+
             <main className="p-6">
-                {/* Sección del producto */}
                 <section className="grid md:grid-cols-2 gap-8">
-                    {/* Imagen del producto */}
                     <ZoomImage imageSrc={producto.imagen.startsWith('http') ? producto.imagen : `/${producto.imagen}`} />
 
-                    {/* Detalles del producto */}
                     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-                        {/* Encabezado */}
                         <div className="flex flex-col space-y-4">
                             <div>
                                 {editMode.nombre ? (
@@ -913,7 +859,6 @@ const ProductPage = ({ producto }) => {
                             </div>
                         </div>
 
-                        {/* Botones */}
                         <div className="flex items-center space-x-4 mt-6">
                             <button className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 shadow-md">
                                 Agregar al carrito
@@ -926,7 +871,6 @@ const ProductPage = ({ producto }) => {
                             </button>
                         </div>
 
-                        {/* Video del producto */}
                         {producto.video && (
                             <div className="mt-6">
                                 <iframe
@@ -946,13 +890,14 @@ const ProductPage = ({ producto }) => {
                         handleTabChange={handleTabChange}
                     />
 
-                    {/* Contenido */}
                     <div className="p-4">{renderContent()}</div>
                 </div>
                 <div className="w-full bg-white shadow-md rounded-md mt-5 p-6">
                     <div className="flex justify-center items-center">
-                        {/* agregar boton para poner los productos relacionados */}
-                        <button className="bg-blue-500 text-white w-12 h-12 rounded-full hover:bg-blue-700 shadow-md flex items-center justify-center">
+                        <button
+                            onClick={() => setShowRelatedModal(true)}
+                            className="bg-blue-500 text-white w-12 h-12 rounded-full hover:bg-blue-700 shadow-md flex items-center justify-center"
+                        >
                             <span>+</span>
                         </button>
                     </div>
