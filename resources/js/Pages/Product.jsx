@@ -16,6 +16,7 @@ import ProductSpecifications from "../Components/product/ProductSpecifications";
 import ProductDocuments from "../Components/product/ProductDocuments";
 import ProductTabs from "../Components/product/ProductTabs";
 import ModalRelatedProducts from "../Components/product/ModalRelatedProducts";
+import RelatedProducts from "../Components/product/RelatedProducts";
 
 const ProductPage = ({ producto }) => {
     const { auth } = usePage().props;
@@ -892,6 +893,22 @@ const ProductPage = ({ producto }) => {
                     />
 
                     <div className="p-4">{renderContent()}</div>
+                </div>
+               
+                <div className="w-full bg-white shadow-md rounded-md mt-5 p-6">
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-semibold"></h2>
+                        {auth.user && (
+                            <button
+                                onClick={() => setShowRelatedModal(true)}
+                                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 shadow-md flex items-center justify-center"
+                            >
+                                <span className="mr-2">+</span> Gestionar Relacionados
+                            </button>
+                        )}
+                    </div>
+                    
+                    <RelatedProducts productId={producto.id_producto} />
                 </div>
                 <div className="w-full bg-white shadow-md rounded-md mt-5 p-6">
                     <div className="flex justify-center items-center">
