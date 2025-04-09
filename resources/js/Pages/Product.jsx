@@ -895,7 +895,9 @@ const ProductPage = ({ producto }) => {
                     <div className="p-4">{renderContent()}</div>
                 </div>
                
-                <div className="w-full bg-white shadow-md rounded-md mt-5 p-6">
+               {
+                /* 
+                 <div className="w-full bg-white shadow-md rounded-md mt-5 p-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl font-semibold"></h2>
                         {auth.user && (
@@ -910,16 +912,24 @@ const ProductPage = ({ producto }) => {
                     
                     <RelatedProducts productId={producto.id_producto} />
                 </div>
-                <div className="w-full bg-white shadow-md rounded-md mt-5 p-6">
+                */
+               }
+               
+                 <div className="w-full bg-white shadow-md rounded-md mt-5 p-6">
+                 <RelatedProducts productId={producto.id_producto} />
                     <div className="flex justify-center items-center">
-                        <button
-                            onClick={() => setShowRelatedModal(true)}
-                            className="bg-blue-500 text-white w-12 h-12 rounded-full hover:bg-blue-700 shadow-md flex items-center justify-center"
-                        >
-                            <span>+</span>
-                        </button>
+                        {auth.user && (
+                            <button
+                                onClick={() => setShowRelatedModal(true)}
+                                className="bg-blue-500 text-white w-12 h-12 rounded-full hover:bg-blue-700 shadow-md flex items-center justify-center"
+                            >
+                                <span>+</span>
+                            </button>
+                        )}
                     </div>
+                    
                 </div>
+               
             </main>
             <Footer />
         </div>
