@@ -35,7 +35,7 @@ const RelatedProducts = ({ productId }) => {
 
     const renderProductCard = (product) => (
         <div key={product.id_producto} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
-            <Link href={`/product/${product.id_producto}`}>
+            <Link href={`/producto/${product.id_producto}`}>
                 <div className="h-48 overflow-hidden">
                     <img 
                         src={product.imagen} 
