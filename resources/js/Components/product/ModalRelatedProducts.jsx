@@ -6,7 +6,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedType, setSelectedType] = useState('similar');
+    const [selectedType, setSelectedType] = useState('accesorio');
 
     const relationTypes = [
         { value: 'accesorio', label: 'Accesorio' },
@@ -54,7 +54,12 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
 
     const handleAddProduct = async (selectedProduct) => {
         try {
-            await axios.post('/api/productos/relacionar', {
+            console.log({
+                id: productId,
+                relacionado_id: selectedProduct.id,
+                tipo: selectedType
+            })
+            await axios.post('/product/agregar-relacion', {
                 id: productId,
                 relacionado_id: selectedProduct.id,
                 tipo: selectedType

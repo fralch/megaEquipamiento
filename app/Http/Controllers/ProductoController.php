@@ -180,7 +180,7 @@ class ProductoController extends Controller
     public function obtenerRelacionados($id)
     {
         $producto = Producto::with('productosRelacionados')->findOrFail($id);
-        return response()->json($producto);
+        return response()->json($producto->productosRelacionados);
     }
 
     /**

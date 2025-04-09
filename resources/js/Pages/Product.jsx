@@ -693,6 +693,7 @@ const ProductPage = ({ producto }) => {
             {/* Modal para productos relacionados */}
             {showRelatedModal && (
                 <ModalRelatedProducts
+                    productId = {productData.id_producto}
                     initialRelated={productData.relatedProducts}
                     onSave={(related) => {
                         setProductData(prev => ({ ...prev, relatedProducts: related }));
