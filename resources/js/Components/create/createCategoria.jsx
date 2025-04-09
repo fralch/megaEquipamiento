@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios"; // Add this import
 
 const Categorias = ({ onSubmit }) => {
   const [categorias, setCategorias] = useState([]);
@@ -12,14 +13,20 @@ const Categorias = ({ onSubmit }) => {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setCategorias([...categorias, form]);
-    setForm({
-      nombre: "",
-      descripcion: "",
-    });
-    onSubmit(form);
+    try {
+      const response = await axios.post('/categoria/create', form);
+      setCategorias([...categorias, response.data]);
+      setForm({
+        nombre: "",
+        descripcion: "",
+      });
+      onSubmit(response.data);
+    } catch (error) {
+      console.error('Error creating category:', error);
+      // You might want to add error handling here (e.g., showing an error message)
+    }
   };
 
   return (

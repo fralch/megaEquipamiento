@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const Subcategorias = ({ onSubmit }) => {
   const [categorias, setCategorias] = useState([]);
@@ -13,14 +14,20 @@ const Subcategorias = ({ onSubmit }) => {
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setCategorias([...categorias, form]);
-    setForm({
-      nombre: "",
-      descripcion: "",
-    });
-    onSubmit(form);
+    try {
+      const response = await axios.post('/subcategoria_post/create', form);
+      setCategorias([...categorias, response.data]);
+      setForm({
+        nombre: "",
+        descripcion: "",
+        id_categoria: "",
+      });
+      onSubmit(response.data);
+    } catch (error) {
+      console.error('Error creating subcategory:', error);
+    }
   };
 
   return (

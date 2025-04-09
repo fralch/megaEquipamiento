@@ -18,7 +18,7 @@ const Marcas = ({ onSubmit }) => {
     setForm({ ...form, imagen: file });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     const formData = new FormData();
@@ -28,20 +28,45 @@ const Marcas = ({ onSubmit }) => {
       formData.append('imagen', form.imagen);
     }
 
-    setMarcas([...marcas, {
-      nombre: form.nombre,
-      descripcion: form.descripcion,
-      imagen: form.imagen ? URL.createObjectURL(form.imagen) : ''
-    }]);
+    try {
+      const response = await fetch('/marca/create', {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+        body: formData,
+      });
 
-    setForm({
-      nombre: "",
-      descripcion: "",
-      imagen: null,
-    });
+      if (!response.ok) {
+        throw new Error('Error creating marca');
+      }
 
-    onSubmit(formData);
+      const data = await response.json();
+      
+      setMarcas([...marcas, {
+        nombre: form.nombre,
+        descripcion: form.descripcion,
+        imagen: form.imagen ? URL.createObjectURL(form.imagen) : ''
+      }]);
+
+      setForm({
+        nombre: "",
+        descripcion: "",
+        imagen: null,
+      });
+
+      // Move the onSubmit call here where formData is defined
+      onSubmit(formData);
+
+      alert('Marca created successfully!');
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
+
+  // Remove this line as it's now moved inside handleSubmit
+  // onSubmit(formData);
+  
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
@@ -128,6 +153,6 @@ const Marcas = ({ onSubmit }) => {
       </div>
     </div>
   );
-};
+}; // End of Marcas component
 
 export default Marcas;

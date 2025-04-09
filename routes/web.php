@@ -47,16 +47,20 @@ Route::get('/categorias-all', [CategoriaController::class, 'getCategorias'])->na
 Route::get('/categorias-con-subcategorias-con-id', [CategoriaController::class, 'getCategoriasConSubcategoriasConId'])->name('categorias.with-subcategorias-id');
 Route::get('/categorias-completa', [CategoriaController::class, 'getCategoriasConSubcategoriasIds'])->name('categorias.complete');
 Route::get('/categoria/{id}', [CategoriaController::class, 'getCategoriaById'])->name('categoria.show');
+Route::post('/categoria/create', [CategoriaController::class, 'store'])->name('categoria.create');
+Route::post('/categoria/update/{id}', [CategoriaController::class, 'update'])->name('categoria.update');
+Route::delete('/categoria/delete/{id}', [CategoriaController::class, 'destroy'])->name('categoria.delete');
 
 // Rutas para subcategorías
 Route::post('/subcategoria_post/create', [SubcategoriaController::class, 'store'])->name('subcategoria.create');
 Route::post('/subcategoria_post/update/{id}', [SubcategoriaController::class, 'update'])->name('subcategoria.update');
+Route::delete('/subcategoria_post/delete/{id}', [SubcategoriaController::class, 'destroy'])->name('subcategoria.delete');
 Route::get('/subcategoria-all', [SubcategoriaController::class, 'getSubcategorias'])->name('subcategoria.all');
 Route::get('/subcategoria_get/categoria/{id}', [SubcategoriaController::class, 'getSubcategoriasCategoria'])->name('subcategoria.by-categoria');
 Route::get('/subcategoria_id/{id}', [SubcategoriaController::class, 'getSubcategoriaById'])->name('subcategoria.show');
 Route::get('/subcategoria_get/cat/{id}', [SubcategoriaController::class, 'getCatBySub'])->name('subcategoria.get-categoria');
 
 // Rutas para marcas
-Route::post('/marca/create', [MarcaController::class, 'createMarca'])->name('marca.create');
-Route::post('/marca/update/{id}', [MarcaController::class, 'updateMarca'])->name('marca.update');
+Route::post('/marca/create', [MarcaController::class, 'create'])->name('marca.create');
+Route::post('/marca/update/{id}', [MarcaController::class, 'update'])->name('marca.update');
 Route::get('/marca/all', [MarcaController::class, 'getMarcas'])->name('marca.all');

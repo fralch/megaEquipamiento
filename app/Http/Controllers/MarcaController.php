@@ -17,14 +17,32 @@ class MarcaController extends Controller
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        // Prepare data for creation
+        $data = [
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+        ];
+
         if ($request->hasFile('imagen')) {
-            $imagePath = $request->file('imagen')->store('marcas', 'public');
-            $request->merge(['imagen' => $imagePath]);
+            $image = $request->file('imagen');
+            
+            // Generate unique filename with timestamp
+            $imagePath = time() . '.' . $image->getClientOriginalExtension();
+            
+            // Set destination path
+            $destinationPath = public_path('img/marcas') . '/' . $imagePath;
+            
+            // Move the uploaded file
+            if (move_uploaded_file($image->getPathname(), $destinationPath)) {
+                // Add the correct image path to the data array
+                $data['imagen'] = '/img/marcas/' . $imagePath;
+            } else {
+                return response()->json(['error' => 'Error moving the file.'], 500);
+            }
         }
 
-        $creado = Marca::create($request->all());
+        $creado = Marca::create($data);
         
-        // devolver json de la marca creada
         return response()->json($creado);     
     }
 

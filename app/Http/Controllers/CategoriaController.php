@@ -96,6 +96,13 @@ class CategoriaController extends Controller
 
          return response()->json($categoria);
     }
+    /**
+     * Eliminar una categoría y devolver el id
+     */ 
+    public function destroy($id){
+        Categoria::destroy($id);
+        return response()->json($id);
+    }
 
 
     // obtener  las categorias y las sub categorias con sus ids y sus nombres

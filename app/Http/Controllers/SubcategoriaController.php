@@ -45,6 +45,13 @@ class SubcategoriaController extends Controller
                          ->with('success', 'Subcategoría actualizada exitosamente.');
     }
 
+    
+    // eliminar una subcategoria
+    public function destroy($id){
+        Subcategoria::destroy($id);
+        return response()->json($id);
+    }
+
     // Obtener todas las subcategorías
     public function getSubcategorias(){
         $subcategorias = Subcategoria::all();
