@@ -1,13 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const Subcategorias = ({ onSubmit }) => {
   const [categorias, setCategorias] = useState([]);
+  const [categoriasOptions, setCategoriasOptions] = useState([]); // Add this state
   const [form, setForm] = useState({
     nombre: "",
     descripcion: "",
     id_categoria: "",
   });
+
+  // Add this useEffect to fetch categories
+  React.useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const response = await axios.get('/categorias-all');
+        console.log(response.data);
+        /* 
+        descripcion: null
+        id_categoria: 1
+        nombre: "Accesorios de Laboratorio"
+        */
+        setCategoriasOptions(response.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategorias();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,6 +37,7 @@ const Subcategorias = ({ onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log(form);
       const response = await axios.post('/subcategoria_post/create', form);
       setCategorias([...categorias, response.data]);
       setForm({
@@ -51,18 +72,24 @@ const Subcategorias = ({ onSubmit }) => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="id_categoria" className="block text-sm font-medium text-gray-700">
               Categoria Padre
             </label>
-            <input
-              type="text"
-              id="nombre"
-              name="nombre"
-              value={form.nombre}
+            <select
+              id="id_categoria"
+              name="id_categoria"
+              value={form.id_categoria}
               onChange={handleChange}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               required
-            />
+            >
+              <option value="">Seleccione una categoría</option>
+              {categoriasOptions.map((categoria) => (
+                <option key={categoria.id} value={categoria.id}>
+                  {categoria.nombre}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="mb-4">
