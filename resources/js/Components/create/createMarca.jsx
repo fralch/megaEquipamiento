@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Marcas = ({ onSubmit }) => {
   const [marcas, setMarcas] = useState([]);
@@ -16,6 +16,23 @@ const Marcas = ({ onSubmit }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setForm({ ...form, imagen: file });
+  };
+
+  useEffect(() => {
+    fetchMarcas();
+  }, []);
+
+  const fetchMarcas = async () => {
+    try {
+      const response = await fetch('/marca/all');
+      if (!response.ok) {
+        throw new Error('Error fetching marcas');
+      }
+      const data = await response.json();
+      setMarcas(data.reverse()); // Reverse the array to show newest first
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -43,11 +60,8 @@ const Marcas = ({ onSubmit }) => {
 
       const data = await response.json();
       
-      setMarcas([...marcas, {
-        nombre: form.nombre,
-        descripcion: form.descripcion,
-        imagen: form.imagen ? URL.createObjectURL(form.imagen) : ''
-      }]);
+      // After successful creation, fetch all marcas again
+      await fetchMarcas();
 
       setForm({
         nombre: "",
@@ -55,18 +69,12 @@ const Marcas = ({ onSubmit }) => {
         imagen: null,
       });
 
-      // Move the onSubmit call here where formData is defined
       onSubmit(formData);
-
       alert('Marca created successfully!');
     } catch (error) {
       console.error('Error:', error);
     }
   };
-
-  // Remove this line as it's now moved inside handleSubmit
-  // onSubmit(formData);
-  
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
