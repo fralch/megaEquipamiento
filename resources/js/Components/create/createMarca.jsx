@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 
 const Marcas = ({ onSubmit }) => {
   const [marcas, setMarcas] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [form, setForm] = useState({
     nombre: "",
     descripcion: "",
@@ -76,6 +78,17 @@ const Marcas = ({ onSubmit }) => {
     }
   };
 
+  // Calculate pagination values
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentMarcas = marcas.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(marcas.length / itemsPerPage);
+
+  // Add pagination controls
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
       <h1 className="text-2xl font-bold mb-4">Crear Marca</h1>
@@ -144,7 +157,7 @@ const Marcas = ({ onSubmit }) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {marcas.map((marca, index) => (
+              {currentMarcas.map((marca, index) => (
                 <tr key={index}>
                   <td className="px-6 py-4 whitespace-nowrap">{marca.nombre}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{marca.descripcion}</td>
@@ -157,6 +170,42 @@ const Marcas = ({ onSubmit }) => {
               ))}
             </tbody>
           </table>
+
+          {/* Pagination controls */}
+          <div className="flex items-center justify-between mt-4">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"
+              >
+                Anterior
+              </button>
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index + 1}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === index + 1
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-200'
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"
+              >
+                Siguiente
+              </button>
+            </div>
+            <div className="text-sm text-gray-500">
+              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, marcas.length)} of {marcas.length} entries
+            </div>
+          </div>
         </div>
       </div>
     </div>
