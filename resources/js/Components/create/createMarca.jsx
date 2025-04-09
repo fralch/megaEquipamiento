@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 
 const Marcas = ({ onSubmit }) => {
+  // Add new state for modal
+  const [previewImage, setPreviewImage] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [marcas, setMarcas] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -89,8 +92,32 @@ const Marcas = ({ onSubmit }) => {
     setCurrentPage(pageNumber);
   };
 
+  // Add modal component at the top level of the return statement
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
+      {/* Image Preview Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg max-w-2xl max-h-[90vh] overflow-auto">
+            <div className="flex justify-end mb-2">
+              <button
+                onClick={() => setShowModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="max-w-full h-auto"
+            />
+          </div>
+        </div>
+      )}
+
       <h1 className="text-2xl font-bold mb-4">Crear Marca</h1>
       <form onSubmit={handleSubmit}>
         <h2 className="text-lg font-bold mb-4">Agregar / Editar Marca</h2>
@@ -163,7 +190,15 @@ const Marcas = ({ onSubmit }) => {
                   <td className="px-6 py-4 whitespace-nowrap">{marca.descripcion}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {marca.imagen && (
-                      <img src={marca.imagen} alt={marca.nombre} className="h-10 w-10 object-cover rounded-full"/>
+                      <img
+                        src={marca.imagen}
+                        alt={marca.nombre}
+                        className="h-10 w-30 object-cover cursor-pointer"
+                        onClick={() => {
+                          setPreviewImage(marca.imagen);
+                          setShowModal(true);
+                        }}
+                      />
                     )}
                   </td>
                 </tr>
