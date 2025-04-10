@@ -7,12 +7,25 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [selectedType, setSelectedType] = useState('accesorio');
+    const [relationTypes, setRelationTypes] = useState([]);
 
-    const relationTypes = [
-        { value: 'accesorio', label: 'Accesorio' },
-        { value: 'suministro', label: 'Suministro' },
-        { value: 'otro', label: 'Otro' }
-    ];
+    // Obtener tipos de relaciones
+    useEffect(() => {
+        const fetchRelationTypes = async () => {
+            try {
+                const response = await axios.get('/tipos-relacion-productos');
+                console.log(response.data);
+                setRelationTypes(response.data);
+                if (response.data.length > 0) {
+                    setSelectedType(response.data[0].nombre);
+                }
+            } catch (error) {
+                console.error('Error al obtener tipos de relaciones:', error);
+            }
+        };
+
+        fetchRelationTypes();
+    }, []);
 
     // Búsqueda de productos
     const searchProducts = async (term) => {
@@ -59,11 +72,14 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                 relacionado_id: selectedProduct.id,
                 tipo: selectedType
             })
-            await axios.post('/product/agregar-relacion', {
+            const response = await axios.post('/product/agregar-relacion', {
                 id: productId,
                 relacionado_id: selectedProduct.id,
                 tipo: selectedType
             });
+
+            console.log(response.data);
+            
 
             setRelatedProducts(prev => [...prev, {
                 ...selectedProduct,
@@ -104,8 +120,8 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                         className="w-full border rounded px-3 py-2 mb-3"
                     >
                         {relationTypes.map(type => (
-                            <option key={type.value} value={type.value}>
-                                {type.label}
+                            <option key={type.id} value={type.nombre}>
+                                {type.nombre.charAt(0).toUpperCase() + type.nombre.slice(1)}
                             </option>
                         ))}
                     </select>

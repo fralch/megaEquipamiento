@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\SubcategoriaController;
 use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\TiposRelacionProductosController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -64,3 +65,7 @@ Route::get('/subcategoria_get/cat/{id}', [SubcategoriaController::class, 'getCat
 Route::post('/marca/create', [MarcaController::class, 'create'])->name('marca.create');
 Route::post('/marca/update/{id}', [MarcaController::class, 'update'])->name('marca.update');
 Route::get('/marca/all', [MarcaController::class, 'getMarcas'])->name('marca.all');
+
+// Rutas para tipos de relación de productos
+Route::get('/tipos-relacion-productos', [TiposRelacionProductosController::class, 'get_all'])->name('tipos-relacion-productos.all');
+Route::post('/tipos-relacion-productos', [TiposRelacionProductosController::class, 'store'])->name('tipos-relacion-productos.store');

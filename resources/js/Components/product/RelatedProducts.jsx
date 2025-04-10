@@ -4,15 +4,30 @@ import { Link } from "@inertiajs/react";
 
 const RelatedProducts = ({ productId }) => {
     const [relatedProducts, setRelatedProducts] = useState([]);
+    const [relationTypes, setRelationTypes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Group products by type
-    const groupedProducts = {
-        accesorio: relatedProducts.filter(product => product.pivot.tipo === "accesorio"),
-        suministro: relatedProducts.filter(product => product.pivot.tipo === "suministro"),
-        otro: relatedProducts.filter(product => product.pivot.tipo === "otro")
-    };
+    // Obtener tipos de relaciones y agrupar productos
+    const groupedProducts = relationTypes.reduce((acc, type) => {
+        acc[type.nombre] = relatedProducts.filter(
+            product => product.pivot.tipo === type.nombre
+        );
+        return acc;
+    }, {});
+
+    useEffect(() => {
+        const fetchRelationTypes = async () => {
+            try {
+                const response = await axios.get('/tipos-relacion-productos');
+                setRelationTypes(response.data);
+            } catch (err) {
+                console.error("Error fetching relation types:", err);
+            }
+        };
+
+        fetchRelationTypes();
+    }, []);
 
     useEffect(() => {
         const fetchRelatedProducts = async () => {
@@ -54,12 +69,14 @@ const RelatedProducts = ({ productId }) => {
         </div>
     );
 
-    const renderProductGroup = (title, products) => {
-        if (products.length === 0) return null;
+    const renderProductGroup = (type, products) => {
+        if (products?.length === 0) return null;
         
         return (
             <div className="mb-8">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">{title}</h2>
+                <h2 className="text-xl font-bold text-gray-800 mb-4">
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {products.map(product => renderProductCard(product))}
                 </div>
@@ -83,9 +100,9 @@ const RelatedProducts = ({ productId }) => {
         <div className="py-6">
             <h1 className="text-2xl font-bold text-gray-800 mb-6">Productos Relacionados</h1>
             
-            {renderProductGroup("Accesorios", groupedProducts.accesorio)}
-            {renderProductGroup("Suministros", groupedProducts.suministro)}
-            {renderProductGroup("Otros Productos", groupedProducts.otro)}
+            {relationTypes.map(type => (
+                renderProductGroup(type.nombre, groupedProducts[type.nombre])
+            ))}
         </div>
     );
 };
