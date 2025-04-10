@@ -2,30 +2,44 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const Subcategorias = ({ onSubmit }) => {
-  const [categorias, setCategorias] = useState([]);
+  const [subcategorias, setSubcategorias] = useState([]);
   const [categoriasOptions, setCategoriasOptions] = useState([]);
   const [form, setForm] = useState({
     nombre: "",
     descripcion: "",
     id_categoria: "",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  React.useEffect(() => {
-    const fetchCategorias = async () => {
-      try {
-        const response = await axios.get('/categorias-all');
-        console.log(response.data);
-        /* 
-        descripcion: null
-        id_categoria: 1
-        nombre: "Accesorios de Laboratorio"
-        */
-        setCategoriasOptions(response.data);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
+  // Function to fetch categories
+  const fetchCategorias = async () => {
+    try {
+      const response = await axios.get('/categorias-all');
+      setCategoriasOptions(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  // Function to fetch subcategories
+  const fetchSubcategorias = async () => {
+    try {
+      // Changed this endpoint to what should be the correct one for subcategories
+      const response = await axios.get('/subcategoria-all');
+      setSubcategorias(response.data);
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+    }
+  };
+
+  // Initial data fetch
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetchCategorias();
+      await fetchSubcategorias();
     };
-    fetchCategorias();
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
@@ -38,13 +52,18 @@ const Subcategorias = ({ onSubmit }) => {
     try {
       console.log(form);
       const response = await axios.post('/subcategoria_post/create', form);
-      setCategorias([...categorias, response.data]);
       setForm({
         nombre: "",
         descripcion: "",
         id_categoria: "",
       });
-      onSubmit(response.data);
+      
+      if (onSubmit) {
+        onSubmit(response.data);
+      }
+      
+      // Fetch updated list of subcategories after successful creation
+      await fetchSubcategorias();
     } catch (error) {
       console.error('Error creating subcategory:', error);
     }
@@ -112,7 +131,7 @@ const Subcategorias = ({ onSubmit }) => {
         </button>
       </form>
 
-      <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
+      <div className="bg-white shadow-md rounded-lg p-6 mt-8 w-full mx-auto">
         <h2 className="text-lg font-bold mb-4">Subcategorías Totales</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -124,17 +143,44 @@ const Subcategorias = ({ onSubmit }) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {categorias.map((subcategoria, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap">{subcategoria.nombre}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{subcategoria.descripcion}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {categoriasOptions.find(cat => cat.id_categoria === subcategoria.id_categoria)?.nombre || ''}
-                  </td>
-                </tr>
+              {[...subcategorias]
+                .reverse()
+                .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                .map((subcategoria, index) => (
+                  <tr key={index}>
+                    <td className="px-6 py-4 whitespace-nowrap">{subcategoria.nombre}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{subcategoria.descripcion}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {categoriasOptions.find(cat => cat.id_categoria === subcategoria.id_categoria)?.nombre || ''}
+                    </td>
+                  </tr>
               ))}
             </tbody>
           </table>
+          
+          {/* Pagination controls */}
+          <div className="mt-4 flex justify-between items-center">
+            <div className="text-sm text-gray-700">
+               {Math.min((currentPage - 1) * itemsPerPage + 1, subcategorias.length)} al {' '}
+              {Math.min(currentPage * itemsPerPage, subcategorias.length)} de {subcategorias.length} 
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+              >
+                Anterior
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(subcategorias.length / itemsPerPage)))}
+                disabled={currentPage >= Math.ceil(subcategorias.length / itemsPerPage)}
+                className="px-3 py-1 border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
