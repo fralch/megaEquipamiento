@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import axios from "axios"; // Add this import
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const Categorias = ({ onSubmit }) => {
   const [categorias, setCategorias] = useState([]);
@@ -7,6 +7,23 @@ const Categorias = ({ onSubmit }) => {
     nombre: "",
     descripcion: "",
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10); // Cambiado de 5 a 10 elementos por página
+
+  // Función para cargar las categorías
+  const loadCategorias = async () => {
+    try {
+      const response = await axios.get('/categorias-all');
+      setCategorias(response.data);
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    }
+  };
+
+  // Cargar categorías al montar el componente
+  useEffect(() => {
+    loadCategorias();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,7 +34,8 @@ const Categorias = ({ onSubmit }) => {
     e.preventDefault();
     try {
       const response = await axios.post('/categoria/create', form);
-      setCategorias([...categorias, response.data]);
+      // Actualizamos la lista de categorías
+      loadCategorias();
       setForm({
         nombre: "",
         descripcion: "",
@@ -28,6 +46,15 @@ const Categorias = ({ onSubmit }) => {
       // You might want to add error handling here (e.g., showing an error message)
     }
   };
+
+  // Calcular los índices de los elementos a mostrar
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = [...categorias].reverse().slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(categorias.length / itemsPerPage);
+
+  // Función para cambiar de página
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
@@ -82,7 +109,7 @@ const Categorias = ({ onSubmit }) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {categorias.map((categoria, index) => (
+              {currentItems.map((categoria, index) => (
                 <tr key={index}>
                   <td className="px-6 py-4 whitespace-nowrap">{categoria.nombre}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{categoria.descripcion}</td>
@@ -90,6 +117,49 @@ const Categorias = ({ onSubmit }) => {
               ))}
             </tbody>
           </table>
+
+          {/* Paginación */}
+          <div className="mt-4 flex justify-center">
+            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+              <button
+                onClick={() => paginate(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                  currentPage === 1 
+                    ? 'text-gray-300 cursor-not-allowed' 
+                    : 'text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                Anterior
+              </button>
+              
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => paginate(index + 1)}
+                  className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${
+                    currentPage === index + 1
+                      ? 'bg-blue-50 border-blue-500 text-blue-600'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() => paginate(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                  currentPage === totalPages 
+                    ? 'text-gray-300 cursor-not-allowed' 
+                    : 'text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                Siguiente
+              </button>
+            </nav>
+          </div>
         </div>
       </div>
     </div>
