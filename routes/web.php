@@ -53,7 +53,7 @@ Route::delete('/categoria/delete/{id}', [CategoriaController::class, 'destroy'])
 
 // Rutas para subcategorías
 Route::post('/subcategoria_post/create', [SubcategoriaController::class, 'store'])->name('subcategoria.create');
-Route::post('/subcategoria_post/update/{id}', [SubcategoriaController::class, 'update'])->name('subcategoria.update');
+Route::post('/subcategoria_post/update/{subcategoria}', [SubcategoriaController::class, 'update'])->name('subcategoria.update');
 Route::delete('/subcategoria_post/delete/{id}', [SubcategoriaController::class, 'destroy'])->name('subcategoria.delete');
 Route::get('/subcategoria-all', [SubcategoriaController::class, 'getSubcategorias'])->name('subcategoria.all');
 Route::get('/subcategoria_get/categoria/{id}', [SubcategoriaController::class, 'getSubcategoriasCategoria'])->name('subcategoria.by-categoria');

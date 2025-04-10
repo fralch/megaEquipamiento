@@ -3,14 +3,13 @@ import axios from "axios";
 
 const Subcategorias = ({ onSubmit }) => {
   const [categorias, setCategorias] = useState([]);
-  const [categoriasOptions, setCategoriasOptions] = useState([]); // Add this state
+  const [categoriasOptions, setCategoriasOptions] = useState([]);
   const [form, setForm] = useState({
     nombre: "",
     descripcion: "",
     id_categoria: "",
   });
 
-  // Add this useEffect to fetch categories
   React.useEffect(() => {
     const fetchCategorias = async () => {
       try {
@@ -85,7 +84,7 @@ const Subcategorias = ({ onSubmit }) => {
             >
               <option value="">Seleccione una categoría</option>
               {categoriasOptions.map((categoria) => (
-                <option key={categoria.id} value={categoria.id}>
+                <option key={categoria.id_categoria} value={categoria.id_categoria}>
                   {categoria.nombre}
                 </option>
               ))}
@@ -129,6 +128,9 @@ const Subcategorias = ({ onSubmit }) => {
                 <tr key={index}>
                   <td className="px-6 py-4 whitespace-nowrap">{subcategoria.nombre}</td>
                   <td className="px-6 py-4 whitespace-nowrap">{subcategoria.descripcion}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {categoriasOptions.find(cat => cat.id_categoria === subcategoria.id_categoria)?.nombre || ''}
+                  </td>
                 </tr>
               ))}
             </tbody>

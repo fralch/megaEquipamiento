@@ -18,19 +18,16 @@ class SubcategoriaController extends Controller
             'descripcion' => 'nullable|string',
             'id_categoria' => 'required|exists:categorias,id_categoria',
         ]);
-
-        Subcategoria::create($request->all());
-
-        return redirect()->route('subcategorias.index')
-                         ->with('success', 'Subcategoría creada exitosamente.');
+    
+        $subcategoria = Subcategoria::create($request->all());
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Subcategoría creada exitosamente.',
+            'data' => $subcategoria
+        ]);
     }
-
-   
-
-   
-    /**
-     * Update the specified resource in storage.
-     */
+    
     public function update(Request $request, Subcategoria $subcategoria)
     {
         $request->validate([
@@ -38,11 +35,14 @@ class SubcategoriaController extends Controller
             'descripcion' => 'nullable|string',
             'id_categoria' => 'required|exists:categorias,id_categoria',
         ]);
-
+    
         $subcategoria->update($request->all());
-
-        return redirect()->route('subcategorias.index')
-                         ->with('success', 'Subcategoría actualizada exitosamente.');
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'Subcategoría actualizada exitosamente.',
+            'data' => $subcategoria
+        ]);
     }
 
     
