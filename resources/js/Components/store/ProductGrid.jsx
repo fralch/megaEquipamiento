@@ -29,6 +29,7 @@ const ProductGrid = ({ products: initialProducts }) => {
           const data = await response.json();
 
           const transformedProducts = data.map(item => {
+            console.log(item);
             const countryName = item.pais.toLowerCase();
             const countryCode = countryCodeMap[countryName] || 'unknown';
             const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
@@ -43,7 +44,8 @@ const ProductGrid = ({ products: initialProducts }) => {
               flag: `https://flagcdn.com/w320/${countryCode}.png`,
               marca: item.marca.imagen,
               nombre_marca: item.marca.nombre,
-              link: `/producto/${item.id_producto}` 
+              link: `/producto/${item.id_producto}`, 
+              descripcion: item.descripcion || '',
             };
           });
 
@@ -119,9 +121,9 @@ const ProductGrid = ({ products: initialProducts }) => {
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
         {currentProducts.map((product) => (
-          <a key={product.id} href={product.link} className="block">
+          <div key={product.id} className="block">
             <Card product={product} />
-          </a>
+          </div>
         ))}
       </div>
       <div className="flex justify-center space-x-2 mt-4">
@@ -144,7 +146,9 @@ const ProductGrid = ({ products: initialProducts }) => {
 const Card = ({ product }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const cardRef = useRef(null);
+  const overlayRef = useRef(null);
 
   // Observer para lazy loading
   useEffect(() => {
@@ -169,11 +173,58 @@ const Card = ({ product }) => {
     };
   }, []);
 
+  // Prevenir que el evento de click se propague al enlace padre
+  const handleButtonClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  // Función para manejar la navegación al producto
+  const navigateToProduct = (e) => {
+    if (showDetails) {
+      // Si el overlay está abierto, evitamos la navegación
+      e.preventDefault();
+    }
+    // Si el overlay está cerrado, dejamos que la navegación ocurra por defecto
+  };
+
+  // Detener la propagación en los clicks dentro del overlay
+  const handleOverlayClick = (e) => {
+    e.stopPropagation();
+  };
+
+  // Añadir al carrito
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Lógica para añadir al carrito
+    console.log('Añadiendo al carrito:', product.id);
+    // Aquí puedes implementar la lógica real para añadir al carrito
+  };
+
+  // Comparar producto
+  const handleCompare = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // Lógica para añadir a comparación
+    console.log('Comparando producto:', product.id);
+    // Aquí puedes implementar la lógica real para comparar
+  };
+
   return (
     <div
       ref={cardRef}
-      className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-128 relative group flex flex-col transition-all duration-300 hover:shadow-xl"
+      className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-128 relative flex flex-col transition-all duration-300 hover:shadow-xl"
+      onMouseEnter={() => setShowDetails(true)}
+      onMouseLeave={() => setShowDetails(false)}
     >
+      {/* Enlace al producto */}
+      <a 
+        href={product.link} 
+        className="absolute inset-0 z-10"
+        onClick={navigateToProduct}
+      ></a>
+
       {/* Placeholder mientras carga */}
       <div
         className={`absolute inset-0 bg-gray-200 transition-opacity duration-300 ${imageLoaded && isVisible ? 'opacity-0' : 'opacity-100'}`}
@@ -194,8 +245,8 @@ const Card = ({ product }) => {
             style={{ opacity: imageLoaded ? 1 : 0 }}
             onLoad={() => setImageLoaded(true)}
             onError={(e) => {
-              e.target.onerror = null; // Evita bucles infinitos si la imagen de respaldo falla
-              e.target.src = 'https://megaequipamiento.com/wp-content/uploads/2024/08/MEGA-LOGO.webp'; // Imagen de respaldo
+              e.target.onerror = null;
+              e.target.src = 'https://megaequipamiento.com/wp-content/uploads/2024/08/MEGA-LOGO.webp';
               setImageLoaded(true);
             }}
           />
@@ -252,24 +303,60 @@ const Card = ({ product }) => {
       </div>
 
       {/* Overlay con información detallada y botones */}
-      <div className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 p-4 overflow-y-auto">
-        <h2 className="text-2xl font-semibold mb-4 text-center">{product.title}</h2>
-        <div className="text-sm text-gray-300 mb-2 space-y-2 overflow-y-auto flex-grow">
-          {product.technicalData && Object.entries(product.technicalData).map(([key, value], index) => (
-            <p key={index}>
-              <strong>{key}:</strong> {value}
-            </p>
-          ))}
+      {showDetails && (
+        <div 
+          ref={overlayRef}
+          className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start z-20 p-4"
+          onClick={handleOverlayClick}
+        >
+          <h2 className="text-2xl font-semibold mb-4 text-center">{product.title}</h2>
+          
+          {/* Contenedor con scroll */}
+          <div className="flex-grow overflow-y-auto mb-4 pr-2 custom-scrollbar">
+            <div className="text-sm text-gray-300 space-y-2">
+              {product.technicalData && Object.entries(product.technicalData).map(([key, value], index) => (
+                <p key={index}>
+                  <strong>{key}:</strong> {value}
+                </p>
+              ))}
+            </div>
+          </div>
+          
+          {/* Botones fijos en la parte inferior */}
+          <div className="flex space-x-4 mt-auto">
+            <button 
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+              onClick={handleAddToCart}
+            >
+              Añadir al carrito
+            </button>
+            <button 
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md"
+              onClick={handleCompare}
+            >
+              Comparar
+            </button>
+          </div>
         </div>
-        <div className="flex space-x-4 mt-auto">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">
-            Añadir al carrito
-          </button>
-          <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md">
-            Comparar
-          </button>
-        </div>
-      </div>
+      )}
+      
+      {/* CSS para el scrollbar personalizado */}
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.3);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.5);
+        }
+      `}</style>
     </div>
   );
 };
