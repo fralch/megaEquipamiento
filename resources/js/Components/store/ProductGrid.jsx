@@ -85,7 +85,8 @@ const ProductGrid = ({ products: initialProducts }) => {
             flag: countryName ? `https://flagcdn.com/w320/${countryCode}.png` : '',
             marca: item.marca?.imagen || '',
             nombre_marca: item.marca?.nombre || '',
-            link: `/producto/${item.id_producto}` 
+            link: `/producto/${item.id_producto}` ,
+            descripcion: item.descripcion || '',
           };
         });
 
@@ -302,36 +303,51 @@ const Card = ({ product }) => {
         </div>
       </div>
 
-      {/* Overlay con información detallada y botones */}
+      {/* Overlay con información detallada, descripción y botones */}
       {showDetails && (
         <div 
           ref={overlayRef}
           className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start z-20 p-4"
           onClick={handleOverlayClick}
         >
-          <h2 className="text-2xl font-semibold mb-4 text-center">{product.title}</h2>
+          <h2 className="text-2xl font-semibold mb-2 text-center">{product.title}</h2>
           
           {/* Contenedor con scroll */}
           <div className="flex-grow overflow-y-auto mb-4 pr-2 custom-scrollbar">
-            <div className="text-sm text-gray-300 space-y-2">
-              {product.technicalData && Object.entries(product.technicalData).map(([key, value], index) => (
-                <p key={index}>
-                  <strong>{key}:</strong> {value}
-                </p>
-              ))}
-            </div>
+            {/* Datos técnicos */}
+            {product.technicalData && Object.keys(product.technicalData).length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium text-blue-300 mb-2">Datos Técnicos</h3>
+                <div className="text-sm text-gray-300 space-y-2">
+                  {Object.entries(product.technicalData).map(([key, value], index) => (
+                    <p key={index}>
+                      <strong>{key}:</strong> {value}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+            {/* Descripción del producto */}
+            {product.descripcion && (
+              <div className="mb-4">
+                <h3 className="text-sm font-medium text-blue-300 mb-2">Descripción</h3>
+                <p className="text-sm text-gray-200">{product.descripcion}</p>
+              </div>
+            )}
+
+            
           </div>
           
           {/* Botones fijos en la parte inferior */}
           <div className="flex space-x-4 mt-auto">
             <button 
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md flex-1"
               onClick={handleAddToCart}
             >
               Añadir al carrito
             </button>
             <button 
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md"
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex-1"
               onClick={handleCompare}
             >
               Comparar
