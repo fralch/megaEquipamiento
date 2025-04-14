@@ -17,6 +17,8 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/carrito',function () { return Inertia::render('Carrito');})->name('carrito.view');
+
 
 // Rutas que retornan vistas
 Route::get('/', function () {
