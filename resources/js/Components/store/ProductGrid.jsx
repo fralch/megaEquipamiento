@@ -172,7 +172,7 @@ const Card = ({ product }) => {
   return (
     <div
       ref={cardRef}
-      className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-96 relative group flex flex-col transition-all duration-300 hover:shadow-xl"
+      className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-128 relative group flex flex-col transition-all duration-300 hover:shadow-xl"
     >
       {/* Placeholder mientras carga */}
       <div
@@ -239,7 +239,7 @@ const Card = ({ product }) => {
       {/* Información del producto (40% restante) */}
       <div className="p-4 flex-grow overflow-y-auto">
         <h2 className="text-lg font-semibold text-gray-800 mb-2">{product.title}</h2>
-        {product.summary && Object.entries(product.summary).slice(0, 2).map(([key, value], index) => (
+        {product.summary && Object.entries(product.summary).slice(0, 3).map(([key, value], index) => (
           <p key={index} className="text-sm text-gray-600">
             <strong>{key}:</strong> {value}
           </p>
