@@ -16,6 +16,7 @@ export default function Subcategoria({ productos }) {
     const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
     const [categoriaNombre, setCategoriaNombre] = useState("");
     const [categoriaId, setCategoriaId] = useState("");
+    const [formattedProducts, setFormattedProducts] = useState([]);
 
     useEffect(() => {
         // Cargar categorías desde localStorage o desde la API
@@ -35,14 +36,16 @@ export default function Subcategoria({ productos }) {
         // Obtener el ID de la subcategoría desde la URL
         const urlParts = window.location.pathname.split('/');
         const subcategoriaId = urlParts[urlParts.length - 1];
-        console.log("productos");
-        console.log(productos);
+
+        // Format products for the grid
+        if (productos && productos.length > 0) {
+            setFormattedProducts(productos);
+        }
 
         // Hacer una solicitud a la API para obtener los datos de la subcategoría
         fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
                 setSubcategoriaNombre(data.nombre);
                 // Obtener el nombre de la categoría
                 fetch(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`)
@@ -54,7 +57,7 @@ export default function Subcategoria({ productos }) {
                     .catch((error) => console.error('Error fetching categoria data:', error));
             })
             .catch((error) => console.error('Error fetching subcategoria data:', error));
-    }, []);
+    }, [productos]);
 
     const toggleCategory = (categoriaNombre) => {
         setOpenCategories((prevState) => ({
@@ -110,12 +113,16 @@ export default function Subcategoria({ productos }) {
                     {productos && productos.length > 0 ? (
                         <>
                           <h1 className="text-2xl font-bold mb-4"><Link href={`/categorias/${categoriaId}`}><span className="text-xl font-bold Link text-gray-600">{categoriaNombre} /</span></Link> {subcategoriaNombre}</h1>
-                          <ProductGrid products={productos} />
+                          <div className="max-w-full">
+                            <ProductGrid products={formattedProducts} />
+                          </div>
                         </>
                     ) : (
                         <>
                         <h1 className="text-2xl font-bold mb-4">Mostrando todos los productos</h1>
-                        <ProductGrid />
+                        <div className="max-w-full">
+                          <ProductGrid />
+                        </div>
                         </>
                     )}
                     <div className="flex justify-center">

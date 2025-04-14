@@ -43,7 +43,7 @@ const ProductGrid = ({ products: initialProducts }) => {
               flag: `https://flagcdn.com/w320/${countryCode}.png`,
               marca: item.marca.imagen,
               nombre_marca: item.marca.nombre,
-              link: `/producto/${item.id_producto}` // Agrega el enlace del producto
+              link: `/producto/${item.id_producto}` 
             };
           });
 
@@ -67,26 +67,30 @@ const ProductGrid = ({ products: initialProducts }) => {
     if (!initialProducts || initialProducts.length === 0) {
       fetchProducts();
     } else {
-      const transformedProducts = initialProducts.map(item => {
-        const countryName = item.pais.toLowerCase();
-        const countryCode = countryCodeMap[countryName] || 'unknown';
-        const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
-        return {
-          id: item.id_producto,
-          title: item.nombre,
-          summary: item.caracteristicas || {},
-          technicalData: item.datos_tecnicos || {},
-          origin: item.pais,
-          price: parseFloat(item.precio_igv),
-          image,
-          flag: `https://flagcdn.com/w320/${countryCode}.png`,
-          marca: item.marca.imagen,
-          nombre_marca: item.marca.nombre,
-          link: `/producto/${item.id_producto}` // Agrega el enlace del producto
-        };
-      });
+      try {
+        const transformedProducts = initialProducts.map(item => {
+          const countryName = (item.pais || '').toLowerCase();
+          const countryCode = countryCodeMap[countryName] || 'unknown';
+          const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
+          return {
+            id: item.id_producto,
+            title: item.nombre,
+            summary: item.caracteristicas || {},
+            technicalData: item.datos_tecnicos || {},
+            origin: item.pais || '',
+            price: parseFloat(item.precio_igv || 0),
+            image,
+            flag: countryName ? `https://flagcdn.com/w320/${countryCode}.png` : '',
+            marca: item.marca?.imagen || '',
+            nombre_marca: item.marca?.nombre || '',
+            link: `/producto/${item.id_producto}` 
+          };
+        });
 
-      setProducts(transformedProducts);
+        setProducts(transformedProducts);
+      } catch (error) {
+        console.error('Error transforming products:', error);
+      }
       setLoading(false);
     }
   }, [initialProducts]);
@@ -168,7 +172,7 @@ const Card = ({ product }) => {
   return (
     <div
       ref={cardRef}
-      className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-128 relative group flex flex-col transition-all duration-300 hover:shadow-xl"
+      className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-96 relative group flex flex-col transition-all duration-300 hover:shadow-xl"
     >
       {/* Placeholder mientras carga */}
       <div
@@ -202,28 +206,32 @@ const Card = ({ product }) => {
       <div className="flex items-center justify-between px-8 mb-2">
         {isVisible && (
           <>
-            <img
-              src={product.marca}
-              alt={`Marca de ${product.nombre_marca}`}
-              className="h-4 object-cover transition-opacity duration-300"
-              style={{ opacity: imageLoaded ? 1 : 0 }}
-              loading="lazy"
-              onError={(e) => {
-                e.target.onerror = null; // Evita bucles infinitos para la imagen
-                e.target.src = ''; // Imagen de respaldo
-              }}
-            />
-            <img
-              src={product.flag}
-              alt={`Bandera de ${product.origin}`}
-              className="w-6 h-4 object-cover transition-opacity duration-300"
-              style={{ opacity: imageLoaded ? 1 : 0 }}
-              loading="lazy"
-              onError={(e) => {
-                e.target.onerror = null; // Evita bucles infinitos para la imagen
-                e.target.src = ''; // Imagen de respaldo
-              }}
-            />
+            {product.marca && (
+              <img
+                src={product.marca}
+                alt={`Marca de ${product.nombre_marca || 'producto'}`}
+                className="h-4 object-cover transition-opacity duration-300"
+                style={{ opacity: imageLoaded ? 1 : 0 }}
+                loading="lazy"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.style.display = 'none';
+                }}
+              />
+            )}
+            {product.flag && (
+              <img
+                src={product.flag}
+                alt={`Bandera de ${product.origin || 'origen'}`}
+                className="w-6 h-4 object-cover transition-opacity duration-300"
+                style={{ opacity: imageLoaded ? 1 : 0 }}
+                loading="lazy"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.style.display = 'none';
+                }}
+              />
+            )}
           </>
         )}
       </div>

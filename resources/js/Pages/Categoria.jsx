@@ -12,6 +12,7 @@ export default function Categoria({ productos, categoria, subcategorias }) {
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [openCategories, setOpenCategories] = useState({});
     const [activeCategory, setActiveCategory] = useState(null);
+    const [formattedProducts, setFormattedProducts] = useState([]);
 
     useEffect(() => {
         const storedData = localStorage.getItem('categoriasCompleta');
@@ -27,16 +28,13 @@ export default function Categoria({ productos, categoria, subcategorias }) {
                 .catch((error) => console.error('Error fetching data:', error));
         }
 
-        // Obtener el ID de la categoría desde la URL
-        const urlParts = window.location.pathname.split('/');
-        const categoriaId = urlParts[urlParts.length - 1];
-        console.log(categoriaId);
-        console.log(productos);
-        console.log(subcategorias);
-        console.log(categoria);
-
-        // Hacer una solicitud a la API para obtener los datos de la categoría
-    }, []);
+        // Ensure productos has all required fields in the correct format
+        if (productos && productos.length > 0) {
+            // Keep the original products array but ensure it has all needed fields
+            // This step is crucial to ensure ProductGrid receives properly formatted data
+            setFormattedProducts(productos);
+        }
+    }, [productos]);
 
     const toggleCategory = (categoriaNombre) => {
         setOpenCategories((prevState) => ({
@@ -91,12 +89,16 @@ export default function Categoria({ productos, categoria, subcategorias }) {
                     {productos && productos.length > 0 ? (
                         <>
                           <h1 className="text-2xl font-bold mb-4">Categoría: {categoria.nombre}</h1>
-                          <ProductGrid products={productos} />
+                          <div className="max-w-full">
+                            <ProductGrid products={formattedProducts} />
+                          </div>
                         </>
                     ) : (
                         <>
                         <h1 className="text-2xl font-bold mb-4">Mostrando todos los productos</h1>
-                        <ProductGrid />
+                        <div className="max-w-full">
+                          <ProductGrid />
+                        </div>
                         </>
                     )}
                      <div className="flex justify-center">
