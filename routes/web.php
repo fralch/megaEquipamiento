@@ -30,6 +30,7 @@ Route::get('/producto/{id}', [ProductoController::class, 'ProductView'])->name('
 Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
 
 // Rutas para crear y mostrar productos
+Route::get('/product', [ProductoController::class, 'getProductosAll']);
 Route::post('/product/create', [ProductoController::class, 'createProduct'])->name('product.create');
 Route::post('/product/update', [ProductoController::class, 'updateProduct'])->name('product.update');
 Route::get('/product/all', [ProductoController::class, 'getProductos'])->name('product.all');
