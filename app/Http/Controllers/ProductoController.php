@@ -115,7 +115,7 @@ class ProductoController extends Controller
     }
 
     // obtener todos los productos
-    public function getProductosAll(Request $request){
+    public function getProductosAll(){
         $productos = Producto::all();
         return response()->json($productos);
     }
