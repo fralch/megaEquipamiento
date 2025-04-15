@@ -114,9 +114,11 @@ class ProductoController extends Controller
         return response()->json($producto);
     }
 
-    // obtener todos los productos
-    public function getProductosAll(){
-        $productos = Producto::all();
+    // obtener todos los productos con paginación
+    public function getProductosAll(Request $request)
+    {
+        $perPage = $request->input('per_page', 50); // Default 50 items per page
+        $productos = Producto::paginate($perPage);
         return response()->json($productos);
     }
     // Obtener todos los productos
