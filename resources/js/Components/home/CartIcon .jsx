@@ -1,8 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const CartIcon = ({  }) => {
+const CartIcon = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const cartItems = [
+    { id: 1, name: 'Cabina de luz PCE-CIC', price: 30520.00, quantity: 1 },
+    { id: 2, name: 'Cabina de luz PCE-CIC Mini', price: 6962.00, quantity: 1 }
+  ];
+
+  const handleClick = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
+    <div 
+      style={{ 
+        position: 'relative', 
+        display: 'inline-block',
+        cursor: 'pointer' 
+      }}
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+    >
       <div
         style={{
           backgroundColor: '#005dad',
@@ -36,6 +58,51 @@ const CartIcon = ({  }) => {
       >
         3
       </div>
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: '60px',
+            width: '350px',
+            backgroundColor: 'white',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+            borderRadius: '4px',
+            padding: '10px',
+            zIndex: 1000,
+          }}
+        >
+          {cartItems.map(item => (
+            <div key={item.id} style={{ padding: '10px', borderBottom: '1px solid #eee' }}>
+              <div style={{ fontWeight: 'bold' }}>{item.name}</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Cantidad: {item.quantity}x</span>
+                <span>S/ {item.price.toFixed(2)}</span>
+              </div>
+            </div>
+          ))}
+          <div style={{ padding: '10px', borderTop: '1px solid #ddd' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+              <span>Total:</span>
+              <span>S/ {total.toFixed(2)}</span>
+            </div>
+          </div>
+          <button
+            style={{
+              backgroundColor: '#005dad',
+              color: 'white',
+              padding: '8px 16px',
+              border: 'none',
+              borderRadius: '4px',
+              width: '100%',
+              marginTop: '10px',
+              cursor: 'pointer',
+            }}
+          >
+            TERMINAR PEDIDO
+          </button>
+        </div>
+      )}
     </div>
   );
 };
