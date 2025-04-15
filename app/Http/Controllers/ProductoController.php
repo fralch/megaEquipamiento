@@ -122,12 +122,10 @@ class ProductoController extends Controller
         return response()->json($productos);
     }
     // Obtener todos los productos
-    public function getProductos()
+    public function getProductos(Request $request)
     {
-        // Obtener todos los productos y cargar la relación 'marca'
-        $productos = Producto::with('marca')->get();
-
-        // Devolver los productos con los datos de la marca
+        $perPage = $request->input('per_page', 50); // Default 50 items per page
+        $productos = Producto::with('marca')->paginate($perPage);
         return response()->json($productos);
     }
 
