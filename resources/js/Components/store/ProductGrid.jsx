@@ -7,9 +7,11 @@ const ProductGrid = ({ products: initialProducts }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 24;
   const [loading, setLoading] = useState(true);
+  // Add new state to track if we're fetching all products
+  const [isAllProducts, setIsAllProducts] = useState(false);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchInitialProducts = async () => {
       try {
         // Verifica si los datos ya están en el localStorage
         const storedData = localStorage.getItem('products');
@@ -22,30 +24,41 @@ const ProductGrid = ({ products: initialProducts }) => {
           setProducts(JSON.parse(storedData));
           setLoading(false);
         } else {
-          const response = await fetch(`${URL_API}/product/all`);
+          const response = await fetch(`${URL_API}/product/all?page=1`);
           if (!response.ok) {
             throw new Error('Network response was not ok');
           }
           const data = await response.json();
-
-          const transformedProducts = data.map(item => {
+          console.log("todos los productos");
+          const transformedProducts = data.data.map(item => {
             console.log(item);
             const countryName = item.pais.toLowerCase();
             const countryCode = countryCodeMap[countryName] || 'unknown';
             const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
+            
             return {
               id: item.id_producto,
+              sku: item.sku,
               title: item.nombre,
               summary: item.caracteristicas || {},
               technicalData: item.datos_tecnicos || {},
               origin: item.pais,
               price: parseFloat(item.precio_igv),
+              priceWithoutProfit: parseFloat(item.precio_sin_ganancia),
+              priceWithProfit: parseFloat(item.precio_ganancia),
               image,
               flag: `https://flagcdn.com/w320/${countryCode}.png`,
               marca: item.marca.imagen,
               nombre_marca: item.marca.nombre,
-              link: `/producto/${item.id_producto}`, 
+              link: `/producto/${item.id_producto}`,
               descripcion: item.descripcion || '',
+              video: item.video || '',
+              envio: item.envio || '',
+              soporte_tecnico: item.soporte_tecnico || '',
+              archivos_adicionales: item.archivos_adicionales,
+              especificaciones_tecnicas: item.especificaciones_tecnicas,
+              subcategoria_id: item.id_subcategoria,
+              marca_id: item.marca_id
             };
           });
 
@@ -67,7 +80,7 @@ const ProductGrid = ({ products: initialProducts }) => {
     };
 
     if (!initialProducts || initialProducts.length === 0) {
-      fetchProducts();
+      fetchInitialProducts();
     } else {
       try {
         const transformedProducts = initialProducts.map(item => {
@@ -104,8 +117,72 @@ const ProductGrid = ({ products: initialProducts }) => {
 
   const totalPages = Math.ceil(products.length / productsPerPage);
 
-  const handlePageChange = (pageNumber) => {
+  // Fetch products function that gets called on page changes when needed
+  const fetchProducts = async (page = 1) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${URL_API}/product/all?page=${page}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      
+      const transformedProducts = data.data.map(item => {
+        const countryName = item.pais.toLowerCase();
+        const countryCode = countryCodeMap[countryName] || 'unknown';
+        const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
+        
+        return {
+          id: item.id_producto,
+          sku: item.sku,
+          title: item.nombre,
+          summary: item.caracteristicas || {},
+          technicalData: item.datos_tecnicos || {},
+          origin: item.pais,
+          price: parseFloat(item.precio_igv),
+          priceWithoutProfit: parseFloat(item.precio_sin_ganancia),
+          priceWithProfit: parseFloat(item.precio_ganancia),
+          image,
+          flag: `https://flagcdn.com/w320/${countryCode}.png`,
+          marca: item.marca.imagen,
+          nombre_marca: item.marca.nombre,
+          link: `/producto/${item.id_producto}`,
+          descripcion: item.descripcion || '',
+          video: item.video || '',
+          envio: item.envio || '',
+          soporte_tecnico: item.soporte_tecnico || '',
+          archivos_adicionales: item.archivos_adicionales,
+          especificaciones_tecnicas: item.especificaciones_tecnicas,
+          subcategoria_id: item.id_subcategoria,
+          marca_id: item.marca_id
+        };
+      });
+
+      // Append new products instead of replacing them
+      setProducts(prevProducts => [...prevProducts, ...transformedProducts]);
+      setIsAllProducts(true);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = async (pageNumber) => {
     setCurrentPage(pageNumber);
+    
+    // Calculate if we need to fetch more products
+    const totalProducts = products.length;
+    const productsNeeded = pageNumber * productsPerPage;
+    
+    // If we need more products and we're not currently loading
+    if (productsNeeded > totalProducts && !loading) {
+      const nextPage = Math.ceil(totalProducts / productsPerPage) + 1;
+      if (!isAllProducts) {
+        await fetchProducts(nextPage);
+      }
+    }
+    
     // Scroll to top when changing page
     window.scrollTo(0, 0);
   };
@@ -414,8 +491,6 @@ const Card = ({ product }) => {
                 <p className="text-sm text-gray-200">{product.descripcion}</p>
               </div>
             )}
-
-            
           </div>
           
           {/* Botones fijos en la parte inferior */}
