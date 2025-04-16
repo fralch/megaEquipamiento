@@ -127,18 +127,89 @@ const ProductGrid = ({ products: initialProducts }) => {
           </div>
         ))}
       </div>
-      <div className="flex justify-center space-x-2 mt-4">
-        {Array.from({ length: totalPages }, (_, i) => (
+      
+      {/* Nueva paginación */}
+      <div className="flex flex-col items-center space-y-2 mt-8 mb-8">
+        <div className="flex items-center justify-center space-x-4">
           <button
-            key={i}
-            onClick={() => handlePageChange(i + 1)}
-            className={`px-4 py-2 rounded ${
-              currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200'
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-lg flex items-center ${
+              currentPage === 1
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
-            {i + 1}
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Anterior
           </button>
-        ))}
+      
+          <div className="flex items-center space-x-2">
+            {Array.from({ length: totalPages }, (_, i) => {
+              // Mostrar siempre primera y última página
+              if (i === 0 || i === totalPages - 1) {
+                return (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`px-4 py-2 rounded-lg ${
+                      currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              }
+              // Mostrar páginas cercanas a la actual
+              if (
+                i + 1 === currentPage ||
+                i + 1 === currentPage - 1 ||
+                i + 1 === currentPage + 1
+              ) {
+                return (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`px-4 py-2 rounded-lg ${
+                      currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              }
+              // Mostrar puntos suspensivos
+              if (
+                i === 1 ||
+                i === totalPages - 2
+              ) {
+                return <span key={i}>...</span>;
+              }
+              return null;
+            })}
+          </div>
+      
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 rounded-lg flex items-center ${
+              currentPage === totalPages
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
+            }`}
+          >
+            Siguiente
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+        
+        <div className="text-sm text-gray-600">
+          Mostrando {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, products.length)} de {products.length} productos
+        </div>
       </div>
     </div>
   );
@@ -310,7 +381,13 @@ const Card = ({ product }) => {
           className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start z-20 p-4"
           onClick={handleOverlayClick}
         >
-          <h2 className="text-2xl font-semibold mb-2 text-center">{product.title}</h2>
+          <a 
+            href={product.link}
+            className="text-2xl font-semibold mb-2 text-center hover:text-blue-300 transition-colors cursor-pointer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {product.title}
+          </a>
           
           {/* Contenedor con scroll */}
           <div className="flex-grow overflow-y-auto mb-4 pr-2 custom-scrollbar">
