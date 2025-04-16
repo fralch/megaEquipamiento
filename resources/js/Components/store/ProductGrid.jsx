@@ -260,27 +260,30 @@ const Card = ({ product }) => {
     // Si el overlay está cerrado, dejamos que la navegación ocurra por defecto
   };
 
-  // Detener la propagación en los clicks dentro del overlay
+  // Modify the handleOverlayClick function
   const handleOverlayClick = (e) => {
-    e.stopPropagation();
+    // Only stop propagation if clicking on buttons or links
+    if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a') {
+      e.stopPropagation();
+    } else {
+      // Navigate to product page
+      window.location.href = product.link;
+    }
   };
 
-  // Añadir al carrito
+  // Add these functions before the return statement in the Card component
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // Lógica para añadir al carrito
-    console.log('Añadiendo al carrito:', product.id);
-    // Aquí puedes implementar la lógica real para añadir al carrito
+    // TODO: Implement cart functionality
+    console.log('Adding to cart:', product.id);
   };
 
-  // Comparar producto
   const handleCompare = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // Lógica para añadir a comparación
-    console.log('Comparando producto:', product.id);
-    // Aquí puedes implementar la lógica real para comparar
+    // TODO: Implement compare functionality
+    console.log('Comparing product:', product.id);
   };
 
   return (
@@ -378,7 +381,7 @@ const Card = ({ product }) => {
       {showDetails && (
         <div 
           ref={overlayRef}
-          className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start z-20 p-4"
+          className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start z-20 p-4 cursor-pointer"
           onClick={handleOverlayClick}
         >
           <a 
