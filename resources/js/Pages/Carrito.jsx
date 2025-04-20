@@ -15,9 +15,9 @@ const formatCurrency = (value) => {
 
 // --- Datos de Ejemplo (mejor si vienen como props) ---
 const sampleCartItems = [
-    { id: 1, reference: 'PCE-ATP 1', name: 'Luminómetro PCE-ATP 1', unitPrice: 9568.00, quantity: 1, imageUrl: '/images/placeholder-luminometro.png' },
-    { id: 2, reference: 'PCE-FCT 5', name: 'Analizador de redes eléctricas PCE-FCT 5', unitPrice: 215.00, quantity: 1, imageUrl: '/images/placeholder-analizador.png' },
-    { id: 3, reference: 'CAL-PCE-ATP', name: 'Certificado de verificación para luminómetros', unitPrice: 1116.00, quantity: 1, imageUrl: '/images/placeholder-certificado.png' }
+    { id: 1, reference: 'PCE-ATP 1', name: 'Luminómetro PCE-ATP 1', unitPrice: 9568.00, quantity: 1, imageUrl: 'https://www.pce-instruments.com/peru/slot/17/artimg/small/pce-instruments-copa-de-viscosidad-iso-pce-128-3-6244950_1303644.webp' },
+    { id: 2, reference: 'PCE-FCT 5', name: 'Analizador de redes eléctricas PCE-FCT 5', unitPrice: 215.00, quantity: 1, imageUrl: 'https://www.pce-instruments.com/peru/slot/17/artimg/small/pce-instruments-soporte-para-copas-de-flujo-6243740_1302209.webp' },
+    { id: 3, reference: 'CAL-PCE-ATP', name: 'Certificado de verificación para luminómetros', unitPrice: 1116.00, quantity: 1, imageUrl: 'https://www.pce-instruments.com/peru/slot/17/artimg/small/pce-instruments-soporte-para-copas-de-flujo-6243740_1302209.webp' }
 ];
 
 // --- Componente Carrito Mejorado ---
@@ -179,10 +179,10 @@ export default function Carrito({ initialCartItems = sampleCartItems }) {
                                 <span className="text-xl font-bold text-gray-900">{formatCurrency(totalNeto)}</span>
                             </div>
                             {/* Puedes añadir más detalles aquí (impuestos, envío, etc.) */}
-                            <p className="text-xs text-gray-500 text-right">Preis (Netto)</p>
+                            <p className="text-xs text-gray-500 text-right">Precio (Neto)</p>
                             <div className="mt-4 text-right">
                                 <button className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
-                                    Proceder al Pago
+                                    Proceder con la compra
                                 </button>
                             </div>
                         </div>
