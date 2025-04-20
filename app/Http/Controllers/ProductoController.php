@@ -196,22 +196,19 @@ class ProductoController extends Controller
      */
     public function buscarPorIniciales(Request $request)
     {
-        \Log::info('Búsqueda recibida:', $request->all());
 
         $request->validate([
-            'producto' => 'required|string|min:1'
+            'producto' => 'required|string|min:3'
         ]);
 
         $producto = $request->input('producto');
         
-        \Log::info('Buscando producto:', ['término' => $producto]);
 
         $productos = Producto::with('marca')
             ->where('nombre', 'LIKE', '%' . $producto . '%')
             ->orWhere('sku', 'LIKE', '%' . $producto . '%')
             ->get();
 
-        \Log::info('Productos encontrados:', ['count' => $productos->count()]);
 
         return response()->json($productos);
     }
