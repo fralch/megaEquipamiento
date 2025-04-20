@@ -75,10 +75,42 @@ class CategoriaController extends Controller
         $request->validate([
             'nombre' => 'required|max:200',
             'descripcion' => 'nullable|string',
+            'img' => 'nullable|file|mimes:jpeg,png,jpg,gif,webm|max:2048',
         ]);
 
-        $creado = Categoria::create($request->all());
-        return response()->json($creado);    
+        // Preparar datos para la creación
+        $data = [
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'img' => null,
+        ];
+
+        if ($request->hasFile('img')) {
+            $file = $request->file('img');
+
+            // Generar nombre único de archivo con timestamp
+            $filePath = time() . '.' . $file->getClientOriginalExtension();
+
+            // Establecer ruta de destino
+            $destinationPath = public_path('img/categorias') . '/' . $filePath;
+
+            // Crear el directorio si no existe
+            if (!file_exists(public_path('img/categorias'))) {
+                mkdir(public_path('img/categorias'), 0777, true);
+            }
+
+            // Mover el archivo subido
+            if (move_uploaded_file($file->getPathname(), $destinationPath)) {
+                // Añadir solo el nombre del archivo al array de datos
+                $data['img'] = '/img/categorias/'.$filePath; // Store only the filename
+            } else {
+                return response()->json(['error' => 'Error al mover el archivo.'], 500);
+            }
+        }
+
+        $creado = Categoria::create($data);
+
+        return response()->json($creado);
     }
 
 

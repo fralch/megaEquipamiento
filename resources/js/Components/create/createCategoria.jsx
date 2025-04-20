@@ -7,8 +7,12 @@ const Categorias = ({ onSubmit }) => {
     nombre: "",
     descripcion: "",
   });
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Cambiado de 5 a 10 elementos por página
+  const [itemsPerPage] = useState(10);
 
   // Función para cargar las categorías
   const loadCategorias = async () => {
@@ -17,6 +21,7 @@ const Categorias = ({ onSubmit }) => {
       setCategorias(response.data);
     } catch (error) {
       console.error('Error loading categories:', error);
+      setError('No se pudieron cargar las categorías');
     }
   };
 
@@ -30,20 +35,91 @@ const Categorias = ({ onSubmit }) => {
     setForm({ ...form, [name]: value });
   };
 
+  // Manejar cambio de archivo de imagen
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validar tamaño del archivo (2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        setError('La imagen no debe exceder los 2MB');
+        return;
+      }
+      
+      // Validar tipo de archivo
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webm'];
+      if (!validTypes.includes(file.type)) {
+        setError('Formato de imagen no válido. Use JPEG, PNG, JPG, GIF o WEBM');
+        return;
+      }
+      
+      setImage(file);
+      
+      // Crear vista previa de la imagen
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      setError(null);
+    } else {
+      setImage(null);
+      setImagePreview(null);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+    
+    // Crear un objeto FormData para enviar los datos del formulario incluyendo la imagen
+    const formData = new FormData();
+    formData.append('nombre', form.nombre);
+    formData.append('descripcion', form.descripcion || '');
+    
+    // Añadir la imagen si existe
+    if (image) {
+      formData.append('img', image);
+    }
+    
     try {
-      const response = await axios.post('/categoria/create', form);
+      // Configurar los headers para envío de formData
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        }
+      };
+      
+      const response = await axios.post('/categoria/create', formData, config);
+      
+      // Mostramos mensaje de éxito
+      alert('Categoría creada exitosamente');
+      
       // Actualizamos la lista de categorías
       loadCategorias();
+      
+      // Reseteamos el formulario
       setForm({
         nombre: "",
         descripcion: "",
       });
-      onSubmit(response.data);
+      setImage(null);
+      setImagePreview(null);
+      
+      // Si hay una función onSubmit, la llamamos con la respuesta
+      if (onSubmit) {
+        onSubmit(response.data);
+      }
     } catch (error) {
+      setForm({
+        nombre: "",
+        descripcion: "",
+      });
       console.error('Error creating category:', error);
-      // You might want to add error handling here (e.g., showing an error message)
+      // setError(error.response?.data?.error || 'Error al crear la categoría');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,15 +132,59 @@ const Categorias = ({ onSubmit }) => {
   // Función para cambiar de página
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // --- Pagination Logic ---
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxPagesToShow = 4;
+    const halfMaxPages = Math.floor(maxPagesToShow / 2);
+
+    let startPage = Math.max(1, currentPage - halfMaxPages);
+    let endPage = Math.min(totalPages, currentPage + halfMaxPages);
+
+    if (currentPage <= halfMaxPages) {
+        endPage = Math.min(totalPages, maxPagesToShow);
+    }
+    if (currentPage + halfMaxPages >= totalPages) {
+        startPage = Math.max(1, totalPages - maxPagesToShow + 1);
+    }
+
+    if (startPage > 1) {
+      pageNumbers.push(1);
+      if (startPage > 2) {
+        pageNumbers.push('...');
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pageNumbers.push(i);
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pageNumbers.push('...');
+      }
+      pageNumbers.push(totalPages);
+    }
+
+    return pageNumbers;
+  };
+
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Crear Categoría</h1>
-      <form onSubmit={handleSubmit}>
-        <h2 className="text-lg font-bold mb-4">Agregar / Editar Categoría</h2>
+      <h1 className="text-2xl font-bold mb-4">Gestión de Categorías</h1>
+      <form onSubmit={handleSubmit} encType="multipart/form-data">
+        <h2 className="text-lg font-bold mb-4">Agregar Nueva Categoría</h2>
+        
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="mb-4">
             <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
-              Nombre
+              Nombre <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -78,88 +198,159 @@ const Categorias = ({ onSubmit }) => {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
-              Descripción
+            <label htmlFor="img" className="block text-sm font-medium text-gray-700">
+              Imagen
             </label>
-            <textarea
-              id="descripcion"
-              name="descripcion"
-              value={form.descripcion}
-              onChange={handleChange}
+            <input
+              type="file"
+              id="img"
+              name="img"
+              onChange={handleImageChange}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              accept="image/jpeg,image/png,image/jpg,image/gif,image/webm"
             />
+            <p className="text-xs text-gray-500 mt-1">
+              Formatos permitidos: JPEG, PNG, JPG, GIF, WEBM (máx. 2MB)
+            </p>
+            
+            {/* Vista previa de imagen */}
+            {imagePreview && (
+              <div className="mt-2">
+                <p className="text-sm font-medium text-gray-700 mb-1">Vista previa:</p>
+                <img 
+                  src={imagePreview} 
+                  alt="Vista previa" 
+                  className="h-24 w-auto object-cover rounded border border-gray-300"
+                />
+              </div>
+            )}
           </div>
         </div>
-        <button
-          type="submit"
-          className="mt-4 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 w-full md:w-auto"
-        >
-          Guardar Categoría
-        </button>
+        
+        <div className="mb-4">
+          <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
+            Descripción
+          </label>
+          <textarea
+            id="descripcion"
+            name="descripcion"
+            value={form.descripcion}
+            onChange={handleChange}
+            rows="3"
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          />
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={loading}
+            className={`px-4 py-2 ${
+              loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+            } text-white font-bold rounded-lg transition-colors`}
+          >
+            {loading ? 'Guardando...' : 'Guardar Categoría'}
+          </button>
+        </div>
       </form>
 
-      <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
-        <h2 className="text-lg font-bold mb-4">Categorías Totales</h2>
+      <div className="mt-8">
+        <h2 className="text-lg font-bold mb-4">Categorías Existentes</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagen</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {currentItems.map((categoria, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap">{categoria.nombre}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{categoria.descripcion}</td>
+              {currentItems.length > 0 ? (
+                currentItems.map((categoria) => (
+                  <tr key={categoria.id_categoria}>
+                    <td className="px-6 py-4 whitespace-nowrap">{categoria.id_categoria}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{categoria.nombre}</td>
+                    <td className="px-6 py-4">
+                      <div className="max-w-xs truncate">{categoria.descripcion || '-'}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {categoria.img ? (
+                        <img 
+                          src={categoria.img} 
+                          alt={categoria.nombre} 
+                          className="h-10 w-10 object-cover rounded"
+                        />
+                      ) : (
+                        <span className="text-gray-400">Sin imagen</span>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
+                    No hay categorías disponibles
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
 
           {/* Paginación */}
-          <div className="mt-4 flex justify-center">
-            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-              <button
-                onClick={() => paginate(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                  currentPage === 1 
-                    ? 'text-gray-300 cursor-not-allowed' 
-                    : 'text-gray-500 hover:bg-gray-50'
-                }`}
-              >
-                Anterior
-              </button>
-              
-              {[...Array(totalPages)].map((_, index) => (
+          {totalPages > 1 && (
+            <div className="mt-4 flex justify-center">
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                {/* Previous Button */}
                 <button
-                  key={index}
-                  onClick={() => paginate(index + 1)}
-                  className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${
-                    currentPage === index + 1
-                      ? 'bg-blue-50 border-blue-500 text-blue-600'
-                      : 'text-gray-700 hover:bg-gray-50'
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                    currentPage === 1
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : 'text-gray-500 hover:bg-gray-50'
                   }`}
                 >
-                  {index + 1}
+                  Anterior
                 </button>
-              ))}
 
-              <button
-                onClick={() => paginate(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                  currentPage === totalPages 
-                    ? 'text-gray-300 cursor-not-allowed' 
-                    : 'text-gray-500 hover:bg-gray-50'
-                }`}
-              >
-                Siguiente
-              </button>
-            </nav>
-          </div>
+                {/* Page Number Buttons */}
+                {getPageNumbers().map((page, index) => (
+                  page === '...' ? (
+                    <span key={`ellipsis-${index}`} className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={page}
+                      onClick={() => paginate(page)}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${
+                        currentPage === page
+                          ? 'bg-blue-50 border-blue-500 text-blue-600 z-10'
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                ))}
+
+                {/* Next Button */}
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                    currentPage === totalPages
+                      ? 'text-gray-300 cursor-not-allowed'
+                      : 'text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  Siguiente
+                </button>
+              </nav>
+            </div>
+          )}
         </div>
       </div>
     </div>
