@@ -144,7 +144,6 @@ const Categorias = ({ onSubmit }) => {
       }
     } catch (error) {
       console.error('Error creating category:', error);
-      setError(error.response?.data?.error || 'Error al crear la categoría');
     } finally {
       setLoading(false);
     }
@@ -306,7 +305,8 @@ const Categorias = ({ onSubmit }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imágenes</th>
+                {/* Columna de Imágenes eliminada */}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th> {/* Nueva columna */}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -318,44 +318,26 @@ const Categorias = ({ onSubmit }) => {
                     <td className="px-6 py-4">
                       <div className="max-w-xs truncate">{categoria.descripcion || '-'}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {/* Mostramos todas las imágenes juntas */}
-                      {(categoria.imagenes_adicionales && categoria.imagenes_adicionales.length > 0) || categoria.img ? (
-                        <div className="flex space-x-1">
-                          {/* Primero mostramos la imagen principal si existe */}
-                          {categoria.img && (
-                            <img 
-                              src={categoria.img} 
-                              alt={`${categoria.nombre} - imagen principal`} 
-                              className="h-8 w-8 object-cover rounded"
-                            />
-                          )}
-                          {/* Luego mostramos hasta 3 imágenes adicionales (o menos si ya hay principal) */}
-                          {categoria.imagenes_adicionales && 
-                            categoria.imagenes_adicionales.slice(0, categoria.img ? 2 : 3).map((img, index) => (
-                              <img 
-                                key={index}
-                                src={img} 
-                                alt={`${categoria.nombre} - imagen ${index + 1}`} 
-                                className="h-8 w-8 object-cover rounded"
-                              />
-                            ))}
-                          {/* Indicador de más imágenes */}
-                          {categoria.imagenes_adicionales && 
-                           categoria.imagenes_adicionales.length > (categoria.img ? 2 : 3) && (
-                            <div className="h-8 w-8 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-600">
-                              +{categoria.imagenes_adicionales.length - (categoria.img ? 2 : 3)}
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">Sin imágenes</span>
-                      )}
+                    {/* Celda de Imágenes eliminada */}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium"> {/* Nueva celda para acciones */}
+                      <button 
+                        onClick={() => console.log('Editar categoría:', categoria.id_categoria)} // Placeholder para editar
+                        className="text-indigo-600 hover:text-indigo-900 mr-3"
+                      >
+                        Editar
+                      </button>
+                      <button 
+                        onClick={() => console.log('Eliminar categoría:', categoria.id_categoria)} // Placeholder para eliminar
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Eliminar
+                      </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
+                  {/* Ajustar colspan */}
                   <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
                     No hay categorías disponibles
                   </td>
