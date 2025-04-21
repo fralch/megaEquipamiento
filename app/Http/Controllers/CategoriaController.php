@@ -170,8 +170,63 @@ class CategoriaController extends Controller
     /**
      * Eliminar una categoría y devolver el id
      */ 
-    public function destroy($id){
-        Categoria::destroy($id);
+    public function destroy($id)
+    {
+        // Primero obtenemos la categoría para acceder a su información
+        $categoria = Categoria::find($id);
+        
+        if (!$categoria) {
+            return response()->json(['error' => 'Categoría no encontrada'], 404);
+        }
+        
+        // Extraemos el nombre de la carpeta del path de la imagen
+        if ($categoria->img) {
+            $imgPath = $categoria->img;
+            $pathParts = explode('/', $imgPath);
+            
+            // La estructura debería ser /img/categorias/nombre_categoria/...
+            if (count($pathParts) >= 4) {
+                $folderName = $pathParts[3]; // Obtenemos el nombre_categoria
+                $categoryFolder = public_path('img/categorias/' . $folderName);
+                
+                // Verificamos si el directorio existe
+                if (file_exists($categoryFolder) && is_dir($categoryFolder)) {
+                    // Eliminamos todos los archivos dentro de la carpeta
+                    $files = glob($categoryFolder . '/*');
+                    foreach ($files as $file) {
+                        if (is_file($file)) {
+                            unlink($file);
+                        }
+                    }
+                    
+                    // Eliminamos la carpeta
+                    rmdir($categoryFolder);
+                }
+            } else {
+                // Si el path no contiene la estructura esperada, intentamos buscar la carpeta
+                // basándonos en el nombre de la categoría
+                $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($categoria->nombre));
+                $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized);
+                $categoryFolder = public_path('img/categorias/' . $categoryNameSanitized);
+                
+                if (file_exists($categoryFolder) && is_dir($categoryFolder)) {
+                    // Eliminamos todos los archivos dentro de la carpeta
+                    $files = glob($categoryFolder . '/*');
+                    foreach ($files as $file) {
+                        if (is_file($file)) {
+                            unlink($file);
+                        }
+                    }
+                    
+                    // Eliminamos la carpeta
+                    rmdir($categoryFolder);
+                }
+            }
+        }
+        
+        // Finalmente eliminamos la categoría de la base de datos
+        $categoria->delete();
+        
         return response()->json($id);
     }
 

@@ -13,6 +13,8 @@ const Categorias = ({ onSubmit }) => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Función para cargar las categorías
   const loadCategorias = async () => {
@@ -29,6 +31,16 @@ const Categorias = ({ onSubmit }) => {
   useEffect(() => {
     loadCategorias();
   }, []);
+
+  // Auto-eliminar mensaje de éxito después de 3 segundos
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -96,6 +108,48 @@ const Categorias = ({ onSubmit }) => {
     setImagenesPreview(newPreviews);
   };
 
+  // Nueva función para eliminar una categoría
+  const handleDeleteCategoria = async (id, nombre) => {
+    // Confirmar antes de eliminar
+    if (!window.confirm(`¿Estás seguro de eliminar la categoría "${nombre}"? Esta acción también eliminará la carpeta de imágenes asociada y no se puede deshacer.`)) {
+      return;
+    }
+    
+    setDeleteLoading(true);
+    try {
+      // Obtener el CSRF token
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      
+      // Configurar los headers para la petición DELETE
+      const config = {
+        headers: {
+          'X-CSRF-TOKEN': csrfToken
+        }
+      };
+      
+      // Enviar petición DELETE a la ruta proporcionada
+      await axios.delete(`/categoria/delete/${id}`, config);
+      
+      // Mostrar mensaje de éxito
+      setSuccessMessage(`Categoría "${nombre}" eliminada correctamente`);
+      
+      // Recargar la lista de categorías
+      loadCategorias();
+      
+      // Si estamos en la última página y no hay más elementos, volver a la página anterior
+      const remainingItems = categorias.length - 1;
+      const newTotalPages = Math.ceil(remainingItems / itemsPerPage);
+      if (currentPage > newTotalPages && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      setError(`Error al eliminar la categoría: ${error.response?.data?.error || 'Error desconocido'}`);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -125,7 +179,7 @@ const Categorias = ({ onSubmit }) => {
       const response = await axios.post('/categoria/create', formData, config);
       
       // Mostramos mensaje de éxito
-      alert('Categoría creada exitosamente');
+      setSuccessMessage('Categoría creada exitosamente');
       
       // Actualizamos la lista de categorías
       loadCategorias();
@@ -144,6 +198,7 @@ const Categorias = ({ onSubmit }) => {
       }
     } catch (error) {
       console.error('Error creating category:', error);
+      setError(`Error al crear la categoría: ${error.response?.data?.message || 'Error desconocido'}`);
     } finally {
       setLoading(false);
     }
@@ -198,14 +253,22 @@ const Categorias = ({ onSubmit }) => {
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
       <h1 className="text-2xl font-bold mb-4">Gestión de Categorías</h1>
+      
+      {/* Mensajes de éxito o error */}
+      {successMessage && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+          {successMessage}
+        </div>
+      )}
+      
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <h2 className="text-lg font-bold mb-4">Agregar Nueva Categoría</h2>
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="mb-4">
@@ -305,8 +368,7 @@ const Categorias = ({ onSubmit }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-                {/* Columna de Imágenes eliminada */}
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th> {/* Nueva columna */}
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -318,26 +380,27 @@ const Categorias = ({ onSubmit }) => {
                     <td className="px-6 py-4">
                       <div className="max-w-xs truncate">{categoria.descripcion || '-'}</div>
                     </td>
-                    {/* Celda de Imágenes eliminada */}
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium"> {/* Nueva celda para acciones */}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button 
-                        onClick={() => console.log('Editar categoría:', categoria.id_categoria)} // Placeholder para editar
+                        onClick={() => console.log('Editar categoría:', categoria.id_categoria)}
                         className="text-indigo-600 hover:text-indigo-900 mr-3"
                       >
                         Editar
                       </button>
                       <button 
-                        onClick={() => console.log('Eliminar categoría:', categoria.id_categoria)} // Placeholder para eliminar
-                        className="text-red-600 hover:text-red-900"
+                        onClick={() => handleDeleteCategoria(categoria.id_categoria, categoria.nombre)}
+                        disabled={deleteLoading}
+                        className={`${
+                          deleteLoading ? 'text-red-300' : 'text-red-600 hover:text-red-900'
+                        } transition-colors`}
                       >
-                        Eliminar
+                        {deleteLoading ? 'Eliminando...' : 'Eliminar'}
                       </button>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  {/* Ajustar colspan */}
                   <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
                     No hay categorías disponibles
                   </td>
