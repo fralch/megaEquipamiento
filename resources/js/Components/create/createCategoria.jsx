@@ -7,8 +7,8 @@ const Categorias = ({ onSubmit }) => {
     nombre: "",
     descripcion: "",
   });
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagenes, setImagenes] = useState([]); // Array para las imágenes
+  const [imagenesPreview, setImagenesPreview] = useState([]); // Array para vistas previas
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,36 +35,65 @@ const Categorias = ({ onSubmit }) => {
     setForm({ ...form, [name]: value });
   };
 
-  // Manejar cambio de archivo de imagen
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+  // Manejar cambio de múltiples imágenes
+  const handleImagenesChange = (e) => {
+    const files = Array.from(e.target.files);
+    const newImagenes = [];
+    const newPreviews = [];
+    let hasError = false;
+
+    // Validar que no se seleccionen más de 5 imágenes
+    if (files.length > 5) {
+      setError('No puedes seleccionar más de 5 imágenes');
+      return;
+    }
+
+    // Validar cada archivo
+    for (const file of files) {
       // Validar tamaño del archivo (2MB)
       if (file.size > 2 * 1024 * 1024) {
-        setError('La imagen no debe exceder los 2MB');
-        return;
+        setError(`La imagen ${file.name} excede los 2MB`);
+        hasError = true;
+        break;
       }
       
       // Validar tipo de archivo
       const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webm'];
       if (!validTypes.includes(file.type)) {
-        setError('Formato de imagen no válido. Use JPEG, PNG, JPG, GIF o WEBM');
-        return;
+        setError(`Formato de imagen ${file.name} no válido. Use JPEG, PNG, JPG, GIF o WEBM`);
+        hasError = true;
+        break;
       }
       
-      setImage(file);
+      newImagenes.push(file);
       
-      // Crear vista previa de la imagen
+      // Crear vista previa para cada imagen
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result);
+        newPreviews.push({ id: file.name, preview: reader.result });
+        // Si ya tenemos todas las previsualizaciones, actualizamos el estado
+        if (newPreviews.length === files.length) {
+          setImagenesPreview([...newPreviews]);
+        }
       };
       reader.readAsDataURL(file);
-      setError(null);
-    } else {
-      setImage(null);
-      setImagePreview(null);
     }
+    
+    if (!hasError) {
+      setImagenes(newImagenes);
+      setError(null);
+    }
+  };
+
+  // Eliminar una imagen de la lista
+  const removeImage = (index) => {
+    const newImagenes = [...imagenes];
+    newImagenes.splice(index, 1);
+    setImagenes(newImagenes);
+    
+    const newPreviews = [...imagenesPreview];
+    newPreviews.splice(index, 1);
+    setImagenesPreview(newPreviews);
   };
 
   const handleSubmit = async (e) => {
@@ -72,14 +101,16 @@ const Categorias = ({ onSubmit }) => {
     setLoading(true);
     setError(null);
     
-    // Crear un objeto FormData para enviar los datos del formulario incluyendo la imagen
+    // Crear un objeto FormData para enviar los datos del formulario incluyendo las imágenes
     const formData = new FormData();
     formData.append('nombre', form.nombre);
     formData.append('descripcion', form.descripcion || '');
     
-    // Añadir la imagen si existe
-    if (image) {
-      formData.append('img', image);
+    // Añadir las imágenes si existen
+    if (imagenes.length > 0) {
+      imagenes.forEach((img, index) => {
+        formData.append(`imagenes[${index}]`, img);
+      });
     }
     
     try {
@@ -104,20 +135,16 @@ const Categorias = ({ onSubmit }) => {
         nombre: "",
         descripcion: "",
       });
-      setImage(null);
-      setImagePreview(null);
+      setImagenes([]);
+      setImagenesPreview([]);
       
       // Si hay una función onSubmit, la llamamos con la respuesta
       if (onSubmit) {
         onSubmit(response.data);
       }
     } catch (error) {
-      setForm({
-        nombre: "",
-        descripcion: "",
-      });
       console.error('Error creating category:', error);
-      // setError(error.response?.data?.error || 'Error al crear la categoría');
+      setError(error.response?.data?.error || 'Error al crear la categoría');
     } finally {
       setLoading(false);
     }
@@ -198,47 +225,63 @@ const Categorias = ({ onSubmit }) => {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="img" className="block text-sm font-medium text-gray-700">
-              Imagen
+            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
+              Descripción
             </label>
-            <input
-              type="file"
-              id="img"
-              name="img"
-              onChange={handleImageChange}
+            <textarea
+              id="descripcion"
+              name="descripcion"
+              value={form.descripcion}
+              onChange={handleChange}
+              rows="3"
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              accept="image/jpeg,image/png,image/jpg,image/gif,image/webm"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Formatos permitidos: JPEG, PNG, JPG, GIF, WEBM (máx. 2MB)
-            </p>
-            
-            {/* Vista previa de imagen */}
-            {imagePreview && (
-              <div className="mt-2">
-                <p className="text-sm font-medium text-gray-700 mb-1">Vista previa:</p>
-                <img 
-                  src={imagePreview} 
-                  alt="Vista previa" 
-                  className="h-24 w-auto object-cover rounded border border-gray-300"
-                />
-              </div>
-            )}
           </div>
         </div>
-        
+
+        {/* Campo unificado para imágenes */}
         <div className="mb-4">
-          <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
-            Descripción
+          <label htmlFor="imagenes" className="block text-sm font-medium text-gray-700">
+            Imágenes (máximo 5)
           </label>
-          <textarea
-            id="descripcion"
-            name="descripcion"
-            value={form.descripcion}
-            onChange={handleChange}
-            rows="3"
+          <input
+            type="file"
+            id="imagenes"
+            name="imagenes"
+            onChange={handleImagenesChange}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+            accept="image/jpeg,image/png,image/jpg,image/gif,image/webm"
+            multiple
           />
+          <p className="text-xs text-gray-500 mt-1">
+            Puedes seleccionar hasta 5 imágenes (máx. 2MB cada una)
+          </p>
+          
+          {/* Vista previa de imágenes */}
+          {imagenesPreview.length > 0 && (
+            <div className="mt-2">
+              <p className="text-sm font-medium text-gray-700 mb-1">Vistas previas:</p>
+              <div className="flex flex-wrap gap-2">
+                {imagenesPreview.map((img, index) => (
+                  <div key={img.id} className="relative">
+                    <img 
+                      src={img.preview} 
+                      alt={`Vista previa ${index + 1}`} 
+                      className="h-24 w-auto object-cover rounded border border-gray-300"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                      title="Eliminar imagen"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end">
@@ -263,7 +306,7 @@ const Categorias = ({ onSubmit }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagen</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imágenes</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -276,14 +319,37 @@ const Categorias = ({ onSubmit }) => {
                       <div className="max-w-xs truncate">{categoria.descripcion || '-'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {categoria.img ? (
-                        <img 
-                          src={categoria.img} 
-                          alt={categoria.nombre} 
-                          className="h-10 w-10 object-cover rounded"
-                        />
+                      {/* Mostramos todas las imágenes juntas */}
+                      {(categoria.imagenes_adicionales && categoria.imagenes_adicionales.length > 0) || categoria.img ? (
+                        <div className="flex space-x-1">
+                          {/* Primero mostramos la imagen principal si existe */}
+                          {categoria.img && (
+                            <img 
+                              src={categoria.img} 
+                              alt={`${categoria.nombre} - imagen principal`} 
+                              className="h-8 w-8 object-cover rounded"
+                            />
+                          )}
+                          {/* Luego mostramos hasta 3 imágenes adicionales (o menos si ya hay principal) */}
+                          {categoria.imagenes_adicionales && 
+                            categoria.imagenes_adicionales.slice(0, categoria.img ? 2 : 3).map((img, index) => (
+                              <img 
+                                key={index}
+                                src={img} 
+                                alt={`${categoria.nombre} - imagen ${index + 1}`} 
+                                className="h-8 w-8 object-cover rounded"
+                              />
+                            ))}
+                          {/* Indicador de más imágenes */}
+                          {categoria.imagenes_adicionales && 
+                           categoria.imagenes_adicionales.length > (categoria.img ? 2 : 3) && (
+                            <div className="h-8 w-8 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-600">
+                              +{categoria.imagenes_adicionales.length - (categoria.img ? 2 : 3)}
+                            </div>
+                          )}
+                        </div>
                       ) : (
-                        <span className="text-gray-400">Sin imagen</span>
+                        <span className="text-gray-400">Sin imágenes</span>
                       )}
                     </td>
                   </tr>

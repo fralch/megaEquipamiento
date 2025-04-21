@@ -75,42 +75,81 @@ class CategoriaController extends Controller
         $request->validate([
             'nombre' => 'required|max:200',
             'descripcion' => 'nullable|string',
-            'img' => 'nullable|file|mimes:jpeg,png,jpg,gif,webm|max:2048',
+            'imagenes.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webm|max:2048', // Validación para múltiples imágenes
+            'imagenes' => 'max:5', // Máximo 5 imágenes
         ]);
-
+    
         // Preparar datos para la creación
         $data = [
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
-            'img' => null,
+            'img' => null, // Mantenemos el campo principal de imagen
         ];
+    
+        // Crear la categoría primero
+        $categoria = Categoria::create($data);
 
+        // Sanitize the category name for the folder path
+        $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($request->nombre)); // Replace non-alphanumeric characters with underscores
+        $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized); // Replace multiple underscores with a single one
+    
+        // Crear directorio específico para esta categoría usando el nombre sanitizado
+        $categoryFolder = 'img/categorias/' . $categoryNameSanitized; // Use sanitized name instead of ID
+        $fullPath = public_path($categoryFolder);
+        
+        // Crear el directorio si no existe
+        if (!file_exists($fullPath)) {
+            mkdir($fullPath, 0777, true);
+        }
+    
+        // Procesar imagen principal si existe
         if ($request->hasFile('img')) {
             $file = $request->file('img');
-
-            // Generar nombre único de archivo con timestamp
-            $filePath = time() . '.' . $file->getClientOriginalExtension();
-
-            // Establecer ruta de destino
-            $destinationPath = public_path('img/categorias') . '/' . $filePath;
-
-            // Crear el directorio si no existe
-            if (!file_exists(public_path('img/categorias'))) {
-                mkdir(public_path('img/categorias'), 0777, true);
-            }
-
-            // Mover el archivo subido
+            // Use a unique name for the file, keeping the original extension
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $destinationPath = $fullPath . '/' . $fileName;
+    
             if (move_uploaded_file($file->getPathname(), $destinationPath)) {
-                // Añadir solo el nombre del archivo al array de datos
-                $data['img'] = '/img/categorias/'.$filePath; // Store only the filename
-            } else {
-                return response()->json(['error' => 'Error al mover el archivo.'], 500);
+                // Actualizar la ruta de la imagen principal
+                $categoria->img = '/' . $categoryFolder . '/' . $fileName; // Use the new path structure
+                $categoria->save();
             }
         }
-
-        $creado = Categoria::create($data);
-
-        return response()->json($creado);
+    
+        // Procesar imágenes adicionales (hasta 5)
+        $imagenesGuardadas = [];
+        
+        if ($request->hasFile('imagenes')) {
+            $imagenes = $request->file('imagenes');
+            $count = 0;
+            
+            foreach ($imagenes as $imagen) {
+                if ($count >= 5) break; // Limitar a 5 imágenes
+                
+                // Use a unique name for each additional image file
+                $fileName = time() . '_' . uniqid() . '_' . $count . '.' . $imagen->getClientOriginalExtension();
+                $destinationPath = $fullPath . '/' . $fileName;
+                
+                if (move_uploaded_file($imagen->getPathname(), $destinationPath)) {
+                    // Guardar las rutas de las imágenes adicionales
+                    $imagenesGuardadas[] = '/' . $categoryFolder . '/' . $fileName; // Use the new path structure
+                    
+                    // Si tienes una tabla para imágenes relacionadas:
+                    // CategoriaImagen::create([
+                    //     'categoria_id' => $categoria->id,
+                    //     'ruta_imagen' => '/' . $categoryFolder . '/' . $fileName
+                    // ]);
+                }
+                
+                $count++;
+            }
+        }
+    
+        // Agregamos las imágenes al resultado para devolverlas
+        // Note: You might want to save $imagenesGuardadas to the database if needed permanently
+        $categoria->imagenes_adicionales = $imagenesGuardadas; 
+    
+        return response()->json($categoria);
     }
 
 
