@@ -15,6 +15,8 @@ const Categorias = ({ onSubmit }) => {
   const [itemsPerPage] = useState(10);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [marcas, setMarcas] = useState([]); // Array para las marcas
+
 
   // Función para cargar las categorías
   const loadCategorias = async () => {
@@ -41,6 +43,21 @@ const Categorias = ({ onSubmit }) => {
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
+
+  // obtener las marcas
+  useEffect(() => {
+    const fetchMarcas = async () => {
+      try {
+        const response = await axios.get('/marca/all');
+        setMarcas(response.data);
+      } catch (error) {
+        console.error('Error fetching marcas:', error);
+        setError('No se pudieron cargar las marcas');
+      }
+    };
+    fetchMarcas();
+  }, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -178,6 +195,16 @@ const Categorias = ({ onSubmit }) => {
       
       const response = await axios.post('/categoria/create', formData, config);
       
+     
+      // TODO : enlazar la categoria con la marca
+      if(response.data.length > 0){
+        const config2 = {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+          }
+        };
+      }
       // Mostramos mensaje de éxito
       setSuccessMessage('Categoría creada exitosamente');
       
@@ -198,7 +225,6 @@ const Categorias = ({ onSubmit }) => {
       }
     } catch (error) {
       console.error('Error creating category:', error);
-      setError(`Error al crear la categoría: ${error.response?.data?.message || 'Error desconocido'}`);
     } finally {
       setLoading(false);
     }
@@ -252,116 +278,161 @@ const Categorias = ({ onSubmit }) => {
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Gestión de Categorías</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Gestión de Categorías</h1>
       
       {/* Mensajes de éxito o error */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center">
+          <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
           {successMessage}
         </div>
       )}
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 flex items-center">
+          <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          </svg>
           {error}
         </div>
       )}
       
-      <form onSubmit={handleSubmit} encType="multipart/form-data">
-        <h2 className="text-lg font-bold mb-4">Agregar Nueva Categoría</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="mb-4">
-            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
-              Nombre <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="nombre"
-              name="nombre"
-              value={form.nombre}
-              onChange={handleChange}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              required
-            />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
-              Descripción
-            </label>
-            <textarea
-              id="descripcion"
-              name="descripcion"
-              value={form.descripcion}
-              onChange={handleChange}
-              rows="3"
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            />
-          </div>
-        </div>
-
-        {/* Campo unificado para imágenes */}
-        <div className="mb-4">
-          <label htmlFor="imagenes" className="block text-sm font-medium text-gray-700">
-            Imágenes (máximo 5)
-          </label>
-          <input
-            type="file"
-            id="imagenes"
-            name="imagenes"
-            onChange={handleImagenesChange}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            accept="image/jpeg,image/png,image/jpg,image/gif,image/webm"
-            multiple
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            Puedes seleccionar hasta 5 imágenes (máx. 2MB cada una)
-          </p>
+      <div className="bg-gray-50 p-5 rounded-lg mb-8 border border-gray-200">
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
+          <h2 className="text-lg font-bold mb-5 text-gray-700 border-b pb-2">Agregar Nueva Categoría</h2>
           
-          {/* Vista previa de imágenes */}
-          {imagenesPreview.length > 0 && (
-            <div className="mt-2">
-              <p className="text-sm font-medium text-gray-700 mb-1">Vistas previas:</p>
-              <div className="flex flex-wrap gap-2">
-                {imagenesPreview.map((img, index) => (
-                  <div key={img.id} className="relative">
-                    <img 
-                      src={img.preview} 
-                      alt={`Vista previa ${index + 1}`} 
-                      className="h-24 w-auto object-cover rounded border border-gray-300"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
-                      title="Eliminar imagen"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="mb-4">
+              <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+                Nombre <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                value={form.nombre}
+                onChange={handleChange}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                required
+              />
             </div>
-          )}
-        </div>
 
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={loading}
-            className={`px-4 py-2 ${
-              loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-            } text-white font-bold rounded-lg transition-colors`}
-          >
-            {loading ? 'Guardando...' : 'Guardar Categoría'}
-          </button>
-        </div>
-      </form>
+            <div className="mb-4">
+              <label htmlFor="marca" className="block text-sm font-medium text-gray-700 mb-1">
+                Marca <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="marca"
+                name="marca"
+                value={form.marca}
+                onChange={handleChange}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                required
+              >
+                <option value="">Selecciona una marca</option>
+                {marcas.map((marca) => (
+                  <option key={marca.id_marca} value={marca.id_marca}>
+                    {marca.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-4 md:col-span-2">
+              <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">
+                Descripción
+              </label>
+              <textarea
+                id="descripcion"
+                name="descripcion"
+                value={form.descripcion}
+                onChange={handleChange}
+                rows="3"
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              />
+            </div>
+          </div>
+
+          {/* Campo unificado para imágenes */}
+          <div className="mb-6 mt-4 p-4 bg-white border border-gray-200 rounded-md">
+            <label htmlFor="imagenes" className="block text-sm font-medium text-gray-700 mb-2">
+              Imágenes (máximo 5)
+            </label>
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                <div className="flex flex-col items-center justify-center pt-7">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                  </svg>
+                  <p className="pt-1 text-sm text-gray-600">Haz clic para seleccionar</p>
+                  <p className="text-xs text-gray-500">Máximo 5 imágenes (2MB cada una)</p>
+                </div>
+                <input
+                  type="file"
+                  id="imagenes"
+                  name="imagenes"
+                  onChange={handleImagenesChange}
+                  className="hidden"
+                  accept="image/jpeg,image/png,image/jpg,image/gif,image/webm"
+                  multiple
+                />
+              </label>
+            </div>
+            
+            {/* Vista previa de imágenes */}
+            {imagenesPreview.length > 0 && (
+              <div className="mt-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">Vistas previas:</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                  {imagenesPreview.map((img, index) => (
+                    <div key={img.id} className="relative group">
+                      <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-100 shadow-sm">
+                        <img 
+                          src={img.preview} 
+                          alt={`Vista previa ${index + 1}`} 
+                          className="h-full w-full object-cover object-center"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md hover:bg-red-600 transition-colors"
+                        title="Eliminar imagen"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end mt-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className={`px-5 py-2.5 ${
+                loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+              } text-white font-medium rounded-lg transition-colors shadow-sm flex items-center`}
+            >
+              {loading && (
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )}
+              {loading ? 'Guardando...' : 'Guardar Categoría'}
+            </button>
+          </div>
+        </form>
+      </div>
 
       <div className="mt-8">
-        <h2 className="text-lg font-bold mb-4">Categorías Existentes</h2>
-        <div className="overflow-x-auto">
+        <h2 className="text-lg font-bold mb-4 text-gray-700 border-b pb-2">Categorías Existentes</h2>
+        <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -374,16 +445,16 @@ const Categorias = ({ onSubmit }) => {
             <tbody className="bg-white divide-y divide-gray-200">
               {currentItems.length > 0 ? (
                 currentItems.map((categoria) => (
-                  <tr key={categoria.id_categoria}>
-                    <td className="px-6 py-4 whitespace-nowrap">{categoria.id_categoria}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{categoria.nombre}</td>
-                    <td className="px-6 py-4">
+                  <tr key={categoria.id_categoria} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{categoria.id_categoria}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{categoria.nombre}</td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
                       <div className="max-w-xs truncate">{categoria.descripcion || '-'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button 
                         onClick={() => console.log('Editar categoría:', categoria.id_categoria)}
-                        className="text-indigo-600 hover:text-indigo-900 mr-3"
+                        className="text-indigo-600 hover:text-indigo-900 mr-3 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors"
                       >
                         Editar
                       </button>
@@ -391,8 +462,8 @@ const Categorias = ({ onSubmit }) => {
                         onClick={() => handleDeleteCategoria(categoria.id_categoria, categoria.nombre)}
                         disabled={deleteLoading}
                         className={`${
-                          deleteLoading ? 'text-red-300' : 'text-red-600 hover:text-red-900'
-                        } transition-colors`}
+                          deleteLoading ? 'bg-red-100 text-red-300' : 'bg-red-50 text-red-600 hover:text-red-900 hover:bg-red-100'
+                        } px-3 py-1 rounded-md transition-colors`}
                       >
                         {deleteLoading ? 'Eliminando...' : 'Eliminar'}
                       </button>
@@ -411,55 +482,87 @@ const Categorias = ({ onSubmit }) => {
 
           {/* Paginación */}
           {totalPages > 1 && (
-            <div className="mt-4 flex justify-center">
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                {/* Previous Button */}
+            <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+              <div className="flex-1 flex justify-between sm:hidden">
                 <button
                   onClick={() => paginate(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                  className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
                     currentPage === 1
-                      ? 'text-gray-300 cursor-not-allowed'
-                      : 'text-gray-500 hover:bg-gray-50'
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   Anterior
                 </button>
-
-                {/* Page Number Buttons */}
-                {getPageNumbers().map((page, index) => (
-                  page === '...' ? (
-                    <span key={`ellipsis-${index}`} className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                      ...
-                    </span>
-                  ) : (
-                    <button
-                      key={page}
-                      onClick={() => paginate(page)}
-                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium ${
-                        currentPage === page
-                          ? 'bg-blue-50 border-blue-500 text-blue-600 z-10'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  )
-                ))}
-
-                {/* Next Button */}
                 <button
                   onClick={() => paginate(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                  className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
                     currentPage === totalPages
-                      ? 'text-gray-300 cursor-not-allowed'
-                      : 'text-gray-500 hover:bg-gray-50'
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   Siguiente
                 </button>
-              </nav>
+              </div>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-center">
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => paginate(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                      currentPage === 1
+                        ? 'text-gray-300 cursor-not-allowed'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="sr-only">Anterior</span>
+                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+
+                  {/* Page Number Buttons */}
+                  {getPageNumbers().map((page, index) => (
+                    page === '...' ? (
+                      <span key={`ellipsis-${index}`} className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        onClick={() => paginate(page)}
+                        className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
+                          currentPage === page
+                            ? 'z-10 bg-indigo-500 border-indigo-500 text-indigo-600'
+                            : 'bg-white text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  ))}
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => paginate(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                      currentPage === totalPages
+                        ? 'text-gray-300 cursor-not-allowed'
+                        : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="sr-only">Siguiente</span>
+                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </nav>
+              </div>
             </div>
           )}
         </div>
