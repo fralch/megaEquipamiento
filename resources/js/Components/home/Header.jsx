@@ -1,8 +1,77 @@
-// Header.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
 import CartIcon from "./CartIcon ";
 
 const Header = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [showResults, setShowResults] = useState(false);
+
+    // Búsqueda de productos
+    const searchProducts = async (term) => {
+        if (term.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await axios.post('/productos/buscar', {
+                producto: term
+            });
+
+            // Verifica que la respuesta sea un array
+            if (Array.isArray(response.data)) {
+                setSearchResults(response.data);
+            } else {
+                console.error('La respuesta no es un array:', response.data);
+                setSearchResults([]);
+            }
+
+        } catch (error) {
+            console.error('Error en la búsqueda:', error);
+            setSearchResults([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            searchProducts(searchTerm);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    // Manejar clic en un producto
+    const handleProductClick = (product) => {
+        // Redirigir a la página del producto
+        window.location.href = `/producto/${product.id_producto}`;
+    };
+
+    // Manejar foco en el input
+    const handleFocus = () => {
+        if (searchTerm.length >= 2) {
+            setShowResults(true);
+        }
+    };
+
+    // Cerrar resultados al hacer clic fuera
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest('.search-container')) {
+                setShowResults(false);
+            }
+        };
+
+        document.addEventListener('click', handleClickOutside);
+        return () => {
+            document.removeEventListener('click', handleClickOutside);
+        };
+    }, []);
+
     return (
         <header className="bg-white">
             <div className="container mx-auto flex items-center px-8 py-8 md:px-12 max-w-full" id="">
@@ -16,11 +85,21 @@ const Header = () => {
                 </a>
 
                 {/* Input de búsqueda centrado - oculto en móvil */}
-                <div className="hidden sm:flex mx-auto w-full max-w-lg items-center rounded-md bg-gray-100 xl:max-w-2xl">
+                <div className="hidden sm:flex mx-auto w-full max-w-lg items-center rounded-md bg-gray-100 xl:max-w-2xl search-container relative">
                     <input
                         className="w-full border-l border-gray-300 bg-transparent py-2 pl-4 text-sm font-semibold"
                         type="text"
                         placeholder="Buscar ..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            if (e.target.value.length >= 2) {
+                                setShowResults(true);
+                            } else {
+                                setShowResults(false);
+                            }
+                        }}
+                        onFocus={handleFocus}
                     />
                     <svg
                         className="ml-auto h-5 px-4 text-gray-500"
@@ -37,6 +116,36 @@ const Header = () => {
                             d="M508.5 468.9L387.1 347.5c-2.3-2.3-5.3-3.5-8.5-3.5h-13.2c31.5-36.5 50.6-84 50.6-136C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c52 0 99.5-19.1 136-50.6v13.2c0 3.2 1.3 6.2 3.5 8.5l121.4 121.4c4.7 4.7 12.3 4.7 17 0l22.6-22.6c4.7-4.7 4.7-12.3 0-17zM208 368c-88.4 0-160-71.6-160-160S119.6 48 208 48s160 71.6 160 160-71.6 160-160 160z"
                         ></path>
                     </svg>
+                    
+                    {/* Resultados de búsqueda */}
+                    {showResults && (searchResults.length > 0 || isLoading) && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+                            {isLoading ? (
+                                <div className="p-3 text-sm text-gray-500">Buscando...</div>
+                            ) : (
+                                searchResults.map(product => (
+                                    <div
+                                        key={product.id_producto}
+                                        className="p-3 hover:bg-gray-100 cursor-pointer border-b"
+                                        onClick={() => handleProductClick(product)}
+                                    >
+                                        <div className="font-medium">{product.nombre}</div>
+                                        <div className="text-sm text-gray-600">
+                                            SKU: {product.sku}
+                                            {product.marca && (
+                                                <span className="ml-2">
+                                                    | Marca: {product.marca.nombre}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="text-sm text-gray-500">
+                                            Precio: S/. {product.precio_igv}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Contacto */}

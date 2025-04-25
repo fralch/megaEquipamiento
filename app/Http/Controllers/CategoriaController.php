@@ -75,10 +75,81 @@ class CategoriaController extends Controller
         $request->validate([
             'nombre' => 'required|max:200',
             'descripcion' => 'nullable|string',
+            'imagenes.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webm|max:2048', // Validación para múltiples imágenes
+            'imagenes' => 'max:5', // Máximo 5 imágenes
         ]);
+    
+        // Preparar datos para la creación
+        $data = [
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'img' => null, // Mantenemos el campo principal de imagen
+        ];
+    
+        // Crear la categoría primero
+        $categoria = Categoria::create($data);
 
-        $creado = Categoria::create($request->all());
-        return response()->json($creado);    
+        // Sanitize the category name for the folder path
+        $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($request->nombre)); // Replace non-alphanumeric characters with underscores
+        $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized); // Replace multiple underscores with a single one
+    
+        // Crear directorio específico para esta categoría usando el nombre sanitizado
+        $categoryFolder = 'img/categorias/' . $categoryNameSanitized; // Use sanitized name instead of ID
+        $fullPath = public_path($categoryFolder);
+        
+        // Crear el directorio si no existe
+        if (!file_exists($fullPath)) {
+            mkdir($fullPath, 0777, true);
+        }
+    
+        // Procesar imagen principal si existe
+        if ($request->hasFile('img')) {
+            $file = $request->file('img');
+            // Use a unique name for the file, keeping the original extension
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $destinationPath = $fullPath . '/' . $fileName;
+    
+            if (move_uploaded_file($file->getPathname(), $destinationPath)) {
+                // Actualizar la ruta de la imagen principal
+                $categoria->img = '/' . $categoryFolder . '/' . $fileName; // Use the new path structure
+                $categoria->save();
+            }
+        }
+    
+        // Procesar imágenes adicionales (hasta 5)
+        $imagenesGuardadas = [];
+        
+        if ($request->hasFile('imagenes')) {
+            $imagenes = $request->file('imagenes');
+            $count = 0;
+            
+            foreach ($imagenes as $imagen) {
+                if ($count >= 5) break; // Limitar a 5 imágenes
+                
+                // Use a unique name for each additional image file
+                $fileName = time() . '_' . uniqid() . '_' . $count . '.' . $imagen->getClientOriginalExtension();
+                $destinationPath = $fullPath . '/' . $fileName;
+                
+                if (move_uploaded_file($imagen->getPathname(), $destinationPath)) {
+                    // Guardar las rutas de las imágenes adicionales
+                    $imagenesGuardadas[] = '/' . $categoryFolder . '/' . $fileName; // Use the new path structure
+                    
+                    // Si tienes una tabla para imágenes relacionadas:
+                    // CategoriaImagen::create([
+                    //     'categoria_id' => $categoria->id,
+                    //     'ruta_imagen' => '/' . $categoryFolder . '/' . $fileName
+                    // ]);
+                }
+                
+                $count++;
+            }
+        }
+    
+        // Agregamos las imágenes al resultado para devolverlas
+        // Note: You might want to save $imagenesGuardadas to the database if needed permanently
+        $categoria->imagenes_adicionales = $imagenesGuardadas; 
+    
+        return response()->json($categoria);
     }
 
 
@@ -99,8 +170,63 @@ class CategoriaController extends Controller
     /**
      * Eliminar una categoría y devolver el id
      */ 
-    public function destroy($id){
-        Categoria::destroy($id);
+    public function destroy($id)
+    {
+        // Primero obtenemos la categoría para acceder a su información
+        $categoria = Categoria::find($id);
+        
+        if (!$categoria) {
+            return response()->json(['error' => 'Categoría no encontrada'], 404);
+        }
+        
+        // Extraemos el nombre de la carpeta del path de la imagen
+        if ($categoria->img) {
+            $imgPath = $categoria->img;
+            $pathParts = explode('/', $imgPath);
+            
+            // La estructura debería ser /img/categorias/nombre_categoria/...
+            if (count($pathParts) >= 4) {
+                $folderName = $pathParts[3]; // Obtenemos el nombre_categoria
+                $categoryFolder = public_path('img/categorias/' . $folderName);
+                
+                // Verificamos si el directorio existe
+                if (file_exists($categoryFolder) && is_dir($categoryFolder)) {
+                    // Eliminamos todos los archivos dentro de la carpeta
+                    $files = glob($categoryFolder . '/*');
+                    foreach ($files as $file) {
+                        if (is_file($file)) {
+                            unlink($file);
+                        }
+                    }
+                    
+                    // Eliminamos la carpeta
+                    rmdir($categoryFolder);
+                }
+            } else {
+                // Si el path no contiene la estructura esperada, intentamos buscar la carpeta
+                // basándonos en el nombre de la categoría
+                $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($categoria->nombre));
+                $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized);
+                $categoryFolder = public_path('img/categorias/' . $categoryNameSanitized);
+                
+                if (file_exists($categoryFolder) && is_dir($categoryFolder)) {
+                    // Eliminamos todos los archivos dentro de la carpeta
+                    $files = glob($categoryFolder . '/*');
+                    foreach ($files as $file) {
+                        if (is_file($file)) {
+                            unlink($file);
+                        }
+                    }
+                    
+                    // Eliminamos la carpeta
+                    rmdir($categoryFolder);
+                }
+            }
+        }
+        
+        // Finalmente eliminamos la categoría de la base de datos
+        $categoria->delete();
+        
         return response()->json($id);
     }
 

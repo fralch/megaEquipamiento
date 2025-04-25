@@ -98,7 +98,6 @@ const RelatedProducts = ({ productId }) => {
 
     return (
         <div className="py-6">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Productos Relacionados</h1>
             
             {relationTypes.map(type => (
                 renderProductGroup(type.nombre, groupedProducts[type.nombre])

@@ -22,6 +22,7 @@ class Categoria extends Model
     protected $fillable = [
         'nombre',
         'descripcion',
+        'img',
     ];
 
     // Definir los campos que deben ser ocultados en arrays

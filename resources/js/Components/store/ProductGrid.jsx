@@ -7,9 +7,11 @@ const ProductGrid = ({ products: initialProducts }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 24;
   const [loading, setLoading] = useState(true);
+  // Add new state to track if we're fetching all products
+  const [isAllProducts, setIsAllProducts] = useState(false);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchInitialProducts = async () => {
       try {
         // Verifica si los datos ya están en el localStorage
         const storedData = localStorage.getItem('products');
@@ -22,30 +24,41 @@ const ProductGrid = ({ products: initialProducts }) => {
           setProducts(JSON.parse(storedData));
           setLoading(false);
         } else {
-          const response = await fetch(`${URL_API}/product/all`);
+          const response = await fetch(`${URL_API}/product/all?page=1`);
           if (!response.ok) {
             throw new Error('Network response was not ok');
           }
           const data = await response.json();
-
-          const transformedProducts = data.map(item => {
+          console.log("todos los productos");
+          const transformedProducts = data.data.map(item => {
             console.log(item);
             const countryName = item.pais.toLowerCase();
             const countryCode = countryCodeMap[countryName] || 'unknown';
             const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
+            
             return {
               id: item.id_producto,
+              sku: item.sku,
               title: item.nombre,
               summary: item.caracteristicas || {},
               technicalData: item.datos_tecnicos || {},
               origin: item.pais,
               price: parseFloat(item.precio_igv),
+              priceWithoutProfit: parseFloat(item.precio_sin_ganancia),
+              priceWithProfit: parseFloat(item.precio_ganancia),
               image,
               flag: `https://flagcdn.com/w320/${countryCode}.png`,
               marca: item.marca.imagen,
               nombre_marca: item.marca.nombre,
-              link: `/producto/${item.id_producto}`, 
+              link: `/producto/${item.id_producto}`,
               descripcion: item.descripcion || '',
+              video: item.video || '',
+              envio: item.envio || '',
+              soporte_tecnico: item.soporte_tecnico || '',
+              archivos_adicionales: item.archivos_adicionales,
+              especificaciones_tecnicas: item.especificaciones_tecnicas,
+              subcategoria_id: item.id_subcategoria,
+              marca_id: item.marca_id
             };
           });
 
@@ -67,7 +80,7 @@ const ProductGrid = ({ products: initialProducts }) => {
     };
 
     if (!initialProducts || initialProducts.length === 0) {
-      fetchProducts();
+      fetchInitialProducts();
     } else {
       try {
         const transformedProducts = initialProducts.map(item => {
@@ -104,8 +117,72 @@ const ProductGrid = ({ products: initialProducts }) => {
 
   const totalPages = Math.ceil(products.length / productsPerPage);
 
-  const handlePageChange = (pageNumber) => {
+  // Fetch products function that gets called on page changes when needed
+  const fetchProducts = async (page = 1) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${URL_API}/product/all?page=${page}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      
+      const transformedProducts = data.data.map(item => {
+        const countryName = item.pais.toLowerCase();
+        const countryCode = countryCodeMap[countryName] || 'unknown';
+        const image = item.imagen && item.imagen.startsWith('http') ? item.imagen : `${URL_API}/${item.imagen}`;
+        
+        return {
+          id: item.id_producto,
+          sku: item.sku,
+          title: item.nombre,
+          summary: item.caracteristicas || {},
+          technicalData: item.datos_tecnicos || {},
+          origin: item.pais,
+          price: parseFloat(item.precio_igv),
+          priceWithoutProfit: parseFloat(item.precio_sin_ganancia),
+          priceWithProfit: parseFloat(item.precio_ganancia),
+          image,
+          flag: `https://flagcdn.com/w320/${countryCode}.png`,
+          marca: item.marca.imagen,
+          nombre_marca: item.marca.nombre,
+          link: `/producto/${item.id_producto}`,
+          descripcion: item.descripcion || '',
+          video: item.video || '',
+          envio: item.envio || '',
+          soporte_tecnico: item.soporte_tecnico || '',
+          archivos_adicionales: item.archivos_adicionales,
+          especificaciones_tecnicas: item.especificaciones_tecnicas,
+          subcategoria_id: item.id_subcategoria,
+          marca_id: item.marca_id
+        };
+      });
+
+      // Append new products instead of replacing them
+      setProducts(prevProducts => [...prevProducts, ...transformedProducts]);
+      setIsAllProducts(true);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setLoading(false);
+    }
+  };
+
+  const handlePageChange = async (pageNumber) => {
     setCurrentPage(pageNumber);
+    
+    // Calculate if we need to fetch more products
+    const totalProducts = products.length;
+    const productsNeeded = pageNumber * productsPerPage;
+    
+    // If we need more products and we're not currently loading
+    if (productsNeeded > totalProducts && !loading) {
+      const nextPage = Math.ceil(totalProducts / productsPerPage) + 1;
+      if (!isAllProducts) {
+        await fetchProducts(nextPage);
+      }
+    }
+    
     // Scroll to top when changing page
     window.scrollTo(0, 0);
   };
@@ -127,18 +204,89 @@ const ProductGrid = ({ products: initialProducts }) => {
           </div>
         ))}
       </div>
-      <div className="flex justify-center space-x-2 mt-4">
-        {Array.from({ length: totalPages }, (_, i) => (
+      
+      {/* Nueva paginación */}
+      <div className="flex flex-col items-center space-y-2 mt-8 mb-8">
+        <div className="flex items-center justify-center space-x-4">
           <button
-            key={i}
-            onClick={() => handlePageChange(i + 1)}
-            className={`px-4 py-2 rounded ${
-              currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200'
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className={`px-4 py-2 rounded-lg flex items-center ${
+              currentPage === 1
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
-            {i + 1}
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Anterior
           </button>
-        ))}
+      
+          <div className="flex items-center space-x-2">
+            {Array.from({ length: totalPages }, (_, i) => {
+              // Mostrar siempre primera y última página
+              if (i === 0 || i === totalPages - 1) {
+                return (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`px-4 py-2 rounded-lg ${
+                      currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              }
+              // Mostrar páginas cercanas a la actual
+              if (
+                i + 1 === currentPage ||
+                i + 1 === currentPage - 1 ||
+                i + 1 === currentPage + 1
+              ) {
+                return (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`px-4 py-2 rounded-lg ${
+                      currentPage === i + 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              }
+              // Mostrar puntos suspensivos
+              if (
+                i === 1 ||
+                i === totalPages - 2
+              ) {
+                return <span key={i}>...</span>;
+              }
+              return null;
+            })}
+          </div>
+      
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className={`px-4 py-2 rounded-lg flex items-center ${
+              currentPage === totalPages
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 text-white'
+            }`}
+          >
+            Siguiente
+            <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+        
+        <div className="text-sm text-gray-600">
+          Mostrando {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, products.length)} de {products.length} productos
+        </div>
       </div>
     </div>
   );
@@ -189,27 +337,30 @@ const Card = ({ product }) => {
     // Si el overlay está cerrado, dejamos que la navegación ocurra por defecto
   };
 
-  // Detener la propagación en los clicks dentro del overlay
+  // Modify the handleOverlayClick function
   const handleOverlayClick = (e) => {
-    e.stopPropagation();
+    // Only stop propagation if clicking on buttons or links
+    if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a') {
+      e.stopPropagation();
+    } else {
+      // Navigate to product page
+      window.location.href = product.link;
+    }
   };
 
-  // Añadir al carrito
+  // Add these functions before the return statement in the Card component
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // Lógica para añadir al carrito
-    console.log('Añadiendo al carrito:', product.id);
-    // Aquí puedes implementar la lógica real para añadir al carrito
+    // TODO: Implement cart functionality
+    console.log('Adding to cart:', product.id);
   };
 
-  // Comparar producto
   const handleCompare = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // Lógica para añadir a comparación
-    console.log('Comparando producto:', product.id);
-    // Aquí puedes implementar la lógica real para comparar
+    // TODO: Implement compare functionality
+    console.log('Comparing product:', product.id);
   };
 
   return (
@@ -307,10 +458,16 @@ const Card = ({ product }) => {
       {showDetails && (
         <div 
           ref={overlayRef}
-          className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start z-20 p-4"
+          className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start z-20 p-4 cursor-pointer"
           onClick={handleOverlayClick}
         >
-          <h2 className="text-2xl font-semibold mb-2 text-center">{product.title}</h2>
+          <a 
+            href={product.link}
+            className="text-2xl font-semibold mb-2 text-center hover:text-blue-300 transition-colors cursor-pointer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {product.title}
+          </a>
           
           {/* Contenedor con scroll */}
           <div className="flex-grow overflow-y-auto mb-4 pr-2 custom-scrollbar">
@@ -334,8 +491,6 @@ const Card = ({ product }) => {
                 <p className="text-sm text-gray-200">{product.descripcion}</p>
               </div>
             )}
-
-            
           </div>
           
           {/* Botones fijos en la parte inferior */}
