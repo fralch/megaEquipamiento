@@ -53,7 +53,7 @@ const RelatedProducts = ({ productId }) => {
             <Link href={`/producto/${product.id_producto}`}>
                 <div className="h-48 overflow-hidden">
                     <img 
-                        src={product.imagen} 
+                        src={product.imagen.startsWith('http') ? product.imagen : `/${product.imagen}`}
                         alt={product.nombre} 
                         className="w-full h-full object-cover"
                     />
