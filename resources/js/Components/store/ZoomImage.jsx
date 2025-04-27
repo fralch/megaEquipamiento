@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 
-const ZoomImage = ({ imageSrc, productId }) => {
+const ZoomImage = ({ imageSrc, productId, imageSize = 100 }) => {
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [isEditing, setIsEditing] = useState(false);
@@ -102,10 +102,15 @@ const ZoomImage = ({ imageSrc, productId }) => {
         onMouseLeave={handleMouseLeave}
         onMouseMove={handleMouseMove}
         onClick={!isEditing ? handleImageClick : undefined}
+        style={{ 
+          width: `${imageSize}%`,
+          aspectRatio: '1/1',
+          position: 'relative'
+        }}
       >
         <img
           src={editedImage || imageSrc}  
-          className={`w-full ${!isEditing && 'cursor-pointer'}`}
+          className={`${!isEditing && 'cursor-pointer'} object-cover w-full h-full`}
           ref={imgRef}
           alt="Imagen del producto"
         />
