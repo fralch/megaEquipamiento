@@ -14,7 +14,7 @@ const NavVertical = ({ isOpen, onClose }) => {
       setCategoriasArray(JSON.parse(storedData));
     } else {
       // Si no están en el localStorage, haz la solicitud a la API
-      fetch(URL_API + '/categorias-completa')
+      fetch('https://equipamientoindustriales.hpservidor.com/categorias-completa')
         .then((response) => response.json())
         .then((data) => {
           setCategoriasArray(data);
@@ -55,7 +55,6 @@ const NavVertical = ({ isOpen, onClose }) => {
           >
             <svg
               className="w-6 h-6"
-              xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"

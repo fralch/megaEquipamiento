@@ -13,7 +13,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
     useEffect(() => {
         const fetchRelationTypes = async () => {
             try {
-                const response = await axios.get('/tipos-relacion-productos');
+                const response = await axios.get('https://equipamientoindustriales.hpservidor.com/tipos-relacion-productos');
                 console.log(response.data);
                 setRelationTypes(response.data);
                 if (response.data.length > 0) {
@@ -36,7 +36,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
 
         setIsLoading(true);
         try {
-            const response = await axios.post('/productos/buscar', {
+            const response = await axios.post('https://equipamientoindustriales.hpservidor.com/productos/buscar', {
                 producto: term
             });
 
@@ -72,7 +72,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                 relacionado_id: selectedProduct.id,
                 tipo: selectedType
             })
-            const response = await axios.post('/product/agregar-relacion', {
+            const response = await axios.post('https://equipamientoindustriales.hpservidor.com/product/agregar-relacion', {
                 id: productId,
                 relacionado_id: selectedProduct.id,
                 tipo: selectedType
@@ -96,7 +96,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
 
     const handleRemoveProduct = async (relatedProduct) => {
         try {
-            await axios.delete(`/api/productos/${productId}/relaciones/${relatedProduct.id}`);
+            await axios.delete(`https://equipamientoindustriales.hpservidor.com/api/productos/${productId}/relaciones/${relatedProduct.id}`);
             setRelatedProducts(prev => prev.filter(p => p.id !== relatedProduct.id));
         } catch (error) {
             console.error('Error al eliminar relación:', error);

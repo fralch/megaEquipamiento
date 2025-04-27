@@ -19,7 +19,7 @@ const RelatedProducts = ({ productId }) => {
     useEffect(() => {
         const fetchRelationTypes = async () => {
             try {
-                const response = await axios.get('/tipos-relacion-productos');
+                const response = await axios.get('https://equipamientoindustriales.hpservidor.com/tipos-relacion-productos');
                 setRelationTypes(response.data);
             } catch (err) {
                 console.error("Error fetching relation types:", err);
@@ -33,7 +33,7 @@ const RelatedProducts = ({ productId }) => {
         const fetchRelatedProducts = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`/product/relacion/${productId}`);
+                const response = await axios.get(`https://equipamientoindustriales.hpservidor.com/product/relacion/${productId}`);
                 setRelatedProducts(response.data);
                 setLoading(false);
             } catch (err) {

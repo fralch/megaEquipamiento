@@ -24,8 +24,8 @@ const ProductDocuments = ({
                 <ul className="list-disc pl-5">
                     {lines.map((line, index) => (
                         <li key={index} className="mb-2">
-                            {line.startsWith('http') || line.startsWith('www') ? (
-                                <a href={line.startsWith('http') ? line : `http://${line}`} 
+                            {line.startsWith('https') || line.startsWith('www') ? (
+                                <a href={line.startsWith('https') ? line : `https://${line}`} 
                                    target="_blank" 
                                    rel="noopener noreferrer"
                                    className="text-blue-600 hover:underline">

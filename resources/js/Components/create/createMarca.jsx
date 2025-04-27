@@ -29,7 +29,7 @@ const Marcas = ({ onSubmit }) => {
 
   const fetchMarcas = async () => {
     try {
-      const response = await fetch('/marca/all');
+      const response = await fetch('https://equipamientoindustriales.hpservidor.com/marca/all');
       if (!response.ok) {
         throw new Error('Error fetching marcas');
       }
@@ -51,7 +51,7 @@ const Marcas = ({ onSubmit }) => {
     }
 
     try {
-      const response = await fetch('/marca/create', {
+      const response = await fetch('https://equipamientoindustriales.hpservidor.com/marca/create', {
         method: 'POST',
         headers: {
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),

@@ -24,7 +24,7 @@ const ProductGrid = ({ products: initialProducts }) => {
           setProducts(JSON.parse(storedData));
           setLoading(false);
         } else {
-          const response = await fetch(`${URL_API}/product/all?page=1`);
+          const response = await fetch(`https://equipamientoindustriales.hpservidor.com/product/all?page=1`);
           if (!response.ok) {
             throw new Error('Network response was not ok');
           }
@@ -121,7 +121,7 @@ const ProductGrid = ({ products: initialProducts }) => {
   const fetchProducts = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await fetch(`${URL_API}/product/all?page=${page}`);
+      const response = await fetch(`https://equipamientoindustriales.hpservidor.com/product/all?page=${page}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }

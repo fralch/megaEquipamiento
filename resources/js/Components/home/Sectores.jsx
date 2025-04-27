@@ -39,7 +39,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -56,7 +55,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -72,7 +70,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -88,7 +85,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -104,7 +100,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -143,7 +138,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -160,7 +154,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -176,7 +169,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -192,7 +184,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -208,7 +199,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -247,7 +237,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -263,7 +252,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -279,7 +267,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -295,7 +282,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -311,7 +297,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -350,7 +335,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -366,7 +350,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -382,7 +365,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -398,7 +380,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -414,7 +395,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -453,7 +433,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -469,7 +448,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -485,7 +463,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -501,7 +478,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -517,7 +493,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -556,7 +531,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -572,7 +546,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -588,7 +561,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -604,7 +576,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"
@@ -620,7 +591,6 @@ const Carrusel = () => {
                                 <li className="flex items-center">
                                     <svg
                                         className="w-6 h-6 text-green-500 mr-3"
-                                        xmlns="http://www.w3.org/2000/svg"
                                         fill="currentColor"
                                         viewBox="0 0 20 20"
                                         aria-hidden="true"

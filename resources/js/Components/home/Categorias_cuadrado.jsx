@@ -144,7 +144,7 @@ const Categories = () => {
       setLoading(false);
     } else {
       // Si no están en el localStorage o son viejos, hacer la solicitud a la API
-      fetch(URL_API + "/categorias-completa")
+      fetch("https://equipamientoindustriales.hpservidor.com/categorias-completa")
         .then((response) => response.json())
         .then((data) => {
           setCategories(data);

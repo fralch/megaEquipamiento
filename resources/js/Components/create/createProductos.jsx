@@ -269,9 +269,9 @@ const Productos = ({ onSubmit }) => {
     const fetchData = async () => {
       try {
         const [catRes, subRes, marRes] = await Promise.all([
-          fetch(`${URL_API}/categorias-all`),
-          fetch(`${URL_API}/subcategoria-all`),
-          fetch(`${URL_API}/marca/all`)
+          fetch(`https://equipamientoindustriales.hpservidor.com/categorias-all`),
+          fetch(`https://equipamientoindustriales.hpservidor.com/subcategoria-all`),
+          fetch(`https://equipamientoindustriales.hpservidor.com/marca/all`)
         ]);
         
         const [categoriasData, subcategoriasData, marcasData] = await Promise.all([

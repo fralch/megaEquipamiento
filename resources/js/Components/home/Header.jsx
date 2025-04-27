@@ -17,7 +17,7 @@ const Header = () => {
 
         setIsLoading(true);
         try {
-            const response = await axios.post('/productos/buscar', {
+            const response = await axios.post('https://equipamientoindustriales.hpservidor.com/productos/buscar', {
                 producto: term
             });
 
@@ -108,7 +108,6 @@ const Header = () => {
                         data-prefix="far"
                         data-icon="search"
                         role="img"
-                        xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 512 512"
                     >
                         <path
@@ -154,7 +153,6 @@ const Header = () => {
                     id="contactos"
                 >
                     <svg
-                        xmlns="http://www.w3.org/2000/svg"
                         width="24"
                         height="24"
                         viewBox="0 0 24 24"

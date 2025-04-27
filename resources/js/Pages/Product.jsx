@@ -96,7 +96,7 @@ const ProductPage = ({ producto }) => {
 
             setTempInputs({});
 
-            const response = await axios.post('/product/update', {
+            const response = await axios.post('https://equipamientoindustriales.hpservidor.com/product/update', {
                 id_producto: producto.id_producto,
                 [field]: tempInputs[field]
             }, {
@@ -144,7 +144,7 @@ const ProductPage = ({ producto }) => {
             }
 
             try {
-                const response = await axios.post('/product/update', {
+                const response = await axios.post('https://equipamientoindustriales.hpservidor.com/product/update', {
                     id_producto: producto.id_producto,
                     [modalType]: parsedData
                 }, {
@@ -296,7 +296,7 @@ const ProductPage = ({ producto }) => {
 
     const sendTableToServer = async () => {
         try {
-            const response = await axios.post('/product/update', {
+            const response = await axios.post('https://equipamientoindustriales.hpservidor.com/product/update', {
                 id_producto: producto.id_producto,
                 especificaciones_tecnicas: JSON.stringify(contenidoTabla)
             }, {

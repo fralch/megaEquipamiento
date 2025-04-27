@@ -18,7 +18,7 @@ export default function Categoria({ productos, categoria, subcategorias }) {
         if (storedData) {
             setCategoriasArray(JSON.parse(storedData));
         } else {
-            fetch(URL_API + "/categorias-completa")
+            fetch("https://equipamientoindustriales.hpservidor.com/categorias-completa")
                 .then((response) => response.json())
                 .then((data) => {
                     setCategoriasArray(data);

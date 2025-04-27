@@ -22,7 +22,7 @@ const Subcategorias = ({ onSubmit }) => {
   // Function to fetch categories
   const fetchCategorias = async () => {
     try {
-      const response = await axios.get('/categorias-all');
+      const response = await axios.get('https://equipamientoindustriales.hpservidor.com/categorias-all');
       setCategoriasOptions(response.data);
     } catch (error) {
       console.error('Error fetching categories:', error);
@@ -33,7 +33,7 @@ const Subcategorias = ({ onSubmit }) => {
   // Function to fetch subcategories
   const fetchSubcategorias = async () => {
     try {
-      const response = await axios.get('/subcategoria-all');
+      const response = await axios.get('https://equipamientoindustriales.hpservidor.com/subcategoria-all');
       setSubcategorias(response.data);
     } catch (error) {
       console.error('Error fetching subcategories:', error);
@@ -127,7 +127,7 @@ const Subcategorias = ({ onSubmit }) => {
       };
       
       // Enviar petición DELETE a la ruta proporcionada
-      await axios.delete(`/subcategoria/delete/${id}`, config);
+      await axios.delete(`https://equipamientoindustriales.hpservidor.com/subcategoria/delete/${id}`, config);
       
       // Mostrar mensaje de éxito
       setSuccessMessage(`Subcategoría "${nombre}" eliminada correctamente`);
@@ -174,7 +174,7 @@ const Subcategorias = ({ onSubmit }) => {
         }
       };
       
-      const response = await axios.post('/subcategoria_post/create', formData, config);
+      const response = await axios.post('https://equipamientoindustriales.hpservidor.com/subcategoria_post/create', formData, config);
       
       // Mostramos mensaje de éxito
       setSuccessMessage('Subcategoría creada exitosamente');

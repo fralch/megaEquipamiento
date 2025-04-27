@@ -23,7 +23,7 @@ export default function Subcategoria({ productos }) {
         if (storedData) {
             setCategoriasArray(JSON.parse(storedData));
         } else {
-            fetch(URL_API + "/categorias-completa")
+            fetch("https://equipamientoindustriales.hpservidor.com/categorias-completa")
                 .then((response) => response.json())
                 .then((data) => {
                     setCategoriasArray(data);
@@ -39,13 +39,13 @@ export default function Subcategoria({ productos }) {
         console.log(productos);
 
         // Hacer una solicitud a la API para obtener los datos de la subcategoría
-        fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`)
+        fetch(`https://equipamientoindustriales.hpservidor.com/subcategoria_id/${subcategoriaId}`)
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
                 setSubcategoriaNombre(data.nombre);
                 // Obtener el nombre de la categoría
-                fetch(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`)
+                fetch(`https://equipamientoindustriales.hpservidor.com/subcategoria_get/cat/${subcategoriaId}`)
                     .then((response) => response.json())
                     .then((data) => {
                         setCategoriaNombre(data.nombre_categoria);

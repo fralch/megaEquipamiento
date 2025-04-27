@@ -18,13 +18,13 @@ const Menu = ({ toggleMenu }) => {
                             id="category-button"
                         >
                             <span className="mr-3 text-2xl md:text-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-6 h-6 md:w-5 md:h-5 fill-white" >
+                                <svg  viewBox="0 0 24 24" className="w-6 h-6 md:w-5 md:h-5 fill-white" >
                                     <path d={mdiLayersOutline} />
                                 </svg>
                             </span>
                             <span className="font-medium">Categorias</span>
                             <span className="ml-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-6 h-6 md:w-5 md:h-5  fill-white">
+                                <svg  viewBox="0 0 24 24" className="w-6 h-6 md:w-5 md:h-5  fill-white">
                                     <path d={mdiChevronDown} />
                                 </svg>
                             </span>
@@ -36,13 +36,13 @@ const Menu = ({ toggleMenu }) => {
                             className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
                         >
                             <span className="mr-3 text-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <svg  viewBox="0 0 24 24">
                                     <path d={mdiGauge} />
                                 </svg>
                             </span>
                             <span>Inicio</span>
                             <span className="ml-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <svg  viewBox="0 0 24 24">
                                     <path d={mdiChevronDown} />
                                 </svg>
                             </span>
@@ -55,7 +55,7 @@ const Menu = ({ toggleMenu }) => {
                                 className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
                             >
                                 <span className="mr-3 text-xl">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <svg  viewBox="0 0 24 24">
                                         <path d={mdiPlus} />
                                     </svg>
                                 </span>
@@ -69,7 +69,7 @@ const Menu = ({ toggleMenu }) => {
                             className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
                         >
                             <span className="mr-3 text-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <svg  viewBox="0 0 24 24">
                                     <path d={mdiWidgetsOutline} />
                                 </svg>
                             </span>
@@ -92,7 +92,7 @@ const Menu = ({ toggleMenu }) => {
                     
                     <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-50 border border-gray-300 w-full md:w-auto">
                         <svg
-                            xmlns="http://www.w3.org/2000/svg"
+                            
                             width="24"
                             height="24"
                             viewBox="0 0 24 24"
