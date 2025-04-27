@@ -212,5 +212,48 @@ class ProductoController extends Controller
 
         return response()->json($productos);
     }
-    
+    /**
+     * Actualizar solo la imagen de un producto
+     */
+    public function updateProductImage(Request $request)
+    {
+        $request->validate([
+            'id_producto' => 'required|exists:productos,id_producto',
+            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        
+        // Buscar el producto por ID
+        $producto = Producto::find($request->id_producto);
+        
+        try {
+            // Eliminar la imagen anterior si existe
+            if ($producto->imagen && file_exists(public_path($producto->imagen))) {
+                unlink(public_path($producto->imagen));
+            }
+            
+            // Procesar la nueva imagen
+            $image = $request->file('imagen');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $imagePath = 'productos/' . $imageName;
+            $image->move(public_path('productos'), $imageName);
+            
+            // Actualizar solo el campo de imagen
+            $producto->imagen = $imagePath;
+            $producto->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Imagen actualizada correctamente',
+                'producto' => $producto->fresh('marca')
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al actualizar la imagen: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
+
+    
