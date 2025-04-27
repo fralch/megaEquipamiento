@@ -1,7 +1,10 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
+import { usePage } from '@inertiajs/react';
 
 const ZoomImage = ({ imageSrc, productId, imageSize = 100 }) => {
+  const { auth } = usePage().props;
+  
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [isEditing, setIsEditing] = useState(false);
@@ -35,9 +38,12 @@ const ZoomImage = ({ imageSrc, productId, imageSize = 100 }) => {
   };
 
   const handleImageClick = () => {
-    setIsEditing(true);
-    setIsZoomed(false);
-    fileInputRef.current.click();
+    // Solo permitir edición si el usuario está autenticado
+    if (auth && auth.user) {
+      setIsEditing(true);
+      setIsZoomed(false);
+      fileInputRef.current.click();
+    }
   };
 
   const handleFileChange = (e) => {
@@ -110,7 +116,7 @@ const ZoomImage = ({ imageSrc, productId, imageSize = 100 }) => {
       >
         <img
           src={editedImage || imageSrc}  
-          className={`${!isEditing && 'cursor-pointer'} object-cover w-full h-full`}
+          className={`${!isEditing && auth && auth.user ? 'cursor-pointer' : ''} object-cover w-full h-full`}
           ref={imgRef}
           alt="Imagen del producto"
         />
@@ -136,7 +142,7 @@ const ZoomImage = ({ imageSrc, productId, imageSize = 100 }) => {
       />
 
       {/* Controles de edición */}
-      {isEditing && (
+      {isEditing && auth && auth.user && (
         <div className="absolute bottom-0 left-0 right-0 bg-gray-800 bg-opacity-75 p-2 flex flex-col justify-center">
           {error && <p className="text-red-500 text-center mb-2">{error}</p>}
           {success && <p className="text-green-500 text-center mb-2">¡Imagen guardada con éxito!</p>}
