@@ -254,6 +254,24 @@ class ProductoController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Obtener productos que tienen como relacionado al producto especificado
+     * 
+     * @param int $id ID del producto relacionado
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function obtenerProductosQueRelacionan($id)
+    {
+        // Buscar todos los productos que tienen como relacionado al producto con ID $id
+        $productos = Producto::with('marca')
+            ->whereHas('productosRelacionados', function($query) use ($id) {
+                $query->where('relacionado_id', $id);
+            })
+            ->get();
+        
+        return response()->json($productos);
+    }
 }
 
     
