@@ -7,6 +7,8 @@ const RelatedProducts = ({ productId }) => {
     const [relationTypes, setRelationTypes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [pendingRelations, setPendingRelations] = useState([]);
+    const [loadingPending, setLoadingPending] = useState(true);
 
     // Obtener tipos de relaciones y agrupar productos
     const groupedProducts = relationTypes.reduce((acc, type) => {
@@ -48,6 +50,25 @@ const RelatedProducts = ({ productId }) => {
         }
     }, [productId]);
 
+    // Nuevo efecto para obtener relaciones pendientes
+    useEffect(() => {
+        const fetchPendingRelations = async () => {
+            try {
+                setLoadingPending(true);
+                const response = await axios.get(`/product/con-relacion/${productId}`);
+                setPendingRelations(response.data);
+                setLoadingPending(false);
+            } catch (err) {
+                console.error("Error fetching pending relations:", err);
+                setLoadingPending(false);
+            }
+        };
+
+        if (productId) {
+            fetchPendingRelations();
+        }
+    }, [productId]);
+
     const renderProductCard = (product) => (
         <div key={product.id_producto} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
             <Link href={`/producto/${product.id_producto}`}>
@@ -84,6 +105,28 @@ const RelatedProducts = ({ productId }) => {
         );
     };
 
+    const renderPendingRelations = () => {
+        if (loadingPending) return null;
+        if (pendingRelations.length === 0) return null;
+
+        return (
+            <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h2 className="text-xl font-bold text-yellow-700 mb-4">
+                    Relaciones Pendientes
+                </h2>
+                <p className="mb-4 text-yellow-600">
+                    Los siguientes productos tienen relación con este producto, pero no existe la relación inversa:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {pendingRelations.map(product => renderProductCard(product))}
+                </div>
+                <div className="mt-4 text-sm text-yellow-600">
+                    <p>Se recomienda establecer la relación inversa para mantener la consistencia de datos.</p>
+                </div>
+            </div>
+        );
+    };
+
     if (loading) {
         return <div className="text-center py-8">Cargando productos relacionados...</div>;
     }
@@ -92,16 +135,17 @@ const RelatedProducts = ({ productId }) => {
         return <div className="text-center py-8 text-red-500">{error}</div>;
     }
 
-    if (relatedProducts.length === 0) {
-        return <div className="text-center py-8 text-gray-500">No hay productos relacionados disponibles.</div>;
-    }
-
     return (
         <div className="py-6">
+            {renderPendingRelations()}
             
-            {relationTypes.map(type => (
-                renderProductGroup(type.nombre, groupedProducts[type.nombre])
-            ))}
+            {relatedProducts.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">No hay productos relacionados disponibles.</div>
+            ) : (
+                relationTypes.map(type => (
+                    renderProductGroup(type.nombre, groupedProducts[type.nombre])
+                ))
+            )}
         </div>
     );
 };
