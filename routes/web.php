@@ -39,11 +39,13 @@ Route::get('/product/all-imagen', [ProductoController::class, 'getProductosImage
 Route::get('/product/show/{id}', [ProductoController::class, 'showProduct'])->name('product.show');
 Route::get('/product/image/{id}', [ProductoController::class, 'getImagenProducto'])->name('product.image');
 Route::get('/product/subcategoria/{id}', [ProductoController::class, 'getProductosSubcategoria'])->name('product.by-subcategoria');
+Route::post('/productos/buscar', [ProductoController::class, 'buscarPorIniciales'])->name('productos.buscar-iniciales');
+Route::post('/productos/actualizar-imagen', [ProductoController::class, 'updateProductImage']);
+// Rutas para relaciones de productos
 Route::post('/product/agregar-relacion', [ProductoController::class, 'agregarRelacion'])->name('product.agregar-relacion');
 Route::get('/product/relacion/{id}', [ProductoController::class, 'obtenerRelacionados'])->name('product.obtener-relacionados');
 Route::get('/product/con-relacion/{id}', [ProductoController::class, 'obtenerProductosQueRelacionan'])->name('product.obtener-productos-que-relacionan');
-Route::post('/productos/buscar', [ProductoController::class, 'buscarPorIniciales'])->name('productos.buscar-iniciales');
-Route::post('/productos/actualizar-imagen', [ProductoController::class, 'updateProductImage']);
+Route::post('/product/eliminar-relacion', [ProductoController::class, 'eliminarRelacion'])->name('product.eliminar-relacion');
 
 // Rutas para usuarios
 Route::apiResource('usuarios', UsuarioController::class);

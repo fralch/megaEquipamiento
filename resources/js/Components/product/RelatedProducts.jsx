@@ -33,12 +33,18 @@ const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = []
         
         setIsLoading(true);
         try {
+            const config = {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                }
+            };
+              
             const response = await axios.post('/product/agregar-relacion', {
                 id: productId,
                 relacionado_id: relatedProductId,
                 tipo: selectedType
-            });
-
+            }, config);
             // Si la operación fue exitosa, actualizamos la lista local
             const relatedProductInfo = response.data.producto || {
                 id: relatedProductId,
@@ -62,11 +68,39 @@ const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = []
 
     const handleRemoveProduct = async (relatedProduct) => {
         try {
-            await axios.delete(`/api/productos/${productId}/relaciones/${relatedProduct.id}`);
-            setRelatedProducts(prev => prev.filter(p => p.id !== relatedProduct.id));
+            // Confirmar antes de eliminar
+            if (!window.confirm(`¿Estás seguro de eliminar la relación con el producto "${relatedProduct.nombre}"?`)) {
+                return;
+            }
+            
+            setIsLoading(true);
+
+            const config = {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                }
+            };
+            // Llamar al endpoint para eliminar la relación
+            const respuesta = await axios.post('/product/eliminar-relacion', {
+                id: productId,
+                relacionado_id: relatedProduct.id_producto || relatedProduct.id
+            }, config);
+            
+            console.log(`Respuesta del servidor: ${respuesta.data}`);
+            // Actualizar la lista local de productos relacionados
+            setRelatedProducts(prev => 
+                prev.filter(p => (p.id_producto || p.id) !== (relatedProduct.id_producto || relatedProduct.id))
+            );
+            
+            // Mostrar mensaje de éxito
+            alert('Relación eliminada correctamente');
+            
         } catch (error) {
             console.error('Error al eliminar relación:', error);
             alert('Error al eliminar la relación');
+        } finally {
+            setIsLoading(false);
         }
     };
 

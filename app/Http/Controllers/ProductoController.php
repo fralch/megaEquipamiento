@@ -163,30 +163,7 @@ class ProductoController extends Controller
         return response()->json($productos);
     }
 
-    /**
-     * Add a related product relationship
-     * 
-     * Example JSON request:
-     * {
-     *    "id": 1,              // ID of the main product
-     *    "relacionado_id": 2,  // ID of the product to relate
-     *    "tipo": "similar"     // Relationship type (e.g., "similar", "complementary", etc.)
-     * }
-     */
-    public function agregarRelacion(Request $request)
-    {
-        $producto = Producto::findOrFail($request->id);
-
-        $producto->productosRelacionados()->attach($request->relacionado_id, ['tipo' => $request->tipo]);
-
-        return response()->json(['message' => 'Relación agregada correctamente']);
-    }
-
-    public function obtenerRelacionados($id)
-    {
-        $producto = Producto::with('productosRelacionados')->findOrFail($id);
-        return response()->json($producto->productosRelacionados);
-    }
+    
 
     /**
      * Buscar productos por iniciales
@@ -256,6 +233,33 @@ class ProductoController extends Controller
     }
 
     /**
+     * Add a related product relationship
+     * 
+     * Example JSON request:
+     * {
+     *    "id": 1,              // ID of the main product
+     *    "relacionado_id": 2,  // ID of the product to relate
+     *    "tipo": "similar"     // Relationship type (e.g., "similar", "complementary", etc.)
+     * }
+     */
+    public function agregarRelacion(Request $request)
+    {
+        $producto = Producto::findOrFail($request->id);
+
+        $producto->productosRelacionados()->attach($request->relacionado_id, ['tipo' => $request->tipo]);
+
+        return response()->json(['message' => 'Relación agregada correctamente']);
+    }
+    /**
+     * Obtener productos relacionados
+     */
+    public function obtenerRelacionados($id)
+    {
+        $producto = Producto::with('productosRelacionados')->findOrFail($id);
+        return response()->json($producto->productosRelacionados);
+    }
+
+    /**
      * Obtener productos que tienen como relacionado al producto especificado
      * 
      * @param int $id ID del producto relacionado
@@ -272,6 +276,28 @@ class ProductoController extends Controller
         
         return response()->json($productos);
     }
+    
+    /**
+     * Eliminar una relación entre productos
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function eliminarRelacion(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:productos,id_producto',
+            'relacionado_id' => 'required|exists:productos,id_producto'
+        ]);
+
+        $producto = Producto::findOrFail($request->id);
+        
+        // Eliminar la relación específica
+        $producto->productosRelacionados()->detach($request->relacionado_id);
+
+        return response()->json(['message' => 'Relación eliminada correctamente']);
+    }
+
 }
 
     
