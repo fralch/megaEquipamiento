@@ -4,7 +4,7 @@ import { usePage } from '@inertiajs/react';
 
 const ZoomImage = ({ imageSrc, productId, imageSize = 100 }) => {
   const { auth } = usePage().props;
-  
+  console.log("Imagen:", imageSrc);
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [isEditing, setIsEditing] = useState(false);
@@ -116,7 +116,9 @@ const ZoomImage = ({ imageSrc, productId, imageSize = 100 }) => {
       >
         <img
           src={editedImage || imageSrc}  
-          className={`${!isEditing && auth && auth.user ? 'cursor-pointer' : ''} object-cover w-full h-full`}
+          className={`${!isEditing && auth && auth.user ? 'cursor-pointer' : ''} object-cover w-full h-full ${
+            imageSrc && imageSrc.toString().startsWith('http') ? 'border-2 border-[#aaa]' : ''
+          }`}
           ref={imgRef}
           alt="Imagen del producto"
         />
