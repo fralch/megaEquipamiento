@@ -31,6 +31,9 @@ const ProductPage = ({ producto }) => {
         textoActual: ""
     });
     const [showRelatedModal, setShowRelatedModal] = useState(false); // Estado para el modal de productos relacionados
+    const [videoUrl, setVideoUrl] = useState(''); // Nuevo estado para la URL del video
+    const [showVideoInput, setShowVideoInput] = useState(false); // Estado para mostrar/ocultar el input de video
+    const [videoPreview, setVideoPreview] = useState(''); // Estado para la previsualización del video
 
     const [productData, setProductData] = useState({
         ...producto,
@@ -881,6 +884,104 @@ const ProductPage = ({ producto }) => {
                                     title="Explora las Propiedades Texturales"
                                     allowFullScreen
                                 ></iframe>
+                            </div>
+                        )}
+                        
+                        {!producto.video && auth.user && (
+                            <div className="mt-6">
+                                {!showVideoInput ? (
+                                    <button 
+                                        onClick={() => setShowVideoInput(true)}
+                                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        Agregar video
+                                    </button>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <div className="flex space-x-2">
+                                            <input 
+                                                type="text" 
+                                                value={videoUrl} 
+                                                onChange={(e) => setVideoUrl(e.target.value)}
+                                                placeholder="Ingresa la URL del video de YouTube (ej: https://youtu.be/XXXX o https://www.youtube.com/watch?v=XXXX)" 
+                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                            <button 
+                                                onClick={() => {
+                                                    // Convertir URL de YouTube a formato de embed
+                                                    let embedUrl = videoUrl;
+                                                    if (videoUrl.includes('youtu.be/')) {
+                                                        embedUrl = videoUrl.replace("youtu.be/", "www.youtube.com/embed/");
+                                                    } else if (videoUrl.includes('youtube.com/watch?v=')) {
+                                                        embedUrl = videoUrl.replace("youtube.com/watch?v=", "youtube.com/embed/");
+                                                    }
+                                                    setVideoPreview(embedUrl);
+                                                }}
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                            >
+                                                Previsualizar
+                                            </button>
+                                            <button 
+                                                onClick={async () => {
+                                                    try {
+                                                        const response = await axios.post('/product/update', {
+                                                            id_producto: producto.id_producto,
+                                                            video: videoUrl
+                                                        }, {
+                                                            headers: {
+                                                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                                                'Content-Type': 'application/json',
+                                                                'Accept': 'application/json'
+                                                            }
+                                                        });
+                                                        
+                                                        if (response.data) {
+                                                            console.log("Video URL updated successfully:", response.data);
+                                                            setProductData(prev => ({
+                                                                ...prev,
+                                                                video: videoUrl
+                                                            }));
+                                                            // Actualizar el producto directamente para reflejar el cambio sin recargar
+                                                            producto.video = videoUrl;
+                                                            setShowVideoInput(false);
+                                                            setVideoUrl('');
+                                                            setVideoPreview('');
+                                                        }
+                                                    } catch (error) {
+                                                        console.error("Error updating video URL:", error);
+                                                        alert("Error al guardar la URL del video. Por favor, inténtalo de nuevo.");
+                                                    }
+                                                }}
+                                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                                disabled={!videoUrl}
+                                            >
+                                                Guardar
+                                            </button>
+                                            <button 
+                                                onClick={() => {
+                                                    setShowVideoInput(false);
+                                                    setVideoUrl('');
+                                                    setVideoPreview('');
+                                                }}
+                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                            >
+                                                Cancelar
+                                            </button>
+                                        </div>
+                                        
+                                        {videoPreview && (
+                                            <div className="mt-4">
+                                                <h3 className="text-lg font-medium mb-2">Previsualización:</h3>
+                                                <iframe
+                                                    className="w-full h-96 rounded-md shadow-lg"
+                                                    src={videoPreview}
+                                                    title="Previsualización del video"
+                                                    allowFullScreen
+                                                ></iframe>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
