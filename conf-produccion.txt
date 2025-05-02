@@ -1,0 +1,74 @@
+//vite.config.js
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+    server: {
+        host: '127.0.0.1',
+        port: 5173,
+        strictPort: true,
+        https: true, // Enable HTTPS for development server
+    },
+    plugins: [
+        laravel({
+            input: 'resources/js/app.jsx',
+            refresh: true,
+            // Force HTTPS for asset URLs
+            transformOnServe: (injectCode, payload) => {
+                return injectCode.replace(
+                    /const base = .*/,
+                    `const base = 'https://' + location.host + '/'`
+                );
+            },
+        }),
+        react(),
+    ],
+});
+
+
+//app/Providers/AppServiceProvider.php
+<?php
+namespace App\Providers;
+
+// Fix the import here
+use Illuminate\Support\Facades\URL;  
+use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\ServiceProvider;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        //
+    }
+    
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        // Force all URLs to use HTTPS in production
+        if($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+        
+        Vite::prefetch(concurrency: 3);
+    }
+}
+
+
+APP_ENV=production
+APP_URL=https://equipamientoindustriales.hpservidor.com
+ASSET_URL=https://equipamientoindustriales.hpservidor.com
+CACHE_STORE=file
+
+
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+npm run build
+
