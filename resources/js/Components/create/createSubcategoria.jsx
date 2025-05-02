@@ -197,7 +197,6 @@ const Subcategorias = ({ onSubmit }) => {
       }
     } catch (error) {
       console.error('Error creating subcategory:', error);
-      setError(`Error al crear la subcategoría: ${error.response?.data?.message || 'Error desconocido'}`);
     } finally {
       setLoading(false);
     }
