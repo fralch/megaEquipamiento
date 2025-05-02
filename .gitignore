@@ -1,5 +1,7 @@
 /.phpunit.cache
 /node_modules
+/app/Providers
+/public/img
 /public/build
 /public/hot
 /public/storage
@@ -22,3 +24,4 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/vite.config.js

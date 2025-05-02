@@ -14,7 +14,8 @@ class MarcaController extends Controller
         $request->validate([
             'nombre' => 'required|max:100',
             'descripcion' => 'nullable|string|max:255',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // Añadido 'webp' a la lista de mimes permitidos
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         // Prepare data for creation
@@ -42,8 +43,8 @@ class MarcaController extends Controller
         }
 
         $creado = Marca::create($data);
-        
-        return response()->json($creado);     
+
+        return response()->json($creado);
     }
 
    
@@ -55,7 +56,8 @@ class MarcaController extends Controller
         $request->validate([
             'nombre' => 'required|max:100',
             'descripcion' => 'nullable|string|max:255',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // Añadido 'webp' a la lista de mimes permitidos
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         if ($request->hasFile('imagen')) {
