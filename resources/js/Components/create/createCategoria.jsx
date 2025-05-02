@@ -87,9 +87,9 @@ const Categorias = ({ onSubmit }) => {
       }
       
       // Validar tipo de archivo
-      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webm'];
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webm', 'image/webp']; // Añadir 'image/webp'
       if (!validTypes.includes(file.type)) {
-        setError(`Formato de imagen ${file.name} no válido. Use JPEG, PNG, JPG, GIF o WEBM`);
+        setError(`Formato de imagen ${file.name} no válido. Use JPEG, PNG, JPG, GIF, WEBM o WEBP`); // Actualizar mensaje de error
         hasError = true;
         break;
       }
@@ -375,7 +375,7 @@ const Categorias = ({ onSubmit }) => {
                   name="imagenes"
                   onChange={handleImagenesChange}
                   className="hidden"
-                  accept="image/jpeg,image/png,image/jpg,image/gif,image/webm"
+                  accept="image/jpeg,image/png,image/jpg,image/gif,image/webm,image/webp" // Añadir image/webp
                   multiple
                 />
               </label>

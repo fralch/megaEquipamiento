@@ -75,7 +75,7 @@ class CategoriaController extends Controller
         $request->validate([
             'nombre' => 'required|max:200',
             'descripcion' => 'nullable|string',
-            'imagenes.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webm|max:2048', // Validación para múltiples imágenes
+            'imagenes.*' =>  'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048', // Validación para múltiples imágenes
             'imagenes' => 'max:5', // Máximo 5 imágenes
         ]);
     

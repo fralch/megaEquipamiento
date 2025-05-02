@@ -48,7 +48,7 @@ class ProductoController extends Controller
             'precio_sin_ganancia' => 'nullable|numeric',
             'precio_ganancia' => 'nullable|numeric',
             'precio_igv' => 'nullable|numeric',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagen' =>  'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
             'descripcion' => 'nullable|string',
             'video' => 'nullable|string|max:255',
             'envio' => 'nullable|string|max:100',

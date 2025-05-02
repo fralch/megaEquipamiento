@@ -17,7 +17,7 @@ class SubcategoriaController extends Controller
             'nombre' => 'required|max:100',
             'descripcion' => 'nullable|string',
             'id_categoria' => 'required|exists:categorias,id_categoria',
-            'img' => 'nullable|file|mimes:jpeg,png,jpg,gif,webm|max:2048',
+            'img' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048'
         ]);
     
         // Preparar datos para la creación
