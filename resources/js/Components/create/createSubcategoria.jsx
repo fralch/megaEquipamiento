@@ -127,7 +127,7 @@ const Subcategorias = ({ onSubmit }) => {
       };
       
       // Enviar petición DELETE a la ruta proporcionada
-      await axios.delete(`/subcategoria/delete/${id}`, config);
+      await axios.post(`/subcategoria/delete/${id}`, config);
       
       // Mostrar mensaje de éxito
       setSuccessMessage(`Subcategoría "${nombre}" eliminada correctamente`);

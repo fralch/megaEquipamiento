@@ -68,6 +68,7 @@ Route::get('/subcategoria-all', [SubcategoriaController::class, 'getSubcategoria
 Route::get('/subcategoria_get/categoria/{id}', [SubcategoriaController::class, 'getSubcategoriasCategoria'])->name('subcategoria.by-categoria');
 Route::get('/subcategoria_id/{id}', [SubcategoriaController::class, 'getSubcategoriaById'])->name('subcategoria.show');
 Route::get('/subcategoria_get/cat/{id}', [SubcategoriaController::class, 'getCatBySub'])->name('subcategoria.get-categoria');
+Route::post('/subcategoria/delete/{id}', [SubcategoriaController::class, 'destroy'])->name('subcategoria.delete');
 
 // Rutas para marcas
 Route::post('/marca/create', [MarcaController::class, 'create'])->name('marca.create');
