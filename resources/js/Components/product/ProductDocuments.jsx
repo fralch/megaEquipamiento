@@ -42,8 +42,23 @@ const ProductDocuments = ({
                 </ul>
             );
         } else {
-            // Si es un string simple, lo mostramos como párrafo
-            return <p>{documents}</p>;
+            // Si es un string simple, verificamos si es un enlace
+            if (documents.startsWith('http') || documents.startsWith('www')) {
+                return (
+                    <a href={documents.startsWith('http') ? documents : `http://${documents}`} 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       className="text-blue-600 hover:underline">
+                        {documents.toLowerCase().endsWith('.pdf') ? 'Manual' : 
+                         (documents.toLowerCase().endsWith('.exe') || 
+                          documents.toLowerCase().endsWith('.msi') || 
+                          documents.toLowerCase().endsWith('.zip')) ? 'Software' : documents}
+                    </a>
+                );
+            } else {
+                // Si no es un enlace, lo mostramos como párrafo
+                return <p>{documents}</p>;
+            }
         }
     };
     
@@ -78,12 +93,16 @@ const ProductDocuments = ({
                         <div>
                             {renderDocumentContent()}
                             {auth.user && (
-                                <button 
-                                    onClick={toggleEditMode}
-                                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                >
-                                    Editar documentos
-                                </button>
+                                <>  
+                                    <br />
+                                    <button 
+                                        onClick={toggleEditMode}
+                                        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                    >
+                                        Editar documentos
+                                    </button>
+                                </>
+                                
                             )}
                         </div>
                     )}
