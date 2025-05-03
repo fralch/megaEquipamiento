@@ -29,10 +29,8 @@ const ProductDocuments = ({
                                    target="_blank" 
                                    rel="noopener noreferrer"
                                    className="text-blue-600 hover:underline">
-                                    {line.toLowerCase().endsWith('.pdf') ? 'Manual' : 
-                                     (line.toLowerCase().endsWith('.exe') || 
-                                      line.toLowerCase().endsWith('.msi') || 
-                                      line.toLowerCase().endsWith('.zip')) ? 'Software' : line}
+                                    {/* Mostrar siempre la URL del enlace */}
+                                    {line}
                                 </a>
                             ) : (
                                 line
@@ -49,10 +47,8 @@ const ProductDocuments = ({
                        target="_blank" 
                        rel="noopener noreferrer"
                        className="text-blue-600 hover:underline">
-                        {documents.toLowerCase().endsWith('.pdf') ? 'Manual' : 
-                         (documents.toLowerCase().endsWith('.exe') || 
-                          documents.toLowerCase().endsWith('.msi') || 
-                          documents.toLowerCase().endsWith('.zip')) ? 'Software' : documents}
+                        {/* Mostrar siempre la URL del enlace */}
+                        {documents}
                     </a>
                 );
             } else {
