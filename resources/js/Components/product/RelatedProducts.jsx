@@ -334,12 +334,14 @@ const RelatedProducts = ({ productId }) => {
                 relacionado_id: productToRemove.id_producto || productToRemove.id // Asegúrate de usar el ID correcto
             }, config);
 
-            // Actualizar la lista local de productos relacionados
+            // Actualizar la lista local de productos relacionados (opcional antes de recargar)
             setRelatedProducts(prev =>
                 prev.filter(p => (p.id_producto || p.id) !== (productToRemove.id_producto || productToRemove.id))
             );
 
             alert('Relación eliminada correctamente');
+            // Añadir recarga de página aquí
+            window.location.reload();
 
         } catch (error) {
             console.error('Error al eliminar relación:', error);
