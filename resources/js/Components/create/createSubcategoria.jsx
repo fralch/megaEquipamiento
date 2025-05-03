@@ -380,7 +380,6 @@ const Subcategorias = ({ onSubmit }) => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoría Padre</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Imagen</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
@@ -395,17 +394,6 @@ const Subcategorias = ({ onSubmit }) => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {categoriasOptions.find(cat => cat.id_categoria === subcategoria.id_categoria)?.nombre || ''}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {subcategoria.img ? (
-                        <img 
-                          src={subcategoria.img} 
-                          alt={subcategoria.nombre}
-                          className="h-10 w-auto object-cover rounded"
-                        />
-                      ) : (
-                        <span className="text-gray-400">Sin imagen</span>
-                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button 
@@ -428,7 +416,7 @@ const Subcategorias = ({ onSubmit }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
                     No hay subcategorías disponibles
                   </td>
                 </tr>
