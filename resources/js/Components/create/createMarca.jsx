@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+// Importa axios si aún no lo has hecho
+import axios from 'axios';
 
 const Marcas = ({ onSubmit }) => {
   // Add new state for modal
@@ -12,6 +14,9 @@ const Marcas = ({ onSubmit }) => {
     descripcion: "",
     imagen: null,
   });
+  // Nuevos estados
+  const [deleteLoading, setDeleteLoading] = useState(null); // Para saber qué ID se está eliminando
+  const [message, setMessage] = useState({ type: '', text: '' }); // Para mensajes de éxito/error
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -74,8 +79,9 @@ const Marcas = ({ onSubmit }) => {
         imagen: null,
       });
 
-      onSubmit(formData);
-      alert('Marca created successfully!');
+      setMessage({ type: 'success', text: 'Marca creada exitosamente!' }); // Actualiza el mensaje
+      // onSubmit(formData); // Comentado o eliminado si no se necesita
+      // alert('Marca created successfully!'); // Reemplazado por el estado message
     } catch (error) {
       console.error('Error:', error);
     }
@@ -87,10 +93,68 @@ const Marcas = ({ onSubmit }) => {
   const currentMarcas = marcas.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(marcas.length / itemsPerPage);
 
+  // Nueva función para eliminar marca
+  const handleDeleteMarca = async (id, nombre) => {
+    if (!window.confirm(`¿Estás seguro de eliminar la marca "${nombre}"? Esta acción no se puede deshacer.`)) {
+      return;
+    }
+
+    setDeleteLoading(id); // Indica que esta marca se está eliminando
+    setMessage({ type: '', text: '' }); // Limpia mensajes anteriores
+
+    try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+      // Aunque la ruta es GET, usamos POST para enviar el token CSRF y seguir buenas prácticas para acciones destructivas.
+      // Si prefieres usar GET, asegúrate de que tu backend lo maneje adecuadamente (puede requerir ajustes en la protección CSRF).
+      const response = await axios.post(`/marca/delete/${id}`, {}, {
+        headers: {
+          'X-CSRF-TOKEN': csrfToken,
+          // 'Content-Type': 'application/json' // No es necesario para una solicitud POST vacía
+        }
+      });
+
+      if (response.status === 200) {
+        setMessage({ type: 'success', text: `Marca "${nombre}" eliminada correctamente.` });
+        // Actualiza el estado local eliminando la marca
+        setMarcas(prevMarcas => prevMarcas.filter(marca => marca.id_marca !== id));
+        // Opcional: Vuelve a cargar las marcas desde el servidor si prefieres
+        // await fetchMarcas();
+
+        // Ajusta la página actual si es necesario (si era la última marca en la página)
+        const remainingItems = marcas.length - 1;
+        const newTotalPages = Math.ceil(remainingItems / itemsPerPage);
+        if (currentPage > newTotalPages && currentPage > 1) {
+          setCurrentPage(currentPage - 1);
+        }
+
+      } else {
+        throw new Error(response.data.message || 'Error al eliminar la marca');
+      }
+
+    } catch (error) {
+      console.error('Error deleting marca:', error);
+      setMessage({ type: 'error', text: error.response?.data?.message || error.message || 'Error al eliminar la marca.' });
+    } finally {
+      setDeleteLoading(null); // Termina el estado de carga
+    }
+  };
+
+
   // Add pagination controls
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
+
+  // Auto-limpiar mensaje después de 3 segundos
+  useEffect(() => {
+    if (message.text) {
+      const timer = setTimeout(() => {
+        setMessage({ type: '', text: '' });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
 
   // Add modal component at the top level of the return statement
   return (
@@ -119,6 +183,12 @@ const Marcas = ({ onSubmit }) => {
       )}
 
       <h1 className="text-2xl font-bold mb-4">Crear Marca</h1>
+      {/* Mostrar mensajes de éxito/error */}
+      {message.text && (
+        <div className={`p-3 mb-4 rounded ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {message.text}
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <h2 className="text-lg font-bold mb-4">Agregar / Editar Marca</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -184,64 +254,60 @@ const Marcas = ({ onSubmit }) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {currentMarcas.map((marca, index) => (
-                <tr key={index}>
+              {currentMarcas.length > 0 ? currentMarcas.map((marca) => ( // Añadido chequeo por si está vacío
+                <tr key={marca.id_marca}> {/* Usar id_marca como key */}
                   <td className="px-6 py-4 whitespace-nowrap">{marca.nombre}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{marca.descripcion}</td>
+                  <td className="px-6 py-4 whitespace-nowrap max-w-xs truncate">{marca.descripcion}</td> {/* Truncar descripción larga */}
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {marca.imagen && (
+                    {marca.imagen ? ( // Comprobar si existe imagen
                       <img
                         src={marca.imagen}
                         alt={marca.nombre}
-                        className="h-10 w-30 object-cover cursor-pointer"
+                        className="h-10 w-auto object-contain cursor-pointer" // Ajustado w-auto y object-contain
                         onClick={() => {
                           setPreviewImage(marca.imagen);
                           setShowModal(true);
                         }}
                       />
+                    ) : (
+                      <span className="text-gray-400 text-sm">Sin imagen</span> // Mensaje si no hay imagen
                     )}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                     {/* Botón Eliminar */}
+                    <button
+                      onClick={() => handleDeleteMarca(marca.id_marca, marca.nombre)}
+                      disabled={deleteLoading === marca.id_marca} // Deshabilita mientras se elimina esta marca
+                      className={`text-red-600 hover:text-red-900 ${deleteLoading === marca.id_marca ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                      {deleteLoading === marca.id_marca ? 'Eliminando...' : 'Eliminar'}
+                    </button>
+                    {/* Aquí podrías añadir un botón de Editar en el futuro */}
+                    {/* <button className="text-indigo-600 hover:text-indigo-900 ml-4">Editar</button> */}
+                  </td>
                 </tr>
-              ))}
+              )) : (
+                 <tr>
+                    <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No hay marcas para mostrar.</td>
+                 </tr>
+              )}
             </tbody>
           </table>
-
-          {/* Pagination controls */}
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"
-              >
-                Anterior
-              </button>
-              {[...Array(totalPages)].map((_, index) => (
-                <button
-                  key={index + 1}
-                  onClick={() => handlePageChange(index + 1)}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === index + 1
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200'
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              ))}
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 bg-gray-200 rounded-md disabled:opacity-50"
-              >
-                Siguiente
-              </button>
-            </div>
-            <div className="text-sm text-gray-500">
-              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, marcas.length)} of {marcas.length} entries
-            </div>
-          </div>
         </div>
+         {/* Controles de Paginación */}
+         {totalPages > 1 && (
+            <div className="mt-4 flex justify-center">
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map(pageNumber => (
+                    <button
+                        key={pageNumber}
+                        onClick={() => handlePageChange(pageNumber)}
+                        className={`mx-1 px-3 py-1 border rounded ${currentPage === pageNumber ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
+                    >
+                        {pageNumber}
+                    </button>
+                ))}
+            </div>
+         )}
       </div>
     </div>
   );

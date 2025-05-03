@@ -78,5 +78,27 @@ class MarcaController extends Controller
         return response()->json($marcas);
     }
 
+    /**
+     * Remove the specified marca from storage.
+     *
+     * @param  \App\Models\Marca  $marca
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $marca = Marca::findOrFail($id);
+        // Verificar si existe una imagen asociada y eliminarla
+        if ($marca->imagen) {
+            $imagePath = public_path(ltrim($marca->imagen, '/'));
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+        
+        // Eliminar la marca
+        $marca->delete();
+        
+        return response()->json(['message' => 'Marca eliminada correctamente']);
+    }
     
 }
