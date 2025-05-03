@@ -290,10 +290,22 @@ class ProductoController extends Controller
             'relacionado_id' => 'required|exists:productos,id_producto'
         ]);
 
-        $producto = Producto::findOrFail($request->id);
+        $idProductoPrincipal = $request->id;
+        $idProductoRelacionado = $request->relacionado_id;
+
+        // Encontrar el producto principal
+        $productoPrincipal = Producto::findOrFail($idProductoPrincipal);
         
-        // Eliminar la relación específica
-        $producto->productosRelacionados()->detach($request->relacionado_id);
+        // Eliminar la relación específica (Principal -> Relacionado)
+        $productoPrincipal->productosRelacionados()->detach($idProductoRelacionado);
+
+        // Buscar el producto relacionado para eliminar la relación inversa si existe
+        $productoRelacionado = Producto::find($idProductoRelacionado);
+
+        // Si el producto relacionado existe, eliminar la relación inversa (Relacionado -> Principal)
+        if ($productoRelacionado) {
+            $productoRelacionado->productosRelacionados()->detach($idProductoPrincipal);
+        }
 
         return response()->json(['message' => 'Relación eliminada correctamente']);
     }

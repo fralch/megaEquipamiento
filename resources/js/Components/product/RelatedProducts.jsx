@@ -67,40 +67,44 @@ const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = []
     };
 
     const handleRemoveProduct = async (relatedProduct) => {
-        try {
-            // Confirmar antes de eliminar
-            if (!window.confirm(`¿Estás seguro de eliminar la relación con el producto "${relatedProduct.nombre}"?`)) {
-                return;
-            }
-            
-            setIsLoading(true);
+        // Confirmar antes de eliminar
+        if (!window.confirm(`¿Estás seguro de eliminar la relación con el producto "${relatedProduct.nombre}"?`)) {
+            return;
+        }
 
+        setLoading(true); // Asumiendo que tienes un estado de carga 'loading'
+        setError(null);   // Asumiendo que tienes un estado de error 'error'
+
+        try {
             const config = {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
+                    'Content-Type': 'application/json', // Cambiado a application/json ya que no enviamos archivos
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                 }
             };
+
             // Llamar al endpoint para eliminar la relación
-            const respuesta = await axios.post('/product/eliminar-relacion', {
-                id: productId,
-                relacionado_id: relatedProduct.id_producto || relatedProduct.id
+            const response = await axios.post('/product/eliminar-relacion', {
+                id: productId, // ID del producto principal
+                relacionado_id: relatedProduct.id_producto || relatedProduct.id // ID del producto relacionado
             }, config);
-            
-            console.log(`Respuesta del servidor: ${respuesta.data}`);
+
+            console.log('Respuesta del servidor:', response.data.message);
+
             // Actualizar la lista local de productos relacionados
-            setRelatedProducts(prev => 
+            setRelatedProducts(prev =>
                 prev.filter(p => (p.id_producto || p.id) !== (relatedProduct.id_producto || relatedProduct.id))
             );
-            
-            // Mostrar mensaje de éxito
+
+            // Opcional: Mostrar mensaje de éxito
             alert('Relación eliminada correctamente');
-            
-        } catch (error) {
-            console.error('Error al eliminar relación:', error);
-            alert('Error al eliminar la relación');
+
+        } catch (err) {
+            console.error('Error al eliminar relación:', err);
+            setError('Error al eliminar la relación. Por favor, inténtalo de nuevo.'); // Actualiza el estado de error
+            alert('Error al eliminar la relación'); // Muestra alerta al usuario
         } finally {
-            setIsLoading(false);
+            setLoading(false); // Finaliza el estado de carga
         }
     };
 
@@ -160,7 +164,7 @@ const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = []
                                         </div>
                                         <button
                                             onClick={() => handleRemoveProduct(product)}
-                                            className="text-red-500 hover:text-red-700"
+                                            className="text-blue-500 hover:text-blue-700"
                                         >
                                             Eliminar
                                         </button>
@@ -201,6 +205,8 @@ const RelatedProducts = ({ productId }) => {
     const [isPendingRelation, setIsPendingRelation] = useState(false);
     // Estado para almacenar información del producto pendiente
     const [pendingProduct, setPendingProduct] = useState(null);
+    // Estado para manejar la carga durante la eliminación
+    const [isDeleting, setIsDeleting] = useState(false);
 
     // Obtener tipos de relaciones y agrupar productos
     const groupedProducts = relationTypes.reduce((acc, type) => {
@@ -308,6 +314,42 @@ const RelatedProducts = ({ productId }) => {
         setShowModal(false);
     };
 
+    // Nueva función para manejar la eliminación directa de la relación
+    const handleRemoveRelationDirectly = async (productToRemove) => {
+        if (!window.confirm(`¿Estás seguro de eliminar la relación con el producto "${productToRemove.nombre}"?`)) {
+            return;
+        }
+
+        setIsDeleting(true);
+        try {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json', // Cambiado a application/json si no envías archivos
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                }
+            };
+            // Llamar al endpoint para eliminar la relación
+            await axios.post('/product/eliminar-relacion', {
+                id: productId,
+                relacionado_id: productToRemove.id_producto || productToRemove.id // Asegúrate de usar el ID correcto
+            }, config);
+
+            // Actualizar la lista local de productos relacionados
+            setRelatedProducts(prev =>
+                prev.filter(p => (p.id_producto || p.id) !== (productToRemove.id_producto || productToRemove.id))
+            );
+
+            alert('Relación eliminada correctamente');
+
+        } catch (error) {
+            console.error('Error al eliminar relación:', error);
+            alert('Error al eliminar la relación');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+
     const renderProductCard = (product, isPending = false) => (
         <div key={product.id_producto} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
             <Link href={`/producto/${product.id_producto}`}>
@@ -327,14 +369,26 @@ const RelatedProducts = ({ productId }) => {
                 </div>
             </Link>
             <div className="p-2 bg-gray-100">
-                <button 
+                <button
                     onClick={(e) => {
                         e.preventDefault();
-                        openRelationModal(product.id_producto, isPending, product);
+                        if (isPending) {
+                            openRelationModal(product.id_producto, true, product);
+                        } else {
+                            // Llamar a la función de eliminación directa si no es pendiente
+                            handleRemoveRelationDirectly(product);
+                        }
                     }}
-                    className={`w-full text-sm ${isPending ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-blue-500 hover:bg-blue-600'} text-white py-1 px-2 rounded`}
+                    // Deshabilitar si se está eliminando
+                    disabled={isDeleting && !isPending}
+                    className={`w-full text-sm ${
+                        isPending
+                            ? 'bg-yellow-500 hover:bg-yellow-600'
+                            : 'bg-blue-500 hover:bg-blue-600' // Cambiar a color rojo para eliminar 
+                    } text-white py-1 px-2 rounded disabled:opacity-50`}
                 >
-                    {isPending ? 'Establecer Relación' : 'Cambiar Relación'}
+                    {/* Cambiar texto a 'Eliminar Relación' si no es pendiente */}
+                    {isPending ? 'Establecer Relación' : (isDeleting ? 'Eliminando...' : 'Eliminar Relación')}
                 </button>
             </div>
         </div>
@@ -407,3 +461,188 @@ const RelatedProducts = ({ productId }) => {
 };
 
 export default RelatedProducts;
+
+const ModalSearchRelatedProducts = ({ productId, initialRelated, onSave, onClose }) => {
+    // ... Lógica del modal de búsqueda y adición ...
+    // Similar a tu ModalRelatedProducts original pero enfocado en buscar y agregar
+
+    const [localRelated, setLocalRelated] = useState(initialRelated);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [isLoadingSearch, setIsLoadingSearch] = useState(false);
+    const [selectedType, setSelectedType] = useState('accesorio'); // O el tipo por defecto
+    const [relationTypes, setRelationTypes] = useState([]);
+
+    // Fetch relation types (similar a tu otro modal)
+    useEffect(() => {
+        const fetchRelationTypes = async () => {
+            try {
+                const response = await axios.get('/tipos-relacion-productos');
+                setRelationTypes(response.data);
+                if (response.data.length > 0) {
+                    setSelectedType(response.data[0].nombre);
+                }
+            } catch (error) {
+                console.error('Error al obtener tipos de relaciones:', error);
+            }
+        };
+        fetchRelationTypes();
+    }, []);
+
+
+    // Search products function (similar a tu otro modal)
+    const searchProducts = async (term) => {
+        if (term.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+        setIsLoadingSearch(true);
+        try {
+            const response = await axios.post('/productos/buscar', { producto: term });
+            if (Array.isArray(response.data)) {
+                // Filtrar el producto actual y los ya relacionados
+                const relatedIds = localRelated.map(p => p.id_producto || p.id);
+                const filteredResults = response.data.filter(p =>
+                    p.id_producto !== productId && !relatedIds.includes(p.id_producto)
+                );
+                setSearchResults(filteredResults);
+            } else {
+                setSearchResults([]);
+            }
+        } catch (error) {
+            console.error('Error en la búsqueda:', error);
+            setSearchResults([]);
+        } finally {
+            setIsLoadingSearch(false);
+        }
+    };
+
+     // Debounce search
+     useEffect(() => {
+        const timer = setTimeout(() => {
+            searchProducts(searchTerm);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm, localRelated]); // Re-buscar si cambian los relacionados locales
+
+
+    // Handle adding a product relation
+    const handleAddProduct = async (selectedProduct) => {
+         try {
+            const config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                }
+            };
+            await axios.post('/product/agregar-relacion', {
+                id: productId,
+                relacionado_id: selectedProduct.id_producto,
+                tipo: selectedType
+            }, config);
+
+            // Actualizar estado local en este modal
+            setLocalRelated(prev => [...prev, {
+                ...selectedProduct,
+                pivot: { tipo: selectedType } // Simular la estructura pivot
+            }]);
+
+            setSearchTerm(''); // Limpiar búsqueda
+            setSearchResults([]); // Limpiar resultados
+
+        } catch (error) {
+            console.error('Error al agregar relación:', error);
+            alert('Error al agregar la relación');
+        }
+    };
+
+
+    // Handle saving changes (pasar la lista actualizada al componente padre)
+    const handleSaveChanges = () => {
+        onSave(localRelated); // Llama a la función onSave del padre con la lista actualizada
+    };
+
+
+    return (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
+            <div className="bg-white rounded-lg shadow-lg z-50 max-w-lg w-full p-6 max-h-[80vh] flex flex-col">
+                <h3 className="text-lg font-bold mb-4">Buscar y Agregar Productos Relacionados</h3>
+
+                 {/* Selector de Tipo */}
+                 <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de relación:</label>
+                    <select
+                        value={selectedType}
+                        onChange={(e) => setSelectedType(e.target.value)}
+                        className="w-full border rounded px-3 py-2"
+                    >
+                        {relationTypes.map(type => (
+                            <option key={type.id} value={type.nombre}>
+                                {type.nombre.charAt(0).toUpperCase() + type.nombre.slice(1)}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Input de Búsqueda */}
+                <div className="mb-4">
+                    <input
+                        type="text"
+                        placeholder="Buscar productos por nombre o SKU..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full border rounded px-3 py-2"
+                    />
+                </div>
+
+                {/* Resultados de Búsqueda */}
+                <div className="flex-grow overflow-y-auto mb-4 border rounded-md">
+                    {isLoadingSearch ? (
+                        <p className="p-3 text-gray-500">Buscando...</p>
+                    ) : searchResults.length > 0 ? (
+                        <ul>
+                            {searchResults.map(product => (
+                                <li key={product.id_producto} className="p-3 border-b hover:bg-gray-50 flex justify-between items-center">
+                                    <div>
+                                        <span className="font-medium">{product.nombre}</span>
+                                        <span className="text-sm text-gray-600 ml-2">(SKU: {product.sku})</span>
+                                    </div>
+                                    <button
+                                        onClick={() => handleAddProduct(product)}
+                                        className="px-3 py-1 bg-green-500 text-white text-sm rounded hover:bg-green-600"
+                                    >
+                                        Agregar
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : searchTerm.length >= 2 ? (
+                        <p className="p-3 text-gray-500">No se encontraron resultados.</p>
+                    ) : (
+                         <p className="p-3 text-gray-400">Ingrese al menos 2 caracteres para buscar.</p>
+                    )}
+                </div>
+
+
+                {/* Botones de Acción */}
+                <div className="flex justify-end space-x-3">
+                     <button
+                        onClick={onClose} // Usar onClose directamente para cancelar
+                        className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                    >
+                        Cerrar
+                    </button>
+                    {/* El botón de guardar ahora solo cierra el modal,
+                        ya que la adición se hace directamente */}
+                    {/* <button
+                        onClick={handleSaveChanges}
+                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                        Guardar Cambios
+                    </button> */}
+                </div>
+            </div>
+        </div>
+    );
+};
