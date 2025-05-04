@@ -82,7 +82,7 @@ const Subcategorias = ({ onSubmit }) => {
     }
     
     // Validar tipo de archivo
-    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webm'];
+    const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webm', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       setError('Formato de imagen no válido. Use JPEG, PNG, JPG, GIF o WEBM');
       return;
@@ -327,12 +327,12 @@ const Subcategorias = ({ onSubmit }) => {
               name="img"
               onChange={handleImageChange}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-              accept="image/jpeg,image/png,image/jpg,image/gif,image/webm"
+              accept="image/jpeg,image/png,image/jpg,image/gif,image/webm,image/webp" // Añadido image/webp
             />
             <p className="text-xs text-gray-500 mt-1">
-              Tamaño máximo: 2MB. Formatos: JPEG, PNG, JPG, GIF, WEBM
+              Tamaño máximo: 2MB. Formatos: JPEG, PNG, JPG, GIF, WEBM, WEBP {/* Añadido WEBP */}
             </p>
-            
+
             {/* Vista previa de imagen */}
             {imgPreview && (
               <div className="mt-2">
