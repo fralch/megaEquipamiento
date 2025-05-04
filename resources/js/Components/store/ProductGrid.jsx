@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import countryCodeMap from './countryJSON.json';
+import { CartContext } from '../../storage/CartContext';
 const URL_API = import.meta.env.VITE_API_URL;
 
 const ProductGrid = ({ products: initialProducts }) => {
@@ -298,6 +299,7 @@ const Card = ({ product }) => {
   const [showDetails, setShowDetails] = useState(false);
   const cardRef = useRef(null);
   const overlayRef = useRef(null);
+  const { dispatch } = useContext(CartContext); // Obtener dispatch del contexto
 
   // Observer para lazy loading
   useEffect(() => {
@@ -352,8 +354,11 @@ const Card = ({ product }) => {
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // TODO: Implement cart functionality
+    // Usar dispatch para añadir el producto al carrito
+    dispatch({ type: 'ADD', product: product });
     console.log('Adding to cart:', product.id);
+    // Opcional: Mostrar alguna notificación al usuario
+    alert(`${product.title} añadido al carrito!`);
   };
 
   const handleCompare = (e) => {
@@ -495,9 +500,9 @@ const Card = ({ product }) => {
           
           {/* Botones fijos en la parte inferior */}
           <div className="flex space-x-4 mt-auto">
-            <button 
+            <button
               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md flex-1"
-              onClick={handleAddToCart}
+              onClick={handleAddToCart} // La función ahora usa dispatch
             >
               Añadir al carrito
             </button>
