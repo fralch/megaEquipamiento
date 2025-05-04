@@ -356,7 +356,7 @@ const Card = ({ product }) => {
     e.stopPropagation();
     // Usar dispatch para añadir el producto al carrito
     dispatch({ type: 'ADD', product: product });
-    console.log('Adding to cart:', product.id);
+    console.log('Adding to cart:', product);
     // Opcional: Mostrar alguna notificación al usuario
     alert(`${product.title} añadido al carrito!`);
   };

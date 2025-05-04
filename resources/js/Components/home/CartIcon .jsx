@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react'; // Importa useContext
+import { CartContext } from '../../storage/CartContext'; // Importa tu CartContext
 
 const CartIcon = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { cart } = useContext(CartContext); // Accede al estado del carrito desde el contexto
+  const [total, setTotal] = useState(0); // Creamos un estado para el total
+  const [totalItems, setTotalItems] = useState(0); // Creamos un estado para la cantidad total de items
 
-  const cartItems = [
-    { id: 1, name: 'Cabina de luz PCE-CIC', price: 30520.00, quantity: 1 },
-    { id: 2, name: 'Cabina de luz PCE-CIC Mini', price: 6962.00, quantity: 1 }
-  ];
 
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
 
-  const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
 
   return (
     <div 
@@ -56,7 +56,7 @@ const CartIcon = () => {
           fontWeight: 'bold',
         }}
       >
-        3
+        {totalItems} {/* Muestra la cantidad total de items del carrito */}
       </div>
       {isOpen && (
         <div
@@ -72,21 +72,31 @@ const CartIcon = () => {
             zIndex: 1000,
           }}
         >
-          {cartItems.map(item => (
-            <div key={item.id} style={{ padding: '10px', borderBottom: '1px solid #eee' }}>
-              <div style={{ fontWeight: 'bold' }}>{item.name}</div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Cantidad: {item.quantity}x</span>
-                <span>S/ {item.price.toFixed(2)}</span>
+          {/* Mapea sobre el 'cart' del contexto */}
+          {cart.length === 0 ? (
+             <div style={{ padding: '10px', textAlign: 'center' }}>Tu carrito está vacío.</div>
+          ) : (
+            cart.map(item => (
+              <div key={item.id} style={{ padding: '10px', borderBottom: '1px solid #eee' }}>
+                {/* Cambia item.name a item.title */}
+                <div style={{ fontWeight: 'bold' }}>{item.title}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Cantidad: {item.quantity}x</span>
+                  {/* Asegúrate que 'item.price' existe y es un número */}
+                  <span>S/ {item.price ? item.price.toFixed(2) : '0.00'}</span>
+                </div>
+              </div>
+            ))
+          )}
+          {/* Muestra el total solo si hay items */}
+          {cart.length > 0 && (
+            <div style={{ padding: '10px', borderTop: '1px solid #ddd' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                <span>Total:</span>
+                <span>S/ {total.toFixed(2)}</span>
               </div>
             </div>
-          ))}
-          <div style={{ padding: '10px', borderTop: '1px solid #ddd' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-              <span>Total:</span>
-              <span>S/ {total.toFixed(2)}</span>
-            </div>
-          </div>
+          )}
           <button
             style={{
               backgroundColor: '#005dad',
@@ -97,7 +107,12 @@ const CartIcon = () => {
               width: '100%',
               marginTop: '10px',
               cursor: 'pointer',
+              // Deshabilita el botón si el carrito está vacío
+              opacity: cart.length === 0 ? 0.5 : 1,
+              pointerEvents: cart.length === 0 ? 'none' : 'auto',
             }}
+            // Deshabilita el botón si el carrito está vacío
+            disabled={cart.length === 0}
           >
             TERMINAR PEDIDO
           </button>
