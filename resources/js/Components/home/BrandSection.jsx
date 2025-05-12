@@ -84,7 +84,7 @@ const BrandSection = () => {
     const loadBrands = async () => {
       try {
         // Usar dynamic import para cargar las imágenes bajo demanda
-        const images = import.meta.glob("/public/img/marcas/**/*.{jpg,png}", { eager: false });
+        const images = import.meta.glob("/public/img/marcas/**/*.{jpg,png,webp,webm}", { eager: false });
         
         // Convertir las rutas de imágenes a objetos de marca
         const brandPromises = Object.keys(images).map(async (path) => {
