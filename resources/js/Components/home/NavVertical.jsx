@@ -18,6 +18,8 @@ const NavVertical = ({ isOpen, onClose }) => {
         .then((response) => response.json())
         .then((data) => {
           setCategoriasArray(data);
+          console.log('Categorias completas:');
+          console.log(data);
           localStorage.setItem('categoriasCompleta', JSON.stringify(data)); // Guarda en localStorage
         })
         .catch((error) => console.error('Error fetching data:', error));

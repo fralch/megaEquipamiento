@@ -14,7 +14,7 @@ const CategoryCard = ({ title, items }) => {
     const loadImages = async () => {
       try {
         const folderName = title.toLowerCase().replace(/\s+/g, '-');
-        const imageModule = await import.meta.glob('/public/img/categorias/**/*.{jpg,png}', { eager: false });
+        const imageModule = await import.meta.glob('/public/img/categorias/**/*.{jpg,png,webp,webm}', { eager: false });
         
         // Filtrar y procesar las rutas
         const paths = Object.keys(imageModule)
@@ -71,7 +71,6 @@ const CategoryCard = ({ title, items }) => {
   
   // Imagen actual a mostrar
   const currentImage = imagePaths.length > 0 ? imagePaths[activeImageIndex] : placeholderImage;
-
   return (
     <div ref={cardRef} className="relative group w-full h-96 rounded-lg overflow-hidden shadow-lg m-4">
       {/* Placeholder mientras carga */}
