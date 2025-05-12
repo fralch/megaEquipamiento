@@ -27,8 +27,14 @@ class MarcaController extends Controller
         if ($request->hasFile('imagen')) {
             $image = $request->file('imagen');
             
-            // Generate unique filename with timestamp
-            $imagePath = time() . '.' . $image->getClientOriginalExtension();
+            // Sanitizar el nombre de la marca para usarlo como nombre de archivo
+            $nombreSanitizado = preg_replace('/[^a-z0-9]+/', '-', strtolower($request->nombre));
+            // Añadir timestamp para evitar colisiones si hay marcas con nombres similares
+            $nombreArchivo = $nombreSanitizado ;
+            // Obtener la extensión original del archivo
+            $extension = $image->getClientOriginalExtension();
+            // Generar el nombre completo del archivo
+            $imagePath = $nombreArchivo . '.' . $extension;
             
             // Set destination path
             $destinationPath = public_path('img/marcas') . '/' . $imagePath;
@@ -38,7 +44,7 @@ class MarcaController extends Controller
                 // Add the correct image path to the data array
                 $data['imagen'] = '/img/marcas/' . $imagePath;
             } else {
-                return response()->json(['error' => 'Error moving the file.'], 500);
+                return response()->json(['error' => 'Error al mover el archivo.'], 500);
             }
         }
 
