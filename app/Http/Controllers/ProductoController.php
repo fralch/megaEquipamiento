@@ -310,6 +310,21 @@ class ProductoController extends Controller
         return response()->json(['message' => 'Relación eliminada correctamente']);
     }
 
+    /* 
+        * Obtener productos por marca
+        *
+        * @param int $marca_id ID de la marca
+        * @return \Illuminate\Http\JsonResponse
+    */
+    public function getProductosByMarca($marca_id, Request $request)
+    {
+        $perPage = $request->input('per_page', 50); // Default 50 items per page
+        $productos = Producto::with('marca')
+            ->where('marca_id', $marca_id)
+            ->paginate($perPage);
+        return response()->json($productos);
+    }
+
 }
 
     
