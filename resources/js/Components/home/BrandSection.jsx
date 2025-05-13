@@ -1,9 +1,13 @@
 // BrandSection.jsx
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "@inertiajs/react";
+import axios from 'axios';
 
 const BrandCard = ({ brand }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState([]);
   const cardRef = useRef(null);
 
   // Configurar Intersection Observer para detectar cuando la tarjeta es visible
@@ -29,19 +33,31 @@ const BrandCard = ({ brand }) => {
     };
   }, []);
 
+  const searchMarca = async (nombre) => {
+    setIsSearching(true);
+    console.log('Buscando marca:', nombre);
+    try {
+      const response = await axios.post('/marca/buscar', {
+        nombre: nombre
+      });
+      console.log(response.data);
+      setSearchResults(response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching marca:', error);
+      throw error;
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   return (
     <div
       ref={cardRef}
       className="relative flex flex-col items-center text-center p-4 group"
     >
       <div className="w-36 h-36 flex items-center justify-center rounded-full border-2 border-blue-500 overflow-hidden">
-        {/* Placeholder mientras la imagen carga */}
-        <div 
-          className={`absolute inset-0 bg-gray-100 flex items-center justify-center transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
-        >
-          <div className="animate-pulse h-8 w-8 bg-gray-300 rounded-full"></div>
-        </div>
-        
+      
         {/* Imagen que solo carga cuando es visible */}
         {isVisible && (
           <img
@@ -60,16 +76,39 @@ const BrandCard = ({ brand }) => {
       </h2>
 
       {/* Button */}
-      <button className="mt-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-        Ver Productos
-      </button>
+      <Link 
+        href={`/marca/${brand.name}`} 
+        className={`mt-2 ${isSearching ? 'bg-gray-400 cursor-wait' : 'bg-green-500 hover:bg-green-600'} text-white px-4 py-2 rounded flex items-center justify-center`}
+        onClick={(e) => {
+          if (isSearching) return; // Evitar múltiples clics mientras busca
+          
+          e.preventDefault(); // Prevenir la navegación inmediata
+          searchMarca(brand.name)
+            .then(() => {
+              // Después de completar la búsqueda, navegar a la página de productos
+              // window.location.href = `/marca/${brand.name}`;
+            })
+            .catch((error) => {
+              console.error('Error en la búsqueda de marca:', error);
+              // Navegar a la página de productos incluso si la búsqueda falla
+              // window.location.href = `/marca/${brand.name}`;
+            });
+        }}
+      >
+        {isSearching ? (
+          <>
+            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Buscando...
+          </>
+        ) : (
+          'Ver Productos'
+        )}
+      </Link>
 
-      {/* Tooltip */}
-      <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 hidden group-hover:flex flex-col items-center w-40 p-2 bg-gray-700 text-white text-sm rounded-full shadow-lg z-10">
-        <div className="w-full h-full flex items-center justify-center">
-          {brand.description}
-        </div>
-      </div>
+    
     </div>
   );
 };
@@ -93,8 +132,7 @@ const BrandSection = () => {
           
           return {
             image: adjustedPath,
-            name,
-            description: `Descripción de ${name}`,
+            name          
           };
         });
         

@@ -76,7 +76,7 @@ Route::post('/marca/create', [MarcaController::class, 'create'])->name('marca.cr
 Route::post('/marca/update/{id}', [MarcaController::class, 'update'])->name('marca.update');
 Route::get('/marca/all', [MarcaController::class, 'getMarcas'])->name('marca.all');
 Route::post('/marca/delete/{id}', [MarcaController::class, 'destroy'])->name('marca.delete');
-Route::post('/marca/buscar/', [MarcaController::class, 'buscarPorNombre'])->name('marca.buscar');
+Route::post('/marca/buscar', [MarcaController::class, 'buscarPorNombre'])->name('marca.buscar');
 
 // Rutas para tipos de relación de productos
 Route::get('/tipos-relacion-productos', [TiposRelacionProductosController::class, 'get_all'])->name('tipos-relacion-productos.all');

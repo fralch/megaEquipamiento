@@ -115,7 +115,7 @@ class MarcaController extends Controller
     */
     public function buscarPorNombre(Request $request)
     {
-        $texto = $request->input('texto');
+        $texto = $request->input('nombre');
         // Modificado para devolver solo la marca más similar al texto
         // Ordenamos por similitud (las que empiezan con el texto tienen prioridad)
         $marca = Marca::where('nombre', 'like', $texto . '%') // Primero busca los que empiezan exactamente con el texto
