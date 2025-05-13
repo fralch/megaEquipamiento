@@ -107,4 +107,27 @@ class MarcaController extends Controller
         return response()->json(['message' => 'Marca eliminada correctamente']);
     }
     
+    /*  
+      Crea una busqueda por nombre de marca donde el texto sea similar al nombre de la marca
+      y devuelve un json con una marca con el nombre similar al texto
+      @param  \Illuminate\Http\Request  $request
+      @return \Illuminate\Http\Response
+    */
+    public function buscarPorNombre(Request $request)
+    {
+        $texto = $request->input('texto');
+        // Modificado para devolver solo la marca más similar al texto
+        // Ordenamos por similitud (las que empiezan con el texto tienen prioridad)
+        $marca = Marca::where('nombre', 'like', $texto . '%') // Primero busca los que empiezan exactamente con el texto
+                    ->orWhere('nombre', 'like', '%' . $texto . '%') // Luego busca cualquier coincidencia
+                    ->orderByRaw("CASE 
+                        WHEN nombre LIKE '{$texto}%' THEN 1 
+                        WHEN nombre LIKE '%{$texto}%' THEN 2 
+                        ELSE 3 
+                    END") // Prioriza coincidencias exactas
+                    ->first(); // Devuelve solo el primer resultado (el más similar)
+        
+        return response()->json($marca);
+    }
+    
 }
