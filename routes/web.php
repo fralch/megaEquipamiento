@@ -22,12 +22,11 @@ Route::get('/carrito',function () { return Inertia::render('Carrito');})->name('
 
 
 // Rutas que retornan vistas
-Route::get('/', function () {
-    return Inertia::render('Welcome');
-})->name('welcome');
+Route::get('/', function () { return Inertia::render('Welcome'); })->name('welcome');
 Route::get('/categorias/{id_categoria?}', [CategoriaController::class, 'CategoriasWiew'])->name('categorias.view');
 Route::get('/subcategoria/{id}', [ProductoController::class, 'subCategoriaView'])->name('subcategoria.view');
 Route::get('/producto/{id}', [ProductoController::class, 'ProductView'])->name('producto.view');
+Route::get('/marcas/{id}', [ProductoController::class, 'ProductViewByMarca'])->name('marcas.view');
 Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
 
 // Rutas para crear y mostrar productos

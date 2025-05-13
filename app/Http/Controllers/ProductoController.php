@@ -33,6 +33,18 @@ class ProductoController extends Controller
         return Inertia::render('Subcategorias', compact('productos'));
     }
 
+    /* Vista de productos por marca view */
+    public function ProductViewByMarca(Request $request, $marca_id)
+    {
+        // Obtener todos los productos de la marca especificada
+        $productos = Producto::with('marca')
+            ->where('marca_id', $marca_id)
+            ->get();
+    
+        // Renderizar la vista con Inertia y pasar los productos
+        return Inertia::render('Marcas', compact('productos'));
+    }
+
 
     /**
      * Crear producto

@@ -41,6 +41,14 @@ const BrandCard = ({ brand }) => {
         nombre: nombre
       });
       console.log(response.data);
+      /*
+      {
+          "id_marca": 6,
+          "nombre": "and _discover-precision",
+          "descripcion": "Descripción de and _discover-precision",
+          "imagen": "/img/marcas/and _discover-precision.jpg"
+      }
+       */
       setSearchResults(response.data);
       return response.data;
     } catch (error) {
@@ -77,21 +85,23 @@ const BrandCard = ({ brand }) => {
 
       {/* Button */}
       <Link 
-        href={`/marca/${brand.name}`} 
+        href="#" 
         className={`mt-2 ${isSearching ? 'bg-gray-400 cursor-wait' : 'bg-green-500 hover:bg-green-600'} text-white px-4 py-2 rounded flex items-center justify-center`}
         onClick={(e) => {
           if (isSearching) return; // Evitar múltiples clics mientras busca
           
           e.preventDefault(); // Prevenir la navegación inmediata
           searchMarca(brand.name)
-            .then(() => {
+            .then((data) => {
               // Después de completar la búsqueda, navegar a la página de productos
-              // window.location.href = `/marca/${brand.name}`;
+              if (data && data.id_marca) {
+                window.location.href = `/marcas/${data.id_marca}`;
+              } else {
+                console.error('No se encontró ID de marca');
+              }
             })
             .catch((error) => {
               console.error('Error en la búsqueda de marca:', error);
-              // Navegar a la página de productos incluso si la búsqueda falla
-              // window.location.href = `/marca/${brand.name}`;
             });
         }}
       >
