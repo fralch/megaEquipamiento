@@ -468,14 +468,22 @@ const Productos = ({ onSubmit }) => {
               value={form.marca_id}
               onChange={handleChange}
             />
-            <FormInput
-              label="País"
-              id="pais"
-              name="pais"
-              value={form.pais}
-              onChange={handleChange}
-              placeholder="País de origen"
-            />
+            <div className="mb-4">
+              <label htmlFor="pais" className="block text-sm font-medium text-gray-700">País</label>
+              <select
+                id="pais"
+                name="pais"
+                value={form.pais}
+                onChange={handleChange}
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                required
+              >
+                <option value="">Seleccione un país</option>
+                {countryOptions.map(option => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
           </div>
         );
 
@@ -585,3 +593,42 @@ const Productos = ({ onSubmit }) => {
 };
 
 export default Productos;
+const countryOptions = [
+  { value: "Alemania", label: "Alemania" },
+  { value: "Argentina", label: "Argentina" },
+  { value: "Australia", label: "Australia" },
+  { value: "Brasil", label: "Brasil" },
+  { value: "Canadá", label: "Canadá" },
+  { value: "Chile", label: "Chile" },
+  { value: "China", label: "China" },
+  { value: "Colombia", label: "Colombia" },
+  { value: "Corea del Sur", label: "Corea del Sur" },
+  { value: "Dinamarca", label: "Dinamarca" },
+  { value: "Egipto", label: "Egipto" },
+  { value: "Emiratos Árabes Unidos", label: "Emiratos Árabes Unidos" },
+  { value: "España", label: "España" },
+  { value: "Estados Unidos", label: "Estados Unidos" },
+  { value: "Francia", label: "Francia" },
+  { value: "India", label: "India" },
+  { value: "Indonesia", label: "Indonesia" },
+  { value: "Italia", label: "Italia" },
+  { value: "Japón", label: "Japón" },
+  { value: "México", label: "México" },
+  { value: "Noruega", label: "Noruega" },
+  { value: "Nueva Zelanda", label: "Nueva Zelanda" },
+  { value: "Países Bajos", label: "Países Bajos" },
+  { value: "Perú", label: "Perú" },
+  { value: "Polonia", label: "Polonia" },
+  { value: "Portugal", label: "Portugal" },
+  { value: "Reino Unido", label: "Reino Unido" },
+  { value: "Rusia", label: "Rusia" },
+  { value: "Singapur", label: "Singapur" },
+  { value: "Sudáfrica", label: "Sudáfrica" },
+  { value: "Suecia", label: "Suecia" },
+  { value: "Suiza", label: "Suiza" },
+  { value: "Tailandia", label: "Tailandia" },
+  { value: "Turquía", label: "Turquía" },
+  { value: "Uruguay", label: "Uruguay" },
+  { value: "Venezuela", label: "Venezuela" },
+  { value: "Vietnam", label: "Vietnam" }
+];
