@@ -396,12 +396,12 @@ const Subcategorias = ({ onSubmit }) => {
                       {categoriasOptions.find(cat => cat.id_categoria === subcategoria.id_categoria)?.nombre || ''}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button 
+                      {/* <button 
                         onClick={() => console.log('Editar subcategoría:', subcategoria.id_subcategoria)}
                         className="text-indigo-600 hover:text-indigo-900 mr-3"
                       >
                         Editar
-                      </button>
+                      </button> */}
                       <button 
                         onClick={() => handleDeleteSubcategoria(subcategoria.id_subcategoria, subcategoria.nombre)}
                         disabled={deleteLoading}

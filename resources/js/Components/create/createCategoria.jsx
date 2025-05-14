@@ -452,12 +452,12 @@ const Categorias = ({ onSubmit }) => {
                       <div className="max-w-xs truncate">{categoria.descripcion || '-'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button 
+                      {/* <button 
                         onClick={() => console.log('Editar categoría:', categoria.id_categoria)}
                         className="text-indigo-600 hover:text-indigo-900 mr-3 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors"
                       >
                         Editar
-                      </button>
+                      </button> */}
                       <button 
                         onClick={() => handleDeleteCategoria(categoria.id_categoria, categoria.nombre)}
                         disabled={deleteLoading}
