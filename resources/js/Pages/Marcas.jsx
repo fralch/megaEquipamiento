@@ -109,7 +109,14 @@ export default function Marcas({ productos }) {
                     
                     {productos && productos.length > 0 ? (
                         <>
-                          <h1 className="text-2xl font-bold mb-4">{"Productos de: "+ productos[0]?.marca?.nombre || "Marca"}</h1>
+                          {(() => {
+                            let nombreMarca = productos[0]?.marca?.nombre || "Marca";
+                            nombreMarca = nombreMarca.replace(/[-_]/g, " ").replace(/\s+/g, " ").trim();
+                            nombreMarca = nombreMarca.charAt(0).toUpperCase() + nombreMarca.slice(1);
+                            return (
+                              <h1 className="text-2xl font-bold mb-4">{"Productos de: " + nombreMarca}</h1>
+                            );
+                          })()}
                           <ProductGrid products={productos} />
                         </>
                     ) : (
