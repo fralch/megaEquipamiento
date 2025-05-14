@@ -28,7 +28,7 @@ class MarcaController extends Controller
             $image = $request->file('imagen');
             
             // Sanitizar el nombre de la marca para usarlo como nombre de archivo
-            $nombreSanitizado = preg_replace('/[^a-z0-9]+/', '-', strtolower($request->nombre));
+            $nombreSanitizado = preg_replace('/[^a-z0-9]+/', '_', strtolower($request->nombre));
             // Añadir timestamp para evitar colisiones si hay marcas con nombres similares
             $nombreArchivo = $nombreSanitizado ;
             // Obtener la extensión original del archivo
@@ -53,6 +53,29 @@ class MarcaController extends Controller
         return response()->json($creado);
     }
 
+    /**
+     * Remove the specified marca from storage.
+     *
+     * @param  \App\Models\Marca  $marca
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $marca = Marca::findOrFail($id);
+        // Verificar si existe una imagen asociada y eliminarla
+        if ($marca->imagen) {
+            $imagePath = public_path(ltrim($marca->imagen, '/'));
+            if (file_exists($imagePath)) {
+                if (!@unlink($imagePath)) {
+                    // Registrar el error si no se puede eliminar, pero continuar
+                    \Log::warning('No se pudo eliminar la imagen de la marca: ' . $imagePath);
+                }
+            }
+        }
+        // Eliminar la marca
+        $marca->delete();
+        return response()->json(['message' => 'Marca eliminada correctamente']);
+    }
    
     /**
      * Update the specified resource in storage.
@@ -84,29 +107,6 @@ class MarcaController extends Controller
         return response()->json($marcas);
     }
 
-    /**
-     * Remove the specified marca from storage.
-     *
-     * @param  \App\Models\Marca  $marca
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $marca = Marca::findOrFail($id);
-        // Verificar si existe una imagen asociada y eliminarla
-        if ($marca->imagen) {
-            $imagePath = public_path(ltrim($marca->imagen, '/'));
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
-            }
-        }
-        
-        // Eliminar la marca
-        $marca->delete();
-        
-        return response()->json(['message' => 'Marca eliminada correctamente']);
-    }
-    
     /*  
       Crea una busqueda por nombre de marca donde el texto sea similar al nombre de la marca
       y devuelve un json con una marca con el nombre similar al texto
@@ -116,6 +116,7 @@ class MarcaController extends Controller
     public function buscarPorNombre(Request $request)
     {
         $texto = $request->input('nombre');
+        // $texto = str_replace(['-', '_'], ' ', strtolower($texto));
         // Modificado para devolver solo la marca más similar al texto
         // Ordenamos por similitud (las que empiezan con el texto tienen prioridad)
         $marca = Marca::where('nombre', 'like', $texto . '%') // Primero busca los que empiezan exactamente con el texto

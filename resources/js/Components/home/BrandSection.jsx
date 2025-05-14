@@ -94,6 +94,7 @@ const BrandCard = ({ brand }) => {
           searchMarca(brand.name)
             .then((data) => {
               // Después de completar la búsqueda, navegar a la página de productos
+              console.log(data);
               if (data && data.id_marca) {
                 window.location.href = `/marcas/${data.id_marca}`;
               } else {
