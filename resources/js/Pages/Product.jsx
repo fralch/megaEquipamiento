@@ -518,6 +518,21 @@ const ProductPage = ({ producto }) => {
                                             className="w-full p-2 border rounded"
                                             value={tempInputs.envio}
                                             onChange={(e) => handleInputChange('envio', e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    const cursorPosition = e.target.selectionStart;
+                                                    const textBeforeCursor = tempInputs.envio.substring(0, cursorPosition);
+                                                    const textAfterCursor = tempInputs.envio.substring(cursorPosition);
+                                                    const newText = textBeforeCursor + '\n• ' + textAfterCursor;
+                                                    handleInputChange('envio', newText);
+                                                    // Establecer el cursor después del punto de la lista
+                                                    setTimeout(() => {
+                                                        e.target.selectionStart = cursorPosition + 3;
+                                                        e.target.selectionEnd = cursorPosition + 3;
+                                                    }, 0);
+                                                }
+                                            }}
                                         />
                                         <div className="mt-2">
                                             <button
@@ -536,7 +551,7 @@ const ProductPage = ({ producto }) => {
                                     </div>
                                 ) : (
                                     <div>
-                                        <p>{productData.envio}</p>
+                                        <div className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: productData.envio.replace(/•/g, '<li style="list-style-type: none;">').replace(/\n•/g, '</li>\n<li style="list-style-type: none;">').replace(/^•/, '<ul style="padding-left: 0;"><li style="list-style-type: none;">') + (productData.envio.includes('•') ? '</li></ul>' : '') }} />
                                         {auth.user && (
                                             <button
                                                 onClick={() => toggleEditMode('envio')}
@@ -557,6 +572,21 @@ const ProductPage = ({ producto }) => {
                                             value={tempInputs.envio}
                                             onChange={(e) => handleInputChange('envio', e.target.value)}
                                             placeholder="Ingrese el contenido de envío"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    const cursorPosition = e.target.selectionStart;
+                                                    const textBeforeCursor = tempInputs.envio.substring(0, cursorPosition);
+                                                    const textAfterCursor = tempInputs.envio.substring(cursorPosition);
+                                                    const newText = textBeforeCursor + '\n• ' + textAfterCursor;
+                                                    handleInputChange('envio', newText);
+                                                    // Establecer el cursor después del punto de la lista
+                                                    setTimeout(() => {
+                                                        e.target.selectionStart = cursorPosition + 3;
+                                                        e.target.selectionEnd = cursorPosition + 3;
+                                                    }, 0);
+                                                }
+                                            }}
                                         />
                                         <div className="mt-2">
                                             <button
