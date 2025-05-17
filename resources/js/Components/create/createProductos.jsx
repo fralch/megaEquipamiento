@@ -66,22 +66,38 @@ const tabs = [
   { id: 'tab8', label: 'Categorías' }
 ];
 
-const FormInput = ({ label, id, name, value, onChange, type = "text", placeholder, required = false, step, className = "" }) => (
-  <div className={`mb-4 ${className}`}>
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
-    <input
-      type={type}
-      id={id}
-      name={name}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-      required={required}
-      step={step}
-    />
-  </div>
-);
+const FormInput = ({ label, id, name, value, onChange, type = "text", placeholder, required = false, step, className = "" }) => {
+  
+  return (
+    <div className={`mb-4 ${className}`}>
+      <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
+      {name === 'envio' || name === 'soporte_tecnico' ? (
+        <textarea
+          id={id}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          required={required}
+          rows={4}
+        />
+      ) : (
+        <input
+          type={type}
+          id={id}
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          required={required}
+          step={step}
+        />
+      )}
+    </div>
+  );
+};
 
 const FormTextarea = ({ label, id, name, value, onChange, placeholder, rows = 4 }) => (
   <div className="mb-4 col-span-2">
