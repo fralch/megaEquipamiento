@@ -17,8 +17,10 @@ import ProductDocuments from "../Components/product/ProductDocuments";
 import ProductTabs from "../Components/product/ProductTabs";
 import ModalRelatedProducts from "../Components/product/ModalRelatedProducts";
 import RelatedProducts from "../Components/product/RelatedProducts";
+import ProductCategoryEdit from "../Components/product/ProductCategoryEdit";
 
 const ProductPage = ({ producto }) => {
+    console.log("producto", producto);
     const { auth } = usePage().props;
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('descripcion');
@@ -199,6 +201,7 @@ const ProductPage = ({ producto }) => {
         { id: 'archivos_adicionales', label: 'Documentos/Descargas' },
         { id: 'envio', label: 'Contenido de Envío' },
         { id: 'soporte', label: 'Soporte Técnico' },
+        { id: 'categoria', label: 'Categorización' },
     ];
 
     useEffect(() => {
@@ -374,6 +377,21 @@ const ProductPage = ({ producto }) => {
                         handleInputChange={(value) => handleInputChange('descripcion', value)}
                         handleSave={() => handleSave('descripcion')}
                         toggleEditMode={() => toggleEditMode('descripcion')}
+                    />
+                );
+            case 'categoria':
+                return (
+                    <ProductCategoryEdit
+                        categorias={producto.categorias}
+                        subcategorias={producto.subcategorias}
+                        marcas={producto.marcas}
+                        countryOptions={producto.countryOptions}
+                        productData={productData}
+                        editMode={editMode}
+                        tempInputs={tempInputs}
+                        handleInputChange={handleInputChange}
+                        handleSave={handleSave}
+                        toggleEditMode={toggleEditMode}
                     />
                 );
             case 'caracteristicas':
@@ -687,6 +705,7 @@ const ProductPage = ({ producto }) => {
                         )}
                     </div>
                 );
+                
             default:
                 return null;
         }
