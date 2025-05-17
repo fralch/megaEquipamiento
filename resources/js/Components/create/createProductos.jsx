@@ -21,6 +21,7 @@ const initialForm = {
   caracteristicas: {},
   datos_tecnicos: {},
   especificaciones_tecnicas: "",
+  archivos_adicionales: "",
 };
 
 const priceFields = [
@@ -440,6 +441,25 @@ const Productos = ({ onSubmit }) => {
             setForm={setForm}
             tableStyles={tableStyles}
           />
+        );
+
+      case 'tab5': // Documentos/Descargas
+        return (
+          <div className="space-y-4">
+            <FormTextarea
+              label="Enlaces de Documentos/Descargas"
+              id="archivos_adicionales"
+              name="archivos_adicionales"
+              value={form.archivos_adicionales}
+              onChange={handleChange}
+              placeholder="Ingrese los enlaces de documentos o descargas (uno por línea)"
+              rows={6}
+            />
+            <div className="text-sm text-gray-500">
+              Ingrese cada enlace en una nueva línea. Ejemplo:
+              <pre className="mt-1 p-2 bg-gray-100 rounded">https://ejemplo.com/manual.pdf</pre>
+            </div>
+          </div>
         );
 
       case 'tab6': // Contenido de Envío

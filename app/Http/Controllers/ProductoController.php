@@ -68,6 +68,7 @@ class ProductoController extends Controller
             'caracteristicas' => 'nullable|json',
             'datos_tecnicos' => 'nullable|json',
             "especificaciones_tecnicas" => 'nullable|string|json', 
+            'archivos_adicionales' => 'nullable|string',
         ]);
     
         // Procesar la imagen si se proporciona
