@@ -518,21 +518,7 @@ const ProductPage = ({ producto }) => {
                                             className="w-full p-2 border rounded"
                                             value={tempInputs.envio}
                                             onChange={(e) => handleInputChange('envio', e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault();
-                                                    const cursorPosition = e.target.selectionStart;
-                                                    const textBeforeCursor = tempInputs.envio.substring(0, cursorPosition);
-                                                    const textAfterCursor = tempInputs.envio.substring(cursorPosition);
-                                                    const newText = textBeforeCursor + '\n• ' + textAfterCursor;
-                                                    handleInputChange('envio', newText);
-                                                    // Establecer el cursor después del punto de la lista
-                                                    setTimeout(() => {
-                                                        e.target.selectionStart = cursorPosition + 3;
-                                                        e.target.selectionEnd = cursorPosition + 3;
-                                                    }, 0);
-                                                }
-                                            }}
+                                           
                                         />
                                         <div className="mt-2">
                                             <button
@@ -572,21 +558,7 @@ const ProductPage = ({ producto }) => {
                                             value={tempInputs.envio}
                                             onChange={(e) => handleInputChange('envio', e.target.value)}
                                             placeholder="Ingrese el contenido de envío"
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault();
-                                                    const cursorPosition = e.target.selectionStart;
-                                                    const textBeforeCursor = tempInputs.envio.substring(0, cursorPosition);
-                                                    const textAfterCursor = tempInputs.envio.substring(cursorPosition);
-                                                    const newText = textBeforeCursor + '\n• ' + textAfterCursor;
-                                                    handleInputChange('envio', newText);
-                                                    // Establecer el cursor después del punto de la lista
-                                                    setTimeout(() => {
-                                                        e.target.selectionStart = cursorPosition + 3;
-                                                        e.target.selectionEnd = cursorPosition + 3;
-                                                    }, 0);
-                                                }
-                                            }}
+                                          
                                         />
                                         <div className="mt-2">
                                             <button
@@ -629,21 +601,7 @@ const ProductPage = ({ producto }) => {
                                             className="w-full p-2 border rounded"
                                             value={tempInputs.soporte_tecnico}
                                             onChange={(e) => handleInputChange('soporte_tecnico', e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault();
-                                                    const cursorPosition = e.target.selectionStart;
-                                                    const textBeforeCursor = tempInputs.soporte_tecnico.substring(0, cursorPosition);
-                                                    const textAfterCursor = tempInputs.soporte_tecnico.substring(cursorPosition);
-                                                    const newText = textBeforeCursor + '\n• ' + textAfterCursor;
-                                                    handleInputChange('soporte_tecnico', newText);
-                                                    // Establecer el cursor después del punto de la lista
-                                                    setTimeout(() => {
-                                                        e.target.selectionStart = cursorPosition + 3;
-                                                        e.target.selectionEnd = cursorPosition + 3;
-                                                    }, 0);
-                                                }
-                                            }}
+                                          
                                         />
                                         <div className="mt-2">
                                             <button

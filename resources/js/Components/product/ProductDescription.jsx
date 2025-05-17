@@ -13,6 +13,7 @@ const ProductDescription = ({ description, editMode, tempInputs, handleInputChan
                                 className="w-full p-2 border rounded"
                                 value={tempInputs}
                                 onChange={(e) => handleInputChange(e.target.value)}
+                                placeholder="Ingrese la descripción del producto"
                             />
                             <div className="mt-2">
                                 <button 
@@ -31,7 +32,10 @@ const ProductDescription = ({ description, editMode, tempInputs, handleInputChan
                         </div>
                     ) : (
                         <div>
-                            <p>{description}</p>
+                            <div className="w-full p-2 bg-transparent overflow-y-auto max-h-96" 
+                                style={{ whiteSpace: 'pre-wrap' }}>
+                                {description}
+                            </div>
                             {auth.user && (
                                 <button 
                                     onClick={toggleEditMode}
@@ -52,6 +56,20 @@ const ProductDescription = ({ description, editMode, tempInputs, handleInputChan
                                 value={tempInputs}
                                 onChange={(e) => handleInputChange(e.target.value)}
                                 placeholder="Ingrese la descripción del producto"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        const cursorPosition = e.target.selectionStart;
+                                        const textBeforeCursor = tempInputs.substring(0, cursorPosition);
+                                        const textAfterCursor = tempInputs.substring(cursorPosition);
+                                        const newText = textBeforeCursor + '\n• ' + textAfterCursor;
+                                        handleInputChange(newText);
+                                        setTimeout(() => {
+                                            e.target.selectionStart = cursorPosition + 3;
+                                            e.target.selectionEnd = cursorPosition + 3;
+                                        }, 0);
+                                    }
+                                }}
                             />
                             <div className="mt-2">
                                 <button 
