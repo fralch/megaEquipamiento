@@ -629,6 +629,21 @@ const ProductPage = ({ producto }) => {
                                             className="w-full p-2 border rounded"
                                             value={tempInputs.soporte_tecnico}
                                             onChange={(e) => handleInputChange('soporte_tecnico', e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    const cursorPosition = e.target.selectionStart;
+                                                    const textBeforeCursor = tempInputs.soporte_tecnico.substring(0, cursorPosition);
+                                                    const textAfterCursor = tempInputs.soporte_tecnico.substring(cursorPosition);
+                                                    const newText = textBeforeCursor + '\n• ' + textAfterCursor;
+                                                    handleInputChange('soporte_tecnico', newText);
+                                                    // Establecer el cursor después del punto de la lista
+                                                    setTimeout(() => {
+                                                        e.target.selectionStart = cursorPosition + 3;
+                                                        e.target.selectionEnd = cursorPosition + 3;
+                                                    }, 0);
+                                                }
+                                            }}
                                         />
                                         <div className="mt-2">
                                             <button
@@ -647,7 +662,7 @@ const ProductPage = ({ producto }) => {
                                     </div>
                                 ) : (
                                     <div>
-                                        <p>{productData.soporte_tecnico}</p>
+                                        <div className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: productData.soporte_tecnico.replace(/•/g, '<li style="list-style-type: none;">').replace(/\n•/g, '</li>\n<li style="list-style-type: none;">').replace(/^•/, '<ul style="padding-left: 0;"><li style="list-style-type: none;">') + (productData.soporte_tecnico.includes('•') ? '</li></ul>' : '') }} />
                                         {auth.user && (
                                             <button
                                                 onClick={() => toggleEditMode('soporte_tecnico')}
@@ -668,6 +683,21 @@ const ProductPage = ({ producto }) => {
                                             value={tempInputs.soporte_tecnico}
                                             onChange={(e) => handleInputChange('soporte_tecnico', e.target.value)}
                                             placeholder="Ingrese la información de soporte técnico"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    const cursorPosition = e.target.selectionStart;
+                                                    const textBeforeCursor = tempInputs.soporte_tecnico.substring(0, cursorPosition);
+                                                    const textAfterCursor = tempInputs.soporte_tecnico.substring(cursorPosition);
+                                                    const newText = textBeforeCursor + '\n• ' + textAfterCursor;
+                                                    handleInputChange('soporte_tecnico', newText);
+                                                    // Establecer el cursor después del punto de la lista
+                                                    setTimeout(() => {
+                                                        e.target.selectionStart = cursorPosition + 3;
+                                                        e.target.selectionEnd = cursorPosition + 3;
+                                                    }, 0);
+                                                }
+                                            }}
                                         />
                                         <div className="mt-2">
                                             <button
