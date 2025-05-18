@@ -4,7 +4,7 @@ import { usePage } from '@inertiajs/react';
 
 const ZoomImage = ({ imageSrc, productId, imageSize = 100 }) => {
   const { auth } = usePage().props;
-  console.log("Imagen:", imageSrc);
+  // console.log("Imagen:", imageSrc);
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomPosition, setZoomPosition] = useState({ x: 0, y: 0 });
   const [isEditing, setIsEditing] = useState(false);

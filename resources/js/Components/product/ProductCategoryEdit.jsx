@@ -1,10 +1,10 @@
-import React from 'react';
+import React,{useState, useEffect} from 'react';
+import { countryOptions  } from '../countrys';
 
 const ProductCategoryEdit = ({
-    categorias,
-    subcategorias,
+    id_subcategoria,
     marcas,
-    countryOptions,
+    countryCurrent,
     productData,
     editMode,
     tempInputs,
@@ -12,6 +12,48 @@ const ProductCategoryEdit = ({
     handleSave,
     toggleEditMode
 }) => {
+    const [subcategoriasAll, setSubcategoriasAll] = useState([]);
+    const [categoriasAll, setCategoriasAll] = useState([]);
+    const [categoriaCurrent, setCategoria] = useState([]);
+    const [subcategoriaCurrent, setSubcategoria] = useState([id_subcategoria]);
+    const [marcasAll, setMarcasAll] = useState([]);
+
+    useEffect(() => {
+        const fetchCatAndSubcatCurrent = async () => {
+            try {
+                // Ejecutar todas las peticiones en paralelo usando un único Promise.all
+                const [
+                    categoriaResponse, 
+                    subcategoriaResponse, 
+                    subcategoriasResponse, 
+                    categoriasResponse, 
+                    marcasResponse
+                ] = await Promise.all([
+                    axios.get('/subcategoria_get/cat/' + id_subcategoria),
+                    axios.get('/subcategoria_id/' + id_subcategoria),
+                    axios.get('/subcategoria-all'),
+                    axios.get('/categorias-all'),
+                    axios.get('/marca/all')
+                ]);
+                
+                // Actualizar todos los estados con las respuestas
+                setCategoria(categoriaResponse.data);
+                setSubcategoria(subcategoriaResponse.data);
+                setSubcategoriasAll(subcategoriasResponse.data);
+                setCategoriasAll(categoriasResponse.data);
+                setMarcasAll(marcasResponse.data);
+                
+                console.log("Datos cargados correctamente");
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        fetchCatAndSubcatCurrent();
+    }, []);
+    
+ 
+    
     return (
         <div className="p-4">
             {editMode.categoria ? (
@@ -27,7 +69,7 @@ const ProductCategoryEdit = ({
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             >
                                 <option value="">Seleccione una categoría</option>
-                                {categorias?.map(categoria => (
+                                {categoriasAll?.map(categoria => (
                                     <option key={categoria.id_categoria} value={categoria.id_categoria}>
                                         {categoria.nombre}
                                     </option>
@@ -45,7 +87,7 @@ const ProductCategoryEdit = ({
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             >
                                 <option value="">Seleccione una subcategoría</option>
-                                {subcategorias?.map(subcategoria => (
+                                {subcategoriasAll?.map(subcategoria => (
                                     <option key={subcategoria.id_subcategoria} value={subcategoria.id_subcategoria}>
                                         {subcategoria.nombre}
                                     </option>
@@ -63,7 +105,7 @@ const ProductCategoryEdit = ({
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             >
                                 <option value="">Seleccione una marca</option>
-                                {marcas?.map(marca => (
+                                {marcasAll?.map(marca => (
                                     <option key={marca.id} value={marca.id}>
                                         {marca.nombre}
                                     </option>
@@ -117,11 +159,11 @@ const ProductCategoryEdit = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <p className="text-sm font-medium text-gray-500">Categoría</p>
-                            <p className="mt-1">{productData.categoria?.nombre || 'No especificado'}</p>
+                            <p className="mt-1">{categoriaCurrent?.nombre_categoria || 'No especificado'}</p>
                         </div>
                         <div>
                             <p className="text-sm font-medium text-gray-500">Subcategoría</p>
-                            <p className="mt-1">{productData.subcategoria?.nombre || 'No especificado'}</p>
+                            <p className="mt-1">{ subcategoriaCurrent?.nombre || 'No especificado'}</p>
                         </div>
                         <div>
                             <p className="text-sm font-medium text-gray-500">Marca</p>

@@ -191,7 +191,7 @@ const ProductPage = ({ producto }) => {
     };
 
     const especificacionesData = parseEspecificacionesTecnicas(productData.especificaciones_tecnicas);
-    console.log("Especificaciones Data:", especificacionesData);
+    // console.log("Especificaciones Data:", especificacionesData);
 
     const tabs = [
         { id: 'descripcion', label: 'Descripción' },
@@ -382,10 +382,9 @@ const ProductPage = ({ producto }) => {
             case 'categoria':
                 return (
                     <ProductCategoryEdit
-                        categorias={producto.categorias}
-                        subcategorias={producto.subcategorias}
+                    id_subcategoria={productData.id_subcategoria}
                         marcas={producto.marcas}
-                        countryOptions={producto.countryOptions}
+                        countryCurrent={producto.countryOptions}
                         productData={productData}
                         editMode={editMode}
                         tempInputs={tempInputs}
