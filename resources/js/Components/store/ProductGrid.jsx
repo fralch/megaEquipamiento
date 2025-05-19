@@ -447,7 +447,7 @@ const Card = ({ product }) => {
       {/* Información del producto (40% restante) */}
       <div className="p-4 flex-grow overflow-y-auto">
         <h2 className="text-lg font-semibold text-gray-800 mb-2">{product.title}</h2>
-        {product.summary && Object.entries(product.summary).slice(0, 3).map(([key, value], index) => (
+        {product.summary && Object.entries(product.summary).slice(0, 4).map(([key, value], index) => (
           <p key={index} className="text-sm text-gray-600">
             <strong>{key}:</strong> {value}
           </p>
