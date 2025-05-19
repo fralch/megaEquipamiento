@@ -1,5 +1,6 @@
-import React,{useState, useEffect} from 'react';
-import { countryOptions  } from '../countrys';
+import React, { useState, useEffect } from 'react';
+import { countryOptions } from '../countrys';
+import axios from 'axios';
 
 const ProductCategoryEdit = ({
     id_subcategoria,
@@ -17,6 +18,7 @@ const ProductCategoryEdit = ({
     const [categoriaCurrent, setCategoria] = useState([]);
     const [subcategoriaCurrent, setSubcategoria] = useState([id_subcategoria]);
     const [marcasAll, setMarcasAll] = useState([]);
+    const [filteredSubcategorias, setFilteredSubcategorias] = useState([]);
 
     useEffect(() => {
         const fetchCatAndSubcatCurrent = async () => {
@@ -43,6 +45,17 @@ const ProductCategoryEdit = ({
                 setCategoriasAll(categoriasResponse.data);
                 setMarcasAll(marcasResponse.data);
                 
+                // Inicializar las subcategorías filtradas si ya hay una categoría seleccionada
+                if (tempInputs.id_categoria) {
+                    const filtered = subcategoriasResponse.data.filter(
+                        subcategoria => subcategoria.id_categoria === parseInt(tempInputs.id_categoria)
+                    );
+                    setFilteredSubcategorias(filtered);
+                } else {
+                    // Si no hay categoría seleccionada, mostrar todas las subcategorías
+                    setFilteredSubcategorias(subcategoriasResponse.data);
+                }
+                
                 console.log("Datos cargados correctamente");
             } catch (error) {
                 console.error('Error fetching data:', error);
@@ -50,9 +63,31 @@ const ProductCategoryEdit = ({
         };
 
         fetchCatAndSubcatCurrent();
-    }, []);
-    
- 
+    }, [id_subcategoria]);
+
+    // Efecto para filtrar subcategorías cuando cambia la categoría seleccionada
+    useEffect(() => {
+        if (tempInputs.id_categoria) {
+            const filtered = subcategoriasAll.filter(
+                subcategoria => subcategoria.id_categoria === parseInt(tempInputs.id_categoria)
+            );
+            setFilteredSubcategorias(filtered);
+        } else {
+            // Si no hay categoría seleccionada, mostrar todas las subcategorías
+            setFilteredSubcategorias(subcategoriasAll);
+        }
+    }, [tempInputs.id_categoria, subcategoriasAll]);
+
+    // Manejador personalizado para el cambio de categoría
+    const handleCategoryChange = (e) => {
+        const categoryId = e.target.value;
+        
+        // Actualizar la categoría seleccionada
+        handleInputChange('id_categoria', categoryId);
+        
+        // Resetear la subcategoría seleccionada cuando se cambia la categoría
+        handleInputChange('id_subcategoria', '');
+    };
     
     return (
         <div className="p-4">
@@ -65,7 +100,7 @@ const ProductCategoryEdit = ({
                                 id="id_categoria"
                                 name="id_categoria"
                                 value={tempInputs.id_categoria || ''}
-                                onChange={(e) => handleInputChange('id_categoria', e.target.value)}
+                                onChange={handleCategoryChange}
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             >
                                 <option value="">Seleccione una categoría</option>
@@ -87,7 +122,7 @@ const ProductCategoryEdit = ({
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             >
                                 <option value="">Seleccione una subcategoría</option>
-                                {subcategoriasAll?.map(subcategoria => (
+                                {filteredSubcategorias.map(subcategoria => (
                                     <option key={subcategoria.id_subcategoria} value={subcategoria.id_subcategoria}>
                                         {subcategoria.nombre}
                                     </option>
@@ -163,7 +198,7 @@ const ProductCategoryEdit = ({
                         </div>
                         <div>
                             <p className="text-sm font-medium text-gray-500">Subcategoría</p>
-                            <p className="mt-1">{ subcategoriaCurrent?.nombre || 'No especificado'}</p>
+                            <p className="mt-1">{subcategoriaCurrent?.nombre || 'No especificado'}</p>
                         </div>
                         <div>
                             <p className="text-sm font-medium text-gray-500">Marca</p>
