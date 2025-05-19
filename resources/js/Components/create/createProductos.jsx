@@ -638,7 +638,7 @@ const Productos = ({ onSubmit }) => {
                           value={editandoPorcentaje ? porcentajeGanancia : form[field.name]}
                           onChange={handleChange}
                           placeholder={field.placeholder}
-                          className="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 pr-8"
+                          className="block w-full border-gray-300 rounded-md shadow-sm pr-8" 
                           step={field.step}
                           onFocus={() => {
                             setEditandoPorcentaje(true);
@@ -648,14 +648,12 @@ const Productos = ({ onSubmit }) => {
                             setEditandoPorcentaje(false);
                           }}
                         />
-                        {editandoPorcentaje && (
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <span className="text-gray-500">%</span>
-                          </div>
-                        )}
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                          <span className="text-blue-500">%</span>
+                        </div>
                       </div>
                       {!editandoPorcentaje && form.precio_ganancia && (
-                        <p className="mt-1 text-xs text-gray-500">
+                        <p className="mt-1 text-xs text-blue-500">
                           Porcentaje aplicado: {porcentajeGanancia}%
                         </p>
                       )}
