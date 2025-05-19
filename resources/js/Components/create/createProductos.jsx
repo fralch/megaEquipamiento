@@ -38,10 +38,10 @@ const priceFields = [
     name: "precio_ganancia",
     type: "number",
     step: "0.01",
-    placeholder: "Ingrese el precio con ganancia",
+    placeholder: "Ingrese el porcentaje de ganancia %",
   },
   {
-    label: "Precio con IGV",
+    label: "Precio con IGV (18%)",
     name: "precio_igv",
     type: "number",
     step: "0.01",
@@ -281,6 +281,8 @@ const Productos = ({ onSubmit }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
+  const [porcentajeGanancia, setPorcentajeGanancia] = useState('');
+  const [editandoPorcentaje, setEditandoPorcentaje] = useState(false);
   const especificacionesRef = useRef(null);
 
   useEffect(() => {
@@ -320,8 +322,60 @@ const Productos = ({ onSubmit }) => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    
+    // Actualizar el valor en el formulario
+    setForm(prev => {
+      const updatedForm = { ...prev, [name]: value };
+      
+      // Si se actualiza el precio sin ganancia, calcular automáticamente el precio con IGV (18%)
+      if (name === 'precio_sin_ganancia' && value) {
+        const precioNumerico = parseFloat(value);
+        if (!isNaN(precioNumerico)) {
+          // Calcular precio con IGV (18%)
+          const precioConIGV = (precioNumerico * 1.18).toFixed(2);
+          updatedForm.precio_igv = precioConIGV;
+          
+          // Si hay un porcentaje de ganancia, recalcular el precio con ganancia
+          if (porcentajeGanancia) {
+            const porcentajeNum = parseFloat(porcentajeGanancia);
+            if (!isNaN(porcentajeNum)) {
+              const precioConGanancia = (precioNumerico * (1 + porcentajeNum / 100)).toFixed(2);
+              updatedForm.precio_ganancia = precioConGanancia;
+            }
+          }
+        }
+      }
+      
+      // Si se actualiza el porcentaje de ganancia
+      if (name === 'precio_ganancia' && value && editandoPorcentaje) {
+        setPorcentajeGanancia(value);
+        const precioSinGanancia = parseFloat(prev.precio_sin_ganancia);
+        if (!isNaN(precioSinGanancia)) {
+          const porcentajeNum = parseFloat(value);
+          if (!isNaN(porcentajeNum)) {
+            // Calcular precio con ganancia
+            const precioConGanancia = (precioSinGanancia * (1 + porcentajeNum / 100)).toFixed(2);
+            updatedForm.precio_ganancia = precioConGanancia;
+          }
+        }
+      }
+      
+      return updatedForm;
+    });
   };
+  
+  // Inicializar el formulario
+  useEffect(() => {
+    if (form.precio_sin_ganancia && porcentajeGanancia) {
+      const precioSinGanancia = parseFloat(form.precio_sin_ganancia);
+      const porcentajeNum = parseFloat(porcentajeGanancia);
+      
+      if (!isNaN(precioSinGanancia) && !isNaN(porcentajeNum)) {
+        const precioConGanancia = (precioSinGanancia * (1 + porcentajeNum / 100)).toFixed(2);
+        setForm(prev => ({ ...prev, precio_ganancia: precioConGanancia }));
+      }
+    }
+  }, [porcentajeGanancia, form.precio_sin_ganancia]);
 
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
@@ -571,14 +625,52 @@ const Productos = ({ onSubmit }) => {
                 required
               />
 
-              {priceFields.map(field => (
-                <FormInput
-                  key={field.name}
-                  {...field}
-                  value={form[field.name]}
-                  onChange={handleChange}
-                />
-              ))}
+              {priceFields.map(field => {
+                if (field.name === 'precio_ganancia') {
+                  return (
+                    <div key={field.name} className="mb-4">
+                      <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">{field.label}</label>
+                      <div className="relative mt-1">
+                        <input
+                          type={field.type}
+                          id={field.name}
+                          name={field.name}
+                          value={editandoPorcentaje ? porcentajeGanancia : form[field.name]}
+                          onChange={handleChange}
+                          placeholder={field.placeholder}
+                          className="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 pr-8"
+                          step={field.step}
+                          onFocus={() => {
+                            setEditandoPorcentaje(true);
+                            setPorcentajeGanancia(porcentajeGanancia || '');
+                          }}
+                          onBlur={() => {
+                            setEditandoPorcentaje(false);
+                          }}
+                        />
+                        {editandoPorcentaje && (
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <span className="text-gray-500">%</span>
+                          </div>
+                        )}
+                      </div>
+                      {!editandoPorcentaje && form.precio_ganancia && (
+                        <p className="mt-1 text-xs text-gray-500">
+                          Porcentaje aplicado: {porcentajeGanancia}%
+                        </p>
+                      )}
+                    </div>
+                  );
+                }
+                return (
+                  <FormInput
+                    key={field.name}
+                    {...field}
+                    value={form[field.name]}
+                    onChange={handleChange}
+                  />
+                );
+              })}
 
               <VideoInput value={form.video} onChange={handleChange} />
             </div>
