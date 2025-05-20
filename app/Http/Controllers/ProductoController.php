@@ -337,6 +337,42 @@ class ProductoController extends Controller
             ->paginate($perPage);
         return response()->json($productos);
     }
+    
+    /**
+     * Actualizar categoría, subcategoría, marca y país de un producto
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateProductCategory(Request $request)
+    {
+        $request->validate([
+            'id_producto' => 'required|exists:productos,id_producto',
+            'id_subcategoria' => 'required|exists:subcategorias,id_subcategoria',
+            'marca_id' => 'required|exists:marcas,id_marca',
+            'pais' => 'nullable|max:100',
+        ]);
+        
+        // Buscar el producto por ID
+        $producto = Producto::find($request->id_producto);
+        
+        // Verificar si el producto existe
+        if (!$producto) {
+            return response()->json(['error' => 'Producto no encontrado'], 404);
+        }
+        
+        // Actualizar solo los campos de categorización
+        $producto->update([
+            'id_subcategoria' => $request->id_subcategoria,
+            'marca_id' => $request->marca_id,
+            'pais' => $request->pais,
+        ]);
+        
+        // Recargar el producto con la relación marca
+        $producto = $producto->fresh('marca');
+        
+        return response()->json($producto);
+    }
 
     /* Crear una funcion que elimine un producto */
     public function deleteProduct(Request $request, $id_producto)

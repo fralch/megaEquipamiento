@@ -19,6 +19,7 @@ const ProductCategoryEdit = ({
     const [subcategoriaCurrent, setSubcategoria] = useState([id_subcategoria]);
     const [marcasAll, setMarcasAll] = useState([]);
     const [filteredSubcategorias, setFilteredSubcategorias] = useState([]);
+    const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
 
     useEffect(() => {
         const fetchCatAndSubcatCurrent = async () => {
@@ -89,8 +90,73 @@ const ProductCategoryEdit = ({
         handleInputChange('id_subcategoria', '');
     };
     
+    // Efecto para limpiar automáticamente los mensajes de estado después de 3 segundos
+    useEffect(() => {
+        if (statusMessage.text) {
+            const timer = setTimeout(() => {
+                setStatusMessage({ type: '', text: '' });
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [statusMessage]);
+    
+    // Función para actualizar la categoría del producto usando el endpoint updateProductCategory
+    const updateProductCategory = async () => {
+        try {
+            // Verificar que los campos requeridos estén presentes
+            if (!tempInputs.id_subcategoria || !tempInputs.marca_id) {
+                setStatusMessage({ 
+                    type: 'error', 
+                    text: 'Por favor, seleccione una subcategoría y una marca' 
+                });
+                return;
+            }
+            
+            // Preparar los datos para enviar al servidor
+            const data = {
+                id_producto: productData.id_producto,
+                id_subcategoria: tempInputs.id_subcategoria,
+                marca_id: tempInputs.marca_id,
+                pais: tempInputs.pais || null
+            };
+            
+            // Realizar la petición POST al endpoint
+            const response = await axios.post('/productos/actualizar-categoria', data, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            });
+            
+            // Si la respuesta es exitosa, actualizar los datos del producto
+            if (response.data) {
+                console.log('Categorización actualizada correctamente:', response.data);
+                // Mostrar mensaje de éxito
+                setStatusMessage({ 
+                    type: 'success', 
+                    text: 'Categorización actualizada correctamente' 
+                });
+                // Actualizar los datos del producto con la respuesta del servidor
+                handleSave('categoria');
+            }
+        } catch (error) {
+            console.error('Error al actualizar la categorización:', error);
+            setStatusMessage({ 
+                type: 'error', 
+                text: 'Error al actualizar la categorización. Por favor, inténtelo de nuevo.' 
+            });
+        }
+    };
+    
     return (
         <div className="p-4">
+            {/* Mostrar mensajes de estado */}
+            {statusMessage.text && (
+                <div className={`mb-4 p-3 rounded ${statusMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {statusMessage.text}
+                </div>
+            )}
             {editMode.categoria ? (
                 <div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -167,7 +233,7 @@ const ProductCategoryEdit = ({
 
                     <div className="mt-4 flex space-x-2">
                         <button
-                            onClick={() => handleSave('categoria')}
+                            onClick={updateProductCategory}
                             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                         >
                             Guardar
