@@ -345,58 +345,56 @@ class ProductoController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function updateProductCategory(Request $request)
-{
-    // Validar los datos de entrada
-    $request->validate([
-        'id_producto' => 'required|exists:productos,id_producto',
-        'id_subcategoria' => 'nullable|exists:subcategorias,id_subcategoria',
-        'id_marca' => 'nullable|exists:marcas,id',  // Asegúrate que esto coincida con el nombre de la columna en tu base de datos
-        'pais' => 'nullable|max:100',
-    ]);
-    
-    try {
-        // Buscar el producto por ID
-        $producto = Producto::find($request->id_producto);
+    {
+        // Validar los datos de entrada
+        $request->validate([
+            'id_producto' => 'required|exists:productos,id_producto',
+            'id_subcategoria' => 'nullable|exists:subcategorias,id_subcategoria',
+            'marca_id' => 'nullable',  // Asegúrate que esto coincida con el nombre de la columna en tu base de datos
+            'pais' => 'nullable|max:100',
+        ]);
         
-        // Verificar si el producto existe
-        if (!$producto) {
-            return response()->json(['error' => 'Producto no encontrado'], 404);
+        try {
+            // Buscar el producto por ID
+            $producto = Producto::find($request->id_producto);
+            
+            // Verificar si el producto existe
+            if (!$producto) {
+                return response()->json(['error' => 'Producto no encontrado'], 404);
+            }
+            
+            // Preparar los datos a actualizar
+            $dataToUpdate = [];
+            
+            // Solo incluir los campos que están presentes en la solicitud
+            if ($request->has('id_subcategoria')) {
+                $dataToUpdate['id_subcategoria'] = $request->id_subcategoria;
+            }
+            if ($request->has('marca_id')) {
+                $dataToUpdate['marca_id'] = $request->marca_id;
+            }
+            if ($request->has('pais')) {
+                $dataToUpdate['pais'] = $request->pais;
+            }
+            
+            // Actualizar solo los campos proporcionados
+            if (!empty($dataToUpdate)) {
+                $producto->update($dataToUpdate);
+            }
+            
+            
+            return response()->json($producto);
+        } catch (\Exception $e) {
+            // Registrar el error para depuración
+            \Log::error('Error al actualizar producto: ' . $e->getMessage());
+            
+            // Devolver una respuesta de error
+            return response()->json([
+                'error' => 'Error al actualizar el producto',
+                'details' => $e->getMessage()
+            ], 500);
         }
-        
-        // Preparar los datos a actualizar
-        $dataToUpdate = [];
-        
-        // Solo incluir los campos que están presentes en la solicitud
-        if ($request->has('id_subcategoria')) {
-            $dataToUpdate['id_subcategoria'] = $request->id_subcategoria;
-        }
-        if ($request->has('id_marca')) {
-            $dataToUpdate['id_marca'] = $request->id_marca;
-        }
-        if ($request->has('pais')) {
-            $dataToUpdate['pais'] = $request->pais;
-        }
-        
-        // Actualizar solo los campos proporcionados
-        if (!empty($dataToUpdate)) {
-            $producto->update($dataToUpdate);
-        }
-        
-        // Recargar el producto con la relación marca
-        $producto = $producto->fresh(['marca']);
-        
-        return response()->json($producto);
-    } catch (\Exception $e) {
-        // Registrar el error para depuración
-        \Log::error('Error al actualizar producto: ' . $e->getMessage());
-        
-        // Devolver una respuesta de error
-        return response()->json([
-            'error' => 'Error al actualizar el producto',
-            'details' => $e->getMessage()
-        ], 500);
     }
-}
 
     /* Crear una funcion que elimine un producto */
     public function deleteProduct(Request $request, $id_producto)

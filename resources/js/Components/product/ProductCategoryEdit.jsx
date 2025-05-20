@@ -143,7 +143,7 @@ const ProductCategoryEdit = ({
                 });
                 return;
             }
-            
+            console.log(tempInputs.marca_id);
             // Realizar la petición POST al endpoint usando FormData
             const response = await axios.post('/productos/actualizar-categoria', formData, {
                 headers: {
@@ -252,7 +252,7 @@ const ProductCategoryEdit = ({
                                 id="marca_id"
                                 name="marca_id"
                                 value={tempInputs.marca_id || ''}
-                                onChange={(e) => handleInputChange('id_marca', e.target.value)}
+                                onChange={(e) => handleInputChange('marca_id', e.target.value)}
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             >
                                 <option value="">Sin marca (opcional)</option>
