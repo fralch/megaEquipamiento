@@ -338,6 +338,43 @@ class ProductoController extends Controller
         return response()->json($productos);
     }
 
+    /* Crear una funcion que elimine un producto */
+    public function deleteProduct(Request $request, $id_producto)
+    {
+        try {
+            // Buscar el producto
+            $producto = Producto::findOrFail($id_producto);
+
+            // Eliminar la imagen si existe
+            if ($producto->imagen && file_exists(public_path($producto->imagen))) {
+                unlink(public_path($producto->imagen));
+            }
+
+            // Eliminar las relaciones bidireccionales
+            $producto->productosRelacionados()->detach(); // Elimina las relaciones donde este producto es el principal
+            Producto::whereHas('productosRelacionados', function($query) use ($id_producto) {
+                $query->where('relacionado_id', $id_producto);
+            })->each(function($p) use ($id_producto) {
+                $p->productosRelacionados()->detach($id_producto);
+            });
+
+            // Eliminar el producto
+            $producto->delete();
+
+            return Inertia::location('/');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Producto no encontrado'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar el producto: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
 
     

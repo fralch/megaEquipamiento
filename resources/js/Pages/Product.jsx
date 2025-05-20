@@ -900,8 +900,9 @@ const ProductPage = ({ producto }) => {
                             </div>
                         </div>
 
-                        <div className="flex items-center space-x-4 mt-6">
-                            <button className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 shadow-md">
+                        <div className="">
+                          <div className="flex items-center space-x-4 mt-6">
+                          <button className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 shadow-md">
                                 Agregar al carrito
                             </button>
                             <button className="bg-gray-200 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-300 shadow-md">
@@ -910,6 +911,34 @@ const ProductPage = ({ producto }) => {
                             <button className="bg-gray-200 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-300 shadow-md">
                                 Comunícate con un asesor
                             </button>
+                          </div>
+                            {auth.user && (
+                                <button 
+                                    onClick={() => {
+                                        if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                                            // Usar el método delete con una URL y configuración correcta
+                                            router.delete(`/product/delete/${producto.id_producto}`, {
+                                                onBefore: () => confirm('¿Estás seguro de que deseas eliminar este producto?'),
+                                                onSuccess: () => {
+                                                    // Navegar a la página anterior o a una ruta específica
+                                                    window.location.href = '/'; // URL específica como fallback
+                                                },
+                                                // Manejar errores
+                                                onError: (errors) => {
+                                                    console.error('Error al eliminar:', errors);
+                                                    alert('Hubo un error al eliminar el producto');
+                                                },
+                                                // Permitir respuestas no-Inertia
+                                                preserveScroll: true,
+                                                preserveState: true
+                                            });
+                                        }
+                                    }} 
+                                    className="w-full mt-4 bg-red-600 text-white px-6 py-3 rounded-md hover:bg-red-700 shadow-md transition-colors duration-200"
+                                >
+                                    Eliminar Producto
+                                </button>
+                            )}
                         </div>
 
                         {producto.video && (
