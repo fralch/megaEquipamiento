@@ -382,7 +382,8 @@ const ProductPage = ({ producto }) => {
             case 'categoria':
                 return (
                     <ProductCategoryEdit
-                    id_subcategoria={productData.id_subcategoria}
+                        id_producto={productData.id_producto}
+                        id_subcategoria={productData.id_subcategoria}
                         marcas={producto.marcas}
                         countryCurrent={producto.countryOptions}
                         productData={productData}

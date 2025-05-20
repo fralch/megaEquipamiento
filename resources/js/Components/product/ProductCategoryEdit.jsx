@@ -3,6 +3,7 @@ import { countryOptions } from '../countrys';
 import axios from 'axios';
 
 const ProductCategoryEdit = ({
+    id_producto,
     id_subcategoria,
     marcas,
     countryCurrent,
@@ -60,6 +61,10 @@ const ProductCategoryEdit = ({
                 console.log("Datos cargados correctamente");
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setStatusMessage({ 
+                    type: 'error', 
+                    text: 'Error al cargar los datos. Por favor, intente nuevamente.' 
+                });
             }
         };
 
@@ -103,29 +108,47 @@ const ProductCategoryEdit = ({
     // Función para actualizar la categoría del producto usando el endpoint updateProductCategory
     const updateProductCategory = async () => {
         try {
-            // Verificar que los campos requeridos estén presentes
-            if (!tempInputs.id_subcategoria || !tempInputs.marca_id) {
+            // Preparar los datos para enviar al servidor
+            const formData = new FormData();
+            
+            // Añadir campos al FormData
+            formData.append('id_producto', productData.id_producto);
+            
+            // Añadir campos opcionales sólo si tienen valor
+            if (tempInputs.id_subcategoria) {
+                formData.append('id_subcategoria', tempInputs.id_subcategoria);
+            }
+            
+            if (tempInputs.marca_id) {
+                formData.append('marca_id', tempInputs.marca_id);
+            }
+            
+            if (tempInputs.pais) {
+                formData.append('pais', tempInputs.pais);
+            }
+            
+            console.log('Enviando datos:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`${key}: ${value}`);
+            }
+            
+            // Obtener el token CSRF
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
+            if (!csrfToken) {
+                console.error('No se encontró el token CSRF');
                 setStatusMessage({ 
                     type: 'error', 
-                    text: 'Por favor, seleccione una subcategoría y una marca' 
+                    text: 'Error de seguridad: No se encontró el token CSRF' 
                 });
                 return;
             }
             
-            // Preparar los datos para enviar al servidor
-            const data = {
-                id_producto: productData.id_producto,
-                id_subcategoria: tempInputs.id_subcategoria,
-                marca_id: tempInputs.marca_id,
-                pais: tempInputs.pais || null
-            };
-            
-            // Realizar la petición POST al endpoint
-            const response = await axios.post('/productos/actualizar-categoria', data, {
+            // Realizar la petición POST al endpoint usando FormData
+            const response = await axios.post('/productos/actualizar-categoria', formData, {
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'multipart/form-data', // Importante para FormData
                 }
             });
             
@@ -135,17 +158,44 @@ const ProductCategoryEdit = ({
                 // Mostrar mensaje de éxito
                 setStatusMessage({ 
                     type: 'success', 
-                    text: 'Categorización actualizada correctamente' 
+                    text: 'Información de categorización actualizada correctamente' 
                 });
                 // Actualizar los datos del producto con la respuesta del servidor
                 handleSave('categoria');
             }
         } catch (error) {
             console.error('Error al actualizar la categorización:', error);
-            setStatusMessage({ 
-                type: 'error', 
-                text: 'Error al actualizar la categorización. Por favor, inténtelo de nuevo.' 
-            });
+            
+            // Mostrar mensaje de error detallado si está disponible
+            if (error.response && error.response.data) {
+                console.error('Detalles del error:', error.response.data);
+                
+                // Si hay errores de validación específicos
+                if (error.response.data.errors) {
+                    const errorMessages = Object.values(error.response.data.errors)
+                        .flat()
+                        .join(', ');
+                    setStatusMessage({ 
+                        type: 'error', 
+                        text: `Error de validación: ${errorMessages}` 
+                    });
+                } else if (error.response.data.message) {
+                    setStatusMessage({ 
+                        type: 'error', 
+                        text: `Error: ${error.response.data.message}` 
+                    });
+                } else {
+                    setStatusMessage({ 
+                        type: 'error', 
+                        text: 'Error al actualizar la información de categorización.' 
+                    });
+                }
+            } else {
+                setStatusMessage({ 
+                    type: 'error', 
+                    text: 'Error al actualizar la información de categorización. Por favor, intente nuevamente.' 
+                });
+            }
         }
     };
     
@@ -179,7 +229,7 @@ const ProductCategoryEdit = ({
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="id_subcategoria" className="block text-sm font-medium text-gray-700">Subcategoría</label>
+                            <label htmlFor="id_subcategoria" className="block text-sm font-medium text-gray-700">Subcategoría (Opcional)</label>
                             <select
                                 id="id_subcategoria"
                                 name="id_subcategoria"
@@ -187,7 +237,7 @@ const ProductCategoryEdit = ({
                                 onChange={(e) => handleInputChange('id_subcategoria', e.target.value)}
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             >
-                                <option value="">Seleccione una subcategoría</option>
+                                <option value="">Sin subcategoría (opcional)</option>
                                 {filteredSubcategorias.map(subcategoria => (
                                     <option key={subcategoria.id_subcategoria} value={subcategoria.id_subcategoria}>
                                         {subcategoria.nombre}
@@ -197,17 +247,17 @@ const ProductCategoryEdit = ({
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="marca_id" className="block text-sm font-medium text-gray-700">Marca</label>
+                            <label htmlFor="marca_id" className="block text-sm font-medium text-gray-700">Marca (Opcional)</label>
                             <select
                                 id="marca_id"
                                 name="marca_id"
                                 value={tempInputs.marca_id || ''}
-                                onChange={(e) => handleInputChange('marca_id', e.target.value)}
+                                onChange={(e) => handleInputChange('id_marca', e.target.value)}
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             >
-                                <option value="">Seleccione una marca</option>
+                                <option value="">Sin marca (opcional)</option>
                                 {marcasAll?.map(marca => (
-                                    <option key={marca.id} value={marca.id}>
+                                    <option key={marca.id_marca} value={marca.id_marca}>
                                         {marca.nombre}
                                     </option>
                                 ))}
@@ -215,7 +265,7 @@ const ProductCategoryEdit = ({
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="pais" className="block text-sm font-medium text-gray-700">País</label>
+                            <label htmlFor="pais" className="block text-sm font-medium text-gray-700">País (Opcional)</label>
                             <select
                                 id="pais"
                                 name="pais"
@@ -223,7 +273,7 @@ const ProductCategoryEdit = ({
                                 onChange={(e) => handleInputChange('pais', e.target.value)}
                                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                             >
-                                <option value="">Seleccione un país</option>
+                                <option value="">Sin país (opcional)</option>
                                 {countryOptions?.map(option => (
                                     <option key={option.value} value={option.value}>{option.label}</option>
                                 ))}
