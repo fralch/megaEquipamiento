@@ -12,6 +12,7 @@ export default function Categoria({ productos, categoria, subcategorias }) {
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [openCategories, setOpenCategories] = useState({});
     const [activeCategory, setActiveCategory] = useState(null);
+    const [mostrarProductos, setMostrarProductos] = useState(false);
 
     useEffect(() => {
         const storedData = localStorage.getItem('categoriasCompleta');
@@ -48,6 +49,10 @@ export default function Categoria({ productos, categoria, subcategorias }) {
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
+    };
+
+    const handleMostrarProductos = () => {
+        setMostrarProductos(true);
     };
 
     return (
@@ -95,8 +100,12 @@ export default function Categoria({ productos, categoria, subcategorias }) {
                         </>
                     ) : (
                         <>
-                        <h1 className="text-2xl font-bold mb-4">Mostrando todos los productos</h1>
-                        <ProductGrid />
+                        <h1 className="text-2xl font-bold mb-4">Categoría: {categoria.nombre}</h1>
+                        <div className="text-center py-10">
+                          <p className="text-xl text-gray-600">No hay productos relacionados a esta categoría.</p>
+                        </div>
+                        <button onClick={handleMostrarProductos} className="bg-[#184f96] hover:bg-blue-800 text-white py-2 px-4 rounded transition-all duration-200 mb-4 mx-auto block">Mostrar productos</button>
+                        {mostrarProductos && <ProductGrid />}
                         </>
                     )}
                      <div className="flex justify-center">

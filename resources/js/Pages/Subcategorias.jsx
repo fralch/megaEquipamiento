@@ -16,6 +16,7 @@ export default function Subcategoria({ productos }) {
     const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
     const [categoriaNombre, setCategoriaNombre] = useState("");
     const [categoriaId, setCategoriaId] = useState("");
+    const [mostrarProductos, setMostrarProductos] = useState(false);
 
     useEffect(() => {
         // Cargar categorías desde localStorage o desde la API
@@ -68,6 +69,10 @@ export default function Subcategoria({ productos }) {
         setIsOpen(!isOpen);
     };
 
+    const handleMostrarProductos = () => {
+        setMostrarProductos(true);
+    };
+
     return (
         <div>
             <Head title="Subcategoria" />
@@ -114,8 +119,12 @@ export default function Subcategoria({ productos }) {
                         </>
                     ) : (
                         <>
-                        <h1 className="text-2xl font-bold mb-4">Mostrando todos los productos</h1>
-                        <ProductGrid />
+                        <h1 className="text-2xl font-bold mb-4"><Link href={`/categorias/${categoriaId}`}><span className="text-xl font-bold Link text-gray-600">{categoriaNombre} /</span></Link> {subcategoriaNombre}</h1>
+                        <p className="text-lg text-gray-600 mb-4">No hay productos relacionados a esta subcategoría.</p>
+                        <div className="flex justify-center">
+                            <button onClick={handleMostrarProductos} className="bg-[#184f96] hover:bg-blue-800 text-white py-2 px-4 rounded transition-all duration-200 mb-4">Mostrar productos</button>
+                        </div>
+                        {mostrarProductos && <ProductGrid />}
                         </>
                     )}
                     <div className="flex justify-center">
