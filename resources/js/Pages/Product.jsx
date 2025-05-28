@@ -21,6 +21,22 @@ import ProductCategoryEdit from "../Components/product/ProductCategoryEdit";
 
 const ProductPage = ({ producto }) => {
     console.log("producto", producto);
+    const [categoriaCurrent, setCategoriaCurrent] = useState(null);
+    const [subcategoriaCurrent, setSubcategoriaCurrent] = useState(null);
+
+    useEffect(() => {
+        const fetchCategoryData = async () => {
+            try {
+                const categoriaResponse = await axios.get('/subcategoria_get/cat/' + producto.id_subcategoria);
+                const subcategoriaResponse = await axios.get('/subcategoria_id/' + producto.id_subcategoria);
+                setCategoriaCurrent(categoriaResponse.data);
+                setSubcategoriaCurrent(subcategoriaResponse.data);
+            } catch (error) {
+                console.error('Error fetching category data:', error);
+            }
+        };
+        fetchCategoryData();
+    }, [producto.id_subcategoria]);
     const { auth } = usePage().props;
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('descripcion');
@@ -717,6 +733,23 @@ const ProductPage = ({ producto }) => {
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
+            {categoriaCurrent && subcategoriaCurrent && (
+                <div className="flex items-center gap-1 px-6 py-3 ">
+                    <Link 
+                        href={`/categorias/${categoriaCurrent.id_categoria}`} 
+                        className="text-gray-600 hover:text-blue-600 transition-colors duration-200 text-lg font-medium"
+                    >
+                        {categoriaCurrent.nombre_categoria}
+                    </Link>
+                    <span className="text-gray-400 mx-1 text-sm font-medium">/</span>
+                    <Link 
+                        href={`/subcategoria/${producto.id_subcategoria}`}
+                        className="text-gray-800 hover:text-blue-600 transition-colors duration-200 text-lg font-medium"
+                    >
+                        {subcategoriaCurrent.nombre}
+                    </Link>
+                </div>
+            )} 
 
             {/* Modal para características */}
             {showModal && (
