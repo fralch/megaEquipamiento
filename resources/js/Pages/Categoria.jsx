@@ -10,8 +10,6 @@ const URL_API = import.meta.env.VITE_API_URL;
 export default function Categoria({ productos, categoria, subcategorias }) {
     const [isOpen, setIsOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
-    const [openCategories, setOpenCategories] = useState({});
-    const [activeCategory, setActiveCategory] = useState(null);
     const [mostrarProductos, setMostrarProductos] = useState(false);
 
     useEffect(() => {
@@ -35,17 +33,7 @@ export default function Categoria({ productos, categoria, subcategorias }) {
         console.log(productos);
         console.log(subcategorias);
         console.log(categoria);
-
-        // Hacer una solicitud a la API para obtener los datos de la categoría
     }, []);
-
-    const toggleCategory = (categoriaNombre) => {
-        setOpenCategories((prevState) => ({
-            ...prevState,
-            [categoriaNombre]: !prevState[categoriaNombre],
-        }));
-        setActiveCategory(categoriaNombre);
-    };
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -64,32 +52,13 @@ export default function Categoria({ productos, categoria, subcategorias }) {
             <div className="min-w-screen min-h-screen bg-gray-200 flex">
                 <nav className="w-1/6 p-4 overflow-y-auto bg-white" id="nav-fijo">
                     {categoriasArray.map((categoria) => (
-                        <div key={categoria.id_categoria}>
-                            <button
-                                onClick={() => toggleCategory(categoria.nombre)}
-                                className={`block w-full text-left p-2 rounded ${
-                                    activeCategory === categoria.nombre
-                                        ? 'bg-[#184f96] text-blue-200'
-                                        : 'bg-gray-200 hover:bg-white'
-                                }`}
-                            >
-                                {categoria.nombre}
-                                <span className="float-right">
-                                    {openCategories[categoria.nombre] ? '-' : '+'}
-                                </span>
-                            </button>
-                            {openCategories[categoria.nombre] &&
-                                categoria.subcategorias &&
-                                categoria.subcategorias.map((subcategoria) => (
-                                    <Link
-                                        key={subcategoria.id_subcategoria}
-                                        href={`/subcategoria/${subcategoria.id_subcategoria}`}
-                                        className="block p-2 pl-6 hover:bg-blue-100 bg-blue-50 rounded"
-                                    >
-                                        {subcategoria.nombre}
-                                    </Link>
-                                ))}
-                        </div>
+                        <Link
+                            key={categoria.id_categoria}
+                            href={`/categorias/${categoria.id_categoria}`}
+                            className="block w-full text-left p-3 mb-2 rounded-lg bg-gray-200 hover:bg-[#184f96] hover:text-white transition-colors duration-200 border border-gray-200 hover:border-blue-500"
+                        >
+                            {categoria.nombre}
+                        </Link>
                     ))}
                 </nav>
                 <div className="flex-1 p-4">
