@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "@inertiajs/react";
 const URL_API = import.meta.env.VITE_API_URL;  
 
-const CategoryCard = ({ title, items }) => {
+const CategoryCard = ({ title, items, categoryId }) => {
   const [imagePaths, setImagePaths] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -71,6 +71,7 @@ const CategoryCard = ({ title, items }) => {
   
   // Imagen actual a mostrar
   const currentImage = imagePaths.length > 0 ? imagePaths[activeImageIndex] : placeholderImage;
+  
   return (
     <div ref={cardRef} className="relative group w-full h-96 rounded-lg overflow-hidden shadow-lg m-4">
       {/* Placeholder mientras carga */}
@@ -100,7 +101,12 @@ const CategoryCard = ({ title, items }) => {
 
           {/* Contenido oculto que aparece con hover */}
           <div className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-center items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
-            <h2 className="text-2xl font-semibold mb-4 text-center">{title}</h2>
+            <Link 
+              href={`/categorias/${categoryId}`} 
+              className="cursor-pointer hover:text-blue-400 transition-colors duration-200"
+            >
+              <h2 className="text-2xl font-semibold mb-4 text-center">{title}</h2>
+            </Link>
 
             {/* Lista desplazable */}
             <div className="space-y-2 h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-300">
@@ -115,10 +121,13 @@ const CategoryCard = ({ title, items }) => {
               ))}
             </div>
 
-            {/* Botón */}
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4">
+            {/* Botón que también lleva a los productos de la categoría */}
+            <Link 
+              href={`/categorias/${categoryId}`}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 transition-colors duration-200"
+            >
               Ver más
-            </button>
+            </Link>
           </div>
         </>
       )}
@@ -174,7 +183,11 @@ const Categories = () => {
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 bg-white min-h-screen">
       {categories.map((category) => (
         <div key={category.id_categoria} className="m-4">
-          <CategoryCard title={category.nombre} items={category.subcategorias} />
+          <CategoryCard 
+            title={category.nombre} 
+            items={category.subcategorias} 
+            categoryId={category.id_categoria}
+          />
         </div>
       ))}
     </div>
