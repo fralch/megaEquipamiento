@@ -86,7 +86,7 @@ class FiltroController extends Controller
             // Revierte la transacción en caso de error
             DB::rollBack();
             // Devuelve un mensaje de error
-            return response()->json(['error' => 'Error al crear el filtro'], 500);
+            return response()->json(['error' => 'Error al crear el filtro', 'message' => $e->getMessage()], 500);
         }
     }
 
