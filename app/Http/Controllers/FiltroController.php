@@ -36,11 +36,12 @@ class FiltroController extends Controller
             'descripcion' => 'nullable|string',
             'orden' => 'integer',
             'obligatorio' => 'boolean',
-            'opciones' => 'required_if:tipo_input,checkbox,select,radio|array',
-            'opciones.*.valor' => 'required|string|max:100',
-            'opciones.*.etiqueta' => 'required|string|max:100',
+            // Cambiar esta línea:
+            'opciones' => 'required_if:tipo_input,checkbox,select,radio|array|min:1',
+            'opciones.*.valor' => 'required_with:opciones|string|max:100',
+            'opciones.*.etiqueta' => 'required_with:opciones|string|max:100',
             'opciones.*.color' => 'nullable|string|max:7',
-            'opciones.*.orden' => 'integer',
+            'opciones.*.orden' => 'nullable|integer',
             'subcategorias' => 'array',
             'subcategorias.*' => 'exists:subcategorias,id_subcategoria'
         ]);
@@ -61,14 +62,17 @@ class FiltroController extends Controller
             ]);
 
             // Si hay opciones, las crea y asocia al filtro
-            if ($request->has('opciones')) {
-                foreach ($request->opciones as $opcion) {
-                    $filtro->opciones()->create([
-                        'valor' => $opcion['valor'],
-                        'etiqueta' => $opcion['etiqueta'],
-                        'color' => $opcion['color'] ?? null,
-                        'orden' => $opcion['orden'] ?? 0
-                    ]);
+            if ($request->has('opciones') && is_array($request->opciones)) {
+                foreach ($request->opciones as $index => $opcion) {
+                    // Filtrar opciones vacías
+                    if (!empty($opcion['valor']) && !empty($opcion['etiqueta'])) {
+                        $filtro->opciones()->create([
+                            'valor' => $opcion['valor'],
+                            'etiqueta' => $opcion['etiqueta'],
+                            'color' => $opcion['color'] ?? null,
+                            'orden' => $opcion['orden'] ?? $index
+                        ]);
+                    }
                 }
             }
 
@@ -86,7 +90,7 @@ class FiltroController extends Controller
             // Revierte la transacción en caso de error
             DB::rollBack();
             // Devuelve un mensaje de error
-            return response()->json(['error' => 'Error al crear el filtro', 'message' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al crear el filtro'], 500);
         }
     }
 
@@ -114,14 +118,15 @@ class FiltroController extends Controller
             'orden' => 'integer',
             'obligatorio' => 'boolean',
             'opciones' => 'array',
-            'opciones.*.id_opcion' => 'exists:opciones_filtros,id_opcion',
-            'opciones.*.valor' => 'string|max:100',
-            'opciones.*.etiqueta' => 'string|max:100',
+            'opciones.*.id_opcion' => 'nullable|exists:opciones_filtros,id_opcion',
+            'opciones.*.valor' => 'required_with:opciones|string|max:100',
+            'opciones.*.etiqueta' => 'required_with:opciones|string|max:100',
             'opciones.*.color' => 'nullable|string|max:7',
-            'opciones.*.orden' => 'integer',
+            'opciones.*.orden' => 'nullable|integer',
             'subcategorias' => 'array',
             'subcategorias.*' => 'exists:subcategorias,id_subcategoria'
         ]);
+        
 
         try {
             // Inicia una transacción de base de datos
@@ -140,14 +145,44 @@ class FiltroController extends Controller
 
             // Si hay opciones, actualiza las existentes o crea nuevas
             if ($request->has('opciones')) {
-                foreach ($request->opciones as $opcionData) {
-                    if (isset($opcionData['id_opcion'])) {
-                        $opcion = OpcionFiltro::find($opcionData['id_opcion']);
-                        if ($opcion) {
-                            $opcion->update($opcionData);
+                // Eliminar opciones existentes si no están en la nueva lista
+                $opcionesExistentes = $filtro->opciones()->pluck('id_opcion')->toArray();
+                $opcionesEnviadas = collect($request->opciones)
+                    ->filter(function($opcion) {
+                        return isset($opcion['id_opcion']);
+                    })
+                    ->pluck('id_opcion')
+                    ->toArray();
+                
+                // Eliminar opciones que ya no están
+                $opcionesAEliminar = array_diff($opcionesExistentes, $opcionesEnviadas);
+                if (!empty($opcionesAEliminar)) {
+                    OpcionFiltro::whereIn('id_opcion', $opcionesAEliminar)->delete();
+                }
+                
+                // Actualizar o crear opciones
+                foreach ($request->opciones as $index => $opcionData) {
+                    if (!empty($opcionData['valor']) && !empty($opcionData['etiqueta'])) {
+                        if (isset($opcionData['id_opcion']) && $opcionData['id_opcion']) {
+                            // Actualizar opción existente
+                            $opcion = OpcionFiltro::find($opcionData['id_opcion']);
+                            if ($opcion && $opcion->id_filtro === $filtro->id_filtro) {
+                                $opcion->update([
+                                    'valor' => $opcionData['valor'],
+                                    'etiqueta' => $opcionData['etiqueta'],
+                                    'color' => $opcionData['color'] ?? null,
+                                    'orden' => $opcionData['orden'] ?? $index
+                                ]);
+                            }
+                        } else {
+                            // Crear nueva opción
+                            $filtro->opciones()->create([
+                                'valor' => $opcionData['valor'],
+                                'etiqueta' => $opcionData['etiqueta'],
+                                'color' => $opcionData['color'] ?? null,
+                                'orden' => $opcionData['orden'] ?? $index
+                            ]);
                         }
-                    } else {
-                        $filtro->opciones()->create($opcionData);
                     }
                 }
             }

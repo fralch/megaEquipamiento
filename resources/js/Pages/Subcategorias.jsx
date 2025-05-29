@@ -30,43 +30,48 @@ export default function Subcategoria({ productos }) {
         descripcion: '',
         orden: 0,
         obligatorio: false,
-        opciones: [{ valor: '', etiqueta: '', color: '', orden: 0 }]
-    });
+        opciones: []
+    });;
 
     const handleCrearFiltro = async () => {
         const urlParts = window.location.pathname.split('/');
         const subcategoriaId = urlParts[urlParts.length - 1];
-
+    
+        // Filtrar opciones válidas antes de enviar
+        const opcionesValidas = nuevoFiltro.opciones.filter(opcion => 
+            opcion.valor.trim() !== '' && opcion.etiqueta.trim() !== ''
+        );
+    
+        const filtroData = {
+            ...nuevoFiltro,
+            subcategorias: [parseInt(subcategoriaId)],
+            opciones: ['select', 'checkbox', 'radio'].includes(nuevoFiltro.tipo_input) ? opcionesValidas : []
+        };
+    
         try {
             const response = await fetch(`${URL_API}/filtros`, {
                 method: 'POST',
                 headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify({
-                    ...nuevoFiltro,
-                    subcategorias: [subcategoriaId]
-                })
+                body: JSON.stringify(filtroData)
             });
-
+    
             if (response.ok) {
                 const nuevoFiltroCreado = await response.json();
                 setFiltros([...filtros, nuevoFiltroCreado]);
                 setMostrarFormularioFiltro(false);
-                setNuevoFiltro({
-                    nombre: '',
-                    tipo_input: 'select',
-                    unidad: '',
-                    descripcion: '',
-                    orden: 0,
-                    obligatorio: false,
-                    opciones: [{ valor: '', etiqueta: '', color: '', orden: 0 }]
-                });
+                resetFormulario();
             } else {
-                console.error('Error al crear el filtro');
+                const errorData = await response.json();
+                console.error('Error al crear el filtro:', errorData);
+                alert('Error al crear el filtro: ' + (errorData.message || 'Error desconocido'));
             }
         } catch (error) {
             console.error('Error:', error);
+            alert('Error de conexión al crear el filtro');
         }
     };
 
@@ -79,23 +84,35 @@ export default function Subcategoria({ productos }) {
             descripcion: filtro.descripcion || '',
             orden: filtro.orden,
             obligatorio: filtro.obligatorio,
-            opciones: filtro.opciones || []
+            opciones: filtro.opciones && filtro.opciones.length > 0 ? filtro.opciones : []
         });
         setMostrarFormularioFiltro(true);
     };
 
     const handleActualizarFiltro = async () => {
         if (!filtroEnEdicion) return;
-
+    
+        // Filtrar opciones válidas antes de enviar
+        const opcionesValidas = nuevoFiltro.opciones.filter(opcion => 
+            opcion.valor.trim() !== '' && opcion.etiqueta.trim() !== ''
+        );
+    
+        const filtroData = {
+            ...nuevoFiltro,
+            opciones: ['select', 'checkbox', 'radio'].includes(nuevoFiltro.tipo_input) ? opcionesValidas : []
+        };
+    
         try {
             const response = await fetch(`${URL_API}/filtros/${filtroEnEdicion.id_filtro}`, {
                 method: 'PUT',
                 headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
-                body: JSON.stringify(nuevoFiltro)
+                body: JSON.stringify(filtroData)
             });
-
+    
             if (response.ok) {
                 const filtroActualizado = await response.json();
                 setFiltros(filtros.map(f => 
@@ -103,29 +120,39 @@ export default function Subcategoria({ productos }) {
                 ));
                 setMostrarFormularioFiltro(false);
                 setFiltroEnEdicion(null);
-                setNuevoFiltro({
-                    nombre: '',
-                    tipo_input: 'select',
-                    unidad: '',
-                    descripcion: '',
-                    orden: 0,
-                    obligatorio: false,
-                    opciones: [{ valor: '', etiqueta: '', color: '', orden: 0 }]
-                });
+                resetFormulario();
             } else {
-                console.error('Error al actualizar el filtro');
+                const errorData = await response.json();
+                console.error('Error al actualizar el filtro:', errorData);
+                alert('Error al actualizar el filtro: ' + (errorData.message || 'Error desconocido'));
             }
         } catch (error) {
             console.error('Error:', error);
+            alert('Error de conexión al actualizar el filtro');
         }
     };
-
+    const resetFormulario = () => {
+        setNuevoFiltro({
+            nombre: '',
+            tipo_input: 'select',
+            unidad: '',
+            descripcion: '',
+            orden: 0,
+            obligatorio: false,
+            opciones: []
+        });
+    };
     const handleEliminarFiltro = async () => {
         if (!filtroAEliminar) return;
 
         try {
             const response = await fetch(`${URL_API}/filtros/${filtroAEliminar.id_filtro}`, {
                 method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
             });
 
             if (response.ok) {
@@ -337,12 +364,17 @@ export default function Subcategoria({ productos }) {
                                                         + Agregar Opción
                                                     </button>
                                                 </div>
+                                                {nuevoFiltro.opciones.length === 0 && (
+                                                    <p className="text-sm text-gray-500">
+                                                        Agrega al menos una opción para este tipo de filtro
+                                                    </p>
+                                                )}
                                                 {nuevoFiltro.opciones.map((opcion, index) => (
                                                     <div key={index} className="flex gap-2 items-start">
                                                         <div className="flex-1">
                                                             <input
                                                                 type="text"
-                                                                value={opcion.valor}
+                                                                value={opcion.valor || ''}
                                                                 onChange={(e) => actualizarOpcion(index, 'valor', e.target.value)}
                                                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
                                                                 placeholder="Valor"
@@ -352,7 +384,7 @@ export default function Subcategoria({ productos }) {
                                                         <div className="flex-1">
                                                             <input
                                                                 type="text"
-                                                                value={opcion.etiqueta}
+                                                                value={opcion.etiqueta || ''}
                                                                 onChange={(e) => actualizarOpcion(index, 'etiqueta', e.target.value)}
                                                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
                                                                 placeholder="Etiqueta"
@@ -363,6 +395,7 @@ export default function Subcategoria({ productos }) {
                                                             type="button"
                                                             onClick={() => eliminarOpcion(index)}
                                                             className="mt-1 text-red-600 hover:text-red-800"
+                                                            disabled={nuevoFiltro.opciones.length === 1}
                                                         >
                                                             ×
                                                         </button>
