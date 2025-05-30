@@ -29,7 +29,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                                     <input
                                         type="checkbox"
                                         className="form-checkbox h-4 w-4 text-[#184f96]"
-                                        checked={filtrosSeleccionados[filtro.id_filtro]?.includes(opcion.id_opcion)}
+                                        checked={Array.isArray(filtrosSeleccionados[filtro.id_filtro]) && filtrosSeleccionados[filtro.id_filtro].includes(opcion.id_opcion)}
                                         onChange={(e) => {
                                             const currentSelected = filtrosSeleccionados[filtro.id_filtro] || [];
                                             const newSelected = e.target.checked
@@ -54,7 +54,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                                         type="radio"
                                         name={`filtro-${filtro.id_filtro}`}
                                         className="form-radio h-4 w-4 text-[#184f96]"
-                                        checked={filtrosSeleccionados[filtro.id_filtro] === opcion.id_opcion}
+                                        checked={filtrosSeleccionados[filtro.id_filtro] === opcion.id_opcion || false}
                                         onChange={() => {
                                             setFiltrosSeleccionados({
                                                 ...filtrosSeleccionados,
@@ -74,7 +74,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                                 min="0"
                                 max="100"
                                 className="w-full"
-                                value={filtrosSeleccionados[filtro.id_filtro] || 0}
+                                value={filtrosSeleccionados[filtro.id_filtro] !== undefined ? filtrosSeleccionados[filtro.id_filtro] : 0}
                                 onChange={(e) => {
                                     setFiltrosSeleccionados({
                                         ...filtrosSeleccionados,
@@ -91,7 +91,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                     {filtro.tipo_input === 'select' && (
                         <select
                             className="w-full rounded border-gray-300 focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
-                            value={filtrosSeleccionados[filtro.id_filtro] || ''}
+                            value={filtrosSeleccionados[filtro.id_filtro] !== undefined ? filtrosSeleccionados[filtro.id_filtro] : ''}
                             onChange={(e) => {
                                 setFiltrosSeleccionados({
                                     ...filtrosSeleccionados,

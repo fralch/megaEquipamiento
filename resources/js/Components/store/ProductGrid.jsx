@@ -576,7 +576,7 @@ const Card = React.memo(({ product }) => {
       )}
       
       {/* CSS para el scrollbar personalizado */}
-      <style jsx>{`
+      <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
         }

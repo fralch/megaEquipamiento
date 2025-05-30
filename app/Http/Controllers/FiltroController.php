@@ -8,6 +8,7 @@ use App\Models\Filtro;
 use App\Models\OpcionFiltro;
 use App\Models\SubcategoriaFiltro;
 use App\Models\Subcategoria;
+use App\Models\Producto;
 use Illuminate\Http\Request; // Para manejar las solicitudes HTTP
 use Illuminate\Support\Str; // Para manipular strings, como generar slugs
 use Illuminate\Support\Facades\DB; // Para manejar transacciones de base de datos
@@ -263,5 +264,83 @@ class FiltroController extends Controller
         $opcion->delete();
         // Devuelve una respuesta vacía con código 204 (sin contenido)
         return response()->json(null, 204);
+    }
+
+    // Método para filtrar productos por filtros seleccionados
+    public function filtrarProductos(Request $request)
+    {
+        // Validar los datos de entrada
+        $request->validate([
+            'subcategoria_id' => 'required|exists:subcategorias,id_subcategoria',
+            'filtros' => 'array'
+        ]);
+
+        // Obtener la subcategoría
+        $subcategoriaId = $request->subcategoria_id;
+        
+        // Iniciar la consulta base para productos de esta subcategoría
+        $query = Producto::where('id_subcategoria', $subcategoriaId);
+        
+        // Si hay filtros seleccionados, aplicarlos a la consulta
+        if ($request->has('filtros') && !empty($request->filtros)) {
+            foreach ($request->filtros as $filtroId => $valorSeleccionado) {
+                // Obtener el filtro para conocer su tipo
+                $filtro = Filtro::find($filtroId);
+                
+                if (!$filtro) continue;
+                
+                // Aplicar el filtro según su tipo
+                switch ($filtro->tipo_input) {
+                    case 'checkbox':
+                        // Para checkbox, valorSeleccionado es un array de IDs de opciones
+                        if (is_array($valorSeleccionado) && !empty($valorSeleccionado)) {
+                            // Aquí implementamos la lógica para filtrar por opciones múltiples
+                            // Como no hay una relación directa en la base de datos, usamos LIKE en JSON
+                            $query->where(function($q) use ($filtro, $valorSeleccionado) {
+                                foreach ($valorSeleccionado as $opcionId) {
+                                    // Buscar en campos JSON como características, datos_técnicos, etc.
+                                    $opcion = OpcionFiltro::find($opcionId);
+                                    if ($opcion) {
+                                        $q->orWhere('caracteristicas', 'LIKE', '%' . $opcion->valor . '%')
+                                          ->orWhere('datos_tecnicos', 'LIKE', '%' . $opcion->valor . '%')
+                                          ->orWhere('especificaciones_tecnicas', 'LIKE', '%' . $opcion->valor . '%');
+                                    }
+                                }
+                            });
+                        }
+                        break;
+                        
+                    case 'radio':
+                    case 'select':
+                        // Para radio y select, valorSeleccionado es un único ID de opción
+                        if (!empty($valorSeleccionado)) {
+                            $opcion = OpcionFiltro::find($valorSeleccionado);
+                            if ($opcion) {
+                                $query->where(function($q) use ($opcion) {
+                                    $q->where('caracteristicas', 'LIKE', '%' . $opcion->valor . '%')
+                                      ->orWhere('datos_tecnicos', 'LIKE', '%' . $opcion->valor . '%')
+                                      ->orWhere('especificaciones_tecnicas', 'LIKE', '%' . $opcion->valor . '%');
+                                });
+                            }
+                        }
+                        break;
+                        
+                    case 'range':
+                        // Para range, valorSeleccionado es un valor numérico
+                        if (is_numeric($valorSeleccionado)) {
+                            // Aquí implementamos la lógica para filtrar por rango
+                            // Como ejemplo, filtramos por precio
+                            $query->where('precio_igv', '<=', $valorSeleccionado);
+                        }
+                        break;
+                }
+            }
+        }
+        
+        // Obtener los productos filtrados
+        $productos = $query->get();
+        
+        // Devolver los productos filtrados
+        return response()->json($productos);
     }
 }

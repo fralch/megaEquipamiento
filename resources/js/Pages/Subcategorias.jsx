@@ -11,7 +11,7 @@ import FiltroConfirmDialog from "../Components/filtros/FiltroConfirmDialog";
 
 const URL_API = import.meta.env.VITE_API_URL;
 
-export default function Subcategoria({ productos }) {
+export default function Subcategoria({ productos: productosIniciales }) {
     const { auth } = usePage().props;
     const [isOpen, setIsOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
@@ -21,6 +21,7 @@ export default function Subcategoria({ productos }) {
     const [categoriaNombre, setCategoriaNombre] = useState("");
     const [categoriaId, setCategoriaId] = useState("");
     const [mostrarProductos, setMostrarProductos] = useState(false);
+    const [productos, setProductos] = useState(productosIniciales || []);
     const [filtros, setFiltros] = useState([]);
     const [filtrosSeleccionados, setFiltrosSeleccionados] = useState({});
     const [mostrarFormularioFiltro, setMostrarFormularioFiltro] = useState(false);
@@ -275,6 +276,50 @@ export default function Subcategoria({ productos }) {
         setMostrarProductos(true);
     };
 
+    const buscarProductosFiltrados = async () => {
+        // Obtener el ID de la subcategoría desde la URL
+        const urlParts = window.location.pathname.split('/');
+        const subcategoriaId = urlParts[urlParts.length - 1];
+        
+        try {
+            // Solo realizar la búsqueda si hay filtros seleccionados
+            if (Object.keys(filtrosSeleccionados).length > 0) {
+                const response = await fetch(`${URL_API}/filtros/filtrar-productos`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        subcategoria_id: subcategoriaId,
+                        filtros: filtrosSeleccionados
+                    })
+                });
+
+                if (response.ok) {
+                    const productosFiltrados = await response.json();
+                    // Actualizar el estado de productos con los productos filtrados
+                    setMostrarProductos(true);
+                    // Usar la función de actualización de estado para asegurar que tenemos el valor más reciente
+                    setProductos(productosFiltrados);
+                } else {
+                    console.error('Error al filtrar productos');
+                }
+            } else {
+                // Si no hay filtros seleccionados, obtener todos los productos de la subcategoría
+                const response = await fetch(`${URL_API}/product/subcategoria/${subcategoriaId}`);
+                if (response.ok) {
+                    const todosProductos = await response.json();
+                    setMostrarProductos(true);
+                    setProductos(todosProductos);
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
     return (
         <div>
             <Head title="Subcategoria" />
@@ -306,14 +351,24 @@ export default function Subcategoria({ productos }) {
                             actualizarOpcion={actualizarOpcion}
                         />
                     ) : (
-                        <FiltroList
-                            filtros={filtros}
-                            auth={auth}
-                            onEditar={handleEditarFiltro}
-                            onEliminar={(filtro) => { setFiltroAEliminar(filtro); setMostrarConfirmacion(true); }}
-                            filtrosSeleccionados={filtrosSeleccionados}
-                            setFiltrosSeleccionados={setFiltrosSeleccionados}
-                        />
+                        <>
+                            <FiltroList
+                                filtros={filtros}
+                                auth={auth}
+                                onEditar={handleEditarFiltro}
+                                onEliminar={(filtro) => { setFiltroAEliminar(filtro); setMostrarConfirmacion(true); }}
+                                filtrosSeleccionados={filtrosSeleccionados}
+                                setFiltrosSeleccionados={setFiltrosSeleccionados}
+                            />
+                            {filtros.length > 0 && Object.keys(filtrosSeleccionados).length > 0 && (
+                                <button
+                                    onClick={buscarProductosFiltrados}
+                                    className="w-full py-2 px-4 bg-[#184f96] text-white rounded hover:bg-blue-700 transition-colors duration-200 mt-4"
+                                >
+                                    Buscar productos
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
                 <div className="flex-1 p-4">
