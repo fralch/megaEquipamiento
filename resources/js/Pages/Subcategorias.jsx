@@ -5,6 +5,9 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
+import FiltroForm from "../Components/filtros/FiltroForm";
+import FiltroList from "../Components/filtros/FiltroList";
+import FiltroConfirmDialog from "../Components/filtros/FiltroConfirmDialog";
 
 const URL_API = import.meta.env.VITE_API_URL;
 
@@ -32,7 +35,7 @@ export default function Subcategoria({ productos }) {
         orden: 0,
         obligatorio: false,
         opciones: []
-    });;
+    });
 
     const handleCrearFiltro = async () => {
         const urlParts = window.location.pathname.split('/');
@@ -132,6 +135,7 @@ export default function Subcategoria({ productos }) {
             alert('Error de conexión al actualizar el filtro');
         }
     };
+
     const resetFormulario = () => {
         setNuevoFiltro({
             nombre: '',
@@ -143,6 +147,7 @@ export default function Subcategoria({ productos }) {
             opciones: []
         });
     };
+
     const handleEliminarFiltro = async () => {
         if (!filtroAEliminar) return;
 
@@ -289,276 +294,50 @@ export default function Subcategoria({ productos }) {
                             </button>
                         )}
                     </div>
-                    
                     {mostrarFormularioFiltro ? (
-                                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                                    <h3 className="text-lg font-medium mb-4">
-                                        {filtroEnEdicion ? 'Editar Filtro' : 'Nuevo Filtro'}
-                                    </h3>
-                                    <form onSubmit={handleSubmitFiltro} className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Nombre</label>
-                                            <input
-                                                type="text"
-                                                value={nuevoFiltro.nombre}
-                                                onChange={(e) => setNuevoFiltro({...nuevoFiltro, nombre: e.target.value})}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
-                                                required
-                                            />
-                                        </div>
-                                        
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Tipo de Input</label>
-                                            <select
-                                                value={nuevoFiltro.tipo_input}
-                                                onChange={(e) => setNuevoFiltro({...nuevoFiltro, tipo_input: e.target.value})}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
-                                            >
-                                                <option value="select">Select</option>
-                                                <option value="checkbox">Checkbox</option>
-                                                <option value="radio">Radio</option>
-                                                <option value="range">Range</option>
-                                            </select>
-                                        </div>
-
-                                        {nuevoFiltro.tipo_input === 'range' && (
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700">Unidad</label>
-                                                <input
-                                                    type="text"
-                                                    value={nuevoFiltro.unidad}
-                                                    onChange={(e) => setNuevoFiltro({...nuevoFiltro, unidad: e.target.value})}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
-                                                    placeholder="ej: kg, cm, etc."
-                                                />
-                                            </div>
-                                        )}
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Descripción</label>
-                                            <textarea
-                                                value={nuevoFiltro.descripcion}
-                                                onChange={(e) => setNuevoFiltro({...nuevoFiltro, descripcion: e.target.value})}
-                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
-                                                rows="3"
-                                            />
-                                        </div>
-
-                                        <div className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={nuevoFiltro.obligatorio}
-                                                onChange={(e) => setNuevoFiltro({...nuevoFiltro, obligatorio: e.target.checked})}
-                                                className="rounded border-gray-300 text-[#184f96] shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
-                                            />
-                                            <label className="ml-2 block text-sm text-gray-700">Obligatorio</label>
-                                        </div>
-
-                                        {['select', 'checkbox', 'radio'].includes(nuevoFiltro.tipo_input) && (
-                                            <div className="space-y-4">
-                                                <div className="flex justify-between items-center">
-                                                    <label className="block text-sm font-medium text-gray-700">Opciones</label>
-                                                    <button
-                                                        type="button"
-                                                        onClick={agregarOpcion}
-                                                        className="text-sm bg-gray-100 px-3 py-1 rounded hover:bg-gray-200"
-                                                    >
-                                                        + Agregar Opción
-                                                    </button>
-                                                </div>
-                                                {nuevoFiltro.opciones.length === 0 && (
-                                                    <p className="text-sm text-gray-500">
-                                                        Agrega al menos una opción para este tipo de filtro
-                                                    </p>
-                                                )}
-                                                {nuevoFiltro.opciones.map((opcion, index) => (
-                                                    <div key={index} className="flex gap-2 items-start">
-                                                        <div className="flex-1">
-                                                            <input
-                                                                type="text"
-                                                                value={opcion.valor || ''}
-                                                                onChange={(e) => actualizarOpcion(index, 'valor', e.target.value)}
-                                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
-                                                                placeholder="Valor"
-                                                                required
-                                                            />
-                                                        </div>
-                                                        <div className="flex-1">
-                                                            <input
-                                                                type="text"
-                                                                value={opcion.etiqueta || ''}
-                                                                onChange={(e) => actualizarOpcion(index, 'etiqueta', e.target.value)}
-                                                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
-                                                                placeholder="Etiqueta"
-                                                                required
-                                                            />
-                                                        </div>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => eliminarOpcion(index)}
-                                                            className="mt-1 text-red-600 hover:text-red-800"
-                                                            disabled={nuevoFiltro.opciones.length === 1}
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        <div className="flex gap-2 justify-end">
-                                            <button
-                                                type="button"
-                                                onClick={() => setMostrarFormularioFiltro(false)}
-                                                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                                            >
-                                                Cancelar
-                                            </button>
-                                            <button
-                                                type="submit"
-                                                className="px-4 py-2 bg-[#184f96] text-white rounded-md hover:bg-blue-700"
-                                            >
-                                                Guardar Filtro
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
+                        <FiltroForm
+                            nuevoFiltro={nuevoFiltro}
+                            setNuevoFiltro={setNuevoFiltro}
+                            filtroEnEdicion={filtroEnEdicion}
+                            onSubmit={handleSubmitFiltro}
+                            onCancel={() => { setMostrarFormularioFiltro(false); setFiltroEnEdicion(null); }}
+                            agregarOpcion={agregarOpcion}
+                            eliminarOpcion={eliminarOpcion}
+                            actualizarOpcion={actualizarOpcion}
+                        />
                     ) : (
-                        <>
-                            {filtros.map((filtro) => (
-                                <div key={filtro.id_filtro} className="mb-4">
-                                    <h3 className="font-medium mb-2">{filtro.nombre}</h3>
-                                    {auth.user && (
-                                        <div className="flex justify-end space-x-2">
-                                            <button
-                                                onClick={() => handleEditarFiltro(filtro)}
-                                                className="text-sm text-blue-600 hover:underline"
-                                            >
-                                                Editar
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    setFiltroAEliminar(filtro);
-                                                    setMostrarConfirmacion(true);
-                                                }}
-                                                className="text-sm text-red-600 hover:underline"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    )}
-                                    {filtro.tipo_input === 'checkbox' && (
-                                        <div className="space-y-2">
-                                            {filtro.opciones.map((opcion) => (
-                                                <label key={opcion.id_opcion} className="flex items-center space-x-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="form-checkbox h-4 w-4 text-[#184f96]"
-                                                        checked={filtrosSeleccionados[filtro.id_filtro]?.includes(opcion.id_opcion)}
-                                                        onChange={(e) => {
-                                                            const currentSelected = filtrosSeleccionados[filtro.id_filtro] || [];
-                                                            const newSelected = e.target.checked
-                                                                ? [...currentSelected, opcion.id_opcion]
-                                                                : currentSelected.filter(id => id !== opcion.id_opcion);
-                                                            setFiltrosSeleccionados({
-                                                                ...filtrosSeleccionados,
-                                                                [filtro.id_filtro]: newSelected
-                                                            });
-                                                        }}
-                                                    />
-                                                    <span>{opcion.etiqueta}</span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                    )}
-                                    {filtro.tipo_input === 'radio' && (
-                                        <div className="space-y-2">
-                                            {filtro.opciones.map((opcion) => (
-                                                <label key={opcion.id_opcion} className="flex items-center space-x-2">
-                                                    <input
-                                                        type="radio"
-                                                        name={`filtro-${filtro.id_filtro}`}
-                                                        className="form-radio h-4 w-4 text-[#184f96]"
-                                                        checked={filtrosSeleccionados[filtro.id_filtro] === opcion.id_opcion}
-                                                        onChange={() => {
-                                                            setFiltrosSeleccionados({
-                                                                ...filtrosSeleccionados,
-                                                                [filtro.id_filtro]: opcion.id_opcion
-                                                            });
-                                                        }}
-                                                    />
-                                                    <span>{opcion.etiqueta}</span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                    )}
-                                    {filtro.tipo_input === 'range' && (
-                                        <div className="space-y-2">
-                                            <input
-                                                type="range"
-                                                min="0"
-                                                max="100"
-                                                className="w-full"
-                                                value={filtrosSeleccionados[filtro.id_filtro] || 0}
-                                                onChange={(e) => {
-                                                    setFiltrosSeleccionados({
-                                                        ...filtrosSeleccionados,
-                                                        [filtro.id_filtro]: e.target.value
-                                                    });
-                                                }}
-                                            />
-                                            <div className="flex justify-between text-sm text-gray-600">
-                                                <span>0 {filtro.unidad}</span>
-                                                <span>100 {filtro.unidad}</span>
-                                            </div>
-                                        </div>
-                                    )}
-                                    {filtro.tipo_input === 'select' && (
-                                        <select
-                                            className="w-full rounded border-gray-300 focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
-                                            value={filtrosSeleccionados[filtro.id_filtro] || ''}
-                                            onChange={(e) => {
-                                                setFiltrosSeleccionados({
-                                                    ...filtrosSeleccionados,
-                                                    [filtro.id_filtro]: e.target.value
-                                                });
-                                            }}
-                                        >
-                                            <option value="">Seleccionar...</option>
-                                            {filtro.opciones.map((opcion) => (
-                                                <option key={opcion.id_opcion} value={opcion.id_opcion}>
-                                                    {opcion.etiqueta}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    )}
-                                </div>
-                            ))}
-                            {filtros.length > 0 && (
-                                <button
-                                    onClick={() => setFiltrosSeleccionados({})}
-                                    className="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200"
-                                >
-                                    Limpiar filtros
-                                </button>
-                            )}
-                        </>
+                        <FiltroList
+                            filtros={filtros}
+                            auth={auth}
+                            onEditar={handleEditarFiltro}
+                            onEliminar={(filtro) => { setFiltroAEliminar(filtro); setMostrarConfirmacion(true); }}
+                            filtrosSeleccionados={filtrosSeleccionados}
+                            setFiltrosSeleccionados={setFiltrosSeleccionados}
+                        />
                     )}
                 </div>
                 <div className="flex-1 p-4">
                     {productos && productos.length > 0 ? (
                         <>
-                          <h1 className="text-2xl font-bold mb-4"><Link href={`/categorias/${categoriaId}`}><span className="text-xl font-bold Link text-gray-600">{categoriaNombre} /</span></Link> {subcategoriaNombre}</h1>
-                          <ProductGrid products={productos} />
+                            <h1 className="text-2xl font-bold mb-4">
+                                <Link href={`/categorias/${categoriaId}`}>
+                                    <span className="text-xl font-bold Link text-gray-600">{categoriaNombre} /</span>
+                                </Link> {subcategoriaNombre}
+                            </h1>
+                            <ProductGrid products={productos} />
                         </>
                     ) : (
                         <>
-                        <h1 className="text-2xl font-bold mb-4"><Link href={`/categorias/${categoriaId}`}><span className="text-xl font-bold Link text-gray-600">{categoriaNombre} /</span></Link> {subcategoriaNombre}</h1>
-                        <p className="text-lg text-gray-600 mb-4">No hay productos relacionados a esta subcategoría.</p>
-                        <div className="flex justify-center">
-                            <button onClick={handleMostrarProductos} className="bg-[#184f96] hover:bg-blue-800 text-white py-2 px-4 rounded transition-all duration-200 mb-4">Mostrar productos</button>
-                        </div>
-                        {mostrarProductos && <ProductGrid />}
+                            <h1 className="text-2xl font-bold mb-4">
+                                <Link href={`/categorias/${categoriaId}`}>
+                                    <span className="text-xl font-bold Link text-gray-600">{categoriaNombre} /</span>
+                                </Link> {subcategoriaNombre}
+                            </h1>
+                            <p className="text-lg text-gray-600 mb-4">No hay productos relacionados a esta subcategoría.</p>
+                            <div className="flex justify-center">
+                                <button onClick={handleMostrarProductos} className="bg-[#184f96] hover:bg-blue-800 text-white py-2 px-4 rounded transition-all duration-200 mb-4">Mostrar productos</button>
+                            </div>
+                            {mostrarProductos && <ProductGrid />}
                         </>
                     )}
                     {auth.user && (
@@ -570,6 +349,12 @@ export default function Subcategoria({ productos }) {
                     )}
                 </div>
             </div>
+            <FiltroConfirmDialog
+                open={mostrarConfirmacion}
+                onCancel={() => setMostrarConfirmacion(false)}
+                onConfirm={handleEliminarFiltro}
+                filtro={filtroAEliminar}
+            />
             <Footer />
         </div>
     );
