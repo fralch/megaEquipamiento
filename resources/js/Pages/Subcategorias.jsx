@@ -352,21 +352,27 @@ export default function Subcategoria({ productos: productosIniciales }) {
                         />
                     ) : (
                         <>
-                            <FiltroList
-                                filtros={filtros}
-                                auth={auth}
-                                onEditar={handleEditarFiltro}
-                                onEliminar={(filtro) => { setFiltroAEliminar(filtro); setMostrarConfirmacion(true); }}
-                                filtrosSeleccionados={filtrosSeleccionados}
-                                setFiltrosSeleccionados={setFiltrosSeleccionados}
-                            />
-                            {filtros.length > 0 && Object.keys(filtrosSeleccionados).length > 0 && (
-                                <button
-                                    onClick={buscarProductosFiltrados}
-                                    className="w-full py-2 px-4 bg-[#184f96] text-white rounded hover:bg-blue-700 transition-colors duration-200 mt-4"
-                                >
-                                    Buscar productos
-                                </button>
+                            {filtros.length > 0 ? (
+                                <>
+                                    <FiltroList
+                                        filtros={filtros}
+                                        auth={auth}
+                                        onEditar={handleEditarFiltro}
+                                        onEliminar={(filtro) => { setFiltroAEliminar(filtro); setMostrarConfirmacion(true); }}
+                                        filtrosSeleccionados={filtrosSeleccionados}
+                                        setFiltrosSeleccionados={setFiltrosSeleccionados}
+                                    />
+                                    {Object.keys(filtrosSeleccionados).length > 0 && (
+                                        <button
+                                            onClick={buscarProductosFiltrados}
+                                            className="w-full py-2 px-4 bg-[#184f96] text-white rounded hover:bg-blue-700 transition-colors duration-200 mt-4"
+                                        >
+                                            Buscar productos
+                                        </button>
+                                    )}
+                                </>
+                            ) : (
+                                <p className="text-gray-500 mb-4">No hay filtros disponibles para esta subcategoría.</p>
                             )}
                         </>
                     )}
