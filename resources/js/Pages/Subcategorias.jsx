@@ -327,7 +327,7 @@ export default function Subcategoria({ productos: productosIniciales }) {
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
             <div className="min-w-screen min-h-screen bg-gray-200 flex">
-                <div className="w-1/6 p-4 bg-white mt-4" id="filtros-container">
+                <div className="w-1/6 sticky top-0 h-screen overflow-y-auto p-4 bg-white shadow-md z-10" id="filtros-container">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-lg font-semibold">Filtros</h2>
                         {auth.user && !mostrarFormularioFiltro && (
