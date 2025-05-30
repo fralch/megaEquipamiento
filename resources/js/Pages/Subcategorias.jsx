@@ -339,6 +339,47 @@ export default function Subcategoria({ productos: productosIniciales }) {
                             </button>
                         )}
                     </div>
+                    <div className="price-filter-container p-4 bg-white rounded-lg shadow mb-4">
+                        <h3 className="text-lg font-medium text-gray-900 mb-3">Rango de Precios</h3>
+                        <div className="flex justify-between mb-2">
+                            <div className="w-5/12">
+                                <label htmlFor="min-price" className="block text-sm font-medium text-gray-700 mb-1">Mínimo</label>
+                                <div className="relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span className="text-gray-500 sm:text-sm">$</span>
+                                    </div>
+                                    <input
+                                        type="number"
+                                        name="min-price"
+                                        id="min-price"
+                                        className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-3 py-2 sm:text-sm border-gray-300 rounded-md"
+                                        placeholder="0"
+                                    />
+                                </div>
+                            </div>
+                            <div className="w-5/12">
+                                <label htmlFor="max-price" className="block text-sm font-medium text-gray-700 mb-1">Máximo</label>
+                                <div className="relative rounded-md shadow-sm">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span className="text-gray-500 sm:text-sm">$</span>
+                                    </div>
+                                    <input
+                                        type="number"
+                                        name="max-price"
+                                        id="max-price"
+                                        className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-3 py-2 sm:text-sm border-gray-300 rounded-md"
+                                        placeholder="100000"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end mt-4">
+                            <button className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md text-sm font-medium">
+                                Aplicar Filtro
+                            </button>
+                        </div>
+                    </div>
                     {mostrarFormularioFiltro ? (
                         <FiltroForm
                             nuevoFiltro={nuevoFiltro}
