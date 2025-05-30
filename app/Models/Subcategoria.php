@@ -49,5 +49,13 @@ class Subcategoria extends Model
     {
         return $this->belongsTo(Marca::class, 'id_marca');
     }
+    
+    // Definir la relación con el modelo Filtro
+    public function filtros()
+    {
+        return $this->belongsToMany(Filtro::class, 'subcategoria_filtros', 'id_subcategoria', 'id_filtro')
+                    ->withPivot('orden', 'activo')
+                    ->withTimestamps();
+    }
 }
 
