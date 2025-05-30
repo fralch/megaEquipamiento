@@ -1,4 +1,4 @@
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
@@ -9,6 +9,7 @@ import Footer from "../Components/home/Footer";
 const URL_API = import.meta.env.VITE_API_URL;
 
 export default function Subcategoria({ productos }) {
+    const { auth } = usePage().props;
     const [isOpen, setIsOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [openCategories, setOpenCategories] = useState({});
@@ -277,22 +278,23 @@ export default function Subcategoria({ productos }) {
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
             <div className="min-w-screen min-h-screen bg-gray-200 flex">
                 <div className="w-1/6 p-4 bg-white mt-4" id="filtros-container">
-                    <h2 className="text-lg font-semibold mb-4">Filtros</h2>
-                    {filtros.length === 0 ? (
-                        <div>
-                            {!mostrarFormularioFiltro ? (
-                                <div className="text-center">
-                                    <p className="text-gray-600 mb-4">No hay filtros definidos para esta subcategoría</p>
-                                    <button
-                                        onClick={() => setMostrarFormularioFiltro(true)}
-                                        className="bg-[#184f96] text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-                                    >
-                                        Crear Nuevo Filtro
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="bg-white rounded-lg p-4">
-                                    <h3 className="text-lg font-medium mb-4">Nuevo Filtro</h3>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-lg font-semibold">Filtros</h2>
+                        {auth.user && !mostrarFormularioFiltro && (
+                            <button
+                                onClick={() => setMostrarFormularioFiltro(true)}
+                                className="py-1 px-2 bg-[#184f96] text-white rounded hover:bg-blue-700 transition-colors duration-200 text-sm"
+                            >
+                                + Filtro
+                            </button>
+                        )}
+                    </div>
+                    
+                    {mostrarFormularioFiltro ? (
+                                <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                                    <h3 className="text-lg font-medium mb-4">
+                                        {filtroEnEdicion ? 'Editar Filtro' : 'Nuevo Filtro'}
+                                    </h3>
                                     <form onSubmit={handleSubmitFiltro} className="space-y-4">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Nombre</label>
@@ -421,30 +423,30 @@ export default function Subcategoria({ productos }) {
                                         </div>
                                     </form>
                                 </div>
-                            )}
-                        </div>
                     ) : (
                         <>
                             {filtros.map((filtro) => (
                                 <div key={filtro.id_filtro} className="mb-4">
                                     <h3 className="font-medium mb-2">{filtro.nombre}</h3>
-                                    <div className="flex justify-end space-x-2">
-                                        <button
-                                            onClick={() => handleEditarFiltro(filtro)}
-                                            className="text-sm text-blue-600 hover:underline"
-                                        >
-                                            Editar
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setFiltroAEliminar(filtro);
-                                                setMostrarConfirmacion(true);
-                                            }}
-                                            className="text-sm text-red-600 hover:underline"
-                                        >
-                                            Eliminar
-                                        </button>
-                                    </div>
+                                    {auth.user && (
+                                        <div className="flex justify-end space-x-2">
+                                            <button
+                                                onClick={() => handleEditarFiltro(filtro)}
+                                                className="text-sm text-blue-600 hover:underline"
+                                            >
+                                                Editar
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setFiltroAEliminar(filtro);
+                                                    setMostrarConfirmacion(true);
+                                                }}
+                                                className="text-sm text-red-600 hover:underline"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    )}
                                     {filtro.tipo_input === 'checkbox' && (
                                         <div className="space-y-2">
                                             {filtro.opciones.map((opcion) => (
@@ -559,11 +561,13 @@ export default function Subcategoria({ productos }) {
                         {mostrarProductos && <ProductGrid />}
                         </>
                     )}
-                    <div className="flex justify-center">
-                        <Link href="/crear"className="fixed bottom-8 right-8 w-14 h-14 bg-[#184f96] hover:bg-blue-800 text-white rounded-full flex items-center justify-center shadow-lg text-2xl transition-all duration-200 hover:scale-110" >
-                            +
-                        </Link>
-                    </div>
+                    {auth.user && (
+                        <div className="flex justify-center">
+                            <Link href="/crear" className="fixed bottom-8 right-8 w-14 h-14 bg-[#184f96] hover:bg-blue-800 text-white rounded-full flex items-center justify-center shadow-lg text-2xl transition-all duration-200 hover:scale-110">
+                                +
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
             <Footer />
