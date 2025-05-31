@@ -27,7 +27,6 @@ export default function FiltroForm({ nuevoFiltro, setNuevoFiltro, filtroEnEdicio
                         <option value="select">Select</option>
                         <option value="checkbox">Checkbox</option>
                         <option value="radio">Radio</option>
-                        <option value="range">Range</option>
                     </select>
                 </div>
                 {nuevoFiltro.tipo_input === 'range' && (
