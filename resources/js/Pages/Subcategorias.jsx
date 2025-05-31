@@ -22,6 +22,7 @@ export default function Subcategoria({ productos: productosIniciales }) {
     const [categoriaId, setCategoriaId] = useState("");
     const [mostrarProductos, setMostrarProductos] = useState(false);
     const [productos, setProductos] = useState(productosIniciales || []);
+    const [productosOriginales, setProductosOriginales] = useState(productosIniciales || []);
     const [filtros, setFiltros] = useState([]);
     const [filtrosSeleccionados, setFiltrosSeleccionados] = useState({});
     const [mostrarFormularioFiltro, setMostrarFormularioFiltro] = useState(false);
@@ -258,6 +259,10 @@ export default function Subcategoria({ productos: productosIniciales }) {
                     .catch((error) => console.error('Error fetching categoria data:', error));
             })
             .catch((error) => console.error('Error fetching subcategoria data:', error));
+
+            if (productosIniciales && productosIniciales.length > 0) {
+                setProductosOriginales(productosIniciales);
+            }
     }, []);
 
     const toggleCategory = (categoriaNombre) => {
@@ -277,12 +282,10 @@ export default function Subcategoria({ productos: productosIniciales }) {
     };
 
     const buscarProductosFiltrados = async () => {
-        // Obtener el ID de la subcategoría desde la URL
         const urlParts = window.location.pathname.split('/');
         const subcategoriaId = urlParts[urlParts.length - 1];
         
         try {
-            // Solo realizar la búsqueda si hay filtros seleccionados
             if (Object.keys(filtrosSeleccionados).length > 0) {
                 const response = await fetch(`${URL_API}/filtros/filtrar-productos`, {
                     method: 'POST',
@@ -296,23 +299,22 @@ export default function Subcategoria({ productos: productosIniciales }) {
                         filtros: filtrosSeleccionados
                     })
                 });
-
+    
                 if (response.ok) {
                     const productosFiltrados = await response.json();
-                    // Actualizar el estado de productos con los productos filtrados
                     setMostrarProductos(true);
-                    // Usar la función de actualización de estado para asegurar que tenemos el valor más reciente
                     setProductos(productosFiltrados);
+                    setProductosOriginales(productosFiltrados); // Actualizar base para filtros de precio
                 } else {
                     console.error('Error al filtrar productos');
                 }
             } else {
-                // Si no hay filtros seleccionados, obtener todos los productos de la subcategoría
                 const response = await fetch(`${URL_API}/product/subcategoria/${subcategoriaId}`);
                 if (response.ok) {
                     const todosProductos = await response.json();
                     setMostrarProductos(true);
                     setProductos(todosProductos);
+                    setProductosOriginales(todosProductos); // Actualizar base para filtros de precio
                 }
             }
         } catch (error) {
@@ -320,6 +322,28 @@ export default function Subcategoria({ productos: productosIniciales }) {
         }
     };
 
+    const filtrarPorPrecio = () => {
+        const precioMin = parseFloat(document.getElementById('min-price').value) || 0;
+        const precioMax = parseFloat(document.getElementById('max-price').value) || Infinity;
+        
+        // Usar productosOriginales como base para el filtrado
+        const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
+        
+        const productosFiltrados = productosBase.filter(producto => {
+            const precio = parseFloat(producto.precio_igv);
+            return precio >= precioMin && precio <= precioMax;
+        });
+        
+        setProductos(productosFiltrados);
+        setMostrarProductos(true);
+    };
+
+    // 4. Función para limpiar filtros de precio
+    const limpiarFiltrosPrecio = () => {
+        document.getElementById('min-price').value = '';
+        document.getElementById('max-price').value = '';
+        setProductos(productosOriginales);
+    };
     return (
         <div>
             <Head title="Subcategoria" />
@@ -374,8 +398,17 @@ export default function Subcategoria({ productos: productosIniciales }) {
                             </div>
                         </div>
 
-                        <div className="flex justify-end mt-4">
-                            <button className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md text-sm font-medium">
+                        <div className="flex justify-between mt-4">
+                            <button 
+                                className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md text-sm font-medium" 
+                                onClick={limpiarFiltrosPrecio}
+                            >
+                                Resetear
+                            </button>
+                            <button 
+                                className="bg-[#184f96] hover:bg-[#184f96]/80 text-white py-2 px-4 rounded-md text-sm font-medium" 
+                                onClick={filtrarPorPrecio}
+                            >
                                 Aplicar Filtro
                             </button>
                         </div>
