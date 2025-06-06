@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\SubcategoriaController;
 use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\FiltroController;
 use App\Http\Controllers\TiposRelacionProductosController;
 use App\Http\Controllers\MarcaCategoriaController;
 use App\Http\Controllers\AuthController;
@@ -78,6 +79,22 @@ Route::post('/marca/update/{id}', [MarcaController::class, 'update'])->name('mar
 Route::get('/marca/all', [MarcaController::class, 'getMarcas'])->name('marca.all');
 Route::post('/marca/delete/{id}', [MarcaController::class, 'destroy'])->name('marca.delete');
 Route::post('/marca/buscar', [MarcaController::class, 'buscarPorNombre'])->name('marca.buscar');
+
+// Rutas para filtros
+Route::prefix('filtros')->group(function () {
+    // Rutas específicas primero
+    Route::get('/subcategoria/{subcategoriaId}', [FiltroController::class, 'getBySubcategoria'])->name('filtros.by-subcategoria');
+    Route::put('/opcion/{id}', [FiltroController::class, 'updateOpcion'])->name('filtros.update-opcion');
+    Route::delete('/opcion/{id}', [FiltroController::class, 'deleteOpcion'])->name('filtros.delete-opcion');
+    Route::post('/filtrar-productos', [FiltroController::class, 'filtrarProductos'])->name('filtros.filtrar-productos');
+    
+    // Rutas generales después
+    Route::get('/', [FiltroController::class, 'index'])->name('filtros.index');
+    Route::post('/', [FiltroController::class, 'store'])->name('filtros.store');
+    Route::get('/{id}', [FiltroController::class, 'show'])->name('filtros.show');
+    Route::put('/{id}', [FiltroController::class, 'update'])->name('filtros.update');
+    Route::delete('/{id}', [FiltroController::class, 'destroy'])->name('filtros.delete');
+});
 
 // Rutas para tipos de relación de productos
 Route::get('/tipos-relacion-productos', [TiposRelacionProductosController::class, 'get_all'])->name('tipos-relacion-productos.all');
