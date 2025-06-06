@@ -335,11 +335,11 @@ const Productos = ({ onSubmit }) => {
           const precioConIGV = (precioNumerico * 1.18).toFixed(2);
           updatedForm.precio_igv = precioConIGV;
           
-          // Si hay un porcentaje de ganancia, recalcular el precio con ganancia
+          // Si hay un porcentaje de ganancia, aplicarlo al precio con IGV
           if (porcentajeGanancia) {
             const porcentajeNum = parseFloat(porcentajeGanancia);
             if (!isNaN(porcentajeNum)) {
-              const precioConGanancia = (precioNumerico * (1 + porcentajeNum / 100)).toFixed(2);
+              const precioConGanancia = (parseFloat(precioConIGV) * (1 + porcentajeNum / 100)).toFixed(2);
               updatedForm.precio_ganancia = precioConGanancia;
             }
           }
@@ -349,12 +349,13 @@ const Productos = ({ onSubmit }) => {
       // Si se actualiza el porcentaje de ganancia
       if (name === 'precio_ganancia' && value && editandoPorcentaje) {
         setPorcentajeGanancia(value);
-        const precioSinGanancia = parseFloat(prev.precio_sin_ganancia);
-        if (!isNaN(precioSinGanancia)) {
+        // Aplicar el porcentaje al precio con IGV en lugar del precio sin ganancia
+        const precioConIGV = parseFloat(prev.precio_igv);
+        if (!isNaN(precioConIGV)) {
           const porcentajeNum = parseFloat(value);
           if (!isNaN(porcentajeNum)) {
-            // Calcular precio con ganancia
-            const precioConGanancia = (precioSinGanancia * (1 + porcentajeNum / 100)).toFixed(2);
+            // Calcular precio con ganancia basado en el precio con IGV
+            const precioConGanancia = (precioConIGV * (1 + porcentajeNum / 100)).toFixed(2);
             updatedForm.precio_ganancia = precioConGanancia;
           }
         }
@@ -366,16 +367,16 @@ const Productos = ({ onSubmit }) => {
   
   // Inicializar el formulario
   useEffect(() => {
-    if (form.precio_sin_ganancia && porcentajeGanancia) {
-      const precioSinGanancia = parseFloat(form.precio_sin_ganancia);
+    if (form.precio_igv && porcentajeGanancia) {
+      const precioConIGV = parseFloat(form.precio_igv);
       const porcentajeNum = parseFloat(porcentajeGanancia);
       
-      if (!isNaN(precioSinGanancia) && !isNaN(porcentajeNum)) {
-        const precioConGanancia = (precioSinGanancia * (1 + porcentajeNum / 100)).toFixed(2);
+      if (!isNaN(precioConIGV) && !isNaN(porcentajeNum)) {
+        const precioConGanancia = (precioConIGV * (1 + porcentajeNum / 100)).toFixed(2);
         setForm(prev => ({ ...prev, precio_ganancia: precioConGanancia }));
       }
     }
-  }, [porcentajeGanancia, form.precio_sin_ganancia]);
+  }, [porcentajeGanancia, form.precio_igv]); // Cambiar la dependencia de precio_sin_ganancia a precio_igv
 
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
