@@ -178,21 +178,25 @@ const ProductGrid = ({ products: initialProducts }) => {
     if (pageNumber < 1 || pageNumber > totalPages || pageNumber === currentPage) {
       return;
     }
-
+  
     setCurrentPage(pageNumber);
     
-    // Verificar si necesitamos cargar más productos
-    const totalProducts = products.length;
-    const productsNeeded = pageNumber * productsPerPage;
+    const hasInitialProducts = initialProducts && Array.isArray(initialProducts) && initialProducts.length > 0;
     
-    if (productsNeeded > totalProducts && !loading && !isAllProducts) {
-      const nextPage = Math.ceil(totalProducts / productsPerPage) + 1;
-      await fetchProducts(nextPage, true);
+    if (!hasInitialProducts) {
+      // Verificar si necesitamos cargar más productos (solo para vista general)
+      const totalProducts = products.length;
+      const productsNeeded = pageNumber * productsPerPage;
+      
+      if (productsNeeded > totalProducts && !loading && !isAllProducts) {
+        const nextPage = Math.ceil(totalProducts / productsPerPage) + 1;
+        await fetchProducts(nextPage, true);
+      }
     }
     
     // Scroll suave hacia arriba
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentPage, totalPages, products.length, productsPerPage, loading, isAllProducts, fetchProducts]);
+  }, [currentPage, totalPages, products.length, productsPerPage, loading, isAllProducts, fetchProducts, initialProducts]);
 
   // Generar números de página para la paginación
   const getPageNumbers = useMemo(() => {
