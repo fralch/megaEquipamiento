@@ -6,6 +6,7 @@ import NavVertical from "../Components/home/NavVertical";
 import ZoomImage from "../Components/store/ZoomImage";
 import Footer from "../Components/home/Footer";
 import Modal_Features from "./assets/modal_features";
+import { useTheme } from '../storage/ThemeContext';
 import axios from "axios";
 
 // Importar componentes modulares
@@ -21,6 +22,7 @@ import ProductCategoryEdit from "../Components/product/ProductCategoryEdit";
 
 const ProductPage = ({ producto }) => {
     console.log("producto", producto);
+    const { isDarkMode } = useTheme();
     const [categoriaCurrent, setCategoriaCurrent] = useState(null);
     const [subcategoriaCurrent, setSubcategoriaCurrent] = useState(null);
 
@@ -728,7 +730,11 @@ const ProductPage = ({ producto }) => {
     };
 
     return (
-        <div className="font-sans text-gray-800 bg-gray-100 min-h-screen">
+        <div className={`font-sans min-h-screen transition-colors duration-300 ${
+            isDarkMode 
+                ? 'text-gray-100 bg-gray-900' 
+                : 'text-gray-800 bg-gray-100'
+        }`}>
             <Head title="Producto" />
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
@@ -737,14 +743,20 @@ const ProductPage = ({ producto }) => {
                 <div className="flex items-center gap-1 px-6 py-3 ">
                     <Link 
                         href={`/categorias/${categoriaCurrent.id_categoria}`} 
-                        className="text-gray-600 hover:text-blue-600 transition-colors duration-200 text-lg font-medium"
+                        className={`hover:text-blue-600 transition-colors duration-200 text-lg font-medium ${
+                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                        }`}
                     >
                         {categoriaCurrent.nombre_categoria}
                     </Link>
-                    <span className="text-gray-400 mx-1 text-sm font-medium">/</span>
+                    <span className={`mx-1 text-sm font-medium ${
+                        isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                    }`}>/</span>
                     <Link 
                         href={`/subcategoria/${producto.id_subcategoria}`}
-                        className="text-gray-800 hover:text-blue-600 transition-colors duration-200 text-lg font-medium"
+                        className={`hover:text-blue-600 transition-colors duration-200 text-lg font-medium ${
+                            isDarkMode ? 'text-gray-100' : 'text-gray-800'
+                        }`}
                     >
                         {subcategoriaCurrent.nombre}
                     </Link>
@@ -781,14 +793,20 @@ const ProductPage = ({ producto }) => {
                 <section className="grid md:grid-cols-2 gap-8">
                     <ZoomImage imageSrc={producto.imagen.startsWith('http') ? producto.imagen : `/${producto.imagen}`} productId={producto.id_producto} />
 
-                    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+                    <div className={`max-w-4xl mx-auto p-6 shadow-lg rounded-lg transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-800' : 'bg-white'
+                    }`}>
                         <div className="flex flex-col space-y-4">
                             <div>
                                 {editMode.nombre ? (
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="text"
-                                            className="text-3xl font-bold text-gray-900 border rounded px-2 py-1 w-full"
+                                            className={`text-3xl font-bold border rounded px-2 py-1 w-full transition-colors duration-300 ${
+                                                isDarkMode 
+                                                    ? 'text-gray-100 bg-gray-700 border-gray-600' 
+                                                    : 'text-gray-900 bg-white border-gray-300'
+                                            }`}
                                             value={tempInputs.nombre || producto.nombre}
                                             onChange={(e) => handleInputChange('nombre', e.target.value)}
                                             autoFocus
@@ -808,7 +826,9 @@ const ProductPage = ({ producto }) => {
                                     </div>
                                 ) : (
                                     <h1
-                                        className="text-3xl font-bold text-gray-900 cursor-pointer"
+                                        className={`text-3xl font-bold cursor-pointer transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                                        }`}
                                         onDoubleClick={() => toggleEditMode('nombre')}
                                     >
                                         {productData.nombre}
@@ -822,7 +842,9 @@ const ProductPage = ({ producto }) => {
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     type="number"
-                                                    className="text-2xl font-semibold text-green-600 border rounded px-2 py-1"
+                                                    className={`text-2xl font-semibold text-green-600 border rounded px-2 py-1 transition-colors duration-300 ${
+                                                        isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
+                                                    }`}
                                                     value={tempInputs.precio_sin_ganancia || producto.precio_sin_ganancia}
                                                     onChange={(e) => handleInputChange('precio_sin_ganancia', e.target.value)}
                                                     autoFocus
@@ -848,7 +870,9 @@ const ProductPage = ({ producto }) => {
                                                 S/ {productData.precio_sin_ganancia}
                                             </p>
                                         )}
-                                        <p className="text-gray-500">
+                                        <p className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                        }`}>
                                             (sin IGV)
                                         </p>
                                     </div>
@@ -857,7 +881,11 @@ const ProductPage = ({ producto }) => {
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     type="number"
-                                                    className="text-2xl font-semibold text-gray-800 border rounded px-2 py-1"
+                                                    className={`text-2xl font-semibold border rounded px-2 py-1 transition-colors duration-300 ${
+                                                        isDarkMode 
+                                                            ? 'text-gray-100 bg-gray-700 border-gray-600' 
+                                                            : 'text-gray-800 bg-white border-gray-300'
+                                                    }`}
                                                     value={tempInputs.precio_igv || producto.precio_igv}
                                                     onChange={(e) => handleInputChange('precio_igv', e.target.value)}
                                                     autoFocus
@@ -877,24 +905,34 @@ const ProductPage = ({ producto }) => {
                                             </div>
                                         ) : (
                                             <p
-                                                className="text-2xl font-semibold text-gray-800 cursor-pointer"
+                                                className={`text-2xl font-semibold cursor-pointer transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-100' : 'text-gray-800'
+                                                }`}
                                                 onDoubleClick={() => toggleEditMode('precio_igv')}
                                             >
                                                 S/ {productData.precio_igv}
                                             </p>
                                         )}
-                                        <p className="text-gray-500">
+                                        <p className={`transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                        }`}>
                                             (con IGV)
                                         </p>
                                     </div>
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className={`text-sm transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                }`}>
                                     <div>
                                         {editMode.sku ? (
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     type="text"
-                                                    className="text-sm text-gray-600 border rounded px-2 py-1"
+                                                    className={`text-sm border rounded px-2 py-1 transition-colors duration-300 ${
+                                                        isDarkMode 
+                                                            ? 'text-gray-300 bg-gray-700 border-gray-600' 
+                                                            : 'text-gray-600 bg-white border-gray-300'
+                                                    }`}
                                                     value={tempInputs.sku || producto.sku}
                                                     onChange={(e) => handleInputChange('sku', e.target.value)}
                                                     autoFocus
@@ -914,7 +952,9 @@ const ProductPage = ({ producto }) => {
                                             </div>
                                         ) : (
                                             <p
-                                                className="text-sm text-gray-600 cursor-pointer"
+                                                className={`text-sm cursor-pointer transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}
                                                 onDoubleClick={() => toggleEditMode('sku')}
                                             >
                                                 SKU: {productData.sku}
@@ -922,11 +962,15 @@ const ProductPage = ({ producto }) => {
                                         )}
                                     </div>
                                     <div>
-                                        <p className="text-sm text-gray-600">
+                                        <p className={`text-sm transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>
                                             Fabricante: {productData.marca?.nombre}
                                         </p>
                                     </div>
-                                    <p>
+                                    <p className={`transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-800'
+                                    }`}>
                                         Plazo de entrega: 1-3 días (Salvo fin
                                         Stock)
                                     </p>
@@ -939,10 +983,18 @@ const ProductPage = ({ producto }) => {
                           <button className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 shadow-md">
                                 Agregar al carrito
                             </button>
-                            <button className="bg-gray-200 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-300 shadow-md">
+                            <button className={`px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${
+                                isDarkMode 
+                                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                            }`}>
                                 Selecciona tus accesorios
                             </button>
-                            <button className="bg-gray-200 text-gray-800 px-6 py-3 rounded-md hover:bg-gray-300 shadow-md">
+                            <button className={`px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${
+                                isDarkMode 
+                                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                            }`}>
                                 Comunícate con un asesor
                             </button>
                           </div>
@@ -1003,7 +1055,11 @@ const ProductPage = ({ producto }) => {
                                                 value={videoUrl} 
                                                 onChange={(e) => setVideoUrl(e.target.value)}
                                                 placeholder="Ingresa la URL del video de YouTube (ej: https://youtu.be/XXXX o https://www.youtube.com/watch?v=XXXX)" 
-                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300 ${
+                                                    isDarkMode 
+                                                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                                                        : 'bg-white border-gray-300 text-gray-900'
+                                                }`}
                                             />
                                             <button 
                                                 onClick={() => {
@@ -1070,7 +1126,9 @@ const ProductPage = ({ producto }) => {
                                         
                                         {videoPreview && (
                                             <div className="mt-4">
-                                                <h3 className="text-lg font-medium mb-2">Previsualización:</h3>
+                                                <h3 className={`text-lg font-medium mb-2 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                                                }`}>Previsualización:</h3>
                                                 <iframe
                                                     className="w-full h-96 rounded-md shadow-lg"
                                                     src={videoPreview}
@@ -1085,7 +1143,9 @@ const ProductPage = ({ producto }) => {
                         )}
                     </div>
                 </section>
-                <div className="w-full bg-white shadow-md rounded-md mt-10">
+                <div className={`w-full shadow-md rounded-md mt-10 transition-colors duration-300 ${
+                    isDarkMode ? 'bg-gray-800' : 'bg-white'
+                }`}>
                     <ProductTabs
                         tabs={tabs}
                         activeTab={activeTab}
@@ -1096,7 +1156,9 @@ const ProductPage = ({ producto }) => {
                 </div>
                
                
-                 <div className="w-full bg-white shadow-md rounded-md mt-5 p-6">
+                 <div className={`w-full shadow-md rounded-md mt-5 p-6 transition-colors duration-300 ${
+                     isDarkMode ? 'bg-gray-800' : 'bg-white'
+                 }`}>
                  <RelatedProducts productId={producto.id_producto} />
                     <div className="flex justify-center items-center">
                         {auth.user && (

@@ -11,9 +11,11 @@ import Footer from "@/Components/home/Footer";
 import Header from "@/Components/home/Header";
 import LabEquipmentSection from "@/Components/home/LabEquipmentSection";
 import ErrorBoundary from "@/Components/ErrorBoundary";
+import { useTheme } from "@/storage/ThemeContext";
 
 export default function Welcome() {
     const { auth } = usePage().props;
+    const { isDarkMode } = useTheme();
     const [showUIElements, setShowUIElements] = useState(false);
     const [activeSubMenu, setActiveSubMenu] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
@@ -56,21 +58,21 @@ export default function Welcome() {
                 {auth.user ? (
                     <button
                         onClick={handleLogout}
-                        className="fixed top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow-md transition duration-300 ease-in-out z-50"
+                        className={`fixed top-4 right-4 ${isDarkMode ? 'bg-red-600 hover:bg-red-700' : 'bg-red-500 hover:bg-red-600'} text-white px-4 py-2 rounded-md shadow-md transition duration-300 ease-in-out z-50`}
                     >
                         Cerrar Sesión
                     </button>
                 ) : (
                     <Link
                         href="/login"
-                        className="fixed top-4 right-4 bg-[#184f96] hover:bg-[#123d75] text-white px-4 py-2 rounded-md shadow-md transition duration-300 ease-in-out z-50"
+                        className={`fixed top-4 right-4 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#184f96] hover:bg-[#123d75]'} text-white px-4 py-2 rounded-md shadow-md transition duration-300 ease-in-out z-50`}
                     >
                         Iniciar Sesión
                     </Link>
                 )}
 
                 <div
-                    className="min-w-screen min-h-screen bg-gray-200"
+                    className={`min-w-screen min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'} transition-colors duration-300`}
                     style={{ marginTop: "-20px" }}
                 >
                     <Menu toggleMenu={toggleMenu} />

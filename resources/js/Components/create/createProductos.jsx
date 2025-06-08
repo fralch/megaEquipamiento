@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useTheme } from '../../storage/ThemeContext';
 import Modal_Features from './assets/modal_features';
 import EspecificacionesTecnicas from './assets/especificacionesTecnicas';
 import { countryOptions } from '../countrys';
@@ -69,10 +70,13 @@ const tabs = [
 ];
 
 const FormInput = ({ label, id, name, value, onChange, type = "text", placeholder, required = false, step, className = "" }) => {
+  const { isDarkMode } = useTheme();
   
   return (
     <div className={`mb-4 ${className}`}>
-      <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
+      <label htmlFor={id} className={`block text-sm font-medium transition-colors duration-300 ${
+        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+      }`}>{label}</label>
       {name === 'envio' || name === 'soporte_tecnico' ? (
         <textarea
           id={id}
@@ -80,7 +84,11 @@ const FormInput = ({ label, id, name, value, onChange, type = "text", placeholde
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+          }`}
           required={required}
           rows={4}
         />
@@ -92,7 +100,11 @@ const FormInput = ({ label, id, name, value, onChange, type = "text", placeholde
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+          }`}
           required={required}
           step={step}
         />
@@ -101,103 +113,153 @@ const FormInput = ({ label, id, name, value, onChange, type = "text", placeholde
   );
 };
 
-const FormTextarea = ({ label, id, name, value, onChange, placeholder, rows = 4 }) => (
-  <div className="mb-4 col-span-2">
-    <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
-    <textarea
-      id={id}
-      name={name}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-      rows={rows}
-    />
-  </div>
-);
-
-const CategorySelect = ({ categorias, selectedCategory, handleCategoryChange }) => (
-  <div className="mb-4">
-    <label htmlFor="categoria" className="block text-sm font-medium text-gray-700">Categoría</label>
-    <select
-      id="categoria"
-      name="categoria"
-      value={selectedCategory}
-      onChange={handleCategoryChange}
-      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-    >
-      <option value="">Seleccione una categoría</option>
-      {categorias.map(({ id_categoria, nombre }) => (
-        <option key={id_categoria} value={id_categoria}>{nombre}</option>
-      ))}
-    </select>
-  </div>
-);
-
-const SubcategorySelect = ({ filteredSubcategorias, value, onChange }) => (
-  <div className="mb-4">
-    <label htmlFor="id_subcategoria" className="block text-sm font-medium text-gray-700">Subcategoría</label>
-    <select
-      id="id_subcategoria"
-      name="id_subcategoria"
-      value={value}
-      onChange={onChange}
-      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-      required
-    >
-      <option value="">Seleccione una subcategoría</option>
-      {filteredSubcategorias.map(({ id_subcategoria, nombre }) => (
-        <option key={id_subcategoria} value={id_subcategoria}>{nombre}</option>
-      ))}
-    </select>
-  </div>
-);
-
-const BrandSelect = ({ marcas, value, onChange }) => (
-  <div className="mb-4">
-    <label htmlFor="marca_id" className="block text-sm font-medium text-gray-700">Marca</label>
-    <select
-      id="marca_id"
-      name="marca_id"
-      value={value}
-      onChange={onChange}
-      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-      required
-    >
-      <option value="">Seleccione una marca</option>
-      {marcas.map(({ id_marca, nombre }) => (
-        <option key={id_marca} value={id_marca}>{nombre}</option>
-      ))}
-    </select>
-  </div>
-);
-
-const VideoInput = ({ value, onChange }) => (
-  <div className="mb-4 col-span-2">
-    <label htmlFor="video" className="block text-sm font-medium text-gray-700">Video del Producto</label>
-    <div className="mt-1">
-      <input
-        type="text"
-        id="video"
-        name="video"
+const FormTextarea = ({ label, id, name, value, onChange, placeholder, rows = 4 }) => {
+  const { isDarkMode } = useTheme();
+  
+  return (
+    <div className="mb-4 col-span-2">
+      <label htmlFor={id} className={`block text-sm font-medium transition-colors duration-300 ${
+        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+      }`}>{label}</label>
+      <textarea
+        id={id}
+        name={name}
         value={value}
         onChange={onChange}
-        placeholder="URL del video de YouTube"
-        className="block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+        placeholder={placeholder}
+        className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+        }`}
+        rows={rows}
       />
     </div>
-    {value && (
-      <div className="mt-2 aspect-video w-full">
-        <iframe
-          className="w-full h-96 rounded-md shadow-lg"
-          src={value.replace("youtu.be", "www.youtube.com/embed")}
-          title="Vista previa del video"
-          allowFullScreen
+  );
+};
+
+const CategorySelect = ({ categorias, selectedCategory, handleCategoryChange }) => {
+  const { isDarkMode } = useTheme();
+  
+  return (
+    <div className="mb-4">
+      <label htmlFor="categoria" className={`block text-sm font-medium transition-colors duration-300 ${
+        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+      }`}>Categoría</label>
+      <select
+        id="categoria"
+        name="categoria"
+        value={selectedCategory}
+        onChange={handleCategoryChange}
+        className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-gray-700 border-gray-600 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+            : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+        }`}
+      >
+        <option value="">Seleccione una categoría</option>
+        {categorias.map(({ id_categoria, nombre }) => (
+          <option key={id_categoria} value={id_categoria}>{nombre}</option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
+const SubcategorySelect = ({ filteredSubcategorias, value, onChange }) => {
+  const { isDarkMode } = useTheme();
+  
+  return (
+    <div className="mb-4">
+      <label htmlFor="id_subcategoria" className={`block text-sm font-medium transition-colors duration-300 ${
+        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+      }`}>Subcategoría</label>
+      <select
+        id="id_subcategoria"
+        name="id_subcategoria"
+        value={value}
+        onChange={onChange}
+        className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-gray-700 border-gray-600 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+            : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+        }`}
+        required
+      >
+        <option value="">Seleccione una subcategoría</option>
+        {filteredSubcategorias.map(({ id_subcategoria, nombre }) => (
+          <option key={id_subcategoria} value={id_subcategoria}>{nombre}</option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
+const BrandSelect = ({ marcas, value, onChange }) => {
+  const { isDarkMode } = useTheme();
+  
+  return (
+    <div className="mb-4">
+      <label htmlFor="marca_id" className={`block text-sm font-medium transition-colors duration-300 ${
+        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+      }`}>Marca</label>
+      <select
+        id="marca_id"
+        name="marca_id"
+        value={value}
+        onChange={onChange}
+        className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-gray-700 border-gray-600 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+            : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+        }`}
+        required
+      >
+        <option value="">Seleccione una marca</option>
+        {marcas.map(({ id_marca, nombre }) => (
+          <option key={id_marca} value={id_marca}>{nombre}</option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
+const VideoInput = ({ value, onChange }) => {
+  const { isDarkMode } = useTheme();
+  
+  return (
+    <div className="mb-4 col-span-2">
+      <label htmlFor="video" className={`block text-sm font-medium transition-colors duration-300 ${
+        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+      }`}>Video del Producto</label>
+      <div className="mt-1">
+        <input
+          type="text"
+          id="video"
+          name="video"
+          value={value}
+          onChange={onChange}
+          placeholder="URL del video de YouTube"
+          className={`block w-full rounded-md shadow-sm transition-colors duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+          }`}
         />
       </div>
-    )}
-  </div>
-);
+      {value && (
+        <div className="mt-2 aspect-video w-full">
+          <iframe
+            className="w-full h-96 rounded-md shadow-lg"
+            src={value.replace("youtu.be", "www.youtube.com/embed")}
+          title="Vista previa del video"
+          allowFullScreen
+          />
+        </div>
+      )}
+    </div>
+  );
+};
 
 const FeaturesButton = ({ label, value, onClick, onRemoveItem }) => (
   <div className="mb-4 w-full">
@@ -272,6 +334,7 @@ const ImageUpload = ({ previewImage, handleImageChange, imageName }) => (
 );
 
 const Productos = ({ onSubmit }) => {
+  const { isDarkMode } = useTheme();
   const [activeTab, setActiveTab] = useState('tab1');
   const [form, setForm] = useState(initialForm);
   const [categorias, setCategorias] = useState([]);
@@ -561,13 +624,19 @@ const Productos = ({ onSubmit }) => {
               onChange={handleChange}
             />
             <div className="mb-4">
-              <label htmlFor="pais" className="block text-sm font-medium text-gray-700">País</label>
+              <label htmlFor="pais" className={`block text-sm font-medium transition-colors duration-300 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>País</label>
               <select
                 id="pais"
                 name="pais"
                 value={form.pais}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+                  isDarkMode 
+                    ? 'bg-gray-700 border-gray-600 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                }`}
                 required
               >
                 <option value="">Seleccione un país</option>
@@ -593,11 +662,17 @@ const Productos = ({ onSubmit }) => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold mb-4 text-center lg:text-left">Crear Producto</h1>
+    <div className={`container mx-auto px-4 py-6 transition-colors duration-300 ${
+      isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+    }`}>
+      <h1 className={`text-2xl font-bold mb-4 text-center lg:text-left transition-colors duration-300 ${
+        isDarkMode ? 'text-white' : 'text-gray-900'
+      }`}>Crear Producto</h1>
       
       <form onSubmit={handleSubmit}>
-        <div className="flex flex-col lg:flex-row bg-white shadow-md rounded-lg p-6 mb-8 w-full">
+        <div className={`flex flex-col lg:flex-row shadow-md rounded-lg p-6 mb-8 w-full transition-colors duration-300 ${
+          isDarkMode ? 'bg-gray-800' : 'bg-white'
+        }`}>
           <ImageUpload
             previewImage={previewImage}
             handleImageChange={handleImageChange}
@@ -630,7 +705,9 @@ const Productos = ({ onSubmit }) => {
                 if (field.name === 'precio_ganancia') {
                   return (
                     <div key={field.name} className="mb-4">
-                      <label htmlFor={field.name} className="block text-sm font-medium text-gray-700">{field.label}</label>
+                      <label htmlFor={field.name} className={`block text-sm font-medium transition-colors duration-300 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                      }`}>{field.label}</label>
                       <div className="relative mt-1">
                         <input
                           type={field.type}
@@ -639,7 +716,11 @@ const Productos = ({ onSubmit }) => {
                           value={editandoPorcentaje ? porcentajeGanancia : form[field.name]}
                           onChange={handleChange}
                           placeholder={field.placeholder}
-                          className="block w-full border-gray-300 rounded-md shadow-sm pr-8" 
+                          className={`block w-full rounded-md shadow-sm pr-8 transition-colors duration-300 ${
+                            isDarkMode 
+                              ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                          }`} 
                           step={field.step}
                           onFocus={() => {
                             setEditandoPorcentaje(true);
@@ -654,7 +735,9 @@ const Productos = ({ onSubmit }) => {
                         </div>
                       </div>
                       {!editandoPorcentaje && form.precio_ganancia && (
-                        <p className="mt-1 text-xs text-blue-500">
+                        <p className={`mt-1 text-xs transition-colors duration-300 ${
+                          isDarkMode ? 'text-blue-400' : 'text-blue-500'
+                        }`}>
                           Porcentaje aplicado: {porcentajeGanancia}%
                         </p>
                       )}
@@ -676,17 +759,26 @@ const Productos = ({ onSubmit }) => {
           </div>
         </div>
 
-        <div className="mt-8 bg-white shadow-md rounded-lg p-6">
-          <div className="flex overflow-x-auto border-b border-gray-200">
+        <div className={`mt-8 shadow-md rounded-lg p-6 transition-colors duration-300 ${
+          isDarkMode ? 'bg-gray-800' : 'bg-white'
+        }`}>
+          <div className={`flex overflow-x-auto border-b transition-colors duration-300 ${
+            isDarkMode ? 'border-gray-700' : 'border-gray-200'
+          }`}>
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-3 text-sm font-medium transition-colors duration-150 ease-in-out whitespace-nowrap
-                  ${activeTab === tab.id 
-                    ? 'text-blue-600 border-b-2 border-blue-600' 
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+                className={`px-4 py-3 text-sm font-medium transition-colors duration-150 ease-in-out whitespace-nowrap ${
+                  activeTab === tab.id 
+                    ? isDarkMode 
+                      ? 'text-blue-400 border-b-2 border-blue-400' 
+                      : 'text-blue-600 border-b-2 border-blue-600'
+                    : isDarkMode 
+                      ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
               >
                 {tab.label}
               </button>
@@ -701,7 +793,11 @@ const Productos = ({ onSubmit }) => {
         <div className="mt-6 text-right">
           <button
             type="submit"
-            className="px-6 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
+            className={`px-6 py-2 text-white font-bold rounded-lg transition-colors duration-300 ${
+              isDarkMode 
+                ? 'bg-blue-600 hover:bg-blue-700' 
+                : 'bg-blue-600 hover:bg-blue-700'
+            }`}
           >
             Guardar Producto
           </button>

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useForm } from '@inertiajs/react';
+import { useTheme } from '../storage/ThemeContext';
 
 export default function Login() {
     const [isLogin, setIsLogin] = useState(true);
     const [showOptionalFields, setShowOptionalFields] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const { isDarkMode, toggleDarkMode } = useTheme();
     
     const loginForm = useForm({
         email: '',
@@ -35,9 +36,7 @@ export default function Login() {
 
     const buttonClasses = "group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#005dad] hover:bg-[#004c8e] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#005dad] disabled:opacity-50 transition-colors duration-200";
 
-    const toggleDarkMode = () => {
-        setIsDarkMode(!isDarkMode);
-    };
+
 
     return (
         <div className={`min-h-screen flex items-center justify-center transition-colors duration-300 ${

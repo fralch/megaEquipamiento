@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { countryOptions } from '../countrys';
+import { useTheme } from '../../storage/ThemeContext';
 import axios from 'axios';
 
 const ProductCategoryEdit = ({
@@ -14,6 +15,7 @@ const ProductCategoryEdit = ({
     handleSave,
     toggleEditMode
 }) => {
+    const { isDarkMode } = useTheme();
     const [subcategoriasAll, setSubcategoriasAll] = useState([]);
     const [categoriasAll, setCategoriasAll] = useState([]);
     const [categoriaCurrent, setCategoria] = useState([]);
@@ -203,7 +205,15 @@ const ProductCategoryEdit = ({
         <div className="p-4">
             {/* Mostrar mensajes de estado */}
             {statusMessage.text && (
-                <div className={`mb-4 p-3 rounded ${statusMessage.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                <div className={`mb-4 p-3 rounded transition-colors duration-200 ${
+                    statusMessage.type === 'success' 
+                        ? isDarkMode 
+                            ? 'bg-green-900 text-green-300 border border-green-700' 
+                            : 'bg-green-100 text-green-700'
+                        : isDarkMode 
+                            ? 'bg-red-900 text-red-300 border border-red-700' 
+                            : 'bg-red-100 text-red-700'
+                }`}>
                     {statusMessage.text}
                 </div>
             )}
@@ -211,13 +221,19 @@ const ProductCategoryEdit = ({
                 <div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="mb-4">
-                            <label htmlFor="id_categoria" className="block text-sm font-medium text-gray-700">Categoría</label>
+                            <label htmlFor="id_categoria" className={`block text-sm font-medium transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                            }`}>Categoría</label>
                             <select
                                 id="id_categoria"
                                 name="id_categoria"
                                 value={tempInputs.id_categoria || ''}
                                 onChange={handleCategoryChange}
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-200 ${
+                                    isDarkMode 
+                                        ? 'bg-gray-700 border-gray-600 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+                                        : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                                }`}
                             >
                                 <option value="">Seleccione una categoría</option>
                                 {categoriasAll?.map(categoria => (
@@ -229,13 +245,19 @@ const ProductCategoryEdit = ({
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="id_subcategoria" className="block text-sm font-medium text-gray-700">Subcategoría (Opcional)</label>
+                            <label htmlFor="id_subcategoria" className={`block text-sm font-medium transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                            }`}>Subcategoría (Opcional)</label>
                             <select
                                 id="id_subcategoria"
                                 name="id_subcategoria"
                                 value={tempInputs.id_subcategoria || ''}
                                 onChange={(e) => handleInputChange('id_subcategoria', e.target.value)}
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-200 ${
+                                    isDarkMode 
+                                        ? 'bg-gray-700 border-gray-600 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+                                        : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                                }`}
                             >
                                 <option value="">Sin subcategoría (opcional)</option>
                                 {filteredSubcategorias.map(subcategoria => (
@@ -247,13 +269,19 @@ const ProductCategoryEdit = ({
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="marca_id" className="block text-sm font-medium text-gray-700">Marca (Opcional)</label>
+                            <label htmlFor="marca_id" className={`block text-sm font-medium transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                            }`}>Marca (Opcional)</label>
                             <select
                                 id="marca_id"
                                 name="marca_id"
                                 value={tempInputs.marca_id || ''}
                                 onChange={(e) => handleInputChange('marca_id', e.target.value)}
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-200 ${
+                                    isDarkMode 
+                                        ? 'bg-gray-700 border-gray-600 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+                                        : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                                }`}
                             >
                                 <option value="">Sin marca (opcional)</option>
                                 {marcasAll?.map(marca => (
@@ -265,13 +293,19 @@ const ProductCategoryEdit = ({
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="pais" className="block text-sm font-medium text-gray-700">País (Opcional)</label>
+                            <label htmlFor="pais" className={`block text-sm font-medium transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                            }`}>País (Opcional)</label>
                             <select
                                 id="pais"
                                 name="pais"
                                 value={tempInputs.pais || ''}
                                 onChange={(e) => handleInputChange('pais', e.target.value)}
-                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-200 ${
+                                    isDarkMode 
+                                        ? 'bg-gray-700 border-gray-600 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+                                        : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                                }`}
                             >
                                 <option value="">Sin país (opcional)</option>
                                 {countryOptions?.map(option => (
@@ -284,45 +318,75 @@ const ProductCategoryEdit = ({
                     <div className="mt-4 flex space-x-2">
                         <button
                             onClick={updateProductCategory}
-                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                            className={`px-4 py-2 rounded transition-colors duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-green-600 text-white hover:bg-green-700' 
+                                    : 'bg-green-500 text-white hover:bg-green-600'
+                            }`}
                         >
                             Guardar
                         </button>
                         <button
                             onClick={() => toggleEditMode('categoria')}
-                            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                            className={`px-4 py-2 rounded transition-colors duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-gray-600 text-white hover:bg-gray-700' 
+                                    : 'bg-gray-500 text-white hover:bg-gray-600'
+                            }`}
                         >
                             Cancelar
                         </button>
                     </div>
                 </div>
             ) : (
-                <div className="bg-white rounded-lg shadow p-4">
+                <div className={`rounded-lg shadow p-4 transition-colors duration-200 ${
+                    isDarkMode ? 'bg-gray-800' : 'bg-white'
+                }`}>
                     <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-semibold">Información de Categorización</h3>
+                        <h3 className={`text-lg font-semibold transition-colors duration-200 ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>Información de Categorización</h3>
                         <button
                             onClick={() => toggleEditMode('categoria')}
-                            className="text-blue-600 hover:text-blue-800"
+                            className={`transition-colors duration-200 ${
+                                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                            }`}
                         >
                             Editar
                         </button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <p className="text-sm font-medium text-gray-500">Categoría</p>
-                            <p className="mt-1">{categoriaCurrent?.nombre_categoria || 'No especificado'}</p>
+                            <p className={`text-sm font-medium transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}>Categoría</p>
+                            <p className={`mt-1 transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                            }`}>{categoriaCurrent?.nombre_categoria || 'No especificado'}</p>
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-gray-500">Subcategoría</p>
-                            <p className="mt-1">{subcategoriaCurrent?.nombre || 'No especificado'}</p>
+                            <p className={`text-sm font-medium transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}>Subcategoría</p>
+                            <p className={`mt-1 transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                            }`}>{subcategoriaCurrent?.nombre || 'No especificado'}</p>
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-gray-500">Marca</p>
-                            <p className="mt-1">{productData.marca?.nombre || 'No especificado'}</p>
+                            <p className={`text-sm font-medium transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}>Marca</p>
+                            <p className={`mt-1 transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                            }`}>{productData.marca?.nombre || 'No especificado'}</p>
                         </div>
                         <div>
-                            <p className="text-sm font-medium text-gray-500">País</p>
-                            <p className="mt-1">{productData.pais || 'No especificado'}</p>
+                            <p className={`text-sm font-medium transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}>País</p>
+                            <p className={`mt-1 transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-200' : 'text-gray-900'
+                            }`}>{productData.pais || 'No especificado'}</p>
                         </div>
                     </div>
                 </div>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "@inertiajs/react";
+import { useTheme } from "../../storage/ThemeContext";
 const URL_API = import.meta.env.VITE_API_URL;  
 
 const CategoryCard = ({ title, items, categoryId }) => {
+  const { isDarkMode } = useTheme();
   const [imagePaths, setImagePaths] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -76,10 +78,10 @@ const CategoryCard = ({ title, items, categoryId }) => {
     <div ref={cardRef} className="relative group w-full h-96 rounded-lg overflow-hidden shadow-lg m-4">
       {/* Placeholder mientras carga */}
       <div 
-        className={`absolute inset-0 bg-gray-200 transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
+        className={`absolute inset-0 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'} transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
       >
         <div className="h-full w-full flex justify-center items-center">
-          <div className="animate-pulse h-8 w-8 bg-gray-400 rounded-full"></div>
+          <div className={`animate-pulse h-8 w-8 ${isDarkMode ? 'bg-gray-600' : 'bg-gray-400'} rounded-full`}></div>
         </div>
       </div>
       
@@ -95,12 +97,12 @@ const CategoryCard = ({ title, items, categoryId }) => {
           />
           
           {/* Título visible por defecto pero desaparece con hover */}
-          <div className="absolute top-4 left-4 bg-gray-900 bg-opacity-70 text-white text-xl font-bold py-2 px-4 rounded-md z-10 transition-opacity duration-300 group-hover:opacity-0">
+          <div className={`absolute top-4 left-4 ${isDarkMode ? 'bg-gray-800 bg-opacity-90' : 'bg-gray-900 bg-opacity-70'} text-white text-xl font-bold py-2 px-4 rounded-md z-10 transition-opacity duration-300 group-hover:opacity-0`}>
             {title}
           </div>
 
           {/* Contenido oculto que aparece con hover */}
-          <div className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-center items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100">
+          <div className={`absolute inset-0 ${isDarkMode ? 'bg-gray-900 bg-opacity-95' : 'bg-gray-800 bg-opacity-90'} text-white flex flex-col justify-center items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100`}>
             <Link 
               href={`/categorias/${categoryId}`} 
               className="cursor-pointer hover:text-blue-400 transition-colors duration-200"
@@ -109,12 +111,12 @@ const CategoryCard = ({ title, items, categoryId }) => {
             </Link>
 
             {/* Lista desplazable */}
-            <div className="space-y-2 h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-300">
+            <div className={`space-y-2 h-40 overflow-y-auto scrollbar-thin ${isDarkMode ? 'scrollbar-thumb-gray-500 scrollbar-track-gray-700' : 'scrollbar-thumb-gray-600 scrollbar-track-gray-300'}`}>
               {items.map((item) => (
                 <Link
                   key={item.id_subcategoria}
                   href={`/subcategoria/${item.id_subcategoria}`}
-                  className="block hover:bg-gray-700 p-2 rounded-md cursor-pointer"
+                  className={`block ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-700'} p-2 rounded-md cursor-pointer transition-colors duration-200`}
                 >
                   {item.nombre}
                 </Link>
@@ -124,7 +126,7 @@ const CategoryCard = ({ title, items, categoryId }) => {
             {/* Botón que también lleva a los productos de la categoría */}
             <Link 
               href={`/categorias/${categoryId}`}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 transition-colors duration-200"
+              className={`${isDarkMode ? 'bg-blue-700 hover:bg-blue-800' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded-md mt-4 transition-colors duration-200`}
             >
               Ver más
             </Link>
@@ -136,6 +138,7 @@ const CategoryCard = ({ title, items, categoryId }) => {
 };
 
 const Categories = () => {
+  const { isDarkMode } = useTheme();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -173,14 +176,14 @@ const Categories = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+      <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-white'} transition-colors duration-300`}>
+        <div className={`animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 ${isDarkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 bg-white min-h-screen">
+    <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-white'} min-h-screen transition-colors duration-300`}>
       {categories.map((category) => (
         <div key={category.id_categoria} className="m-4">
           <CategoryCard 

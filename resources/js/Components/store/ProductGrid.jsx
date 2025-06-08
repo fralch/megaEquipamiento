@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useContext, useCallback, useMemo } from 'react';
 import countryCodeMap from './countryJSON.json';
 import { CartContext } from '../../storage/CartContext';
+import { useTheme } from '../../storage/ThemeContext';
 const URL_API = import.meta.env.VITE_API_URL;
 
 const ProductGrid = ({ products: initialProducts }) => {
+  const { isDarkMode } = useTheme();
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -243,15 +245,15 @@ const ProductGrid = ({ products: initialProducts }) => {
 
   if (loading && products.length === 0) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+      <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+        <div className={`animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 ${isDarkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
       </div>
     );
   }
 
   if (error && products.length === 0) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
         <div className="text-center">
           <p className="text-red-600 mb-4">Error al cargar productos: {error}</p>
           <button 
@@ -266,8 +268,8 @@ const ProductGrid = ({ products: initialProducts }) => {
   }
 
   return (
-    <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
+    <div className={`container mx-auto px-4 py-8 transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
         {currentProducts.map((product) => (
           <Card 
             key={`product-${product.id}-${product.sku || 'no-sku'}`} 
@@ -285,8 +287,8 @@ const ProductGrid = ({ products: initialProducts }) => {
               disabled={currentPage === 1}
               className={`px-4 py-2 rounded-lg flex items-center ${
                 currentPage === 1
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  ? isDarkMode ? 'bg-gray-700 cursor-not-allowed text-gray-400' : 'bg-gray-300 cursor-not-allowed'
+                  : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
               }`}
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -298,7 +300,7 @@ const ProductGrid = ({ products: initialProducts }) => {
             <div className="flex items-center space-x-2">
               {getPageNumbers.map((pageNumber, index) => (
                 pageNumber === '...' ? (
-                  <span key={`ellipsis-${index}`} className="px-2">...</span>
+                  <span key={`ellipsis-${index}`} className={`px-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>...</span>
                 ) : (
                   <button
                     key={`page-${pageNumber}`}
@@ -306,8 +308,8 @@ const ProductGrid = ({ products: initialProducts }) => {
                     disabled={loading}
                     className={`px-4 py-2 rounded-lg ${
                       currentPage === pageNumber 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100'
+                        ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white'
+                        : isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 disabled:bg-gray-800' : 'bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100'
                     }`}
                   >
                     {pageNumber}
@@ -321,8 +323,8 @@ const ProductGrid = ({ products: initialProducts }) => {
               disabled={currentPage === totalPages || loading}
               className={`px-4 py-2 rounded-lg flex items-center ${
                 currentPage === totalPages || loading
-                  ? 'bg-gray-300 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  ? isDarkMode ? 'bg-gray-700 cursor-not-allowed text-gray-400' : 'bg-gray-300 cursor-not-allowed'
+                  : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
               }`}
             >
               Siguiente
@@ -332,7 +334,7 @@ const ProductGrid = ({ products: initialProducts }) => {
             </button>
           </div>
           
-          <div className="text-sm text-gray-600">
+          <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             Mostrando {paginationInfo.start}-{paginationInfo.end} de {paginationInfo.total} productos
             {loading && <span className="ml-2">(Cargando...)</span>}
           </div>
@@ -343,6 +345,7 @@ const ProductGrid = ({ products: initialProducts }) => {
 };
 
 const Card = React.memo(({ product }) => {
+  const { isDarkMode } = useTheme();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -432,7 +435,11 @@ const Card = React.memo(({ product }) => {
   return (
     <div
       ref={cardRef}
-      className="w-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 h-128 relative flex flex-col transition-all duration-300 hover:shadow-xl"
+      className={`w-full rounded-xl shadow-lg overflow-hidden border h-128 relative flex flex-col transition-all duration-300 hover:shadow-xl ${
+        isDarkMode 
+          ? 'bg-gray-800 hover:bg-gray-750 shadow-gray-900/50 border-gray-700' 
+          : 'bg-white hover:bg-gray-50 border-gray-200'
+      }`}
       onMouseEnter={() => setShowDetails(true)}
       onMouseLeave={() => setShowDetails(false)}
     >
@@ -479,7 +486,7 @@ const Card = React.memo(({ product }) => {
               <img
                 src={product.marca}
                 alt={`Marca ${product.nombre_marca || 'desconocida'}`}
-                className="h-4 object-cover transition-opacity duration-300"
+                className="h-5 object-cover transition-opacity duration-300" 
                 style={{ opacity: imageLoaded ? 1 : 0 }}
                 loading="lazy"
                 onError={(e) => {
@@ -491,7 +498,7 @@ const Card = React.memo(({ product }) => {
               <img
                 src={product.flag}
                 alt={`Bandera de ${product.origin || 'origen desconocido'}`}
-                className="w-6 h-4 object-cover transition-opacity duration-300"
+                className="w-9 h-5 object-cover transition-opacity duration-300"
                 style={{ opacity: imageLoaded ? 1 : 0 }}
                 loading="lazy"
                 onError={(e) => {
@@ -504,15 +511,21 @@ const Card = React.memo(({ product }) => {
       </div>
 
       {/* Información del producto (40% restante) */}
-      <div className="p-4 flex-grow overflow-y-auto">
-        <h2 className="text-lg font-semibold text-gray-800 mb-2">{product.title}</h2>
+      <div className="p-4 flex-grow overflow-y-auto min-h-60">
+        <h2 className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
+          isDarkMode ? 'text-gray-100' : 'text-gray-800'
+        }`}>{product.title}</h2>
         {summaryEntries.map(([key, value], index) => (
-          <p key={`${key}-${index}`} className="text-sm text-gray-600">
+          <p key={`${key}-${index}`} className={`text-sm transition-colors duration-300 ${
+            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+          }`}>
             <strong>{key}:</strong> {value}
           </p>
         ))}
         <div className="flex justify-between items-center mt-2">
-          <span className="text-xl font-bold text-blue-600">
+          <span className={`text-xl font-bold transition-colors duration-300 ${
+            isDarkMode ? 'text-blue-400' : 'text-blue-600'
+          }`}>
             ${product.price.toFixed(2)}
           </span>
         </div>
@@ -521,12 +534,20 @@ const Card = React.memo(({ product }) => {
       {/* Overlay con información detallada */}
       {showDetails && (
         <div 
-          className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-start z-20 p-4 cursor-pointer"
+          className={`absolute inset-0 bg-opacity-95 flex flex-col justify-start z-20 p-4 cursor-pointer transition-all duration-300 ${
+            isDarkMode 
+              ? 'bg-gray-900 text-gray-100' 
+              : 'bg-gray-800 text-white'
+          }`}
           onClick={handleOverlayClick}
         >
           <a 
             href={product.link}
-            className="text-2xl font-semibold mb-2 text-center hover:text-blue-300 transition-colors cursor-pointer"
+            className={`text-2xl font-semibold mb-2 text-center transition-colors cursor-pointer ${
+              isDarkMode 
+                ? 'hover:text-blue-300 text-gray-100' 
+                : 'hover:text-blue-300 text-white'
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
             {product.title}
@@ -537,8 +558,12 @@ const Card = React.memo(({ product }) => {
             {/* Datos técnicos */}
             {technicalDataEntries.length > 0 && (
               <div className="mb-4">
-                <h3 className="text-sm font-medium text-blue-300 mb-2">Datos Técnicos</h3>
-                <div className="text-sm text-gray-300 space-y-2">
+                <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                  isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                }`}>Datos Técnicos</h3>
+                <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-200' : 'text-gray-300'
+                }`}>
                   {technicalDataEntries.map(([key, value], index) => (
                     <p key={`tech-${key}-${index}`}>
                       <strong>{key}:</strong> {value}
@@ -551,8 +576,12 @@ const Card = React.memo(({ product }) => {
             {/* Descripción del producto */}
             {product.descripcion && (
               <div className="mb-4">
-                <h3 className="text-sm font-medium text-blue-300 mb-2">Descripción</h3>
-                <p className="text-sm text-gray-200">{product.descripcion}</p>
+                <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                  isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                }`}>Descripción</h3>
+                <p className={`text-sm transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-100' : 'text-gray-200'
+                }`}>{product.descripcion}</p>
               </div>
             )}
           </div>
@@ -560,13 +589,21 @@ const Card = React.memo(({ product }) => {
           {/* Botones fijos en la parte inferior */}
           <div className="flex space-x-4 mt-auto">
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md flex-1"
+              className={`font-bold py-2 px-4 rounded-md flex-1 transition-all duration-300 ${
+                isDarkMode 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
+              }`}
               onClick={handleAddToCart}
             >
               Añadir al carrito
             </button>
             <button 
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md flex-1"
+              className={`font-bold py-2 px-4 rounded-md flex-1 transition-all duration-300 ${
+                isDarkMode 
+                  ? 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg' 
+                  : 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg'
+              }`}
               onClick={handleCompare}
             >
               Comparar
@@ -581,15 +618,15 @@ const Card = React.memo(({ product }) => {
           width: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.1);
+          background: ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'};
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.3);
+          background: ${isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'};
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(255, 255, 255, 0.5);
+          background: ${isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'};
         }
       `}</style>
     </div>

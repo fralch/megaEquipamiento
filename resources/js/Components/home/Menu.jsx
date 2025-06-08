@@ -2,12 +2,16 @@
 import React from "react";
 import { mdiChevronDown, mdiGauge, mdiLayersOutline, mdiWidgetsOutline, mdiPlus } from "@mdi/js";
 import { Link, usePage } from "@inertiajs/react";
+import { useTheme } from '../../storage/ThemeContext';
 
 const Menu = ({ toggleMenu }) => {
     const { auth } = usePage().props;
+    const { isDarkMode } = useTheme();
 
     return (
-        <div className="rounded bg-white px-5 py-3 shadow-xl pb-5" id="menu">
+        <div className={`rounded px-5 py-3 shadow-xl pb-5 transition-colors duration-300 ${
+            isDarkMode ? 'bg-gray-800' : 'bg-white'
+        }`} id="menu">
             <div className="-mx-1 flex flex-col md:flex-row items-center justify-between">
                 <ul className="flex flex-col md:flex-row h-10 w-full flex-wrap items-center">
                     <li className="relative block w-full md:w-auto mb-2 md:mb-0">
@@ -33,7 +37,11 @@ const Menu = ({ toggleMenu }) => {
                     <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0 mt-2 md:mt-0">
                         <a
                             href="/"
-                            className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
+                            className={`mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:no-underline ${
+                                isDarkMode 
+                                    ? 'text-gray-200 hover:bg-gray-700' 
+                                    : 'text-black hover:bg-gray-100'
+                            }`}
                         >
                             <span className="mr-3 text-xl">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -52,7 +60,11 @@ const Menu = ({ toggleMenu }) => {
                         <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0">
                             <Link
                                 href="/crear"
-                                className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
+                                className={`mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:no-underline ${
+                                    isDarkMode 
+                                        ? 'text-gray-200 hover:bg-gray-700' 
+                                        : 'text-black hover:bg-gray-100'
+                                }`}
                             >
                                 <span className="mr-3 text-xl">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -66,7 +78,11 @@ const Menu = ({ toggleMenu }) => {
                     <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0">
                         <a
                             href="#"
-                            className="mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:bg-gray-100 hover:no-underline"
+                            className={`mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:no-underline ${
+                                isDarkMode 
+                                    ? 'text-gray-200 hover:bg-gray-700' 
+                                    : 'text-black hover:bg-gray-100'
+                            }`}
                         >
                             <span className="mr-3 text-xl">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -82,7 +98,11 @@ const Menu = ({ toggleMenu }) => {
                         <select
                             name="moneda"
                             id="moneda"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            className={`text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 transition-colors duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-gray-700 border-gray-600 text-white' 
+                                    : 'bg-gray-50 border-gray-300 text-gray-900'
+                            }`}
                         >
                             <option value="sol">Soles</option>
                             <option value="dollar">Dolares</option>
@@ -90,7 +110,11 @@ const Menu = ({ toggleMenu }) => {
                         </select>
                     </div>
                     
-                    <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gray-50 border border-gray-300 w-full md:w-auto">
+                    <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border w-full md:w-auto transition-colors duration-200 ${
+                        isDarkMode 
+                            ? 'bg-gray-700 border-gray-600' 
+                            : 'bg-gray-50 border-gray-300'
+                    }`}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -101,7 +125,7 @@ const Menu = ({ toggleMenu }) => {
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="text-gray-600"
+                            className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}
                         >
                             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                             <path d="M6 6m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
@@ -111,7 +135,9 @@ const Menu = ({ toggleMenu }) => {
                             <path d="M13 18h-5a2 2 0 0 1 -2 -2v-8" />
                             <path d="M10 15l3 3l-3 3" />
                         </svg>
-                        <span className="text-sm font-medium text-gray-700">Comparador</span>
+                        <span className={`text-sm font-medium ${
+                            isDarkMode ? 'text-gray-200' : 'text-gray-700'
+                        }`}>Comparador</span>
                     </div>
                 </div>
             </div>

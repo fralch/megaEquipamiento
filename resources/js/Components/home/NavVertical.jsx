@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Link } from "@inertiajs/react";
+import { useTheme } from '../../storage/ThemeContext';
 const URL_API = import.meta.env.VITE_API_URL;
 
 const NavVertical = ({ isOpen, onClose }) => {
   const [categoriasArray, setCategoriasArray] = useState([]);
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     // Verifica si los datos ya están en el localStorage
@@ -39,8 +41,10 @@ const NavVertical = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className={`fixed inset-y-0 left-0 w-80 bg-white shadow-lg z-10 transform transition-transform duration-300 ${
+      className={`fixed inset-y-0 left-0 w-80 shadow-lg z-10 transform transition-all duration-300 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
+      } ${
+        isDarkMode ? 'bg-gray-900' : 'bg-white'
       }`}
       style={{ height: '100vh' }}
     >
@@ -53,7 +57,11 @@ const NavVertical = ({ isOpen, onClose }) => {
           />
           <button
             onClick={onClose}
-            className="p-1 rounded-lg focus:outline-none focus:ring"
+            className={`p-1 rounded-lg focus:outline-none focus:ring transition-colors duration-200 ${
+              isDarkMode 
+                ? 'text-gray-300 hover:bg-gray-800 focus:ring-gray-600' 
+                : 'text-gray-600 hover:bg-gray-100 focus:ring-gray-300'
+            }`}
           >
             <svg
               className="w-6 h-6"
@@ -76,10 +84,14 @@ const NavVertical = ({ isOpen, onClose }) => {
             <div key={categoria.id_categoria}>
               <button
                 onClick={() => toggleCategory(categoria.nombre)}
-                className={`block w-full text-left p-2 rounded ${
+                className={`block w-full text-left p-2 rounded transition-colors duration-200 ${
                   activeCategory === categoria.nombre
-                    ? 'bg-blue-200 text-blue-800'
-                    : 'bg-white hover:bg-gray-200'
+                    ? isDarkMode 
+                      ? 'bg-blue-800 text-blue-200' 
+                      : 'bg-blue-200 text-blue-800'
+                    : isDarkMode 
+                      ? 'bg-gray-900 text-gray-200 hover:bg-gray-800' 
+                      : 'bg-white text-gray-900 hover:bg-gray-200'
                 }`}
               >
                 {categoria.nombre}
@@ -93,7 +105,11 @@ const NavVertical = ({ isOpen, onClose }) => {
                   <Link
                     key={subcategoria.id_subcategoria}
                     href={`/subcategoria/${subcategoria.id_subcategoria}`}
-                    className="block p-2 pl-6 hover:bg-blue-50 rounded"
+                    className={`block p-2 pl-6 rounded transition-colors duration-200 ${
+                      isDarkMode 
+                        ? 'text-gray-300 hover:bg-gray-800' 
+                        : 'text-gray-700 hover:bg-blue-50'
+                    }`}
                   >
                     {subcategoria.nombre}
                   </Link>

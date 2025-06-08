@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useTheme } from '../../storage/ThemeContext';
 
 const Categorias = ({ onSubmit }) => {
+  const { isDarkMode } = useTheme();
   const [categorias, setCategorias] = useState([]);
   const [form, setForm] = useState({
     nombre: "",
@@ -277,12 +279,20 @@ const Categorias = ({ onSubmit }) => {
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 mb-8 w-full mx-auto">
-      <h1 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">Gestión de Categorías</h1>
+    <div className={`shadow-md rounded-lg p-6 mb-8 w-full mx-auto transition-colors duration-300 ${
+      isDarkMode ? 'bg-gray-800' : 'bg-white'
+    }`}>
+      <h1 className={`text-2xl font-bold mb-6 border-b pb-2 transition-colors duration-300 ${
+        isDarkMode ? 'text-white border-gray-600' : 'text-gray-800 border-gray-200'
+      }`}>Gestión de Categorías</h1>
       
       {/* Mensajes de éxito o error */}
       {successMessage && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6 flex items-center">
+        <div className={`border px-4 py-3 rounded mb-6 flex items-center transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-green-900 border-green-600 text-green-300' 
+            : 'bg-green-100 border-green-400 text-green-700'
+        }`}>
           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
@@ -291,7 +301,11 @@ const Categorias = ({ onSubmit }) => {
       )}
       
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 flex items-center">
+        <div className={`border px-4 py-3 rounded mb-6 flex items-center transition-colors duration-300 ${
+          isDarkMode 
+            ? 'bg-red-900 border-red-600 text-red-300' 
+            : 'bg-red-100 border-red-400 text-red-700'
+        }`}>
           <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
           </svg>
@@ -299,13 +313,21 @@ const Categorias = ({ onSubmit }) => {
         </div>
       )}
       
-      <div className="bg-gray-50 p-5 rounded-lg mb-8 border border-gray-200">
+      <div className={`p-5 rounded-lg mb-8 border transition-colors duration-300 ${
+        isDarkMode 
+          ? 'bg-gray-700 border-gray-600' 
+          : 'bg-gray-50 border-gray-200'
+      }`}>
         <form onSubmit={handleSubmit} encType="multipart/form-data">
-          <h2 className="text-lg font-bold mb-5 text-gray-700 border-b pb-2">Agregar Nueva Categoría</h2>
+          <h2 className={`text-lg font-bold mb-5 border-b pb-2 transition-colors duration-300 ${
+            isDarkMode ? 'text-gray-200 border-gray-600' : 'text-gray-700 border-gray-200'
+          }`}>Agregar Nueva Categoría</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="mb-4">
-              <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="nombre" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 Nombre <span className="text-red-500">*</span>
               </label>
               <input
@@ -314,13 +336,19 @@ const Categorias = ({ onSubmit }) => {
                 name="nombre"
                 value={form.nombre}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+                  isDarkMode 
+                    ? 'bg-gray-600 border-gray-500 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                }`}
                 required
               />
             </div>
 
             <div className="mb-4">
-              <label htmlFor="marca" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="marca" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 Marca <span className="text-red-500">*</span>
               </label>
               <select
@@ -328,7 +356,11 @@ const Categorias = ({ onSubmit }) => {
                 name="marca"
                 value={form.marca}
                 onChange={handleChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+                  isDarkMode 
+                    ? 'bg-gray-600 border-gray-500 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                }`}
                 required
               >
                 <option value="">Selecciona una marca</option>
@@ -341,7 +373,9 @@ const Categorias = ({ onSubmit }) => {
             </div>
 
             <div className="mb-4 md:col-span-2">
-              <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="descripcion" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>
                 Descripción
               </label>
               <textarea
@@ -350,24 +384,40 @@ const Categorias = ({ onSubmit }) => {
                 value={form.descripcion}
                 onChange={handleChange}
                 rows="3"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+                  isDarkMode 
+                    ? 'bg-gray-600 border-gray-500 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                }`}
               />
             </div>
           </div>
 
           {/* Campo unificado para imágenes */}
-          <div className="mb-6 mt-4 p-4 bg-white border border-gray-200 rounded-md">
-            <label htmlFor="imagenes" className="block text-sm font-medium text-gray-700 mb-2">
+          <div className={`mb-6 mt-4 p-4 border rounded-md transition-colors duration-300 ${
+            isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-white border-gray-200'
+          }`}>
+            <label htmlFor="imagenes" className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>
               Imágenes (máximo 5)
             </label>
             <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+              <label className={`flex flex-col w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors duration-300 ${
+                isDarkMode 
+                  ? 'border-gray-500 hover:bg-gray-700' 
+                  : 'border-gray-300 hover:bg-gray-50'
+              }`}>
                 <div className="flex flex-col items-center justify-center pt-7">
                   <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                   </svg>
-                  <p className="pt-1 text-sm text-gray-600">Haz clic para seleccionar</p>
-                  <p className="text-xs text-gray-500">Máximo 5 imágenes (2MB cada una)</p>
+                  <p className={`pt-1 text-sm transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                  }`}>Haz clic para seleccionar</p>
+                  <p className={`text-xs transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`}>Máximo 5 imágenes (2MB cada una)</p>
                 </div>
                 <input
                   type="file"
@@ -384,11 +434,15 @@ const Categorias = ({ onSubmit }) => {
             {/* Vista previa de imágenes */}
             {imagenesPreview.length > 0 && (
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Vistas previas:</p>
+                <p className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>Vistas previas:</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                   {imagenesPreview.map((img, index) => (
                     <div key={img.id} className="relative group">
-                      <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-100 shadow-sm">
+                      <div className={`aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg shadow-sm transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+                      }`}>
                         <img 
                           src={img.preview} 
                           alt={`Vista previa ${index + 1}`} 
@@ -414,9 +468,11 @@ const Categorias = ({ onSubmit }) => {
             <button
               type="submit"
               disabled={loading}
-              className={`px-5 py-2.5 ${
-                loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
-              } text-white font-medium rounded-lg transition-colors shadow-sm flex items-center`}
+              className={`px-5 py-2.5 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center ${
+                loading 
+                  ? (isDarkMode ? 'bg-blue-500' : 'bg-blue-400') 
+                  : (isDarkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-600 hover:bg-blue-700')
+              }`}
             >
               {loading && (
                 <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -431,24 +487,50 @@ const Categorias = ({ onSubmit }) => {
       </div>
 
       <div className="mt-8">
-        <h2 className="text-lg font-bold mb-4 text-gray-700 border-b pb-2">Categorías Existentes</h2>
-        <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <h2 className={`text-lg font-bold mb-4 border-b pb-2 transition-colors duration-300 ${
+          isDarkMode ? 'text-gray-200 border-gray-600' : 'text-gray-700 border-gray-200'
+        }`}>Categorías Existentes</h2>
+        <div className={`overflow-x-auto rounded-lg border shadow-sm transition-colors duration-300 ${
+          isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
+        }`}>
+          <table className={`min-w-full divide-y transition-colors duration-300 ${
+            isDarkMode ? 'divide-gray-600' : 'divide-gray-200'
+          }`}>
+            <thead className={`transition-colors duration-300 ${
+              isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+            }`}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                }`}>ID</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                }`}>Nombre</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                }`}>Descripción</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                }`}>Acciones</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className={`divide-y transition-colors duration-300 ${
+              isDarkMode ? 'bg-gray-800 divide-gray-600' : 'bg-white divide-gray-200'
+            }`}>
               {currentItems.length > 0 ? (
                 currentItems.map((categoria) => (
-                  <tr key={categoria.id_categoria} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{categoria.id_categoria}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{categoria.nombre}</td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                  <tr key={categoria.id_categoria} className={`transition-colors duration-300 ${
+                    isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                  }`}>
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>{categoria.id_categoria}</td>
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium transition-colors duration-300 ${
+                      isDarkMode ? 'text-white' : 'text-gray-900'
+                    }`}>{categoria.nombre}</td>
+                    <td className={`px-6 py-4 text-sm transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
                       <div className="max-w-xs truncate">{categoria.descripcion || '-'}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -461,9 +543,14 @@ const Categorias = ({ onSubmit }) => {
                       <button 
                         onClick={() => handleDeleteCategoria(categoria.id_categoria, categoria.nombre)}
                         disabled={deleteLoading}
-                        className={`${
-                          deleteLoading ? 'bg-red-100 text-red-300' : 'bg-red-50 text-red-600 hover:text-red-900 hover:bg-red-100'
-                        } px-3 py-1 rounded-md transition-colors`}
+                        className={`px-3 py-1 rounded-md transition-colors duration-300 ${
+                          deleteLoading 
+                            ? (isDarkMode ? 'bg-red-900 text-red-400' : 'bg-red-100 text-red-300') 
+                            : (isDarkMode 
+                                ? 'bg-red-900 text-red-300 hover:text-red-200 hover:bg-red-800' 
+                                : 'bg-red-50 text-red-600 hover:text-red-900 hover:bg-red-100'
+                              )
+                        }`}
                       >
                         {deleteLoading ? 'Eliminando...' : 'Eliminar'}
                       </button>
@@ -472,7 +559,9 @@ const Categorias = ({ onSubmit }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="px-6 py-4 text-center text-gray-500">
+                  <td colSpan="4" className={`px-6 py-4 text-center transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`}>
                     No hay categorías disponibles
                   </td>
                 </tr>
@@ -482,15 +571,23 @@ const Categorias = ({ onSubmit }) => {
 
           {/* Paginación */}
           {totalPages > 1 && (
-            <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
+            <div className={`px-6 py-3 flex items-center justify-between border-t transition-colors duration-300 ${
+              isDarkMode ? 'border-gray-600' : 'border-gray-200'
+            }`}>
               <div className="flex-1 flex justify-between sm:hidden">
                 <button
                   onClick={() => paginate(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md transition-colors duration-300 ${
                     currentPage === 1
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                      ? (isDarkMode 
+                          ? 'bg-gray-700 border-gray-600 text-gray-500 cursor-not-allowed' 
+                          : 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
+                        )
+                      : (isDarkMode 
+                          ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700' 
+                          : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                        )
                   }`}
                 >
                   Anterior
@@ -498,10 +595,16 @@ const Categorias = ({ onSubmit }) => {
                 <button
                   onClick={() => paginate(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                  className={`ml-3 relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md transition-colors duration-300 ${
                     currentPage === totalPages
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                      ? (isDarkMode 
+                          ? 'bg-gray-700 border-gray-600 text-gray-500 cursor-not-allowed' 
+                          : 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'
+                        )
+                      : (isDarkMode 
+                          ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700' 
+                          : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                        )
                   }`}
                 >
                   Siguiente
@@ -513,10 +616,16 @@ const Categorias = ({ onSubmit }) => {
                   <button
                     onClick={() => paginate(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                    className={`relative inline-flex items-center px-2 py-2 rounded-l-md border text-sm font-medium transition-colors duration-300 ${
                       currentPage === 1
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : 'text-gray-500 hover:bg-gray-50'
+                        ? (isDarkMode 
+                            ? 'bg-gray-800 border-gray-600 text-gray-600 cursor-not-allowed' 
+                            : 'bg-white border-gray-300 text-gray-300 cursor-not-allowed'
+                          )
+                        : (isDarkMode 
+                            ? 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700' 
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                          )
                     }`}
                   >
                     <span className="sr-only">Anterior</span>
@@ -528,17 +637,27 @@ const Categorias = ({ onSubmit }) => {
                   {/* Page Number Buttons */}
                   {getPageNumbers().map((page, index) => (
                     page === '...' ? (
-                      <span key={`ellipsis-${index}`} className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                      <span key={`ellipsis-${index}`} className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors duration-300 ${
+                        isDarkMode 
+                          ? 'bg-gray-800 border-gray-600 text-gray-300' 
+                          : 'bg-white border-gray-300 text-gray-700'
+                      }`}>
                         ...
                       </span>
                     ) : (
                       <button
                         key={page}
                         onClick={() => paginate(page)}
-                        className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium ${
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors duration-300 ${
                           currentPage === page
-                            ? 'z-10 bg-indigo-500 border-indigo-500 text-indigo-600'
-                            : 'bg-white text-gray-700 hover:bg-gray-50'
+                            ? (isDarkMode 
+                                ? 'z-10 bg-indigo-600 border-indigo-600 text-white' 
+                                : 'z-10 bg-indigo-500 border-indigo-500 text-indigo-600'
+                              )
+                            : (isDarkMode 
+                                ? 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700' 
+                                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                              )
                         }`}
                       >
                         {page}
@@ -550,10 +669,16 @@ const Categorias = ({ onSubmit }) => {
                   <button
                     onClick={() => paginate(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                    className={`relative inline-flex items-center px-2 py-2 rounded-r-md border text-sm font-medium transition-colors duration-300 ${
                       currentPage === totalPages
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : 'text-gray-500 hover:bg-gray-50'
+                        ? (isDarkMode 
+                            ? 'bg-gray-800 border-gray-600 text-gray-600 cursor-not-allowed' 
+                            : 'bg-white border-gray-300 text-gray-300 cursor-not-allowed'
+                          )
+                        : (isDarkMode 
+                            ? 'bg-gray-800 border-gray-600 text-gray-400 hover:bg-gray-700' 
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                          )
                     }`}
                   >
                     <span className="sr-only">Siguiente</span>

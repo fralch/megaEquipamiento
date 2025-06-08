@@ -2,8 +2,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "@inertiajs/react";
 import axios from 'axios';
+import { useTheme } from '../../storage/ThemeContext';
 
 const BrandCard = ({ brand }) => {
+  const { isDarkMode } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -62,9 +64,13 @@ const BrandCard = ({ brand }) => {
   return (
     <div
       ref={cardRef}
-      className="relative flex flex-col items-center text-center p-4 group"
+      className={`relative flex flex-col items-center text-center p-4 group transition-colors duration-300 ${
+        isDarkMode ? 'text-white' : 'text-gray-900'
+      }`}
     >
-      <div className="w-36 h-36 flex items-center justify-center rounded-full border-2 border-blue-500 overflow-hidden">
+      <div className={`w-36 h-36 flex items-center justify-center rounded-full border-2 overflow-hidden transition-colors duration-300 bg-white ${
+          isDarkMode ? 'border-blue-400' : 'border-blue-500'
+        }`}>
       
         {/* Imagen que solo carga cuando es visible */}
         {isVisible && (
@@ -79,14 +85,20 @@ const BrandCard = ({ brand }) => {
       </div>
 
       {/* Name */}
-      <h2 className="mt-4 text-lg font-semibold">
+      <h2 className={`mt-4 text-lg font-semibold transition-colors duration-300 ${
+        isDarkMode ? 'text-white' : 'text-gray-900'
+      }`}>
         {brand.name}
       </h2>
 
       {/* Button */}
       <Link 
         href="#" 
-        className={`mt-2 ${isSearching ? 'bg-gray-400 cursor-wait' : 'bg-green-500 hover:bg-green-600'} text-white px-4 py-2 rounded flex items-center justify-center`}
+        className={`mt-2 transition-colors duration-300 text-white px-4 py-2 rounded flex items-center justify-center ${
+          isSearching 
+            ? (isDarkMode ? 'bg-gray-600 cursor-wait' : 'bg-gray-400 cursor-wait')
+            : (isDarkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600')
+        }`}
         onClick={(e) => {
           if (isSearching) return; // Evitar múltiples clics mientras busca
           
@@ -125,6 +137,7 @@ const BrandCard = ({ brand }) => {
 };
 
 const BrandSection = () => {
+  const { isDarkMode } = useTheme();
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef(null);
@@ -195,13 +208,19 @@ const BrandSection = () => {
   }, []);
 
   return (
-    <div className="p-8 bg-white" id="marcas" ref={sectionRef}>
-      <h2 className="text-2xl font-bold mb-8 text-center">Marcas</h2>
+    <div className={`p-8 transition-colors duration-300 ${
+      isDarkMode ? 'bg-gray-900' : 'bg-white'
+    }`} id="marcas" ref={sectionRef}>
+      <h2 className={`text-2xl font-bold mb-8 text-center transition-colors duration-300 ${
+        isDarkMode ? 'text-white' : 'text-gray-900'
+      }`}>Marcas</h2>
       
       {loading ? (
         // Indicador de carga
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <div className={`animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 transition-colors duration-300 ${
+            isDarkMode ? 'border-blue-400' : 'border-blue-500'
+          }`}></div>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
