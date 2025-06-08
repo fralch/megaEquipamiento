@@ -499,13 +499,33 @@ const Productos = ({ onSubmit }) => {
   const saveModalData = (data) => {
     try {
       const jsonValue = typeof data === 'string' ? JSON.parse(data) : data;
-      setForm(prev => ({ 
-        ...prev, 
-        [modalType]: { 
-          ...prev[modalType], // Mantiene los datos existentes
-          ...jsonValue         // Agrega los nuevos datos
-        } 
-      }));
+      setForm(prev => {
+        const updatedForm = { 
+          ...prev, 
+          [modalType]: { 
+            ...prev[modalType], // Mantiene los datos existentes
+            ...jsonValue         // Agrega los nuevos datos
+          } 
+        };
+        
+        // Si se están guardando datos técnicos, tomar los primeros 4 y asignarlos a características
+        if (modalType === 'datos_tecnicos') {
+          const datosTecnicos = updatedForm.datos_tecnicos;
+          const keys = Object.keys(datosTecnicos);
+          const primerosCuatro = {};
+          
+          // Tomar solo los primeros 4 elementos
+          for (let i = 0; i < Math.min(4, keys.length); i++) {
+            const key = keys[i];
+            primerosCuatro[key] = datosTecnicos[key];
+          }
+          
+          // Asignar los primeros 4 datos técnicos a características
+          updatedForm.caracteristicas = primerosCuatro;
+        }
+        
+        return updatedForm;
+      });
     } catch (error) {
       console.error('Error saving modal data:', error);
       setForm(prev => ({ ...prev, [modalType]: {} }));
@@ -535,12 +555,27 @@ const Productos = ({ onSubmit }) => {
 
       case 'tab2': // Características
         return (
-          <FeaturesButton
-          label="Características"
-          value={form.caracteristicas}
-          onClick={() => toggleModal('caracteristicas')}
-          onRemoveItem={(key) => handleRemoveFeatureItem('caracteristicas', key)}
-        />
+          <div className="mb-4 w-full">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Características</label>
+            <div className="p-4 border border-gray-300 rounded-md bg-gray-50">
+              <p className="text-sm text-gray-600 mb-3 italic">
+                Las características se generan automáticamente tomando los primeros 4 elementos de los Datos Técnicos.
+              </p>
+              {Object.keys(form.caracteristicas || {}).length === 0 ? (
+                <p className="text-gray-500">No hay características. Agregue datos técnicos para generar características automáticamente.</p>
+              ) : (
+                <div className="max-h-60 overflow-y-auto">
+                  <ul className="list-disc pl-5">
+                    {Object.entries(form.caracteristicas).map(([key, val]) => (
+                      <li key={key} className="mb-1">
+                        <span className="font-medium">{key}:</span> {val}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
         );
 
       case 'tab3': // Datos Técnicos
