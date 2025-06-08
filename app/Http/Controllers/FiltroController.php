@@ -318,8 +318,7 @@ class FiltroController extends Controller
                             if ($opcion) {
                                 $query->where(function($q) use ($opcion) {
                                     $q->where('caracteristicas', 'LIKE', '%' . $opcion->valor . '%')
-                                      ->orWhere('datos_tecnicos', 'LIKE', '%' . $opcion->valor . '%')
-                                      ->orWhere('especificaciones_tecnicas', 'LIKE', '%' . $opcion->valor . '%');
+                                      ->orWhere('datos_tecnicos', 'LIKE', '%' . $opcion->valor . '%');
                                 });
                             }
                         }
