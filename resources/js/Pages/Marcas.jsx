@@ -12,9 +12,8 @@ const URL_API = import.meta.env.VITE_API_URL;
 export default function Marcas({ productos }) {
     const { isDarkMode } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
-    const [categoriasArray, setCategoriasArray] = useState([]);
-    const [openCategories, setOpenCategories] = useState({});
-    const [activeCategory, setActiveCategory] = useState(null);
+    const [marcasArray, setMarcasArray] = useState([]);
+    const [activeMarca, setActiveMarca] = useState(null);
     const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
     const [categoriaNombre, setCategoriaNombre] = useState("");
     const [categoriaId, setCategoriaId] = useState("");
@@ -22,48 +21,25 @@ export default function Marcas({ productos }) {
     const [mostrarTodosLosProductos, setMostrarTodosLosProductos] = useState(false);
 
     useEffect(() => {
-        // Cargar categorías desde localStorage o desde la API
-        const storedData = localStorage.getItem('categoriasCompleta');
-        if (storedData) {
-            setCategoriasArray(JSON.parse(storedData));
-        } else {
-            fetch(URL_API + "/categorias-completa")
-                .then((response) => response.json())
-                .then((data) => {
-                    setCategoriasArray(data);
-                    localStorage.setItem('categoriasCompleta', JSON.stringify(data));
-                })
-                .catch((error) => console.error('Error fetching data:', error));
-        }
-
-        // Obtener el ID de la subcategoría desde la URL
-        const urlParts = window.location.pathname.split('/');
-        const subcategoriaId = urlParts[urlParts.length - 1];
-        console.log(productos);
-
-        // Hacer una solicitud a la API para obtener los datos de la subcategoría
-        fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`)
+        // Cargar marcas desde la API
+        fetch(URL_API + "/marca/all")
             .then((response) => response.json())
             .then((data) => {
-                setSubcategoriaNombre(data.nombre);
-                // Obtener el nombre de la categoría
-                fetch(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`)
-                    .then((response) => response.json())
-                    .then((data) => {
-                        setCategoriaNombre(data.nombre_categoria);
-                        setCategoriaId(data.id_categoria);
-                    })
-                    .catch((error) => console.error('Error fetching categoria data:', error));
+                // Ordenar las marcas alfabéticamente por nombre
+                const marcasOrdenadas = data.sort((a, b) => 
+                    a.nombre.toLowerCase().localeCompare(b.nombre.toLowerCase())
+                );
+                setMarcasArray(marcasOrdenadas);
             })
-            .catch((error) => console.error('Error fetching subcategoria data:', error));
+            .catch((error) => console.error('Error fetching marcas:', error));
+
+        console.log(productos);
     }, []);
 
-    const toggleCategory = (categoriaNombre) => {
-        setOpenCategories((prevState) => ({
-            ...prevState,
-            [categoriaNombre]: !prevState[categoriaNombre],
-        }));
-        setActiveCategory(categoriaNombre);
+    const handleMarcaClick = (marcaId, marcaNombre) => {
+        setActiveMarca(marcaNombre);
+        // Aquí puedes agregar lógica para navegar a la página de la marca específica
+        window.location.href = `/marcas/${marcaId}`;
     };
 
     const toggleMenu = () => {
@@ -86,38 +62,41 @@ export default function Marcas({ productos }) {
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
             <div className={`min-w-screen min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'} flex transition-colors duration-200`}>
                 <nav className={`w-1/6 p-4 overflow-y-auto ${isDarkMode ? 'bg-gray-800' : 'bg-white'} transition-colors duration-200`} id="nav-fijo">
-                    {categoriasArray.map((categoria) => (
-                        <div key={categoria.id_categoria}>
+                    <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>
+                        Marcas
+                    </h3>
+                    {marcasArray.map((marca) => (
+                        <div key={marca.id_marca} className="mb-2">
                             <button
-                                onClick={() => toggleCategory(categoria.nombre)}
-                                className={`block w-full text-left p-2 rounded transition-colors duration-200 ${
-                                    activeCategory === categoria.nombre
-                                        ? 'bg-[#184f96] text-blue-200'
+                                onClick={() => handleMarcaClick(marca.id_marca, marca.nombre)}
+                                className={`block w-full text-left p-3 rounded-lg transition-all duration-200 ${
+                                    activeMarca === marca.nombre
+                                        ? 'bg-[#184f96] text-white shadow-md'
                                         : isDarkMode 
-                                            ? 'bg-gray-700 text-white hover:bg-gray-600'
-                                            : 'bg-gray-200 text-gray-900 hover:bg-white'
-                                }`}
+                                            ? 'bg-gray-700 text-white hover:bg-gray-600 hover:shadow-sm'
+                                            : 'bg-gray-100 text-gray-900 hover:bg-white hover:shadow-sm'
+                                } transform hover:scale-105`}
                             >
-                                {categoria.nombre}
-                                <span className="float-right">
-                                    {openCategories[categoria.nombre] ? '-' : '+'}
-                                </span>
+                                <div>
+                                    <div className="font-medium">
+                                        {marca.nombre.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim()}
+                                    </div>
+                                    {marca.descripcion && (
+                                        <div className={`text-xs mt-1 ${
+                                            activeMarca === marca.nombre
+                                                ? 'text-blue-100'
+                                                : isDarkMode 
+                                                    ? 'text-gray-400'
+                                                    : 'text-gray-600'
+                                        }`}>
+                                            {marca.descripcion.length > 30 
+                                                ? marca.descripcion.substring(0, 30) + '...'
+                                                : marca.descripcion
+                                            }
+                                        </div>
+                                    )}
+                                </div>
                             </button>
-                            {openCategories[categoria.nombre] &&
-                                categoria.subcategorias &&
-                                categoria.subcategorias.map((subcategoria) => (
-                                    <Link
-                                        key={subcategoria.id_subcategoria}
-                                        href={`/subcategoria/${subcategoria.id_subcategoria}`}
-                                        className={`block p-2 pl-6 rounded transition-colors duration-200 ${
-                                            isDarkMode 
-                                                ? 'bg-gray-700 text-white hover:bg-gray-600'
-                                                : 'bg-blue-50 text-gray-900 hover:bg-blue-100'
-                                        }`}
-                                    >
-                                        {subcategoria.nombre}
-                                    </Link>
-                                ))}
                         </div>
                     ))}
                 </nav>
