@@ -21,16 +21,36 @@ class ProductoController extends Controller
      }
 
      /* vista de subcategoria */
-     public function subCategoriaView(Request $request, $subcategoria_id)
+     public function subCategoriaView(Request $request, $subcategoria_id, $marca_id = null)
     {
-        // Obtener el ID de la subcategoría desde la solicitud
-        $id = $request->id;
+        // Usar el ID de la subcategoría desde el parámetro de la ruta
+        $id = $subcategoria_id;
+        
+        // El ID de la marca viene como parámetro opcional de la ruta
+        // $marca_id ya está disponible como parámetro de la función
     
-        // Obtener los productos de la subcategoría y cargar la relación 'marca'
-        $productos = Producto::with('marca')->where('id_subcategoria', $id)->get();
+        // Construir la consulta base para productos de la subcategoría
+        $query = Producto::with('marca')->where('id_subcategoria', $id);
+        
+        // Si se proporciona un ID de marca, agregar el filtro
+        if ($marca_id) {
+            $query->where('marca_id', $marca_id);
+        }
+        
+        // Ejecutar la consulta
+        $productos = $query->get();
     
         // Renderizar la vista con Inertia y pasar los productos
-        return Inertia::render('Subcategorias', compact('productos'));
+        if ($marca_id) {
+            // Si hay marca_id, renderizar Subcategorias-marcas y pasar el marcaId
+            return Inertia::render('Subcategorias-marcas', [
+                'productos' => $productos,
+                'marcaId' => $marca_id
+            ]);
+        } else {
+            // Si no hay marca_id, renderizar la vista normal
+            return Inertia::render('Subcategorias', compact('productos'));
+        }
     }
 
     /* Vista de productos por marca view */
