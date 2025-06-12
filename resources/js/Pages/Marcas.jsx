@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import { useTheme } from "../storage/ThemeContext";
 import Header from "../Components/home/Header";
@@ -84,15 +84,17 @@ export default function Marcas({ productos }) {
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
             <div className={`min-w-screen min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'} flex transition-colors duration-200`}>
-                <nav className="w-1/6 p-4 overflow-y-auto bg-white" id="nav-fijo">
+                <nav className={`w-1/6 p-4 overflow-y-auto ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-md transition-colors duration-200`} id="nav-fijo">
                     {categoriasArray.map((categoria) => (
                         <div key={categoria.id_categoria}>
                             <button
                                 onClick={() => toggleCategory(categoria.nombre)}
-                                className={`block w-full text-left p-2 rounded ${
+                                className={`block w-full text-left p-2 rounded transition-colors duration-200 ${
                                     activeCategory === categoria.nombre
                                         ? 'bg-[#184f96] text-blue-200'
-                                        : 'bg-gray-200 hover:bg-white'
+                                        : isDarkMode 
+                                            ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+                                            : 'bg-gray-200 hover:bg-white text-gray-900'
                                 }`}
                             >
                                 {categoria.nombre}
@@ -115,7 +117,11 @@ export default function Marcas({ productos }) {
                                         <Link
                                             key={subcategoria.id_subcategoria}
                                             href={href}
-                                            className="block p-2 pl-6 hover:bg-blue-100 bg-blue-50 rounded"
+                                            className={`block p-2 pl-6 rounded transition-colors duration-200 ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-600 hover:bg-gray-500 text-gray-200' 
+                                                    : 'bg-blue-50 hover:bg-blue-100 text-gray-900'
+                                            }`}
                                         >
                                             {subcategoria.nombre}
                                         </Link>
