@@ -312,9 +312,7 @@ class FiltroController extends Controller
                                     // Buscar en campos JSON como características, datos_técnicos, etc.
                                     $opcion = OpcionFiltro::find($opcionId);
                                     if ($opcion) {
-                                        $q->orWhere('caracteristicas', 'LIKE', '%' . $opcion->valor . '%')
-                                          ->orWhere('datos_tecnicos', 'LIKE', '%' . $opcion->valor . '%')
-                                          ->orWhere('especificaciones_tecnicas', 'LIKE', '%' . $opcion->valor . '%');
+                                        $q->orWhere('caracteristicas', 'LIKE', '%' . $opcion->valor . '%');
                                     }
                                 }
                             });
