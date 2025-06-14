@@ -37,7 +37,7 @@ export default function Subcategoria({ productos: productosIniciales }) {
         unidad: '',
         descripcion: '',
         orden: 0,
-        obligatorio: false,
+        obligatorio: true,
         opciones: []
     });
 
@@ -92,7 +92,7 @@ export default function Subcategoria({ productos: productosIniciales }) {
             unidad: filtro.unidad || '',
             descripcion: filtro.descripcion || '',
             orden: filtro.orden,
-            obligatorio: filtro.obligatorio,
+            obligatorio: true,
             opciones: filtro.opciones && filtro.opciones.length > 0 ? filtro.opciones : []
         });
         setMostrarFormularioFiltro(true);
@@ -148,7 +148,7 @@ export default function Subcategoria({ productos: productosIniciales }) {
             unidad: '',
             descripcion: '',
             orden: 0,
-            obligatorio: false,
+            obligatorio: true,
             opciones: []
         });
     };

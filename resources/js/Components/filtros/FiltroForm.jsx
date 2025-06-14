@@ -55,32 +55,8 @@ export default function FiltroForm({ nuevoFiltro, setNuevoFiltro, filtroEnEdicio
                         />
                     </div>
                 )}
-                <div>
-                    <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Descripción</label>
-                    <textarea
-                        value={nuevoFiltro.descripcion}
-                        onChange={(e) => setNuevoFiltro({...nuevoFiltro, descripcion: e.target.value})}
-                        className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50 transition-colors duration-200 ${
-                            isDarkMode 
-                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                                : 'bg-white border-gray-300 text-gray-900'
-                        }`}
-                        rows="3"
-                    />
-                </div>
-                <div className="flex items-center">
-                    <input
-                        type="checkbox"
-                        checked={nuevoFiltro.obligatorio}
-                        onChange={(e) => setNuevoFiltro({...nuevoFiltro, obligatorio: e.target.checked})}
-                        className={`rounded shadow-sm text-[#184f96] focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50 transition-colors duration-200 ${
-                            isDarkMode 
-                                ? 'border-gray-600 bg-gray-700' 
-                                : 'border-gray-300 bg-white'
-                        }`}
-                    />
-                    <label className={`ml-2 block text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Obligatorio</label>
-                </div>
+
+
                 {['select', 'checkbox', 'radio'].includes(nuevoFiltro.tipo_input) && (
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
@@ -90,8 +66,8 @@ export default function FiltroForm({ nuevoFiltro, setNuevoFiltro, filtroEnEdicio
                                 onClick={agregarOpcion}
                                 className={`text-sm px-3 py-1 rounded transition-colors duration-200 ${
                                     isDarkMode 
-                                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white' 
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:text-blue-500'
                                 }`}
                             >
                                 + Agregar Opción
@@ -108,27 +84,23 @@ export default function FiltroForm({ nuevoFiltro, setNuevoFiltro, filtroEnEdicio
                                     <input
                                         type="text"
                                         value={opcion.valor || ''}
-                                        onChange={(e) => actualizarOpcion(index, 'valor', e.target.value)}
+                                        onChange={(e) => {
+                                            const valor = e.target.value;
+                                            // Actualizar tanto valor como etiqueta con el mismo contenido en una sola operación
+                                            const nuevasOpciones = [...nuevoFiltro.opciones];
+                                            nuevasOpciones[index] = {
+                                                ...nuevasOpciones[index],
+                                                valor: valor,
+                                                etiqueta: valor
+                                            };
+                                            setNuevoFiltro({...nuevoFiltro, opciones: nuevasOpciones});
+                                        }}
                                         className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50 transition-colors duration-200 ${
                                             isDarkMode 
                                                 ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                                                 : 'bg-white border-gray-300 text-gray-900'
                                         }`}
-                                        placeholder="Valor"
-                                        required
-                                    />
-                                </div>
-                                <div className="flex-1">
-                                    <input
-                                        type="text"
-                                        value={opcion.etiqueta || ''}
-                                        onChange={(e) => actualizarOpcion(index, 'etiqueta', e.target.value)}
-                                        className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50 transition-colors duration-200 ${
-                                            isDarkMode 
-                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                                                : 'bg-white border-gray-300 text-gray-900'
-                                        }`}
-                                        placeholder="Etiqueta"
+                                        placeholder="Valor/Etiqueta"
                                         required
                                     />
                                 </div>
