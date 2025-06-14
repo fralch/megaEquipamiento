@@ -424,7 +424,7 @@ const Card = React.memo(({ product }) => {
     setImageLoaded(true);
   }, []);
 
-  // Renderizar entradas del summary de forma optimizada
+  // Renderizar entradas del summary de forma optimizada los 4 primeros
   const summaryEntries = useMemo(() => {
     if (!product.summary || typeof product.summary !== 'object') return [];
     return Object.entries(product.summary).slice(0, 4);
@@ -559,17 +559,17 @@ const Card = React.memo(({ product }) => {
           
           {/* Contenedor con scroll */}
           <div className="flex-grow overflow-y-auto mb-4 pr-2 custom-scrollbar">
-            {/* Datos técnicos */}
-            {technicalDataEntries.length > 0 && (
+            {/* product.summary */}
+            {product.summary && Object.keys(product.summary).length > 0 && (
               <div className="mb-4">
                 <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
                   isDarkMode ? 'text-blue-300' : 'text-blue-300'
-                }`}>Datos Técnicos</h3>
+                }`}>Características</h3>
                 <div className={`text-sm space-y-2 transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-300'
                 }`}>
-                  {technicalDataEntries.map(([key, value], index) => (
-                    <p key={`tech-${key}-${index}`}>
+                  {Object.entries(product.summary).map(([key, value], index) => (
+                    <p key={`summary-${key}-${index}`}>
                       <strong>{key}:</strong> {value}
                     </p>
                   ))}
