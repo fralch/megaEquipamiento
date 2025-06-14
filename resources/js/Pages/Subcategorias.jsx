@@ -66,7 +66,7 @@ export default function Subcategoria({ productos: productosIniciales }) {
                 },
                 body: JSON.stringify(filtroData)
             });
-    
+            console.log(await response.json());
             if (response.ok) {
                 const nuevoFiltroCreado = await response.json();
                 setFiltros([...filtros, nuevoFiltroCreado]);
