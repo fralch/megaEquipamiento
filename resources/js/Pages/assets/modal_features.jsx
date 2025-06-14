@@ -38,7 +38,7 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
       <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div className="mt-3 text-center">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
-            {type === 'caracteristicas' ? 'Características' : 'Datos Técnicos'}
+            Características
           </h3>
           <div className="mt-2 px-7 py-3">
             <input

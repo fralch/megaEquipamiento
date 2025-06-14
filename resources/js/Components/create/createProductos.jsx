@@ -21,7 +21,7 @@ const initialForm = {
   envio: "",
   soporte_tecnico: "",
   caracteristicas: {},
-  datos_tecnicos: {},
+
   especificaciones_tecnicas: "",
   archivos_adicionales: "",
 };
@@ -61,7 +61,7 @@ const tableStyles = {
 const tabs = [
   { id: 'tab1', label: 'Descripción' },
   { id: 'tab2', label: 'Características' },
-  { id: 'tab3', label: 'Datos Técnicos' },
+
   { id: 'tab4', label: 'Especificaciones Técnicas' },
   { id: 'tab5', label: 'Documentos/Descargas' },
   { id: 'tab6', label: 'Contenido de Envío' },
@@ -460,7 +460,7 @@ const Productos = ({ onSubmit }) => {
     Object.entries(form).forEach(([key, value]) => {
       if (key === 'imagen' && value) {
         formData.append(key, value);
-      } else if ((key === 'caracteristicas' || key === 'datos_tecnicos') && value) {
+      } else if (key === 'caracteristicas' && value) {
         formData.append(key, JSON.stringify(value));
       } else if (value !== null && value !== undefined) {
         formData.append(key, value);
@@ -508,21 +508,7 @@ const Productos = ({ onSubmit }) => {
           } 
         };
         
-        // Si se están guardando datos técnicos, tomar los primeros 4 y asignarlos a características
-        if (modalType === 'datos_tecnicos') {
-          const datosTecnicos = updatedForm.datos_tecnicos;
-          const keys = Object.keys(datosTecnicos);
-          const primerosCuatro = {};
-          
-          // Tomar solo los primeros 4 elementos
-          for (let i = 0; i < Math.min(4, keys.length); i++) {
-            const key = keys[i];
-            primerosCuatro[key] = datosTecnicos[key];
-          }
-          
-          // Asignar los primeros 4 datos técnicos a características
-          updatedForm.caracteristicas = primerosCuatro;
-        }
+
         
         return updatedForm;
       });
@@ -558,11 +544,8 @@ const Productos = ({ onSubmit }) => {
           <div className="mb-4 w-full">
             <label className="block text-sm font-medium text-gray-700 mb-2">Características</label>
             <div className="p-4 border border-gray-300 rounded-md bg-gray-50">
-              <p className="text-sm text-gray-600 mb-3 italic">
-                Las características se generan automáticamente tomando los primeros 4 elementos de los Datos Técnicos.
-              </p>
               {Object.keys(form.caracteristicas || {}).length === 0 ? (
-                <p className="text-gray-500">No hay características. Agregue datos técnicos para generar características automáticamente.</p>
+                <p className="text-gray-500">No hay características definidas.</p>
               ) : (
                 <div className="max-h-60 overflow-y-auto">
                   <ul className="list-disc pl-5">
@@ -574,18 +557,18 @@ const Productos = ({ onSubmit }) => {
                   </ul>
                 </div>
               )}
+              <button
+                type="button"
+                onClick={() => toggleModal('caracteristicas')}
+                className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+              >
+                Agregar Características
+              </button>
             </div>
           </div>
         );
 
-      case 'tab3': // Datos Técnicos
-        return (
-          <FeaturesButton
-            label="Datos Técnicos"
-            value={form.datos_tecnicos}
-            onClick={() => toggleModal('datos_tecnicos')}
-          />
-        );
+
 
       case 'tab4': // Especificaciones Técnicas
         return (

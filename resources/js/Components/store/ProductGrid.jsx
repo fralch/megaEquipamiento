@@ -29,7 +29,7 @@ const ProductGrid = ({ products: initialProducts }) => {
       sku: item.sku || '',
       title: item.nombre || 'Sin título',
       summary: item.caracteristicas || {},
-      technicalData: item.datos_tecnicos || {},
+
       origin: item.pais || '',
       price: parseFloat(item.precio_igv || 0),
       priceWithoutProfit: parseFloat(item.precio_sin_ganancia || 0),

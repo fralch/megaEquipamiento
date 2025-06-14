@@ -12,7 +12,7 @@ import axios from "axios";
 // Importar componentes modulares
 import ProductDescription from "../Components/product/ProductDescription";
 import ProductFeatures from "../Components/product/ProductFeatures";
-import ProductTechnicalData from "../Components/product/ProductTechnicalData";
+
 import ProductSpecifications from "../Components/product/ProductSpecifications";
 import ProductDocuments from "../Components/product/ProductDocuments";
 import ProductTabs from "../Components/product/ProductTabs";
@@ -58,7 +58,7 @@ const ProductPage = ({ producto }) => {
     const [productData, setProductData] = useState({
         ...producto,
         caracteristicas: typeof producto.caracteristicas === 'string' ? JSON.parse(producto.caracteristicas) : producto.caracteristicas || {},
-        datos_tecnicos: typeof producto.datos_tecnicos === 'string' ? JSON.parse(producto.datos_tecnicos) : producto.datos_tecnicos || {},
+
         descripcion: producto.descripcion || '',
         archivos_adicionales: producto.archivos_adicionales || '',
         envio: producto.envio || '',
@@ -158,12 +158,7 @@ const ProductPage = ({ producto }) => {
                     caracteristicas: parsedData
                 }));
                 console.log("caracteristicas", parsedData);
-            } else if (modalType === 'datos_tecnicos') {
-                setProductData(prevData => ({
-                    ...prevData,
-                    datos_tecnicos: parsedData
-                }));
-                console.log("datos_tecnicos", parsedData);
+
             }
 
             try {
@@ -214,7 +209,7 @@ const ProductPage = ({ producto }) => {
     const tabs = [
         { id: 'descripcion', label: 'Descripción' },
         { id: 'caracteristicas', label: 'Características' },
-        { id: 'datos', label: 'Datos Técnicos' },
+
         { id: 'especificaciones', label: 'Especificaciones Técnicas' },
         { id: 'archivos_adicionales', label: 'Documentos/Descargas' },
         { id: 'envio', label: 'Contenido de Envío' },
@@ -419,13 +414,7 @@ const ProductPage = ({ producto }) => {
                         handleOpenModal={handleOpenModal}
                     />
                 );
-            case 'datos':
-                return (
-                    <ProductTechnicalData
-                        technicalData={productData.datos_tecnicos}
-                        handleOpenModal={handleOpenModal}
-                    />
-                );
+
             case 'especificaciones':
                 return (
                     <div className="p-4">
@@ -770,9 +759,7 @@ const ProductPage = ({ producto }) => {
                     type={modalType}
                     onSave={handleSaveFeatures}
                     onClose={handleCloseModal}
-                    initialData={modalType === 'caracteristicas'
-                        ? productData.caracteristicas
-                        : productData.datos_tecnicos}
+                    initialData={productData.caracteristicas}
                 />
             )}
 

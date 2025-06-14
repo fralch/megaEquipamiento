@@ -34,7 +34,7 @@ class Producto extends Model
         'envio',
         'soporte_tecnico',
         'caracteristicas',
-        'datos_tecnicos',
+
         'especificaciones_tecnicas',
         'archivos_adicionales', // Cambiado de 'documentos' a 'archivos_adicionales'
     ];
@@ -54,7 +54,7 @@ class Producto extends Model
     // Definir los campos que deben ser convertidos a arrays
     protected $casts = [
         'caracteristicas' => 'array',
-        'datos_tecnicos' => 'array',
+
         'archivos_adicionales' => 'array', // Cambiado de 'documentos' a 'archivos_adicionales'
     ];
 

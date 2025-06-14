@@ -86,7 +86,7 @@ class ProductoController extends Controller
             'envio' => 'nullable|string|max:100',
             'soporte_tecnico' => 'nullable|string',
             'caracteristicas' => 'nullable|json',
-            'datos_tecnicos' => 'nullable|json',
+
             "especificaciones_tecnicas" => 'nullable|string|json', 
             'archivos_adicionales' => 'nullable|string',
         ]);
@@ -105,15 +105,14 @@ class ProductoController extends Controller
             }
         }
     
-        // Convertir caracteristicas y datos_tecnicos a arrays si son strings JSON
+        // Convertir caracteristicas a array si es string JSON
         $caracteristicas = is_string($request->caracteristicas) ? json_decode($request->caracteristicas, true) : $request->caracteristicas;
-        $datos_tecnicos = is_string($request->datos_tecnicos) ? json_decode($request->datos_tecnicos, true) : $request->datos_tecnicos;
     
         // Crear el producto
         $producto = Producto::create(array_merge($request->except('imagen'), [
             'imagen' => $imagePath,
             'caracteristicas' => $caracteristicas,
-            'datos_tecnicos' => $datos_tecnicos,
+
         ]));
     
         return response()->json($producto);

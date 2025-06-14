@@ -325,10 +325,7 @@ class FiltroController extends Controller
                         if (!empty($valorSeleccionado)) {
                             $opcion = OpcionFiltro::find($valorSeleccionado);
                             if ($opcion) {
-                                $query->where(function($q) use ($opcion) {
-                                    $q->where('caracteristicas', 'LIKE', '%' . $opcion->valor . '%')
-                                      ->orWhere('datos_tecnicos', 'LIKE', '%' . $opcion->valor . '%');
-                                });
+                                $query->where('caracteristicas', 'LIKE', '%' . $opcion->valor . '%');
                             }
                         }
                         break;
