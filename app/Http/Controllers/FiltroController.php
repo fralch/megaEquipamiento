@@ -29,43 +29,44 @@ class FiltroController extends Controller
     // Método para crear un nuevo filtro
     public function store(Request $request)
     {
-        // Valida los datos de entrada
-        $request->validate([
-            'nombre' => 'required|string|max:100',
-            'tipo_input' => 'required|in:range,checkbox,select,radio',
-            'unidad' => 'nullable|string|max:20',
-            'descripcion' => 'nullable|string',
-            'orden' => 'integer',
-            'obligatorio' => 'boolean',
-            // Cambiar esta línea:
-            'opciones' => 'required_if:tipo_input,checkbox,select,radio|array|min:1',
-            'opciones.*.valor' => 'required_with:opciones|string|max:100',
-            'opciones.*.etiqueta' => 'required_with:opciones|string|max:100',
-            'opciones.*.color' => 'nullable|string|max:7',
-            'opciones.*.orden' => 'nullable|integer',
-            'subcategorias' => 'array',
-            'subcategorias.*' => 'exists:subcategorias,id_subcategoria'
-        ]);
-
         try {
-            // Inicia una transacción de base de datos
-            DB::beginTransaction();
-
-            // Crea un nuevo filtro con los datos proporcionados
-            $filtro = Filtro::create([
-                'nombre' => $request->nombre,
-                'slug' => Str::slug($request->nombre), // Genera un slug a partir del nombre
-                'tipo_input' => $request->tipo_input,
-                'unidad' => $request->unidad,
-                'descripcion' => $request->descripcion,
-                'orden' => $request->orden ?? 0, // Usa 0 si no se proporciona un valor
-                'obligatorio' => $request->obligatorio ?? false // Usa false si no se proporciona un valor
+            // Log de los datos recibidos para debug
+            \Log::info('Datos recibidos en store filtro:', $request->all());
+            
+            // Valida los datos de entrada
+            $validatedData = $request->validate([
+                'nombre' => 'required|string|max:100',
+                'tipo_input' => 'required|in:range,checkbox,select,radio',
+                'unidad' => 'nullable|string|max:20',
+                'descripcion' => 'nullable|string',
+                'orden' => 'integer',
+                'obligatorio' => 'boolean',
+                'opciones' => 'required_if:tipo_input,checkbox,select,radio|array|min:1',
+                'opciones.*.valor' => 'required_with:opciones|string|max:100',
+                'opciones.*.etiqueta' => 'required_with:opciones|string|max:100',
+                'opciones.*.color' => 'nullable|string|max:7',
+                'opciones.*.orden' => 'nullable|integer',
+                'subcategorias' => 'array',
+                'subcategorias.*' => 'exists:subcategorias,id_subcategoria'
             ]);
 
-            // Si hay opciones, las crea y asocia al filtro
-            if ($request->has('opciones') && is_array($request->opciones)) {
-                foreach ($request->opciones as $index => $opcion) {
-                    // Filtrar opciones vacías
+            \Log::info('Datos validados correctamente');
+
+            DB::beginTransaction();
+
+            $filtro = Filtro::create([
+                'nombre' => $validatedData['nombre'],
+                'slug' => Str::slug($validatedData['nombre']),
+                'tipo_input' => $validatedData['tipo_input'],
+                'unidad' => $validatedData['unidad'] ?? null,
+                'descripcion' => $validatedData['descripcion'] ?? null,
+                'orden' => $validatedData['orden'] ?? 0,
+                'obligatorio' => $validatedData['obligatorio'] ?? false
+            ]);
+
+            // Crear opciones si existen
+            if (isset($validatedData['opciones']) && is_array($validatedData['opciones'])) {
+                foreach ($validatedData['opciones'] as $index => $opcion) {
                     if (!empty($opcion['valor']) && !empty($opcion['etiqueta'])) {
                         $filtro->opciones()->create([
                             'valor' => $opcion['valor'],
@@ -77,21 +78,31 @@ class FiltroController extends Controller
                 }
             }
 
-            // Si hay subcategorías, las asocia al filtro
-            if ($request->has('subcategorias')) {
-                $filtro->subcategorias()->attach($request->subcategorias, ['activo' => true]);
+            // Asociar subcategorías
+            if (isset($validatedData['subcategorias'])) {
+                $filtro->subcategorias()->attach($validatedData['subcategorias'], ['activo' => true]);
             }
 
-            // Confirma la transacción
             DB::commit();
-            // Devuelve el filtro creado con sus relaciones cargadas
             return response()->json($filtro->load(['opciones', 'subcategorias']), 201);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Error de validación específico
+            \Log::error('Error de validación en filtro:', $e->errors());
+            return response()->json([
+                'error' => 'Error de validación',
+                'details' => $e->errors()
+            ], 422);
+            
         } catch (\Exception $e) {
-            // Revierte la transacción en caso de error
             DB::rollBack();
-            // Devuelve un mensaje de error
-            return response()->json(['error' => 'Error al crear el filtro'], 500);
+            \Log::error('Error al crear filtro:', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['error' => 'Error al crear el filtro: ' . $e->getMessage()], 500);
         }
     }
 

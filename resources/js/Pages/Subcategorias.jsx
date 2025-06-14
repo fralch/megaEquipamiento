@@ -45,7 +45,6 @@ export default function Subcategoria({ productos: productosIniciales }) {
         const urlParts = window.location.pathname.split('/');
         const subcategoriaId = urlParts[urlParts.length - 1];
     
-        // Filtrar opciones válidas antes de enviar
         const opcionesValidas = nuevoFiltro.opciones.filter(opcion => 
             opcion.valor.trim() !== '' && opcion.etiqueta.trim() !== ''
         );
@@ -66,16 +65,18 @@ export default function Subcategoria({ productos: productosIniciales }) {
                 },
                 body: JSON.stringify(filtroData)
             });
-            console.log(await response.json());
+    
+            // ✅ CORRECCIÓN: Solo una llamada a response.json()
+            const responseData = await response.json();
+            console.log('Respuesta del servidor:', responseData);
+    
             if (response.ok) {
-                const nuevoFiltroCreado = await response.json();
-                setFiltros([...filtros, nuevoFiltroCreado]);
+                setFiltros([...filtros, responseData]);
                 setMostrarFormularioFiltro(false);
                 resetFormulario();
             } else {
-                const errorData = await response.json();
-                console.error('Error al crear el filtro:', errorData);
-                alert('Error al crear el filtro: ' + (errorData.message || 'Error desconocido'));
+                console.error('Error al crear el filtro:', responseData);
+                alert('Error al crear el filtro: ' + (responseData.message || responseData.error || 'Error desconocido'));
             }
         } catch (error) {
             console.error('Error:', error);
