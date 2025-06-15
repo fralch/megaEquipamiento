@@ -1,22 +1,29 @@
 import React from "react";
 
+import { useTheme } from "../../storage/ThemeContext";
+
 export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtrosSeleccionados, setFiltrosSeleccionados }) {
+    const { isDarkMode } = useTheme();
     return (
         <>
             {filtros.map((filtro) => (
                 <div key={filtro.id_filtro} className="mb-4">
-                    <h3 className="font-medium mb-2">{filtro.nombre}</h3>
+                    <h3 className={`font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>{filtro.nombre}</h3>
                     {auth.user && (
                         <div className="flex justify-end space-x-2">
                             <button
                                 onClick={() => onEditar(filtro)}
-                                className="text-sm text-blue-600 hover:underline"
+                                className={`text-sm hover:underline transition-colors duration-200 ${
+                                    isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+                                }`}
                             >
                                 Editar
                             </button>
                             <button
                                 onClick={() => onEliminar(filtro)}
-                                className="text-sm text-red-600 hover:underline"
+                                className={`text-sm hover:underline transition-colors duration-200 ${
+                                    isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-700'
+                                }`}
                             >
                                 Eliminar
                             </button>
@@ -41,7 +48,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                                             });
                                         }}
                                     />
-                                    <span>{opcion.etiqueta}</span>
+                                    <span className={`${isDarkMode ? 'text-gray-200' : 'text-gray-900'} transition-colors duration-200`}>{opcion.etiqueta}</span>
                                 </label>
                             ))}
                         </div>
@@ -62,7 +69,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                                             });
                                         }}
                                     />
-                                    <span>{opcion.etiqueta}</span>
+                                    <span className={`${isDarkMode ? 'text-gray-200' : 'text-gray-900'} transition-colors duration-200`}>{opcion.etiqueta}</span>
                                 </label>
                             ))}
                         </div>
@@ -82,7 +89,9 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                                     });
                                 }}
                             />
-                            <div className="flex justify-between text-sm text-gray-600">
+                            <div className={`flex justify-between text-sm transition-colors duration-200 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
                                 <span>0 {filtro.unidad}</span>
                                 <span>100 {filtro.unidad}</span>
                             </div>
@@ -90,7 +99,11 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                     )}
                     {filtro.tipo_input === 'select' && (
                         <select
-                            className="w-full rounded border-gray-300 focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50"
+                            className={`w-full rounded focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50 transition-colors duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-gray-700 border-gray-600 text-white' 
+                                    : 'bg-white border-gray-300 text-gray-900'
+                            }`}
                             value={filtrosSeleccionados[filtro.id_filtro] !== undefined ? filtrosSeleccionados[filtro.id_filtro] : ''}
                             onChange={(e) => {
                                 setFiltrosSeleccionados({
@@ -115,7 +128,11 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                         setFiltrosSeleccionados({});
                         window.location.reload();
                     }}
-                    className="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200"
+                    className={`w-full py-2 px-4 rounded transition-colors duration-200 ${
+                        isDarkMode 
+                            ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                 >
                     Limpiar filtros
                 </button>
