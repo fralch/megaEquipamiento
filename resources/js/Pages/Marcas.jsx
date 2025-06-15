@@ -102,16 +102,7 @@ export default function Marcas({ productos }) {
                                         nombreMarca = nombreMarca.charAt(0).toUpperCase() + nombreMarca.slice(1);
                                         return (
                                             <div className="mb-8">
-                                                <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-4 ${
-                                                    isDarkMode 
-                                                        ? 'bg-blue-900/30 text-blue-300 border border-blue-700/50' 
-                                                        : 'bg-blue-100 text-blue-800 border border-blue-200'
-                                                } transition-all duration-200`}>
-                                                    <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                                    </svg>
-                                                    Productos encontrados
-                                                </div>
+                                               
                                                 <h1 className={`text-3xl lg:text-4xl font-bold mb-2 ${
                                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                                 } transition-colors duration-200`}>
@@ -123,7 +114,7 @@ export default function Marcas({ productos }) {
                                                     Descubre nuestra selección de productos de alta calidad
                                                 </p>
                                                 <div className={`h-1 w-20 rounded-full ${
-                                                    isDarkMode ? 'bg-gradient-to-r from-blue-400 to-purple-500' : 'bg-gradient-to-r from-blue-500 to-indigo-600'
+                                                    isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
                                                 } mb-8`}></div>
                                             </div>
                                         );
@@ -189,7 +180,7 @@ export default function Marcas({ productos }) {
                                 Categorías
                             </h2>
                             <div className={`h-0.5 w-12 rounded-full ${
-                                isDarkMode ? 'bg-gradient-to-r from-blue-400 to-purple-500' : 'bg-gradient-to-r from-blue-500 to-indigo-600'
+                                isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
                             }`}></div>
                         </div>
 
@@ -213,8 +204,8 @@ export default function Marcas({ productos }) {
                                             className={`group w-full text-left p-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg ${
                                                 activeCategory === categoria.nombre
                                                     ? isDarkMode
-                                                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/25'
-                                                        : 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25'
+                                                        ? 'bg-gradient-to-r from-blue-800 to-green-500 text-white shadow-lg shadow-blue-500/25'
+                                                        : 'bg-gradient-to-r from-blue-700 to-green-500 text-white shadow-lg shadow-blue-500/25'
                                                     : isDarkMode 
                                                         ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-100 border border-gray-600/50 hover:border-gray-500' 
                                                         : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md'
@@ -266,8 +257,8 @@ export default function Marcas({ productos }) {
                                                             <div className="flex items-center">
                                                                 <div className={`w-2 h-2 rounded-full mr-3 transition-all duration-300 ${
                                                                     isDarkMode 
-                                                                        ? 'bg-blue-400 group-hover:bg-blue-300' 
-                                                                        : 'bg-blue-500 group-hover:bg-blue-600'
+                                                                        ? 'bg-green-400 group-hover:bg-green-300' 
+                                                                        : 'bg-green-500 group-hover:bg-green-600'
                                                                 } group-hover:scale-125`}></div>
                                                                 <span className="text-sm font-medium group-hover:font-semibold transition-all duration-200">
                                                                     {subcategoria.nombre}
