@@ -509,8 +509,8 @@ export default function Subcategoria({ productos: productosIniciales }) {
                                                 onClick={buscarProductosFiltrados}
                                                 className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 mt-6 ${
                                                     isDarkMode 
-                                                        ? 'bg-gradient-to-r from-blue-800 to-green-500 hover:from-blue-700 hover:to-green-400 text-white shadow-lg' 
-                                                        : 'bg-gradient-to-r from-blue-700 to-green-500 hover:from-blue-600 hover:to-green-400 text-white shadow-md'
+                                                        ? 'bg-[#184f96] hover:bg-blue-700 text-white shadow-lg' 
+                                                        : 'bg-[#184f96] hover:bg-blue-600 text-white shadow-md'
                                                 }`}
                                             >
                                                 Buscar productos
