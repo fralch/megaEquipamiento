@@ -111,7 +111,10 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
             ))}
             {filtros.length > 0 && (
                 <button
-                    onClick={() => setFiltrosSeleccionados({})}
+                    onClick={() => {
+                        setFiltrosSeleccionados({});
+                        window.location.reload();
+                    }}
                     className="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors duration-200"
                 >
                     Limpiar filtros
