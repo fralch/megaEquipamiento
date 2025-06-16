@@ -25,50 +25,89 @@ export default function SubcategoriaMarcas({ productos: productosIniciales, marc
 
     useEffect(() => {
         setIsLoading(true);
-        // Cargar categorías desde localStorage o desde la API
-        const storedData = localStorage.getItem('categoriasCompleta');
-        if (storedData) {
-            setCategoriasArray(JSON.parse(storedData));
-            setIsLoading(false);
-        } else {
-            fetch(URL_API + "/categorias-completa")
-                .then((response) => response.json())
-                .then((data) => {
-                    setCategoriasArray(data);
-                    localStorage.setItem('categoriasCompleta', JSON.stringify(data));
-                    setIsLoading(false);
-                })
-                .catch((error) => {
-                    console.error('Error fetching data:', error);
-                    setIsLoading(false);
-                });
-        }
-
+        
         // Obtener el ID de la subcategoría desde la URL
         const urlParts = window.location.pathname.split('/');
         const subcategoriaId = urlParts[urlParts.length - 1];
 
-        console.log("productos");
-        console.log(productos);
+        console.log("Productos:", productos);
+        console.log("Marca ID:", marcaId);
+        console.log("Subcategoría ID:", subcategoriaId);
 
-        // Hacer una solicitud a la API para obtener los datos de la subcategoría
-        fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-                setSubcategoriaNombre(data.nombre);
-                // Obtener el nombre de la categoría
-                fetch(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`)
-                    .then((response) => response.json())
-                    .then((data) => {
-                        setCategoriaNombre(data.nombre_categoria);
-                        setCategoriaId(data.id_categoria);
-                    })
-                    .catch((error) => console.error('Error fetching categoria data:', error));
-            })
-            .catch((error) => console.error('Error fetching subcategoria data:', error));
+        // Función para cargar las categorías optimizadas por marca
+        const cargarCategoriasOptimizadas = async () => {
+            try {
+                // Construir URL usando tu ruta específica
+                const url = marcaId 
+                    ? `${URL_API}/catsub_optimizadas/${marcaId}`
+                    : `${URL_API}/catsub_optimizadas`;
+                
+                console.log('Llamando a categorías optimizadas:', url);
+                
+                const categoriasResponse = await fetch(url);
+                
+                if (categoriasResponse.ok) {
+                    const categoriasData = await categoriasResponse.json();
+                    setCategoriasArray(categoriasData);
+                    console.log('Categorías cargadas:', categoriasData);
+                } else {
+                    console.error('Error al cargar categorías optimizadas:', categoriasResponse.status);
+                    // Fallback: cargar todas las categorías si falla la específica
+                    const fallbackResponse = await fetch(`${URL_API}/catsub_optimizadas`);
+                    if (fallbackResponse.ok) {
+                        const fallbackData = await fallbackResponse.json();
+                        setCategoriasArray(fallbackData);
+                        console.log('Categorías fallback cargadas:', fallbackData);
+                    } else {
+                        setCategoriasArray([]);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching categorías optimizadas:', error);
+                setCategoriasArray([]);
+            }
+        };
 
-    }, []);
+        // Función para cargar información de subcategoría (código existente)
+        const cargarInfoSubcategoria = async () => {
+            try {
+                if (subcategoriaId && !isNaN(subcategoriaId)) {
+                    console.log('Cargando info de subcategoría:', subcategoriaId);
+                    
+                    const subcategoriaResponse = await fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`);
+                    if (subcategoriaResponse.ok) {
+                        const subcategoriaData = await subcategoriaResponse.json();
+                        console.log('Datos de subcategoría:', subcategoriaData);
+                        setSubcategoriaNombre(subcategoriaData.nombre);
+                        
+                        // Obtener el nombre de la categoría
+                        const categoriaResponse = await fetch(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`);
+                        if (categoriaResponse.ok) {
+                            const categoriaData = await categoriaResponse.json();
+                            console.log('Datos de categoría:', categoriaData);
+                            setCategoriaNombre(categoriaData.nombre_categoria);
+                            setCategoriaId(categoriaData.id_categoria);
+                        } else {
+                            console.error('Error al cargar categoría:', categoriaResponse.status);
+                        }
+                    } else {
+                        console.error('Error al cargar subcategoría:', subcategoriaResponse.status);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching subcategoria info:', error);
+            }
+        };
+
+        // Ejecutar ambas funciones en paralelo
+        Promise.all([
+            cargarCategoriasOptimizadas(),
+            cargarInfoSubcategoria()
+        ]).finally(() => {
+            setIsLoading(false);
+        });
+
+    }, [marcaId, productos]); // Agregar marcaId y productos como dependencias
 
     const toggleCategory = (categoriaNombre) => {
         setOpenCategories((prevState) => ({

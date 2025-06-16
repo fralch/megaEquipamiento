@@ -204,4 +204,48 @@ class SubcategoriaController extends Controller
         // Devolver el nombre de la categoría
         return response()->json(['nombre_categoria' => $categoria->nombre, 'id_categoria' => $categoria->id_categoria]);
     }
+
+    public function getCategoriasOptimizadasPorMarca($marca_id = null)
+    {
+        try {
+            // Consulta optimizada usando subconsultas
+            $categorias = Categoria::select('id_categoria', 'nombre', 'descripcion', 'img')
+                ->with(['subcategorias' => function ($query) use ($marca_id) {
+                    $query->select('id_subcategoria', 'nombre', 'descripcion', 'id_categoria')
+                        ->whereExists(function ($subQuery) use ($marca_id) {
+                            $subQuery->select(\DB::raw(1))
+                                ->from('productos')
+                                ->whereColumn('productos.id_subcategoria', 'subcategorias.id_subcategoria');
+                            
+                            if ($marca_id) {
+                                $subQuery->where('productos.marca_id', $marca_id);
+                            }
+                        });
+                }])
+                ->whereExists(function ($query) use ($marca_id) {
+                    $query->select(\DB::raw(1))
+                        ->from('subcategorias')
+                        ->whereColumn('subcategorias.id_categoria', 'categorias.id_categoria')
+                        ->whereExists(function ($subQuery) use ($marca_id) {
+                            $subQuery->select(\DB::raw(1))
+                                ->from('productos')
+                                ->whereColumn('productos.id_subcategoria', 'subcategorias.id_subcategoria');
+                            
+                            if ($marca_id) {
+                                $subQuery->where('productos.marca_id', $marca_id);
+                            }
+                        });
+                })
+                ->orderBy('nombre')
+                ->get();
+
+            return response()->json($categorias, 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al obtener las categorías optimizadas',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
