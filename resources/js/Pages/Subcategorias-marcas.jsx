@@ -96,115 +96,8 @@ export default function SubcategoriaMarcas({ productos: productosIniciales, marc
             } transition-all duration-300`}>
                 
                 <div className="flex w-full">
-                    {/* Enhanced Sidebar Navigation */}
-                    <nav className={`w-1/6 flex-shrink-0 min-h-screen p-6 overflow-y-auto ${
-                        isDarkMode 
-                            ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-r border-gray-700' 
-                            : 'bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200'
-                    } shadow-2xl transition-all duration-300`} id="nav-fijo">
-                        
-                        <div className="mb-8">
-                            <h2 className={`text-xl font-bold mb-2 ${
-                                isDarkMode ? 'text-white' : 'text-gray-900'
-                            } transition-colors duration-200`}>
-                                Categorías
-                            </h2>
-                            <div className={`h-0.5 w-12 rounded-full ${
-                                isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
-                            }`}></div>
-                        </div>
-
-                        {isLoading ? (
-                            <div className="space-y-3">
-                                {[...Array(5)].map((_, i) => (
-                                    <div key={i} className={`h-10 rounded-lg animate-pulse ${
-                                        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
-                                    }`}></div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="space-y-2">
-                                {categoriasArray.map((categoria, index) => (
-                                    <div key={categoria.id_categoria} 
-                                         className="animate-slideIn"
-                                         style={{ animationDelay: `${index * 0.05}s` }}>
-                                        
-                                        <button
-                                            onClick={() => toggleCategory(categoria.nombre)}
-                                            className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
-                                                activeCategory === categoria.nombre
-                                                    ? isDarkMode
-                                                        ? 'bg-gradient-to-r from-blue-800 to-green-500 text-white shadow-md'
-                                                        : 'bg-gradient-to-r from-blue-700 to-green-500 text-white shadow-md'
-                                                    : isDarkMode 
-                                                        ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-100 border border-gray-600/50 hover:border-gray-500' 
-                                                        : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 shadow-sm'
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-medium text-sm">
-                                                    {categoria.nombre}
-                                                </span>
-                                                <div className={`flex items-center justify-center w-6 h-6 rounded-full transition-all duration-150 ${
-                                                    activeCategory === categoria.nombre
-                                                        ? 'bg-white/20'
-                                                        : isDarkMode
-                                                            ? 'bg-gray-600 group-hover:bg-gray-500'
-                                                            : 'bg-gray-100 group-hover:bg-gray-200'
-                                                }`}>
-                                                    <span className={`text-xs font-bold transition-all duration-150 ${
-                                                        activeCategory === categoria.nombre
-                                                            ? 'text-white'
-                                                            : isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                                    }`}>
-                                                        {openCategories[categoria.nombre] ? '−' : '+'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </button>
-
-                                        {openCategories[categoria.nombre] && categoria.subcategorias && (
-                                            <div className="mt-1 ml-3 space-y-1 animate-slideDown">
-                                                {categoria.subcategorias.map((subcategoria, subIndex) => {
-                                                    // Usar el ID de marca enviado por el controlador
-                                                    const href = marcaId
-                                                        ? `/subcategoria/${subcategoria.id_subcategoria}/${marcaId}`
-                                                        : `/subcategoria/${subcategoria.id_subcategoria}`;
-                                                    
-                                                    return (
-                                                        <Link
-                                                            key={subcategoria.id_subcategoria}
-                                                            href={href}
-                                                            className={`group block p-2 pl-4 rounded-md transition-all duration-150 transform hover:scale-[1.02] hover:translate-x-1 ${
-                                                                isDarkMode 
-                                                                    ? 'bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 border border-gray-600/50 hover:border-gray-500/70' 
-                                                                    : 'bg-blue-50/50 hover:bg-blue-100/70 text-gray-800 border border-blue-100 hover:border-blue-200'
-                                                            } hover:shadow-sm`}
-                                                            style={{ animationDelay: `${subIndex * 0.03}s` }}
-                                                        >
-                                                            <div className="flex items-center">
-                                                                <div className={`w-1.5 h-1.5 rounded-full mr-2 transition-all duration-100 ${
-                                                                    isDarkMode 
-                                                                        ? 'bg-green-400 group-hover:bg-green-300' 
-                                                                        : 'bg-green-500 group-hover:bg-green-600'
-                                                                }`}></div>
-                                                                <span className="text-xs font-medium group-hover:font-semibold transition-all duration-100">
-                                                                    {subcategoria.nombre}
-                                                                </span>
-                                                            </div>
-                                                        </Link>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </nav>
-
                     {/* Main Content */}
-                    <div className="flex-1 p-6 lg:p-8 w-full">
+                    <div className="flex-1 p-6 lg:p-8 w-5/6">
                         <div className="w-full">
                             {productos && productos.length > 0 ? (
                                 <>
@@ -295,6 +188,113 @@ export default function SubcategoriaMarcas({ productos: productosIniciales, marc
                             )}
                         </div>
                     </div>
+
+                    {/* Enhanced Sidebar Navigation - Moved to Right */}
+                    <nav className={`w-1/6 flex-shrink-0 min-h-screen p-6 overflow-y-auto ${
+                        isDarkMode 
+                            ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-l border-gray-700' 
+                            : 'bg-gradient-to-b from-white via-gray-50 to-white border-l border-gray-200'
+                    } shadow-2xl transition-all duration-300`} id="nav-fijo">
+                        
+                        <div className="mb-8">
+                            <h2 className={`text-xl font-bold mb-2 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            } transition-colors duration-200`}>
+                                Categorías
+                            </h2>
+                            <div className={`h-0.5 w-12 rounded-full ${
+                                isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
+                            }`}></div>
+                        </div>
+
+                        {isLoading ? (
+                            <div className="space-y-3">
+                                {[...Array(5)].map((_, i) => (
+                                    <div key={i} className={`h-10 rounded-lg animate-pulse ${
+                                        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+                                    }`}></div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                {categoriasArray.map((categoria, index) => (
+                                    <div key={categoria.id_categoria} 
+                                         className="animate-slideIn"
+                                         style={{ animationDelay: `${index * 0.05}s` }}>
+                                        
+                                        <button
+                                            onClick={() => toggleCategory(categoria.nombre)}
+                                            className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg ${
+                                                activeCategory === categoria.nombre
+                                                    ? isDarkMode
+                                                        ? 'bg-gradient-to-r from-blue-800 to-green-500 text-white shadow-md'
+                                                        : 'bg-gradient-to-r from-blue-700 to-green-500 text-white shadow-md'
+                                                    : isDarkMode 
+                                                        ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-100 border border-gray-600/50 hover:border-gray-500' 
+                                                        : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 shadow-sm'
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-medium text-sm">
+                                                    {categoria.nombre}
+                                                </span>
+                                                <div className={`flex items-center justify-center w-6 h-6 rounded-full transition-all duration-150 ${
+                                                    activeCategory === categoria.nombre
+                                                        ? 'bg-white/20'
+                                                        : isDarkMode
+                                                            ? 'bg-gray-600 group-hover:bg-gray-500'
+                                                            : 'bg-gray-100 group-hover:bg-gray-200'
+                                                }`}>
+                                                    <span className={`text-xs font-bold transition-all duration-150 ${
+                                                        activeCategory === categoria.nombre
+                                                            ? 'text-white'
+                                                            : isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                    }`}>
+                                                        {openCategories[categoria.nombre] ? '−' : '+'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        {openCategories[categoria.nombre] && categoria.subcategorias && (
+                                            <div className="mt-1 ml-3 space-y-1 animate-slideDown">
+                                                {categoria.subcategorias.map((subcategoria, subIndex) => {
+                                                    // Usar el ID de marca enviado por el controlador
+                                                    const href = marcaId
+                                                        ? `/subcategoria/${subcategoria.id_subcategoria}/${marcaId}`
+                                                        : `/subcategoria/${subcategoria.id_subcategoria}`;
+                                                    
+                                                    return (
+                                                        <Link
+                                                            key={subcategoria.id_subcategoria}
+                                                            href={href}
+                                                            className={`group block p-2 pl-4 rounded-md transition-all duration-150 transform hover:scale-[1.02] hover:translate-x-1 ${
+                                                                isDarkMode 
+                                                                    ? 'bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 border border-gray-600/50 hover:border-gray-500/70' 
+                                                                    : 'bg-blue-50/50 hover:bg-blue-100/70 text-gray-800 border border-blue-100 hover:border-blue-200'
+                                                            } hover:shadow-sm`}
+                                                            style={{ animationDelay: `${subIndex * 0.03}s` }}
+                                                        >
+                                                            <div className="flex items-center">
+                                                                <div className={`w-1.5 h-1.5 rounded-full mr-2 transition-all duration-100 ${
+                                                                    isDarkMode 
+                                                                        ? 'bg-green-400 group-hover:bg-green-300' 
+                                                                        : 'bg-green-500 group-hover:bg-green-600'
+                                                                }`}></div>
+                                                                <span className="text-sm font-medium group-hover:font-semibold transition-all duration-100">
+                                                                    {subcategoria.nombre}
+                                                                </span>
+                                                            </div>
+                                                        </Link>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </nav>
                 </div>
             </div>
 

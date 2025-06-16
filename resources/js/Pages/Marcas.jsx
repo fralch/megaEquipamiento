@@ -193,36 +193,36 @@ export default function Marcas({ productos }) {
                                 ))}
                             </div>
                         ) : (
-                            <div className="space-y-3">
+                            <div className="space-y-2">
                                 {categoriasArray.map((categoria, index) => (
                                     <div key={categoria.id_categoria} 
                                          className="animate-slideIn"
-                                         style={{ animationDelay: `${index * 0.1}s` }}>
+                                         style={{ animationDelay: `${index * 0.08}s` }}>
                                         
                                         <button
                                             onClick={() => toggleCategory(categoria.nombre)}
-                                            className={`group w-full text-left p-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg ${
+                                            className={`group w-full text-left p-3 rounded-lg transition-all duration-200 hover:shadow-md ${
                                                 activeCategory === categoria.nombre
                                                     ? isDarkMode
-                                                        ? 'bg-gradient-to-r from-blue-800 to-green-500 text-white shadow-lg shadow-blue-500/25'
-                                                        : 'bg-gradient-to-r from-blue-700 to-green-500 text-white shadow-lg shadow-blue-500/25'
+                                                        ? 'bg-gradient-to-r from-blue-800 to-green-500 text-white shadow-md shadow-blue-500/20'
+                                                        : 'bg-gradient-to-r from-blue-700 to-green-500 text-white shadow-md shadow-blue-500/20'
                                                     : isDarkMode 
-                                                        ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-100 border border-gray-600/50 hover:border-gray-500' 
-                                                        : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md'
+                                                        ? 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-100 border border-gray-600/40 hover:border-gray-500/60' 
+                                                        : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 shadow-sm'
                                             }`}
                                         >
                                             <div className="flex items-center justify-between">
-                                                <span className="font-medium text-sm lg:text-base">
+                                                <span className="font-medium text-sm">
                                                     {categoria.nombre}
                                                 </span>
-                                                <div className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ${
+                                                <div className={`flex items-center justify-center w-6 h-6 rounded-full transition-all duration-200 ${
                                                     activeCategory === categoria.nombre
                                                         ? 'bg-white/20 rotate-45'
                                                         : isDarkMode
                                                             ? 'bg-gray-600 group-hover:bg-gray-500'
                                                             : 'bg-gray-100 group-hover:bg-gray-200'
                                                 }`}>
-                                                    <span className={`text-sm font-bold transition-all duration-300 ${
+                                                    <span className={`text-xs font-bold transition-all duration-200 ${
                                                         activeCategory === categoria.nombre
                                                             ? 'text-white'
                                                             : isDarkMode ? 'text-gray-300' : 'text-gray-600'
