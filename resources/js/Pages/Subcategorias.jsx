@@ -284,7 +284,21 @@ export default function Subcategoria({ productos: productosIniciales }) {
         setIsOpen(!isOpen);
     };
 
-    const handleMostrarProductos = () => {
+    const handleMostrarProductos = async () => {
+        const urlParts = window.location.pathname.split('/');
+        const subcategoriaId = urlParts[urlParts.length - 1];
+        
+        try {
+            const response = await fetch(`${URL_API}/product/subcategoria/${subcategoriaId}`);
+            if (response.ok) {
+                const productosData = await response.json();
+                setProductos(productosData);
+                setProductosOriginales(productosData);
+            }
+        } catch (error) {
+            console.error('Error cargando productos:', error);
+        }
+        
         setMostrarProductos(true);
     };
 
@@ -568,14 +582,41 @@ export default function Subcategoria({ productos: productosIniciales }) {
                                         <ProductGrid products={productos} />
                                     </div>
                                 </>
-                            ) : (
+                            ) : mostrarProductos ? (
                                 <>
                                     <div className="mb-8">
-                                        <h1 className={`text-3xl lg:text-4xl font-bold mb-2 ${
+                                        <h1 className={`text-2xl lg:text-2xl font-bold mb-2 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         } transition-colors duration-200`}>
                                             <Link href={`/categorias/${categoriaId}`}>
-                                                <span className={`text-2xl lg:text-3xl font-bold hover:underline ${
+                                                <span className={`text-lg lg:text-xl font-bold hover:underline ${
+                                                    isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
+                                                } transition-colors duration-200`}>
+                                                    {categoriaNombre} /
+                                                </span>
+                                            </Link> {subcategoriaNombre}
+                                        </h1>
+                                        <p className={`text-lg ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        } mb-6 transition-colors duration-200`}>
+                                            Explora nuestra selección de productos especializados
+                                        </p>
+                                        <div className={`h-1 w-20 rounded-full ${
+                                            isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
+                                        } mb-8`}></div>
+                                    </div>
+                                    <div className="animate-fadeIn">
+                                        <ProductGrid products={productos} />
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="mb-8">
+                                        <h1 className={`text-2xl lg:text-2xl font-bold mb-2 ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        } transition-colors duration-200`}>
+                                            <Link href={`/categorias/${categoriaId}`}>
+                                                <span className={`text-lg lg:text-xl font-bold hover:underline ${
                                                     isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
                                                 } transition-colors duration-200`}>
                                                     {categoriaNombre} /
@@ -602,12 +643,12 @@ export default function Subcategoria({ productos: productosIniciales }) {
                                                             d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                                     </svg>
                                                 </div>
-                                                <h2 className={`text-2xl lg:text-3xl font-bold mb-4 ${
+                                                <h2 className={`text-xl lg:text-2xl font-bold mb-4 ${ 
                                                     isDarkMode ? 'text-white' : 'text-gray-800'
                                                 } transition-colors duration-200`}>
                                                     No hay productos disponibles
                                                 </h2>
-                                                <p className={`text-lg mb-8 ${
+                                                <p className={`text-base mb-8 ${
                                                     isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                                 } transition-colors duration-200`}>
                                                     No hay productos relacionados a esta subcategoría.
@@ -624,11 +665,6 @@ export default function Subcategoria({ productos: productosIniciales }) {
                                                         Mostrar productos
                                                     </button>
                                                 </div>
-                                                {mostrarProductos && (
-                                                    <div className="mt-8 animate-fadeIn">
-                                                        <ProductGrid />
-                                                    </div>
-                                                )}
                                             </div>
                                         </div>
                                     </div>
