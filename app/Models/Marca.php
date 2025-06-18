@@ -23,6 +23,7 @@ class Marca extends Model
         'nombre',
         'descripcion',
         'imagen',
+        'video_url',
     ];
 
     // Definir los campos que deben ser ocultados en arrays

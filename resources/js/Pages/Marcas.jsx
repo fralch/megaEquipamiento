@@ -9,7 +9,60 @@ import Footer from "../Components/home/Footer";
 
 const URL_API = import.meta.env.VITE_API_URL;
 
-export default function Marcas({ productos }) {
+// Función para convertir URLs de video al formato embed
+const getEmbedUrl = (url) => {
+    if (!url) {
+        console.log('getEmbedUrl: URL vacía o null');
+        return null;
+    }
+    
+    console.log('getEmbedUrl: Procesando URL:', url);
+    
+    try {
+        // Si ya es una URL embed, devolverla tal como está
+        if (url.includes('/embed/') || url.includes('player.vimeo.com') || url.includes('player.')) {
+            console.log('getEmbedUrl: URL ya en formato embed, devolviendo tal como está');
+            return url;
+        }
+        
+        // YouTube URLs normales
+        if (url.includes('youtube.com/watch')) {
+            const videoId = url.split('v=')[1]?.split('&')[0];
+            const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+            console.log('getEmbedUrl: Convertido YouTube watch a embed:', embedUrl);
+            return embedUrl;
+        }
+        
+        if (url.includes('youtu.be/')) {
+            const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+            const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+            console.log('getEmbedUrl: Convertido YouTube short a embed:', embedUrl);
+            return embedUrl;
+        }
+        
+        // Vimeo URLs normales
+        if (url.includes('vimeo.com/') && !url.includes('player.vimeo.com')) {
+            const videoId = url.split('vimeo.com/')[1]?.split('?')[0];
+            const embedUrl = videoId ? `https://player.vimeo.com/video/${videoId}` : null;
+            console.log('getEmbedUrl: Convertido Vimeo a embed:', embedUrl);
+            return embedUrl;
+        }
+        
+        // Para otras URLs válidas, intentar usarlas directamente
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            console.log('getEmbedUrl: URL HTTP válida, devolviendo tal como está');
+            return url;
+        }
+        
+        console.log('getEmbedUrl: URL no reconocida:', url);
+        return null;
+    } catch (error) {
+        console.error('getEmbedUrl: Error procesando URL de video:', error, 'URL:', url);
+        return null;
+    }
+};
+
+export default function Marcas({ marca, productos }) {
     const { isDarkMode } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
@@ -184,6 +237,54 @@ export default function Marcas({ productos }) {
                                             </div>
                                         );
                                     })()}
+                                    
+                                    {/* Video de la marca */}
+                                    {marca && marca.video_url && (() => {
+                                        console.log('Renderizando video para marca:', marca.nombre, 'URL original:', marca.video_url);
+                                        const embedUrl = getEmbedUrl(marca.video_url);
+                                        console.log('URL embed procesada:', embedUrl);
+                                        
+                                        return embedUrl ? (
+                                            <div className="mb-8">
+                                                <div className={`rounded-2xl overflow-hidden shadow-2xl ${
+                                                    isDarkMode 
+                                                        ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' 
+                                                        : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+                                                } transition-all duration-300`}>
+                                                    <div className="aspect-video w-full">
+                                                        <iframe
+                                                            src={embedUrl}
+                                                            className="w-full h-full"
+                                                            frameBorder="0"
+                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                            allowFullScreen
+                                                            title={`Video de ${marca.nombre}`}
+                                                            onLoad={() => {
+                                                                console.log('Video cargado exitosamente:', embedUrl);
+                                                            }}
+                                                            onError={(e) => {
+                                                                console.error('Error cargando iframe:', e);
+                                                                console.error('URL que falló:', embedUrl);
+                                                            }}
+                                                        ></iframe>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="mb-8">
+                                                <div className={`rounded-2xl p-6 text-center ${
+                                                    isDarkMode 
+                                                        ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 text-gray-300' 
+                                                        : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200 text-gray-600'
+                                                } transition-all duration-300`}>
+                                                    <p>Video no disponible o URL inválida</p>
+                                                    <p className="text-sm mt-2">URL original: {marca.video_url}</p>
+                                                    <p className="text-xs mt-1 opacity-75">URL procesada: {embedUrl || 'null'}</p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
+                                    
                                     <div className="animate-fadeIn">
                                         <ProductGrid products={productos} />
                                     </div>

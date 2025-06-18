@@ -56,13 +56,16 @@ class ProductoController extends Controller
     /* Vista de productos por marca view */
     public function ProductViewByMarca(Request $request, $marca_id)
     {
+        // Obtener la información de la marca
+        $marca = Marca::find($marca_id);
+        
         // Obtener todos los productos de la marca especificada
         $productos = Producto::with('marca')
             ->where('marca_id', $marca_id)
             ->get();
     
-        // Renderizar la vista con Inertia y pasar los productos
-        return Inertia::render('Marcas', compact('productos'));
+        // Renderizar la vista con Inertia y pasar tanto la marca como los productos
+        return Inertia::render('Marcas', compact('marca', 'productos'));
     }
 
 
