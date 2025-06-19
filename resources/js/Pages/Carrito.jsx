@@ -1,6 +1,7 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { useTheme } from '../storage/ThemeContext';
 import { useForm } from '@inertiajs/react';
+import { CartContext } from '../storage/CartContext';
 import Header from "@/Components/home/Header";
 import Footer from "@/Components/home/Footer";
 
@@ -11,13 +12,6 @@ const formatCurrency = (value) => {
         currency: 'PEN',
     }).format(value);
 };
-
-// --- Datos de Ejemplo ---
-const sampleCartItems = [
-    { id: 1, reference: 'PCE-ATP 1', name: 'Luminómetro PCE-ATP 1', unitPrice: 9568.00, quantity: 1, imageUrl: 'https://www.pce-instruments.com/peru/slot/17/artimg/small/pce-instruments-copa-de-viscosidad-iso-pce-128-3-6244950_1303644.webp' },
-    { id: 2, reference: 'PCE-FCT 5', name: 'Analizador de redes eléctricas PCE-FCT 5', unitPrice: 215.00, quantity: 2, imageUrl: 'https://www.pce-instruments.com/peru/slot/17/artimg/small/pce-instruments-soporte-para-copas-de-flujo-6243740_1302209.webp' },
-    { id: 3, reference: 'CAL-PCE-ATP', name: 'Certificado de verificación para luminómetros', unitPrice: 1116.00, quantity: 1, imageUrl: 'https://www.pce-instruments.com/peru/slot/17/artimg/small/pce-instruments-soporte-para-copas-de-flujo-6243740_1302209.webp' }
-];
 
 // --- Componente Stepper Mejorado ---
 const CheckoutStepper = ({ currentStep = 1, isDarkMode }) => {
@@ -131,20 +125,35 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
         onRemoveItem(item.id);
     };
 
+    // Mapear los datos del producto real a la estructura esperada
+    const displayItem = {
+        id: item.id,
+        reference: item.sku || `REF-${item.id}`,
+        name: item.title,
+        unitPrice: item.price,
+        quantity: item.quantity || 1,
+        imageUrl: item.image
+    };
+
     return (
         <div className={`
-            group relative bg-white rounded-xl shadow-sm border transition-all duration-300 hover:shadow-md
+            group relative rounded-xl shadow-sm border transition-all duration-300 hover:shadow-md
             ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:border-gray-600' : 'bg-white border-gray-200 hover:border-gray-300'}
         `}>
             <div className="p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                     {/* Imagen del producto */}
                     <div className="flex-shrink-0">
-                        <div className="w-24 h-24 bg-gray-50 rounded-lg overflow-hidden border">
+                        <div className={`w-24 h-24 rounded-lg overflow-hidden border ${
+                            isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-200'
+                        }`}>
                             <img
-                                src={item.imageUrl || '/images/placeholder.png'}
-                                alt={item.name}
+                                src={displayItem.imageUrl || '/images/placeholder.png'}
+                                alt={displayItem.name}
                                 className="w-full h-full object-contain p-2"
+                                onError={(e) => {
+                                    e.target.src = '/images/placeholder.png';
+                                }}
                             />
                         </div>
                     </div>
@@ -154,27 +163,36 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
                             <div className="flex-grow">
                                 <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    Ref: {item.reference}
+                                    Ref: {displayItem.reference}
                                 </p>
                                 <h3 className={`font-semibold text-lg ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                                    {item.name}
+                                    {displayItem.name}
                                 </h3>
+                                {item.origin && (
+                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        Origen: {item.origin}
+                                    </p>
+                                )}
                                 <p className={`text-lg font-bold mt-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                                    {formatCurrency(item.unitPrice)}
+                                    {formatCurrency(displayItem.unitPrice)}
                                 </p>
                             </div>
 
                             {/* Controles de cantidad */}
                             <div className="flex items-center gap-3">
-                                <div className="flex items-center bg-gray-50 rounded-lg p-1">
+                                <div className={`flex items-center rounded-lg p-1 ${
+                                    isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+                                }`}>
                                     <button
-                                        onClick={() => onUpdateQuantity(item.id, -1)}
-                                        disabled={item.quantity <= 1 || isUpdating}
+                                        onClick={() => onUpdateQuantity(displayItem.id, -1)}
+                                        disabled={displayItem.quantity <= 1 || isUpdating}
                                         className={`
                                             w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200
-                                            ${item.quantity <= 1 
+                                            ${displayItem.quantity <= 1 
                                                 ? 'text-gray-400 cursor-not-allowed' 
-                                                : 'text-gray-700 hover:bg-gray-200 active:bg-gray-300'
+                                                : isDarkMode 
+                                                    ? 'text-gray-300 hover:bg-gray-600 active:bg-gray-500'
+                                                    : 'text-gray-700 hover:bg-gray-200 active:bg-gray-300'
                                             }
                                         `}
                                     >
@@ -183,14 +201,20 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
                                         </svg>
                                     </button>
                                     
-                                    <span className="w-12 text-center font-semibold text-gray-900">
-                                        {item.quantity}
+                                    <span className={`w-12 text-center font-semibold ${
+                                        isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                                    }`}>
+                                        {displayItem.quantity}
                                     </span>
                                     
                                     <button
-                                        onClick={() => onUpdateQuantity(item.id, 1)}
+                                        onClick={() => onUpdateQuantity(displayItem.id, 1)}
                                         disabled={isUpdating}
-                                        className="w-8 h-8 rounded-md flex items-center justify-center text-gray-700 hover:bg-gray-200 active:bg-gray-300 transition-colors duration-200"
+                                        className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 ${
+                                            isDarkMode 
+                                                ? 'text-gray-300 hover:bg-gray-600 active:bg-gray-500'
+                                                : 'text-gray-700 hover:bg-gray-200 active:bg-gray-300'
+                                        }`}
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -202,7 +226,11 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowDeleteConfirm(true)}
-                                        className="w-8 h-8 rounded-md flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-200"
+                                        className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 ${
+                                            isDarkMode 
+                                                ? 'text-gray-400 hover:text-red-400 hover:bg-red-900/20'
+                                                : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
+                                        }`}
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -211,8 +239,14 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
                                     
                                     {/* Confirmación de eliminación */}
                                     {showDeleteConfirm && (
-                                        <div className="absolute right-0 top-10 bg-white rounded-lg shadow-lg border p-3 z-20 min-w-[200px]">
-                                            <p className="text-sm text-gray-600 mb-3">¿Eliminar este producto?</p>
+                                        <div className={`absolute right-0 top-10 rounded-lg shadow-lg border p-3 z-20 min-w-[200px] ${
+                                            isDarkMode 
+                                                ? 'bg-gray-800 border-gray-600' 
+                                                : 'bg-white border-gray-200'
+                                        }`}>
+                                            <p className={`text-sm mb-3 ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>¿Eliminar este producto?</p>
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={handleDelete}
@@ -222,7 +256,11 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
                                                 </button>
                                                 <button
                                                     onClick={() => setShowDeleteConfirm(false)}
-                                                    className="flex-1 bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-300 transition-colors"
+                                                    className={`flex-1 px-3 py-1 rounded text-sm transition-colors ${
+                                                        isDarkMode 
+                                                            ? 'bg-gray-600 text-gray-200 hover:bg-gray-500'
+                                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                                    }`}
                                                 >
                                                     Cancelar
                                                 </button>
@@ -234,12 +272,14 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
                         </div>
 
                         {/* Total del item */}
-                        <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+                        <div className={`mt-4 pt-4 border-t flex justify-between items-center ${
+                            isDarkMode ? 'border-gray-700' : 'border-gray-100'
+                        }`}>
                             <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                 Subtotal:
                             </span>
                             <span className={`text-lg font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                                {formatCurrency(item.unitPrice * item.quantity)}
+                                {formatCurrency(displayItem.unitPrice * displayItem.quantity)}
                             </span>
                         </div>
                     </div>
@@ -248,7 +288,9 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
 
             {/* Overlay de loading */}
             {isUpdating && (
-                <div className="absolute inset-0 bg-white bg-opacity-50 rounded-xl flex items-center justify-center">
+                <div className={`absolute inset-0 bg-opacity-50 rounded-xl flex items-center justify-center ${
+                    isDarkMode ? 'bg-gray-900' : 'bg-white'
+                }`}>
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
             )}
@@ -263,7 +305,7 @@ const CartSummary = ({ total, itemCount, isDarkMode }) => {
 
     return (
         <div className={`
-            sticky top-4 bg-white rounded-xl shadow-sm border p-6
+            sticky top-4 rounded-xl shadow-sm border p-6
             ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}
         `}>
             <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
@@ -289,7 +331,9 @@ const CartSummary = ({ total, itemCount, isDarkMode }) => {
                     </span>
                 </div>
                 
-                <div className="border-t pt-3">
+                <div className={`border-t pt-3 ${
+                    isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                }`}>
                     <div className="flex justify-between items-center">
                         <span className={`text-lg font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
                             Total
@@ -308,7 +352,9 @@ const CartSummary = ({ total, itemCount, isDarkMode }) => {
                 </svg>
             </button>
             
-            <p className="text-xs text-center mt-3 text-gray-500">
+            <p className={`text-xs text-center mt-3 ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}>
                 Envío gratuito en pedidos superiores a S/ 500
             </p>
         </div>
@@ -336,16 +382,28 @@ const EmptyCart = ({ isDarkMode }) => {
 };
 
 // --- Componente Principal ---
-export default function Carrito({ initialCartItems = sampleCartItems }) {
-    const [cartItems, setCartItems] = useState(initialCartItems);
+export default function Carrito() {
+    const { cart, dispatch } = useContext(CartContext);
     const [updatingItems, setUpdatingItems] = useState(new Set());
     const { isDarkMode } = useTheme();
 
+    // Debug: log cart changes
+    useEffect(() => {
+        console.log('Cart state:', cart);
+    }, [cart]);
+
+    // Obtener items del carrito desde el contexto
+    const cartItems = Array.isArray(cart) ? cart : [];
+
     const calculateTotal = useCallback(() => {
-        return cartItems.reduce((sum, item) => sum + (item.unitPrice * item.quantity), 0);
+        return cartItems.reduce((sum, item) => {
+            const quantity = item.quantity || 1;
+            const price = item.price || 0;
+            return sum + (price * quantity);
+        }, 0);
     }, [cartItems]);
 
-    const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    const totalItems = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
     const handleUpdateQuantity = async (itemId, change) => {
         setUpdatingItems(prev => new Set([...prev, itemId]));
@@ -353,15 +411,11 @@ export default function Carrito({ initialCartItems = sampleCartItems }) {
         // Simular delay de API
         await new Promise(resolve => setTimeout(resolve, 300));
         
-        setCartItems(currentItems =>
-            currentItems.map(item => {
-                if (item.id === itemId) {
-                    const newQuantity = item.quantity + change;
-                    return { ...item, quantity: Math.max(1, newQuantity) };
-                }
-                return item;
-            })
-        );
+        // Dispatch action to update quantity in context
+        dispatch({
+            type: 'UPDATE_QUANTITY',
+            payload: { id: itemId, change }
+        });
         
         setUpdatingItems(prev => {
             const newSet = new Set(prev);
@@ -374,7 +428,12 @@ export default function Carrito({ initialCartItems = sampleCartItems }) {
     };
 
     const handleRemoveItem = (itemId) => {
-        setCartItems(currentItems => currentItems.filter(item => item.id !== itemId));
+        // Dispatch action to remove item from context
+        dispatch({
+            type: 'REMOVE_ITEM',
+            payload: { id: itemId }
+        });
+        
         // **PUNTO DE INTEGRACIÓN INERTIA:**
         // Aquí llamarías a router.delete(route('cart.remove', itemId), { preserveState: true, preserveScroll: true });
     };
