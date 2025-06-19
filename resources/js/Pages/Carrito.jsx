@@ -300,9 +300,6 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
 
 // --- Componente Resumen del Carrito ---
 const CartSummary = ({ total, itemCount, isDarkMode }) => {
-    const igv = total * 0.18;
-    const totalWithIgv = total + igv;
-
     return (
         <div className={`
             sticky top-4 rounded-xl shadow-sm border p-6
@@ -313,35 +310,13 @@ const CartSummary = ({ total, itemCount, isDarkMode }) => {
             </h3>
             
             <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                        Productos ({itemCount})
+                <div className="flex justify-between items-center">
+                    <span className={`text-lg font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                        Total ({itemCount} {itemCount === 1 ? 'producto' : 'productos'})
                     </span>
-                    <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
+                    <span className={`text-xl font-bold text-blue-600`}>
                         {formatCurrency(total)}
                     </span>
-                </div>
-                
-                <div className="flex justify-between text-sm">
-                    <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                        IGV (18%)
-                    </span>
-                    <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                        {formatCurrency(igv)}
-                    </span>
-                </div>
-                
-                <div className={`border-t pt-3 ${
-                    isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                }`}>
-                    <div className="flex justify-between items-center">
-                        <span className={`text-lg font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                            Total
-                        </span>
-                        <span className={`text-xl font-bold text-blue-600`}>
-                            {formatCurrency(totalWithIgv)}
-                        </span>
-                    </div>
                 </div>
             </div>
 
@@ -355,7 +330,7 @@ const CartSummary = ({ total, itemCount, isDarkMode }) => {
             <p className={`text-xs text-center mt-3 ${
                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
             }`}>
-                Envío gratuito en pedidos superiores a S/ 500
+                Envío gratuito en pedidos superiores a S/ 500 (incluye envío de productos)
             </p>
         </div>
     );
