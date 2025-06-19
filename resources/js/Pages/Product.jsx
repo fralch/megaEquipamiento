@@ -832,7 +832,7 @@ const ProductPage = ({ producto }) => {
                                                     className={`text-2xl font-semibold text-green-600 border rounded px-2 py-1 transition-colors duration-300 ${
                                                         isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
                                                     }`}
-                                                    value={tempInputs.precio_sin_ganancia || producto.precio_sin_ganancia}
+                                                    value={tempInputs.precio_ganancia || producto.precio_ganancia}
                                                     onChange={(e) => handleInputChange('precio_sin_ganancia', e.target.value)}
                                                     autoFocus
                                                 />
@@ -854,7 +854,7 @@ const ProductPage = ({ producto }) => {
                                                 className="text-2xl font-semibold text-green-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('precio_sin_ganancia')}
                                             >
-                                                S/ {productData.precio_sin_ganancia}
+                                                S/ {productData.precio_ganancia}
                                             </p>
                                         )}
                                         <p className={`transition-colors duration-300 ${
