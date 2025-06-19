@@ -1,9 +1,12 @@
-import React, { useState, useContext } from 'react'; // Importa useContext
+import React, { useState, useContext, useEffect } from 'react'; // Importa useContext
+import { useTheme } from '../../storage/ThemeContext';
 import { CartContext } from '../../storage/CartContext'; // Importa tu CartContext
+import { router } from '@inertiajs/react';
 
 const CartIcon = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { cart } = useContext(CartContext); // Accede al estado del carrito desde el contexto
+  const { cart, dispatch } = useContext(CartContext); // Accede al estado del carrito y dispatch desde el contexto
+  const { isDarkMode } = useTheme(); // Obtiene el estado del tema
   const [total, setTotal] = useState(0); // Creamos un estado para el total
   const [totalItems, setTotalItems] = useState(0); // Creamos un estado para la cantidad total de items
 
@@ -12,7 +15,14 @@ const CartIcon = () => {
     setIsOpen(!isOpen);
   };
 
+  const handleRemoveItem = (itemId) => {
+    dispatch({ type: 'REMOVE', id: itemId });
+  };
 
+  useEffect(() => {
+    setTotal(cart.reduce((acc, item) => acc + item.price, 0));
+    setTotalItems(cart.length);
+  }, [cart]);
 
   return (
     <div 
@@ -65,8 +75,9 @@ const CartIcon = () => {
             right: 0,
             top: '60px',
             width: '350px',
-            backgroundColor: 'white',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+            backgroundColor: isDarkMode ? '#2d3748' : 'white',
+            color: isDarkMode ? 'white' : 'black',
+            boxShadow: isDarkMode ? '0 2px 5px rgba(0,0,0,0.5)' : '0 2px 5px rgba(0,0,0,0.2)',
             borderRadius: '4px',
             padding: '10px',
             zIndex: 1000,
@@ -74,23 +85,51 @@ const CartIcon = () => {
         >
           {/* Mapea sobre el 'cart' del contexto */}
           {cart.length === 0 ? (
-             <div style={{ padding: '10px', textAlign: 'center' }}>Tu carrito está vacío.</div>
+             <div style={{ padding: '10px', textAlign: 'center', color: isDarkMode ? '#a0aec0' : '#666' }}>Tu carrito está vacío.</div>
           ) : (
             cart.map(item => (
-              <div key={item.id} style={{ padding: '10px', borderBottom: '1px solid #eee' }}>
-                {/* Cambia item.name a item.title */}
-                <div style={{ fontWeight: 'bold' }}>{item.title}</div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Cantidad: {item.quantity}x</span>
-                  {/* Asegúrate que 'item.price' existe y es un número */}
-                  <span>S/ {item.price ? item.price.toFixed(2) : '0.00'}</span>
+              <div key={item.id} style={{ padding: '10px', borderBottom: isDarkMode ? '1px solid #4a5568' : '1px solid #eee' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1 }}>
+                    {/* Cambia item.name a item.title */}
+                    <div style={{ fontWeight: 'bold' }}>{item.title}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px' }}>
+                      <span>Cantidad: {item.quantity}x</span>
+                      {/* Asegúrate que 'item.price' existe y es un número */}
+                      <span>S/ {item.price ? item.price.toFixed(2) : '0.00'}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleRemoveItem(item.id);
+                    }}
+                    style={{
+                      backgroundColor: '#dc3545',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '24px',
+                      height: '24px',
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginLeft: '10px',
+                      flexShrink: 0
+                    }}
+                    title="Eliminar producto"
+                  >
+                    ×
+                  </button>
                 </div>
               </div>
             ))
           )}
           {/* Muestra el total solo si hay items */}
           {cart.length > 0 && (
-            <div style={{ padding: '10px', borderTop: '1px solid #ddd' }}>
+            <div style={{ padding: '10px', borderTop: isDarkMode ? '1px solid #4a5568' : '1px solid #ddd' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
                 <span>Total:</span>
                 <span>S/ {total.toFixed(2)}</span>
@@ -98,6 +137,10 @@ const CartIcon = () => {
             </div>
           )}
           <button
+            onClick={(e) => {
+              e.stopPropagation();
+              router.visit('/carrito');
+            }}
             style={{
               backgroundColor: '#005dad',
               color: 'white',

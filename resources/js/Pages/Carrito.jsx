@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-// useForm se mantiene importado, aunque no se usa activamente en esta versión local
+import { useTheme } from '../storage/ThemeContext';
 import { useForm } from '@inertiajs/react';
 import Header from "@/Components/home/Header";
 import Footer from "@/Components/home/Footer";
@@ -26,6 +26,7 @@ export default function Carrito({ initialCartItems = sampleCartItems }) {
     // --- Estado ---
     // Usa los items iniciales (sean props o el fallback)
     const [cartItems, setCartItems] = useState(initialCartItems);
+    const { isDarkMode } = useTheme();
 
     // --- Cálculos Derivados ---
     // useCallback puede ser útil si pasas esta función como prop, aunque no es estrictamente necesario aquí.
@@ -64,23 +65,39 @@ export default function Carrito({ initialCartItems = sampleCartItems }) {
         <>
             <Header />
             
-            {/* Contenedor principal con padding y fondo gris claro */}
-            <div className="carrito-container p-4 md:p-8 bg-gray-50 font-sans min-h-screen">
+            {/* Contenedor principal con padding y fondo adaptable al tema */}
+            <div className={`carrito-container p-4 md:p-8 font-sans min-h-screen transition-colors duration-300 ${
+                isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+            }`}>
                 {/* --- Stepper/Pasos --- */}
                 <div className="stepper mb-6 flex flex-wrap space-x-1 md:space-x-2 items-center text-sm">
                     {/* Usa clases más semánticas y consistentes */}
                     <span className="step active bg-blue-600 text-white px-3 py-1.5 rounded-md font-medium">1. Carro</span>
-                    <span className="step bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md">2. Dirección</span>
-                    <span className="step bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md">3. Envío</span>
-                    <span className="step bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md">4. Pago</span>
-                    <span className="step bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md">5. Terminar</span>
-                    <a href="#siguiente" className="ml-auto text-blue-600 hover:underline text-sm">Siguiente...</a>
+                    <span className={`step px-3 py-1.5 rounded-md transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
+                    }`}>2. Dirección</span>
+                    <span className={`step px-3 py-1.5 rounded-md transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
+                    }`}>3. Envío</span>
+                    <span className={`step px-3 py-1.5 rounded-md transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
+                    }`}>4. Pago</span>
+                    <span className={`step px-3 py-1.5 rounded-md transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
+                    }`}>5. Terminar</span>
+                    <a href="#siguiente" className={`ml-auto hover:underline text-sm transition-colors duration-300 ${
+                        isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                    }`}>Siguiente...</a>
                 </div>
 
                 {/* --- Contenedor de la Tabla (usando divs y grid para flexibilidad) --- */}
-                <div className="cart-table bg-white shadow-md rounded-lg overflow-hidden">
+                <div className={`cart-table shadow-md rounded-lg overflow-hidden transition-colors duration-300 ${
+                    isDarkMode ? 'bg-gray-800' : 'bg-white'
+                }`}>
                     {/* Encabezado (visible en pantallas medianas y grandes) */}
-                    <div className="cart-header hidden md:grid grid-cols-12 gap-4 p-4 bg-gray-100 border-b font-medium text-sm text-gray-600">
+                    <div className={`cart-header hidden md:grid grid-cols-12 gap-4 p-4 border-b font-medium text-sm transition-colors duration-300 ${
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-gray-300' : 'bg-gray-100 border-gray-200 text-gray-600'
+                    }`}>
                         {/* Ajusta col-span para alinear con el contenido */}
                         <div className="col-span-12 md:col-span-5 lg:col-span-6">Artículo</div>
                         <div className="col-span-12 md:col-span-2 text-right">Precio (sin IGV)</div>
@@ -93,11 +110,17 @@ export default function Carrito({ initialCartItems = sampleCartItems }) {
                     {/* --- Items del Carrito --- */}
                     <div className="cart-items">
                         {cartItems.length === 0 ? (
-                            <p className="p-6 text-center text-gray-500">Tu carrito está vacío.</p>
+                            <p className={`p-6 text-center transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}>Tu carrito está vacío.</p>
                         ) : (
                             cartItems.map((item) => (
                                 // Fila de cada item
-                                <div key={item.id} className="cart-item grid grid-cols-12 gap-4 items-center p-4 border-b last:border-b-0 hover:bg-gray-50 transition duration-150 ease-in-out">
+                                <div key={item.id} className={`cart-item grid grid-cols-12 gap-4 items-center p-4 border-b last:border-b-0 transition duration-150 ease-in-out ${
+                                    isDarkMode 
+                                        ? 'border-gray-600 hover:bg-gray-700' 
+                                        : 'border-gray-200 hover:bg-gray-50'
+                                }`}>
 
                                     {/* 1. Artículo (Imagen y Texto) */}
                                     <div className="col-span-12 md:col-span-5 lg:col-span-6 flex items-center space-x-4">
@@ -107,20 +130,30 @@ export default function Carrito({ initialCartItems = sampleCartItems }) {
                                             className="w-16 h-16 md:w-20 md:h-20 object-contain border rounded p-1 bg-white" // Padding dentro del borde
                                         />
                                         <div className="flex-grow">
-                                            <p className="text-sm text-gray-500">{`Referencia ${item.reference}`}</p>
-                                            <p className="font-semibold text-gray-800">{item.name}</p>
+                                            <p className={`text-sm transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>{`Referencia ${item.reference}`}</p>
+                                            <p className={`font-semibold transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                                            }`}>{item.name}</p>
                                         </div>
                                     </div>
 
                                     {/* 2. Precio Unitario */}
                                     <div className="col-span-5 md:col-span-2 text-right">
-                                        <span className="md:hidden font-medium text-xs text-gray-500 mr-1">Precio:</span>
-                                        <span className="text-sm md:text-base text-gray-700">{formatCurrency(item.unitPrice)}</span>
+                                        <span className={`md:hidden font-medium text-xs mr-1 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                        }`}>Precio:</span>
+                                        <span className={`text-sm md:text-base transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>{formatCurrency(item.unitPrice)}</span>
                                     </div>
 
                                     {/* 3. Cantidad */}
                                     <div className="col-span-7 md:col-span-3 lg:col-span-2 flex items-center justify-end md:justify-center space-x-2">
-                                        <span className="md:hidden font-medium text-xs text-gray-500 mr-1">Cant:</span>
+                                        <span className={`md:hidden font-medium text-xs mr-1 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                        }`}>Cant:</span>
                                         <button
                                             onClick={() => handleUpdateQuantity(item.id, -1)}
                                             disabled={item.quantity <= 1} // Deshabilitar si es 1
@@ -131,7 +164,11 @@ export default function Carrito({ initialCartItems = sampleCartItems }) {
                                         </button>
                                         {/* Input visual, no editable directamente */}
                                         <span
-                                            className="font-medium text-center w-10 px-2 py-1 border rounded-md bg-gray-50"
+                                            className={`font-medium text-center w-10 px-2 py-1 border rounded-md transition-colors duration-300 ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-700 border-gray-600 text-gray-200' 
+                                                    : 'bg-gray-50 border-gray-300 text-gray-800'
+                                            }`}
                                             aria-live="polite" // Anuncia cambios de cantidad a lectores de pantalla
                                         >
                                             {item.quantity}
@@ -146,8 +183,12 @@ export default function Carrito({ initialCartItems = sampleCartItems }) {
                                     </div>
 
                                     {/* 4. Precio Total por Item */}
-                                    <div className="col-span-9 md:col-span-2 text-right font-semibold">
-                                        <span className="md:hidden font-medium text-xs text-gray-500 mr-1">Total Item:</span>
+                                    <div className={`col-span-9 md:col-span-2 text-right font-semibold transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                                    }`}>
+                                        <span className={`md:hidden font-medium text-xs mr-1 transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                        }`}>Total Item:</span>
                                         {formatCurrency(item.unitPrice * item.quantity)}
                                     </div>
 
@@ -173,15 +214,25 @@ export default function Carrito({ initialCartItems = sampleCartItems }) {
                 {/* --- Resumen Total --- */}
                 {cartItems.length > 0 && (
                     <div className="cart-summary mt-6 flex flex-col items-end">
-                        <div className="w-full md:w-auto md:min-w-[300px] p-4 bg-white shadow-md rounded-lg border">
+                        <div className={`w-full md:w-auto md:min-w-[300px] p-4 shadow-md rounded-lg border transition-colors duration-300 ${
+                            isDarkMode 
+                                ? 'bg-gray-800 border-gray-600' 
+                                : 'bg-white border-gray-200'
+                        }`}>
                             <div className="flex justify-between items-center mb-2">
-                                <span className="text-lg font-semibold text-gray-700">Total neto:</span>
-                                <span className="text-xl font-bold text-gray-900">{formatCurrency(totalNeto)}</span>
+                                <span className={`text-lg font-semibold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>Total neto:</span>
+                                <span className={`text-xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                                }`}>{formatCurrency(totalNeto)}</span>
                             </div>
                             {/* Puedes añadir más detalles aquí (impuestos, envío, etc.) */}
-                            <p className="text-xs text-gray-500 text-right">Precio (Neto)</p>
+                            <p className={`text-xs text-right transition-colors duration-300 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}>Precio (Neto)</p>
                             <div className="mt-4 text-right">
-                                <button className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50">
+                                <button className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition-colors duration-300">
                                     Proceder con la compra
                                 </button>
                             </div>
