@@ -21,32 +21,32 @@ const initialForm = {
   envio: "",
   soporte_tecnico: "",
   caracteristicas: {},
-
   especificaciones_tecnicas: "",
   archivos_adicionales: "",
 };
 
 const priceFields = [
   {
-    label: "Precio sin Ganancia",
+    label: "Precio Base (C)",
     name: "precio_sin_ganancia",
     type: "number",
     step: "0.01",
-    placeholder: "Ingrese el precio sin ganancia",
+    placeholder: "Ingrese el costo base del producto",
   },
   {
-    label: "Precio con Ganancia",
-    name: "precio_ganancia",
+    label: "Porcentaje de Ganancia (R%)",
+    name: "porcentaje_ganancia",
     type: "number",
     step: "0.01",
     placeholder: "Ingrese el porcentaje de ganancia %",
   },
   {
-    label: "Precio con IGV (18%)",
+    label: "Precio Final con IGV (P)",
     name: "precio_igv",
     type: "number",
     step: "0.01",
-    placeholder: "Ingrese el precio con IGV",
+    placeholder: "Precio calculado automáticamente",
+    readOnly: true,
   },
 ];
 
@@ -61,7 +61,6 @@ const tableStyles = {
 const tabs = [
   { id: 'tab1', label: 'Descripción' },
   { id: 'tab2', label: 'Características' },
-
   { id: 'tab4', label: 'Especificaciones Técnicas' },
   { id: 'tab5', label: 'Documentos/Descargas' },
   { id: 'tab6', label: 'Contenido de Envío' },
@@ -69,7 +68,7 @@ const tabs = [
   { id: 'tab8', label: 'Categorías' }
 ];
 
-const FormInput = ({ label, id, name, value, onChange, type = "text", placeholder, required = false, step, className = "" }) => {
+const FormInput = ({ label, id, name, value, onChange, type = "text", placeholder, required = false, step, className = "", readOnly = false }) => {
   const { isDarkMode } = useTheme();
   
   return (
@@ -101,12 +100,17 @@ const FormInput = ({ label, id, name, value, onChange, type = "text", placeholde
           onChange={onChange}
           placeholder={placeholder}
           className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
-            isDarkMode 
-              ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
-              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+            readOnly 
+              ? isDarkMode 
+                ? 'bg-gray-600 border-gray-500 text-gray-300 placeholder-gray-400' 
+                : 'bg-gray-100 border-gray-300 text-gray-600 placeholder-gray-500'
+              : isDarkMode 
+                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
           }`}
           required={required}
           step={step}
+          readOnly={readOnly}
         />
       )}
     </div>
@@ -252,9 +256,9 @@ const VideoInput = ({ value, onChange }) => {
           <iframe
             className="w-full h-96 rounded-md shadow-lg"
             src={value.replace("youtu.be", "www.youtube.com/embed")}
-          title="Vista previa del video"
-          allowFullScreen
-          />
+            title="Vista previa del video"
+            allowFullScreen
+            />
         </div>
       )}
     </div>
@@ -345,7 +349,6 @@ const Productos = ({ onSubmit }) => {
   const [modalType, setModalType] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
   const [porcentajeGanancia, setPorcentajeGanancia] = useState('');
-  const [editandoPorcentaje, setEditandoPorcentaje] = useState(false);
   const especificacionesRef = useRef(null);
 
   useEffect(() => {
@@ -383,44 +386,52 @@ const Productos = ({ onSubmit }) => {
     }
   };
 
+  const calculatePrices = (costoBase, porcentajeNum) => {
+    if (!isNaN(costoBase) && !isNaN(porcentajeNum) && porcentajeNum < 100 && porcentajeNum >= 0) {
+      // Calcular precio con ganancia (sin IGV): P = C × (100/(100-R))
+      const precioConGanancia = costoBase * (100 / (100 - porcentajeNum));
+      
+      // El precio_igv es el precio con IGV (precio con ganancia + 18%)
+      const precioConIGV = precioConGanancia * 1.18;
+      
+      return {
+        precio_ganancia: precioConGanancia.toFixed(2),
+        precio_igv: precioConIGV.toFixed(2)
+      };
+    }
+    return null;
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
+    
+    if (name === 'porcentaje_ganancia') {
+      setPorcentajeGanancia(value);
+      const costoBase = parseFloat(form.precio_sin_ganancia);
+      const porcentajeNum = parseFloat(value);
+      
+      const prices = calculatePrices(costoBase, porcentajeNum);
+      if (prices) {
+        setForm(prev => ({
+          ...prev,
+          ...prices
+        }));
+      }
+      return;
+    }
     
     // Actualizar el valor en el formulario
     setForm(prev => {
       const updatedForm = { ...prev, [name]: value };
       
-      // Si se actualiza el precio sin ganancia, calcular automáticamente el precio con IGV (18%)
+      // Si se actualiza el precio sin ganancia (C), calcular automáticamente
       if (name === 'precio_sin_ganancia' && value) {
-        const precioNumerico = parseFloat(value);
-        if (!isNaN(precioNumerico)) {
-          // Calcular precio con IGV (18%)
-          const precioConIGV = (precioNumerico * 1.18).toFixed(2);
-          updatedForm.precio_igv = precioConIGV;
-          
-          // Si hay un porcentaje de ganancia, aplicarlo al precio con IGV
-          if (porcentajeGanancia) {
-            const porcentajeNum = parseFloat(porcentajeGanancia);
-            if (!isNaN(porcentajeNum)) {
-              const precioConGanancia = (parseFloat(precioConIGV) * (1 + porcentajeNum / 100)).toFixed(2);
-              updatedForm.precio_ganancia = precioConGanancia;
-            }
-          }
-        }
-      }
-      
-      // Si se actualiza el porcentaje de ganancia
-      if (name === 'precio_ganancia' && value && editandoPorcentaje) {
-        setPorcentajeGanancia(value);
-        // Aplicar el porcentaje al precio con IGV en lugar del precio sin ganancia
-        const precioConIGV = parseFloat(prev.precio_igv);
-        if (!isNaN(precioConIGV)) {
-          const porcentajeNum = parseFloat(value);
-          if (!isNaN(porcentajeNum)) {
-            // Calcular precio con ganancia basado en el precio con IGV
-            const precioConGanancia = (precioConIGV * (1 + porcentajeNum / 100)).toFixed(2);
-            updatedForm.precio_ganancia = precioConGanancia;
-          }
+        const costoBase = parseFloat(value);
+        const porcentajeNum = parseFloat(porcentajeGanancia);
+        
+        const prices = calculatePrices(costoBase, porcentajeNum);
+        if (prices) {
+          Object.assign(updatedForm, prices);
         }
       }
       
@@ -428,18 +439,21 @@ const Productos = ({ onSubmit }) => {
     });
   };
   
-  // Inicializar el formulario
+  // Recalcular precios cuando cambie el porcentaje de ganancia
   useEffect(() => {
-    if (form.precio_igv && porcentajeGanancia) {
-      const precioConIGV = parseFloat(form.precio_igv);
+    if (form.precio_sin_ganancia && porcentajeGanancia) {
+      const costoBase = parseFloat(form.precio_sin_ganancia);
       const porcentajeNum = parseFloat(porcentajeGanancia);
       
-      if (!isNaN(precioConIGV) && !isNaN(porcentajeNum)) {
-        const precioConGanancia = (precioConIGV * (1 + porcentajeNum / 100)).toFixed(2);
-        setForm(prev => ({ ...prev, precio_ganancia: precioConGanancia }));
+      const prices = calculatePrices(costoBase, porcentajeNum);
+      if (prices) {
+        setForm(prev => ({
+          ...prev,
+          ...prices
+        }));
       }
     }
-  }, [porcentajeGanancia, form.precio_igv]); // Cambiar la dependencia de precio_sin_ganancia a precio_igv
+  }, [porcentajeGanancia, form.precio_sin_ganancia]);
 
   const handleCategoryChange = (event) => {
     setSelectedCategory(event.target.value);
@@ -483,6 +497,7 @@ const Productos = ({ onSubmit }) => {
         setForm(initialForm);
         setSelectedCategory('');
         setPreviewImage(null);
+        setPorcentajeGanancia('');
       } else {
         console.error('Error al crear el producto:', response.statusText);
       }
@@ -507,8 +522,6 @@ const Productos = ({ onSubmit }) => {
             ...jsonValue         // Agrega los nuevos datos
           } 
         };
-        
-
         
         return updatedForm;
       });
@@ -567,8 +580,6 @@ const Productos = ({ onSubmit }) => {
             </div>
           </div>
         );
-
-
 
       case 'tab4': // Especificaciones Técnicas
         return (
@@ -720,7 +731,7 @@ const Productos = ({ onSubmit }) => {
               />
 
               {priceFields.map(field => {
-                if (field.name === 'precio_ganancia') {
+                if (field.name === 'porcentaje_ganancia') {
                   return (
                     <div key={field.name} className="mb-4">
                       <label htmlFor={field.name} className={`block text-sm font-medium transition-colors duration-300 ${
@@ -731,28 +742,21 @@ const Productos = ({ onSubmit }) => {
                           type={field.type}
                           id={field.name}
                           name={field.name}
-                          value={editandoPorcentaje ? porcentajeGanancia : form[field.name]}
+                          value={porcentajeGanancia}
                           onChange={handleChange}
                           placeholder={field.placeholder}
                           className={`block w-full rounded-md shadow-sm pr-8 transition-colors duration-300 ${
                             isDarkMode 
-                              ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                              ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                              : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
                           }`} 
                           step={field.step}
-                          onFocus={() => {
-                            setEditandoPorcentaje(true);
-                            setPorcentajeGanancia(porcentajeGanancia || '');
-                          }}
-                          onBlur={() => {
-                            setEditandoPorcentaje(false);
-                          }}
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                          <span className="text-blue-500">%</span>
+                          <span className={`text-sm ${isDarkMode ? 'text-blue-400' : 'text-blue-500'}`}>%</span>
                         </div>
                       </div>
-                      {!editandoPorcentaje && form.precio_ganancia && (
+                      {porcentajeGanancia && (
                         <p className={`mt-1 text-xs transition-colors duration-300 ${
                           isDarkMode ? 'text-blue-400' : 'text-blue-500'
                         }`}>
@@ -762,6 +766,36 @@ const Productos = ({ onSubmit }) => {
                     </div>
                   );
                 }
+                
+                if (field.name === 'precio_igv') {
+                  return (
+                    <div key={field.name} className="mb-4">
+                      <label htmlFor={field.name} className={`block text-sm font-medium transition-colors duration-300 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                      }`}>{field.label}</label>
+                      <input
+                        type={field.type}
+                        id={field.name}
+                        name={field.name}
+                        value={form[field.name]}
+                        placeholder={field.placeholder}
+                        className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+                          isDarkMode 
+                            ? 'bg-gray-600 border-gray-500 text-gray-300 placeholder-gray-400' 
+                            : 'bg-gray-100 border-gray-300 text-gray-600 placeholder-gray-500'
+                        }`}
+                        step={field.step}
+                        readOnly
+                      />
+                      <p className={`mt-1 text-xs transition-colors duration-300 ${
+                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        IGV 18% incluido
+                      </p>
+                    </div>
+                  );
+                }
+                
                 return (
                   <FormInput
                     key={field.name}
