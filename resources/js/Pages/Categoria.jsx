@@ -6,9 +6,10 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
+import CategoryBrandSection from "../Components/categoria/CategoryBrandSection";
 const URL_API = import.meta.env.VITE_API_URL;
 
-export default function Categoria({ productos, categoria, subcategorias }) {
+export default function Categoria({ productos, categoria, subcategorias, marcas }) {
     const { auth } = usePage().props;
     const { isDarkMode } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
@@ -36,6 +37,7 @@ export default function Categoria({ productos, categoria, subcategorias }) {
         console.log(productos);
         console.log(subcategorias);
         console.log(categoria);
+        console.log(marcas);
     }, []);
 
     const toggleMenu = () => {
@@ -69,6 +71,7 @@ export default function Categoria({ productos, categoria, subcategorias }) {
                         <>
                           <h1 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>Categoría: {categoria.nombre}</h1>
                           <ProductGrid products={productos} />
+                          <CategoryBrandSection marcas={marcas} />
                         </>
                     ) : (
                         <>
@@ -78,6 +81,7 @@ export default function Categoria({ productos, categoria, subcategorias }) {
                         </div>
                         <button onClick={handleMostrarProductos} className={`${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#184f96] hover:bg-blue-800'} text-white py-2 px-4 rounded transition-all duration-200 mb-4 mx-auto block`}>Mostrar productos</button>
                         {mostrarProductos && <ProductGrid />}
+                        <CategoryBrandSection marcas={marcas} />
                         </>
                     )}
                      <div className="flex justify-center">

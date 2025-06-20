@@ -18,10 +18,12 @@ class CategoriaController extends Controller
             $productos = [];
             $categoria = null;
             $subcategorias = [];
+            $marcas = [];
             return Inertia::render('Categoria', [
                 'productos' => $productos,
                 'categoria' => $categoria,
                 'subcategorias' => $subcategorias,
+                'marcas' => $marcas,
             ]);
         }
 
@@ -36,6 +38,9 @@ class CategoriaController extends Controller
         // Obtener las subcategorías asociadas a la categoría
         $subcategorias = $categoria->subcategorias;
 
+        // Obtener las marcas relacionadas a la categoría
+        $marcas = $categoria->marcas;
+
         // Verificar los IDs de las subcategorías
         $subcategoriaIds = $subcategorias->pluck('id_subcategoria')->toArray();
 
@@ -47,6 +52,7 @@ class CategoriaController extends Controller
             'productos' => $productos,
             'categoria' => $categoria,
             'subcategorias' => $subcategorias,
+            'marcas' => $marcas,
         ]);
     }
 
