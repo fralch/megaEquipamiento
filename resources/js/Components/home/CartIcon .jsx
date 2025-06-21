@@ -26,9 +26,18 @@ const CartIcon = () => {
     }, 200);
   };
 
+  const handleUpdateQuantity = (itemId, change) => {
+    dispatch({
+      type: 'UPDATE_QUANTITY',
+      payload: { id: itemId, change }
+    });
+  };
+
   useEffect(() => {
-    setTotal(cart.reduce((acc, item) => acc + item.price, 0));
-    setTotalItems(cart.length);
+    // Calcular el total considerando la cantidad de cada producto
+    setTotal(cart.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0));
+    // Calcular el total de items considerando las cantidades
+    setTotalItems(cart.reduce((acc, item) => acc + (item.quantity || 1), 0));
   }, [cart]);
 
   return (
@@ -40,6 +49,7 @@ const CartIcon = () => {
         @keyframes gentlePulse{0%,100%{transform:scale(1);box-shadow:0 8px 25px rgba(59,130,246,0.15)}50%{transform:scale(1.02);box-shadow:0 12px 35px rgba(59,130,246,0.25)}}
         @keyframes elegantBounce{0%{transform:scale(0.3) rotate(-10deg);opacity:0}50%{transform:scale(1.1) rotate(5deg)}70%{transform:scale(0.95) rotate(-2deg)}100%{transform:scale(1) rotate(0deg);opacity:1}}
         @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        @keyframes quantityPop{0%{transform:scale(0.8)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
         .cart-scrollbar::-webkit-scrollbar{width:6px}
         .cart-scrollbar::-webkit-scrollbar-track{background:${isDarkMode ? "rgba(51,65,85,0.3)" : "rgba(241,245,249,0.5)"
           };border-radius:10px}
@@ -47,6 +57,42 @@ const CartIcon = () => {
         .cart-scrollbar::-webkit-scrollbar-thumb:hover{background:linear-gradient(to bottom,#2563eb,#1e40af)}
         .glass-effect{backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
         .shimmer-effect{background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);background-size:200% 100%;animation:shimmer 2s infinite}
+        .quantity-button{
+          background: ${isDarkMode ? "rgba(51,65,85,0.8)" : "rgba(241,245,249,0.9)"};
+          color: ${isDarkMode ? "#cbd5e1" : "#475569"};
+          border: 1px solid ${isDarkMode ? "rgba(71,85,105,0.5)" : "rgba(203,213,225,0.8)"};
+          width: 28px;
+          height: 28px;
+          border-radius: 8px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          font-weight: 600;
+          transition: all 0.2s ease;
+          user-select: none;
+        }
+        .quantity-button:hover:not(:disabled){
+          background: ${isDarkMode ? "rgba(71,85,105,0.9)" : "rgba(226,232,240,1)"};
+          border-color: rgba(59,130,246,0.5);
+          transform: scale(1.1);
+        }
+        .quantity-button:active:not(:disabled){
+          transform: scale(0.95);
+        }
+        .quantity-button:disabled{
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+        .quantity-display{
+          min-width: 32px;
+          text-align: center;
+          font-weight: 700;
+          font-size: 15px;
+          color: ${isDarkMode ? "#f1f5f9" : "#1e293b"};
+          padding: 0 8px;
+        }
         `}
       </style>
 
@@ -388,6 +434,7 @@ const CartIcon = () => {
                                   "center",
                                 fontSize:
                                   "13px",
+                                marginBottom: "12px",
                               }}
                             >
                               <span
@@ -412,6 +459,58 @@ const CartIcon = () => {
                                     2
                                   )
                                   : "0.00"}
+                              </span>
+                            </div>
+                            
+                            {/* Controles de cantidad */}
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                marginTop: "8px",
+                              }}
+                            >
+                              <button
+                                className="quantity-button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateQuantity(item.id, -1);
+                                }}
+                                disabled={(item.quantity || 1) <= 1}
+                                style={{
+                                  animation: hoveredItem === item.id ? "quantityPop 0.3s ease" : "none",
+                                }}
+                              >
+                                −
+                              </button>
+                              
+                              <span className="quantity-display">
+                                {item.quantity || 1}
+                              </span>
+                              
+                              <button
+                                className="quantity-button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleUpdateQuantity(item.id, 1);
+                                }}
+                                style={{
+                                  animation: hoveredItem === item.id ? "quantityPop 0.3s ease" : "none",
+                                }}
+                              >
+                                +
+                              </button>
+                              
+                              <span
+                                style={{
+                                  marginLeft: "auto",
+                                  fontSize: "14px",
+                                  fontWeight: "600",
+                                  color: isDarkMode ? "#94a3b8" : "#64748b",
+                                }}
+                              >
+                                Subtotal: S/ {((item.price || 0) * (item.quantity || 1)).toFixed(2)}
                               </span>
                             </div>
                           </div>
