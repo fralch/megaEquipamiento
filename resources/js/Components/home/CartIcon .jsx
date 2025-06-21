@@ -123,7 +123,7 @@ const CartIcon = () => {
             right: "-3px",
             fontSize: "12px",
             fontWeight: "800",
-            border: "3px solid rgba(255,255,255,0.9)",
+            border: "2px solid rgba(255,255,255,0.9)",
             boxShadow:
               totalItems > 0
                 ? "0 6px 20px rgba(220,38,38,0.4), 0 0 0 2px rgba(220,38,38,0.1)"
