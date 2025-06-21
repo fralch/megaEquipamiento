@@ -117,7 +117,7 @@ const CheckoutStepper = ({ currentStep = 1, isDarkMode }) => {
 };
 
 // --- Componente Item del Carrito ---
-const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode }) => {
+const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isDarkMode }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const handleDelete = () => {
@@ -202,7 +202,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
                                 }`}>
                                     <button
                                         onClick={() => onUpdateQuantity(displayItem.id, -1)}
-                                        disabled={displayItem.quantity <= 1 || isUpdating}
+                                        disabled={displayItem.quantity <= 1}
                                         className={`
                                             w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200
                                             ${displayItem.quantity <= 1 
@@ -226,7 +226,6 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
                                     
                                     <button
                                         onClick={() => onUpdateQuantity(displayItem.id, 1)}
-                                        disabled={isUpdating}
                                         className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors duration-200 ${
                                             isDarkMode 
                                                 ? 'text-gray-300 hover:bg-gray-600 active:bg-gray-500'
@@ -303,14 +302,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemoveItem, isUpdating, isDarkMode
                 </div>
             </div>
 
-            {/* Overlay de loading */}
-            {isUpdating && (
-                <div className={`absolute inset-0 bg-opacity-50 rounded-xl flex items-center justify-center ${
-                    isDarkMode ? 'bg-gray-900' : 'bg-white'
-                }`}>
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                </div>
-            )}
+
         </div>
     );
 };
@@ -465,7 +457,7 @@ const EmptyCart = ({ isDarkMode }) => {
 // --- Componente Principal ---
 export default function Carrito() {
     const { cart, dispatch } = useContext(CartContext);
-    const [updatingItems, setUpdatingItems] = useState(new Set());
+
     const { isDarkMode } = useTheme();
 
     // Debug: log cart changes
@@ -486,22 +478,11 @@ export default function Carrito() {
 
     const totalItems = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
-    const handleUpdateQuantity = async (itemId, change) => {
-        setUpdatingItems(prev => new Set([...prev, itemId]));
-        
-        // Simular delay de API
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Dispatch action to update quantity in context
+    const handleUpdateQuantity = (itemId, change) => {
+        // Dispatch action to update quantity in context immediately
         dispatch({
             type: 'UPDATE_QUANTITY',
             payload: { id: itemId, change }
-        });
-        
-        setUpdatingItems(prev => {
-            const newSet = new Set(prev);
-            newSet.delete(itemId);
-            return newSet;
         });
         
         // **PUNTO DE INTEGRACIÓN INERTIA:**
@@ -553,7 +534,7 @@ export default function Carrito() {
                                         item={item}
                                         onUpdateQuantity={handleUpdateQuantity}
                                         onRemoveItem={handleRemoveItem}
-                                        isUpdating={updatingItems.has(item.id)}
+
                                         isDarkMode={isDarkMode}
                                     />
                                 ))}
