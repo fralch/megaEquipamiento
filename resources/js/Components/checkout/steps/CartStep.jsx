@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import CartItem from "../components/CartItem";
 import CartSummary from "../components/CartSummary";
 import EmptyCart from "../components/EmptyCart";
@@ -56,8 +56,7 @@ const CartStep = ({ cartItems, onUpdateQuantity, onRemoveItem, onComplete, isDar
                         total={calculateTotal()}
                         itemCount={totalItems}
                         isDarkMode={isDarkMode}
-                        onProceed={handleProceedToCheckout}
-                        buttonText="Continuar con la dirección"
+                        onProceedToCheckout={handleProceedToCheckout}
                     />
                 </div>
             </div>

@@ -95,7 +95,7 @@ const CartSummary = ({ total, itemCount, isDarkMode, onProceedToCheckout }) => {
             <p className={`text-xs text-center mt-3 ${
                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
             }`}>
-                Envío gratuito en pedidos superiores a S/ 500 (incluye envío de productos)
+                Envío gratuito en pedidos superiores a S/ 800 (incluye envío de productos)
             </p>
         </>
     );
