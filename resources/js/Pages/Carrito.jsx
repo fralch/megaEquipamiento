@@ -4,6 +4,8 @@ import { useForm } from '@inertiajs/react';
 import { CartContext } from '../storage/CartContext';
 import Header from "@/Components/home/Header";
 import Footer from "@/Components/home/Footer";
+import CheckoutTabs from '../Components/checkout/CheckoutTabs';
+import { router } from '@inertiajs/react';
 
 // --- Helper para formatear moneda ---
 const formatCurrency = (value) => {
@@ -501,59 +503,38 @@ export default function Carrito() {
     };
 
     return (
-        <>
+        <div className={`min-h-screen transition-colors duration-300 ${
+            isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+        }`}>
             <Header />
             
-            <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-                <div className="container mx-auto px-4 py-8">
-                    {/* Header */}
+            <main className="container mx-auto px-4 py-8">
+                <div className="max-w-7xl mx-auto">
+                    {/* Header del carrito */}
                     <div className="mb-8">
-                        <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                            Carrito de compras
+                        <h1 className={`text-3xl font-bold ${
+                            isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                        }`}>
+                            Proceso de Compra
                         </h1>
-                        {cartItems.length > 0 && (
-                            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-2`}>
-                                {totalItems} {totalItems === 1 ? 'producto' : 'productos'} en tu carrito
-                            </p>
-                        )}
+                        <p className={`mt-2 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                            Completa tu compra paso a paso
+                        </p>
                     </div>
 
-                    {/* Stepper */}
-                    {cartItems.length > 0 && <CheckoutStepper currentStep={1} isDarkMode={isDarkMode} />}
-
-                    {/* Contenido principal */}
-                    {cartItems.length === 0 ? (
-                        <EmptyCart isDarkMode={isDarkMode} />
-                    ) : (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Lista de productos */}
-                            <div className="lg:col-span-2 space-y-4">
-                                {cartItems.map((item) => (
-                                    <CartItem
-                                        key={item.id}
-                                        item={item}
-                                        onUpdateQuantity={handleUpdateQuantity}
-                                        onRemoveItem={handleRemoveItem}
-
-                                        isDarkMode={isDarkMode}
-                                    />
-                                ))}
-                            </div>
-
-                            {/* Resumen */}
-                            <div className="lg:col-span-1">
-                                <CartSummary
-                                    total={calculateTotal()}
-                                    itemCount={totalItems}
-                                    isDarkMode={isDarkMode}
-                                />
-                            </div>
-                        </div>
-                    )}
+                    {/* Checkout con tabs */}
+                    <CheckoutTabs 
+                        cartItems={cartItems}
+                        onUpdateQuantity={handleUpdateQuantity}
+                        onRemoveItem={handleRemoveItem}
+                        isDarkMode={isDarkMode}
+                    />
                 </div>
-            </div>
+            </main>
             
             <Footer />
-        </>
+        </div>
     );
 }
