@@ -16,7 +16,6 @@ export default function Carrito() {
             address: 'Av. Javier Prado 123',
             district: 'San Isidro',
             city: 'Lima',
-            postalCode: '15036',
             phone: '987654321',
             isDefault: true
         },
@@ -27,7 +26,6 @@ export default function Carrito() {
             address: 'Calle Los Pinos 456',
             district: 'Miraflores',
             city: 'Lima',
-            postalCode: '15074',
             phone: '987654322',
             isDefault: false
         }

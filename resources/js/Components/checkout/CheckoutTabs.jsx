@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../storage/ThemeContext';
+import { CheckoutProvider } from '../../storage/CheckoutContext';
 import CartStep from './steps/CartStep';
 import AddressStep from './steps/AddressStep';
 import ShippingStep from './steps/ShippingStep';
@@ -103,9 +104,7 @@ const CheckoutTabs = ({ cartItems, onUpdateQuantity, onRemoveItem, userAddresses
                 return (
                     <AddressStep
                         onComplete={(data) => handleStepComplete(2, { address: data })}
-                        initialData={stepData.address}
                         isDarkMode={isDarkMode}
-                        addresses={userAddresses} // Pasar las direcciones al componente
                     />
                 );
             case 3:
@@ -140,8 +139,9 @@ const CheckoutTabs = ({ cartItems, onUpdateQuantity, onRemoveItem, userAddresses
     };
 
     return (
-        <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
-            <div className="container mx-auto px-4 py-8">
+        <CheckoutProvider>
+            <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                <div className="container mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
@@ -227,8 +227,9 @@ const CheckoutTabs = ({ cartItems, onUpdateQuantity, onRemoveItem, userAddresses
                         Paso {activeStep} de {steps.length}
                     </div>
                 </div>
+                </div>
             </div>
-        </div>
+        </CheckoutProvider>
     );
 };
 

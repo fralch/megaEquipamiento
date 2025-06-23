@@ -232,7 +232,6 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
                             <p className="font-medium">{orderData?.address?.fullName}</p>
                             <p>{orderData?.address?.address}</p>
                             <p>{orderData?.address?.district}, {orderData?.address?.city}</p>
-                            <p>{orderData?.address?.postalCode}</p>
                             <p className="mt-2">
                                 <span className="font-medium">Teléfono:</span> {orderData?.address?.phone}
                             </p>
