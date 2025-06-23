@@ -3,12 +3,6 @@ import React, { useState } from 'react';
 const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
     const [selectedPayment, setSelectedPayment] = useState(initialData?.method || null);
     const [paymentData, setPaymentData] = useState({
-        // Tarjeta de crédito/débito
-        cardNumber: initialData?.cardNumber || '',
-        cardName: initialData?.cardName || '',
-        expiryDate: initialData?.expiryDate || '',
-        cvv: initialData?.cvv || '',
-        
         // Transferencia bancaria
         bankAccount: initialData?.bankAccount || '',
         
@@ -19,19 +13,10 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
         documentNumber: initialData?.documentNumber || '',
         
         // Opciones
-        savePaymentMethod: initialData?.savePaymentMethod || false,
         requestInvoice: initialData?.requestInvoice || false
     });
 
     const paymentMethods = [
-        {
-            id: 'card',
-            name: 'Tarjeta de crédito/débito',
-            description: 'Visa, Mastercard, American Express',
-            icon: 'card',
-            processingTime: 'Inmediato',
-            fees: 'Sin comisiones adicionales'
-        },
         {
             id: 'transfer',
             name: 'Transferencia bancaria',
@@ -85,11 +70,6 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
 
     const getPaymentIcon = (iconType) => {
         const icons = {
-            card: (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
-            ),
             bank: (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -101,7 +81,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
                 </svg>
             )
         };
-        return icons[iconType] || icons.card;
+        return icons[iconType] || icons.bank;
     };
 
     const handlePaymentSelect = (method) => {
@@ -112,28 +92,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
         setPaymentData(prev => ({ ...prev, [field]: value }));
     };
 
-    const formatCardNumber = (value) => {
-        const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-        const matches = v.match(/\d{4,16}/g);
-        const match = matches && matches[0] || '';
-        const parts = [];
-        for (let i = 0, len = match.length; i < len; i += 4) {
-            parts.push(match.substring(i, i + 4));
-        }
-        if (parts.length) {
-            return parts.join(' ');
-        } else {
-            return v;
-        }
-    };
 
-    const formatExpiryDate = (value) => {
-        const v = value.replace(/\D/g, '');
-        if (v.length >= 2) {
-            return v.substring(0, 2) + '/' + v.substring(2, 4);
-        }
-        return v;
-    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -142,13 +101,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
             return;
         }
 
-        // Validaciones básicas según el método de pago
-        if (selectedPayment === 'card') {
-            if (!paymentData.cardNumber || !paymentData.cardName || !paymentData.expiryDate || !paymentData.cvv) {
-                return;
-            }
-        }
-
+        // Validaciones básicas
         if (!paymentData.documentNumber) {
             return;
         }
@@ -164,101 +117,6 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
 
     const renderPaymentForm = () => {
         switch (selectedPayment) {
-            case 'card':
-                return (
-                    <div className="space-y-4">
-                        <div>
-                            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                Número de tarjeta *
-                            </label>
-                            <input
-                                type="text"
-                                value={paymentData.cardNumber}
-                                onChange={(e) => handleInputChange('cardNumber', formatCardNumber(e.target.value))}
-                                placeholder="1234 5678 9012 3456"
-                                maxLength={19}
-                                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                    isDarkMode
-                                        ? 'bg-gray-700 border-gray-600 text-gray-200'
-                                        : 'bg-white border-gray-300 text-gray-900'
-                                }`}
-                                required
-                            />
-                        </div>
-                        
-                        <div>
-                            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                Nombre en la tarjeta *
-                            </label>
-                            <input
-                                type="text"
-                                value={paymentData.cardName}
-                                onChange={(e) => handleInputChange('cardName', e.target.value.toUpperCase())}
-                                placeholder="JUAN PEREZ"
-                                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                    isDarkMode
-                                        ? 'bg-gray-700 border-gray-600 text-gray-200'
-                                        : 'bg-white border-gray-300 text-gray-900'
-                                }`}
-                                required
-                            />
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    Fecha de vencimiento *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={paymentData.expiryDate}
-                                    onChange={(e) => handleInputChange('expiryDate', formatExpiryDate(e.target.value))}
-                                    placeholder="MM/AA"
-                                    maxLength={5}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                        isDarkMode
-                                            ? 'bg-gray-700 border-gray-600 text-gray-200'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                    }`}
-                                    required
-                                />
-                            </div>
-                            
-                            <div>
-                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    CVV *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={paymentData.cvv}
-                                    onChange={(e) => handleInputChange('cvv', e.target.value.replace(/\D/g, ''))}
-                                    placeholder="123"
-                                    maxLength={4}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                        isDarkMode
-                                            ? 'bg-gray-700 border-gray-600 text-gray-200'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                    }`}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                id="savePaymentMethod"
-                                checked={paymentData.savePaymentMethod}
-                                onChange={(e) => handleInputChange('savePaymentMethod', e.target.checked)}
-                                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            />
-                            <label htmlFor="savePaymentMethod" className={`ml-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                Guardar método de pago para futuras compras
-                            </label>
-                        </div>
-                    </div>
-                );
-                
             case 'transfer':
                 return (
                     <div className={`p-6 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-blue-50 border-blue-200'}`}>

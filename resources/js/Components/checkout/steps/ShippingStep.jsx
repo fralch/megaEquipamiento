@@ -256,24 +256,7 @@ const ShippingStep = ({ onComplete, initialData, addressData, isDarkMode }) => {
                             </div>
                         )}
 
-                        {/* Instrucciones especiales */}
-                        <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-                            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                Instrucciones especiales de entrega (opcional)
-                            </label>
-                            <textarea
-                                value={specialInstructions}
-                                onChange={(e) => setSpecialInstructions(e.target.value)}
-                                placeholder="Ej: Entregar en recepción, tocar timbre dos veces, etc."
-                                rows={3}
-                                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                    isDarkMode
-                                        ? 'bg-gray-700 border-gray-600 text-gray-200'
-                                        : 'bg-white border-gray-300 text-gray-900'
-                                }`}
-                            />
-                        </div>
-
+                      
                         <button
                             type="submit"
                             disabled={!selectedShipping}
