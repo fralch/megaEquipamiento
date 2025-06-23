@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
+import { useCheckout } from '../../../storage/CheckoutContext';
 
 const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
+    const { checkoutState, updateCustomerData } = useCheckout();
     const [selectedPayment, setSelectedPayment] = useState(initialData?.method || null);
     const [paymentData, setPaymentData] = useState({
         // Transferencia bancaria
         bankAccount: initialData?.bankAccount || '',
         
-        // Datos de facturación
-        billingAddress: initialData?.billingAddress || orderData?.address?.address || '',
-        billingName: initialData?.billingName || orderData?.address?.fullName || '',
-        documentType: initialData?.documentType || 'dni',
-        documentNumber: initialData?.documentNumber || '',
-        
         // Opciones
         requestInvoice: initialData?.requestInvoice || false
     });
+    
+    // Obtener datos de facturación del contexto
+    const billingData = {
+        billingAddress: checkoutState.customerData?.address || '',
+        billingName: checkoutState.customerData?.fullName || '',
+        documentType: checkoutState.customerData?.rucDni?.length === 11 ? 'ruc' : 'dni',
+        documentNumber: checkoutState.customerData?.rucDni || '',
+        company: checkoutState.customerData?.company || '',
+        email: checkoutState.customerData?.email || ''
+    };
 
     const paymentMethods = [
         {
@@ -89,7 +95,18 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
     };
 
     const handleInputChange = (field, value) => {
-        setPaymentData(prev => ({ ...prev, [field]: value }));
+        // Si es un campo de facturación, actualizar el contexto
+        if (['documentNumber', 'documentType', 'company', 'email'].includes(field)) {
+            if (field === 'documentNumber') {
+                updateCustomerData({ rucDni: value });
+            } else if (field === 'company') {
+                updateCustomerData({ company: value });
+            } else if (field === 'email') {
+                updateCustomerData({ email: value });
+            }
+        } else {
+            setPaymentData(prev => ({ ...prev, [field]: value }));
+        }
     };
 
 
@@ -102,13 +119,14 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
         }
 
         // Validaciones básicas
-        if (!paymentData.documentNumber) {
+        if (!billingData.documentNumber) {
             return;
         }
 
         const finalPaymentData = {
             method: selectedPayment,
             ...paymentData,
+            ...billingData,
             totals
         };
 
@@ -293,7 +311,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
                                             Tipo de documento *
                                         </label>
                                         <select
-                                            value={paymentData.documentType}
+                                            value={billingData.documentType}
                                             onChange={(e) => handleInputChange('documentType', e.target.value)}
                                             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                                 isDarkMode
@@ -313,9 +331,9 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
                                         </label>
                                         <input
                                             type="text"
-                                            value={paymentData.documentNumber}
+                                            value={billingData.documentNumber}
                                             onChange={(e) => handleInputChange('documentNumber', e.target.value)}
-                                            placeholder={paymentData.documentType === 'dni' ? '12345678' : paymentData.documentType === 'ruc' ? '12345678901' : 'A1234567'}
+                                            placeholder={billingData.documentType === 'dni' ? '12345678' : billingData.documentType === 'ruc' ? '12345678901' : 'A1234567'}
                                             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                                 isDarkMode
                                                     ? 'bg-gray-700 border-gray-600 text-gray-200'
