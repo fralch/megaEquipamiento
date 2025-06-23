@@ -7,6 +7,31 @@ import CheckoutTabs from "../Components/checkout/CheckoutTabs";
 
 // --- Componente Principal ---
 export default function Carrito() {
+    // Datos simulados de direcciones del usuario
+    const userAddresses = [
+        {
+            id: 1,
+            name: 'Casa',
+            fullName: 'Juan Pérez',
+            address: 'Av. Javier Prado 123',
+            district: 'San Isidro',
+            city: 'Lima',
+            postalCode: '15036',
+            phone: '987654321',
+            isDefault: true
+        },
+        {
+            id: 2,
+            name: 'Oficina',
+            fullName: 'Juan Pérez',
+            address: 'Calle Los Pinos 456',
+            district: 'Miraflores',
+            city: 'Lima',
+            postalCode: '15074',
+            phone: '987654322',
+            isDefault: false
+        }
+    ];
     const { cart, dispatch } = useContext(CartContext);
 
     const { isDarkMode } = useTheme();
@@ -57,6 +82,7 @@ export default function Carrito() {
                         onUpdateQuantity={handleUpdateQuantity}
                         onRemoveItem={handleRemoveItem}
                         isDarkMode={isDarkMode}
+                        userAddresses={userAddresses} // Pasar las direcciones simuladas
                     />
                 </div>
             </main>

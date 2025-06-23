@@ -20,6 +20,7 @@ const AddressStep = ({ onComplete, initialData, isDarkMode }) => {
     const [showNewAddressForm, setShowNewAddressForm] = useState(false);
     
     const { data, setData, errors, processing } = useForm({
+        // Campos existentes
         fullName: initialData?.fullName || '',
         address: initialData?.address || '',
         district: initialData?.district || '',
@@ -27,7 +28,15 @@ const AddressStep = ({ onComplete, initialData, isDarkMode }) => {
         postalCode: initialData?.postalCode || '',
         phone: initialData?.phone || '',
         reference: initialData?.reference || '',
-        saveAddress: false
+        saveAddress: false,
+        
+        // Nuevos campos basados en la imagen
+        company: initialData?.company || '',
+        department: initialData?.department || '',
+        rucDni: initialData?.rucDni || '',
+
+        email: initialData?.email || '',
+
     });
 
     const districts = [
@@ -47,7 +56,14 @@ const AddressStep = ({ onComplete, initialData, isDarkMode }) => {
             postalCode: address.postalCode,
             phone: address.phone,
             reference: address.reference || '',
-            saveAddress: false
+            saveAddress: false,
+            // Mantener valores adicionales si existen
+            company: address.company || '',
+            department: address.department || '',
+            rucDni: address.rucDni || '',
+
+            email: address.email || '',
+
         });
         setShowNewAddressForm(false);
     };
@@ -62,7 +78,13 @@ const AddressStep = ({ onComplete, initialData, isDarkMode }) => {
             postalCode: '',
             phone: '',
             reference: '',
-            saveAddress: true
+            saveAddress: true,
+            company: '',
+            department: '',
+            rucDni: '',
+
+            email: '',
+
         });
         setShowNewAddressForm(true);
     };
@@ -71,7 +93,7 @@ const AddressStep = ({ onComplete, initialData, isDarkMode }) => {
         e.preventDefault();
         
         // Validación básica
-        if (!data.fullName || !data.address || !data.district || !data.phone) {
+        if (!data.fullName || !data.address || !data.district || !data.phone || !data.rucDni) {
             return;
         }
 
@@ -190,15 +212,108 @@ const AddressStep = ({ onComplete, initialData, isDarkMode }) => {
                                 {showNewAddressForm ? 'Nueva dirección' : 'Editar dirección'}
                             </h3>
                             
+                            {/* Información de la empresa (opcional) */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                        Nombre completo *
+                                        Empresa
                                     </label>
                                     <input
                                         type="text"
-                                        value={data.fullName}
-                                        onChange={(e) => setData('fullName', e.target.value)}
+                                        value={data.company}
+                                        onChange={(e) => setData('company', e.target.value)}
+                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-gray-200'
+                                                : 'bg-white border-gray-300 text-gray-900'
+                                        }`}
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        Departamento
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.department}
+                                        onChange={(e) => setData('department', e.target.value)}
+                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-gray-200'
+                                                : 'bg-white border-gray-300 text-gray-900'
+                                        }`}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* RUC/DNI */}
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    RUC/DNI *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.rucDni}
+                                    onChange={(e) => setData('rucDni', e.target.value)}
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-gray-200'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                    required
+                                />
+                            </div>
+
+
+
+                            {/* Nombre completo */}
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    Nombre completo *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.fullName}
+                                    onChange={(e) => setData('fullName', e.target.value)}
+                                    placeholder="Ej: Juan Carlos Pérez García"
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-gray-200'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                    required
+                                />
+                            </div>
+
+                            {/* Dirección */}
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    Dirección *
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.address}
+                                    onChange={(e) => setData('address', e.target.value)}
+                                    placeholder="Ej: Av. Javier Prado 123"
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-gray-200'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                    required
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        Ciudad *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.city}
+                                        onChange={(e) => setData('city', e.target.value)}
                                         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                             isDarkMode
                                                 ? 'bg-gray-700 border-gray-600 text-gray-200'
@@ -210,41 +325,21 @@ const AddressStep = ({ onComplete, initialData, isDarkMode }) => {
                                 
                                 <div>
                                     <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                        Teléfono *
+                                        País *
                                     </label>
-                                    <input
-                                        type="tel"
-                                        value={data.phone}
-                                        onChange={(e) => setData('phone', e.target.value)}
+                                    <select
+                                        value="Perú"
                                         className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                                             isDarkMode
                                                 ? 'bg-gray-700 border-gray-600 text-gray-200'
                                                 : 'bg-white border-gray-300 text-gray-900'
                                         }`}
-                                        required
-                                    />
+                                        readOnly
+                                    >
+                                        <option value="Perú">Perú</option>
+                                    </select>
                                 </div>
-                            </div>
-
-                            <div>
-                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    Dirección *
-                                </label>
-                                <input
-                                    type="text"
-                                    value={data.address}
-                                    onChange={(e) => setData('address', e.target.value)}
-                                    placeholder="Ej: Av. Javier Prado 123, Dpto 401"
-                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                        isDarkMode
-                                            ? 'bg-gray-700 border-gray-600 text-gray-200'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                    }`}
-                                    required
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                
                                 <div>
                                     <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                         Distrito *
@@ -265,41 +360,47 @@ const AddressStep = ({ onComplete, initialData, isDarkMode }) => {
                                         ))}
                                     </select>
                                 </div>
-                                
-                                <div>
-                                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                        Ciudad
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={data.city}
-                                        onChange={(e) => setData('city', e.target.value)}
-                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                            isDarkMode
-                                                ? 'bg-gray-700 border-gray-600 text-gray-200'
-                                                : 'bg-white border-gray-300 text-gray-900'
-                                        }`}
-                                        readOnly
-                                    />
-                                </div>
-                                
-                                <div>
-                                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                        Código postal
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={data.postalCode}
-                                        onChange={(e) => setData('postalCode', e.target.value)}
-                                        placeholder="15036"
-                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                                            isDarkMode
-                                                ? 'bg-gray-700 border-gray-600 text-gray-200'
-                                                : 'bg-white border-gray-300 text-gray-900'
-                                        }`}
-                                    />
-                                </div>
                             </div>
+
+                            {/* Email */}
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    Dirección E-Mail *
+                                </label>
+                                <input
+                                    type="email"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-gray-200'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                    required
+                                />
+                            </div>
+
+
+
+                            {/* Teléfono */}
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    Teléfono *
+                                </label>
+                                <input
+                                    type="tel"
+                                    value={data.phone}
+                                    onChange={(e) => setData('phone', e.target.value)}
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-gray-200'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                    required
+                                />
+                            </div>
+
+
 
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -338,7 +439,7 @@ const AddressStep = ({ onComplete, initialData, isDarkMode }) => {
                                 disabled={processing}
                                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50"
                             >
-                                {processing ? 'Guardando...' : 'Continuar con el envío'}
+                                {processing ? 'Guardando...' : 'Continuar'}
                             </button>
                         </form>
                     )}

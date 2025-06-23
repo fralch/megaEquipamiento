@@ -6,7 +6,7 @@ import ShippingStep from './steps/ShippingStep';
 import PaymentStep from './steps/PaymentStep';
 import ConfirmStep from './steps/ConfirmStep';
 
-const CheckoutTabs = ({ cartItems, onUpdateQuantity, onRemoveItem }) => {
+const CheckoutTabs = ({ cartItems, onUpdateQuantity, onRemoveItem, userAddresses = [] }) => {
     const { isDarkMode } = useTheme();
     const [activeStep, setActiveStep] = useState(1);
     const [completedSteps, setCompletedSteps] = useState([]);
@@ -105,6 +105,7 @@ const CheckoutTabs = ({ cartItems, onUpdateQuantity, onRemoveItem }) => {
                         onComplete={(data) => handleStepComplete(2, { address: data })}
                         initialData={stepData.address}
                         isDarkMode={isDarkMode}
+                        addresses={userAddresses} // Pasar las direcciones al componente
                     />
                 );
             case 3:
