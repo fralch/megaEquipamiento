@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
+import { useCheckout } from '../../../storage/CheckoutContext';
 
 const ConfirmStep = ({ orderData, isDarkMode }) => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [orderNumber, setOrderNumber] = useState(null);
+    const { checkoutState } = useCheckout();
 
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('es-PE', {
@@ -89,6 +91,22 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
     };
 
     const handleViewOrder = () => {
+        // Mostrar todos los datos del pedido en console
+        console.log('=== DATOS COMPLETOS DEL PEDIDO ===');
+        console.log('Número de orden:', orderNumber);
+        console.log('Datos del pedido (orderData):', orderData);
+        console.log('Totales calculados:', totals);
+        
+        // Datos del contexto de checkout
+        console.log('Estado completo del checkout:', checkoutState);
+        console.log('Datos del cliente:', checkoutState.customerData);
+        console.log('Datos de envío:', checkoutState.shippingData);
+        console.log('Datos de pago:', checkoutState.paymentData);
+        console.log('Resumen del pedido:', checkoutState.orderSummary);
+        console.log('Paso actual:', checkoutState.currentStep);
+        console.log('Pasos completados:', checkoutState.completedSteps);
+        console.log('=== FIN DATOS DEL PEDIDO ===');
+        
         router.visit(`/orders/${orderNumber}`);
     };
 
