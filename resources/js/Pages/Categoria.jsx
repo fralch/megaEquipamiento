@@ -195,7 +195,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                             )}
                           </h1>
                           <ProductGrid products={filteredProducts} />
-                          <CategoryBrandSection marcas={marcas} />
+                          <CategoryBrandSection marcas={selectedBrand ? marcas.filter(marca => String(marca.id_marca) === String(selectedBrand)) : marcas} />
                         </>
                     ) : (
                         <>
@@ -205,7 +205,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                         </div>
                         <button onClick={handleMostrarProductos} className={`${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#184f96] hover:bg-blue-800'} text-white py-2 px-4 rounded transition-all duration-200 mb-4 mx-auto block`}>Mostrar productos</button>
                         {mostrarProductos && <ProductGrid products={filteredProducts} />}
-                        <CategoryBrandSection marcas={marcas} />
+                        <CategoryBrandSection marcas={selectedBrand ? marcas.filter(marca => String(marca.id_marca) === String(selectedBrand)) : marcas} />
                         </>
                     )}
                      <div className="flex justify-center">
