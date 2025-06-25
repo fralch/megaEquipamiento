@@ -28,7 +28,19 @@ class ProductoController extends Controller
         
         // El ID de la marca viene como parámetro opcional de la ruta
         // $marca_id ya está disponible como parámetro de la función
-    
+
+        // Obtener la subcategoría por su ID
+        $subcategoria = Subcategoria::find($id);
+
+        if (!$subcategoria) {
+            return response()->json(['error' => 'Subcategoría no encontrada'], 404);
+        }
+
+        // Obtener solo las marcas que tienen productos en esta subcategoría específica
+        $marcas = Marca::whereHas('productos', function($query) use ($id) {
+            $query->where('id_subcategoria', $id);
+        })->get();
+
         // Construir la consulta base para productos de la subcategoría
         $query = Producto::with('marca')->where('id_subcategoria', $id);
         
@@ -45,11 +57,15 @@ class ProductoController extends Controller
             // Si hay marca_id, renderizar Subcategorias-marcas y pasar el marcaId
             return Inertia::render('Subcategorias-marcas', [
                 'productos' => $productos,
-                'marcaId' => $marca_id
+                'marcaId' => $marca_id,
+                'marcas' => $marcas
             ]);
         } else {
             // Si no hay marca_id, renderizar la vista normal
-            return Inertia::render('Subcategorias', compact('productos'));
+            return Inertia::render('Subcategorias', [
+                'productos' => $productos,
+                'marcas' => $marcas
+            ]);
         }
     }
 
