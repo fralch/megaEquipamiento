@@ -6,7 +6,6 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
-import CategoryBrandSection from "../Components/categoria/CategoryBrandSection";
 const URL_API = import.meta.env.VITE_API_URL;
 
 export default function Categoria({ productos, categoria, subcategorias, marcas }) {
@@ -71,6 +70,132 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
     const handleBrandChange = (event) => {
         const value = event.target.value;
         setSelectedBrand(value === 'all' ? null : value);
+    };
+
+    // Función para manejar el filtro por marca desde las tarjetas
+    const handleBrandFilter = (marcaId) => {
+        setSelectedBrand(String(marcaId));
+        // Scroll suave hacia arriba para ver los productos filtrados
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Componente de tarjeta de marca integrado
+    const CategoryBrandCard = ({ brand }) => {
+        const [imageLoaded, setImageLoaded] = useState(false);
+        const [isSearching, setIsSearching] = useState(false);
+        const isActive = String(selectedBrand) === String(brand.id_marca);
+
+        const handleBrandClick = (e) => {
+            e.preventDefault();
+            if (isSearching) return;
+            
+            setIsSearching(true);
+            
+            // Aplicar filtro por marca
+            setTimeout(() => {
+                handleBrandFilter(brand.id_marca);
+                setIsSearching(false);
+            }, 300);
+        };
+
+        return (
+            <div
+                className={`relative flex flex-col items-center text-center p-4 group transition-all duration-300 rounded-lg ${
+                    isActive 
+                        ? (isDarkMode ? 'bg-blue-900/50 border-2 border-blue-400' : 'bg-blue-100/70 border-2 border-blue-500')
+                        : (isDarkMode ? 'hover:bg-gray-700/30' : 'hover:bg-gray-100/50')
+                } ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+            >
+                <div className={`w-36 h-36 flex items-center justify-center rounded-full border-2 overflow-hidden transition-all duration-300 bg-white ${
+                    isActive
+                        ? (isDarkMode ? 'border-blue-300 shadow-lg' : 'border-blue-600 shadow-lg')
+                        : (isDarkMode ? 'border-blue-400' : 'border-blue-500')
+                }`}>
+                    
+                    {/* Imagen de la marca */}
+                    <img
+                        src={brand.imagen}
+                        alt={brand.nombre}
+                        className={`object-contain w-32 h-32 transition-opacity duration-300 ${
+                            imageLoaded ? 'opacity-100' : 'opacity-0'
+                        }`}
+                        loading="lazy"
+                        onLoad={() => setImageLoaded(true)}
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                        }}
+                    />
+                    
+                    {/* Fallback si no hay imagen */}
+                    {!imageLoaded && (
+                        <div className={`w-32 h-32 flex items-center justify-center text-4xl font-bold ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                            {brand.nombre.charAt(0).toUpperCase()}
+                        </div>
+                    )}
+                </div>
+
+                {/* Nombre de la marca */}
+                <h3 className={`mt-4 text-lg font-semibold transition-colors duration-300 ${
+                    isActive 
+                        ? (isDarkMode ? 'text-blue-300' : 'text-blue-700')
+                        : (isDarkMode ? 'text-white' : 'text-gray-900')
+                }`}>
+                    {brand.nombre}
+                </h3>
+
+                {/* Descripción */}
+                {brand.descripcion && (
+                    <p className={`mt-1 text-sm transition-colors duration-300 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                    }`}>
+                        {brand.descripcion}
+                    </p>
+                )}
+
+                {/* Indicador de filtro activo */}
+                {isActive && (
+                    <div className={`mt-2 px-2 py-1 rounded-full text-xs font-medium ${
+                        isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+                    }`}>
+                        Filtro Activo
+                    </div>
+                )}
+
+                {/* Botón */}
+                <button 
+                    className={`mt-3 transition-all duration-300 text-white px-4 py-2 rounded flex items-center justify-center transform hover:scale-105 ${
+                        isSearching 
+                            ? (isDarkMode ? 'bg-gray-600 cursor-wait' : 'bg-gray-400 cursor-wait')
+                            : isActive
+                                ? (isDarkMode ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-gray-400 cursor-not-allowed opacity-50')
+                                : (isDarkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600')
+                    }`}
+                    onClick={handleBrandClick}
+                    disabled={isSearching || isActive}
+                >
+                    {isSearching ? (
+                        <>
+                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Filtrando...
+                        </>
+                    ) : isActive ? (
+                        'Filtro Activo'
+                    ) : (
+                        'Filtrar por Marca'
+                    )}
+                </button>
+            </div>
+        );
+    };
+
+    // Función para limpiar filtros
+    const clearBrandFilter = () => {
+        setSelectedBrand(null);
     };
 
     return (
@@ -156,7 +281,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                                     {subcategorias.map((subcategoria, subIndex) => (
                                         <Link
                                             key={subcategoria.id_subcategoria}
-                                            href={`/subcategorias/${subcategoria.id_subcategoria}`}
+                                            href={`/subcategoria/${subcategoria.id_subcategoria}`}
                                             className={`group block p-2 pl-4 rounded-md transition-all duration-150 transform hover:scale-[1.02] hover:translate-x-1 ${
                                                 isDarkMode 
                                                     ? 'bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 border border-gray-600/50 hover:border-gray-500/70' 
@@ -186,16 +311,29 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                 <div className={`flex-1 p-4 transition-colors duration-200`}>
                     {productos && productos.length > 0 ? (
                         <>
-                          <h1 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>
-                            Categoría: {categoria.nombre}
+                          <div className="flex items-center justify-between mb-4">
+                            <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>
+                                Categoría: {categoria.nombre}
+                                {selectedBrand && (
+                                    <span className="text-sm font-normal ml-2 opacity-75">
+                                        - Filtrado por marca
+                                    </span>
+                                )}
+                            </h1>
                             {selectedBrand && (
-                                <span className="text-sm font-normal ml-2 opacity-75">
-                                    - Filtrado por marca
-                                </span>
+                                <button
+                                    onClick={clearBrandFilter}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                        isDarkMode 
+                                            ? 'bg-red-600 hover:bg-red-700 text-white' 
+                                            : 'bg-red-500 hover:bg-red-600 text-white'
+                                    }`}
+                                >
+                                    Limpiar Filtros
+                                </button>
                             )}
-                          </h1>
+                          </div>
                           <ProductGrid products={filteredProducts} />
-                          <CategoryBrandSection marcas={selectedBrand ? marcas.filter(marca => String(marca.id_marca) === String(selectedBrand)) : marcas} />
                         </>
                     ) : (
                         <>
@@ -205,9 +343,37 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                         </div>
                         <button onClick={handleMostrarProductos} className={`${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#184f96] hover:bg-blue-800'} text-white py-2 px-4 rounded transition-all duration-200 mb-4 mx-auto block`}>Mostrar productos</button>
                         {mostrarProductos && <ProductGrid products={filteredProducts} />}
-                        <CategoryBrandSection marcas={selectedBrand ? marcas.filter(marca => String(marca.id_marca) === String(selectedBrand)) : marcas} />
                         </>
                     )}
+
+                    {/* Sección de marcas integrada */}
+                    {marcas && marcas.length > 0 && (
+                        <div className={`p-8 mt-8 transition-colors duration-300 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
+                        } rounded-lg`}>
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    Marcas Disponibles en esta Categoría
+                                </h2>
+                                {selectedBrand && (
+                                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                        isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+                                    }`}>
+                                        {filteredProducts.length} producto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                                {marcas.map((marca) => (
+                                    <CategoryBrandCard key={marca.id_marca} brand={marca} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                      <div className="flex justify-center">
                         <Link href="/crear" className={`fixed bottom-8 right-8 w-14 h-14 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#184f96] hover:bg-blue-800'} text-white rounded-full flex items-center justify-center shadow-lg text-2xl transition-all duration-200 hover:scale-110`}>
                             +
