@@ -48,6 +48,12 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
         setMostrarProductos(true);
     };
 
+    const [isSubcategoryDropdownOpen, setIsSubcategoryDropdownOpen] = useState(false);
+
+    const toggleSubcategoryDropdown = () => {
+        setIsSubcategoryDropdownOpen(!isSubcategoryDropdownOpen);
+    };
+
     return (
         <div>
             <Head title="Categorias" />
@@ -56,13 +62,19 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
             <div className={`min-w-screen min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'} flex transition-colors duration-200`}>
                 <nav className={`w-1/6 p-4 overflow-y-auto ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-md transition-colors duration-200`} id="nav-fijo">
-                    {categoriasArray.map((categoria) => (
+                    <button
+                        onClick={toggleSubcategoryDropdown}
+                        className={`block w-full text-left p-3 mb-2 rounded-lg font-bold ${isDarkMode ? 'bg-gray-700 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-900 hover:bg-[#184f96] hover:text-white'} transition-colors duration-200 border ${isDarkMode ? 'border-gray-600 hover:border-blue-500' : 'border-gray-200 hover:border-blue-500'}`}
+                    >
+                        {categoria.nombre}
+                    </button>
+                    {isSubcategoryDropdownOpen && subcategorias && subcategorias.map((subcategoria) => (
                         <Link
-                            key={categoria.id_categoria}
-                            href={`/categorias/${categoria.id_categoria}`}
-                            className={`block w-full text-left p-3 mb-2 rounded-lg ${isDarkMode ? 'bg-gray-700 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-900 hover:bg-[#184f96] hover:text-white'} transition-colors duration-200 border ${isDarkMode ? 'border-gray-600 hover:border-blue-500' : 'border-gray-200 hover:border-blue-500'}`}
+                            key={subcategoria.id_subcategoria}
+                            href={`/subcategorias/${subcategoria.id_subcategoria}`}
+                            className={`block w-full text-left p-3 mb-2 rounded-lg ml-4 ${isDarkMode ? 'bg-gray-700 text-white hover:bg-blue-600' : 'bg-gray-200 text-gray-900 hover:bg-[#184f96] hover:text-white'} transition-colors duration-200 border ${isDarkMode ? 'border-gray-600 hover:border-blue-500' : 'border-gray-200 hover:border-blue-500'}`}
                         >
-                            {categoria.nombre}
+                            {subcategoria.nombre}
                         </Link>
                     ))}
                 </nav>

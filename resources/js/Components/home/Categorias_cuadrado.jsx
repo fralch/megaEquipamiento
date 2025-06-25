@@ -128,7 +128,7 @@ const CategoryCard = ({ title, items, categoryId }) => {
               href={`/categorias/${categoryId}`}
               className={`${isDarkMode ? 'bg-blue-700 hover:bg-blue-800' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded-md mt-4 transition-colors duration-200`}
             >
-              Ver más
+              {title}
             </Link>
           </div>
         </>

@@ -246,4 +246,20 @@ class CategoriaController extends Controller
         // Devolver las categorías como respuesta JSON
         return response()->json($categorias);
     }
+
+    /**
+     * Obtener las subcategorías de una categoría específica
+     */
+    public function getSubcategorias($id_categoria)
+    {
+        $categoria = Categoria::find($id_categoria);
+        
+        if (!$categoria) {
+            return response()->json(['error' => 'Categoría no encontrada'], 404);
+        }
+        
+        $subcategorias = $categoria->subcategorias;
+        
+        return response()->json($subcategorias);
+    }
 }
