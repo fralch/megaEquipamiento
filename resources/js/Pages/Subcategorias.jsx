@@ -395,51 +395,237 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         }
     };
 
-    const buscarProductosFiltrados = async () => {
-        const subcategoriaId = getSubcategoriaId();
-        
-        try {
-            if (Object.keys(filtrosSeleccionados).length > 0) {
-                const productosFiltrados = await makeRequest(`${URL_API}/filtros/filtrar-productos`, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        subcategoria_id: subcategoriaId,
-                        filtros: filtrosSeleccionados
-                    })
-                });
-
-                setMostrarProductos(true);
-                
-                if (selectedBrand) {
-                    const productosFiltradosPorMarca = productosFiltrados.filter(product => 
-                        String(product.marca_id) === String(selectedBrand)
-                    );
-                    setProductos(productosFiltradosPorMarca);
-                } else {
-                    setProductos(productosFiltrados);
-                    setProductosOriginales(productosFiltrados);
-                }
+   const buscarProductosFiltrados = () => {
+    try {
+        // Si no hay filtros seleccionados, mostrar todos los productos
+        if (Object.keys(filtrosSeleccionados).length === 0) {
+            if (selectedBrand) {
+                const productosFiltradosPorMarca = productosOriginales.filter(product => 
+                    String(product.marca_id) === String(selectedBrand)
+                );
+                setProductos(productosFiltradosPorMarca);
             } else {
-                if (selectedBrand) {
-                    const productosFiltradosPorMarca = productosOriginales.filter(product => 
-                        String(product.marca_id) === String(selectedBrand)
-                    );
-                    setProductos(productosFiltradosPorMarca);
-                    setMostrarProductos(true);
-                } else {
-                    const todosProductos = await makeRequest(`${URL_API}/product/subcategoria/${subcategoriaId}`);
-                    setMostrarProductos(true);
-                    setProductos(todosProductos);
-                    setProductosOriginales(todosProductos);
+                setProductos(productosOriginales);
+            }
+            setMostrarProductos(true);
+            return;
+        }
+
+        // Aplicar filtros a los productos originales
+        let productosFiltrados = productosOriginales.filter(producto => {
+            // Verificar cada filtro seleccionado
+            for (const [filtroId, valorSeleccionado] of Object.entries(filtrosSeleccionados)) {
+                // Buscar el filtro en la lista de filtros disponibles
+                const filtro = filtros.find(f => f.id_filtro === parseInt(filtroId));
+                
+                if (!filtro) continue;
+                
+                // Aplicar filtro según su tipo
+                switch (filtro.tipo_input) {
+                    case 'checkbox':
+                        // Para checkbox, valorSeleccionado es un array de IDs de opciones
+                        if (Array.isArray(valorSeleccionado) && valorSeleccionado.length > 0) {
+                            let cumpleFiltro = false;
+                            
+                            for (const opcionId of valorSeleccionado) {
+                                const opcion = filtro.opciones?.find(opt => opt.id_opcion === parseInt(opcionId));
+                                if (opcion && cumpleCondicionFiltro(producto, opcion, filtro)) {
+                                    cumpleFiltro = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (!cumpleFiltro) return false;
+                        }
+                        break;
+                        
+                    case 'radio':
+                    case 'select':
+                        // Para radio y select, valorSeleccionado es un único ID de opción
+                        if (valorSeleccionado) {
+                            const opcion = filtro.opciones?.find(opt => opt.id_opcion === parseInt(valorSeleccionado));
+                            if (opcion && !cumpleCondicionFiltro(producto, opcion, filtro)) {
+                                return false;
+                            }
+                        }
+                        break;
+                        
+                    case 'range':
+                        // Para range, valorSeleccionado es un valor numérico
+                        if (valorSeleccionado && !isNaN(valorSeleccionado)) {
+                            if (!cumpleCondicionRango(producto, valorSeleccionado, filtro)) {
+                                return false;
+                            }
+                        }
+                        break;
                 }
             }
-        } catch (error) {
-            console.error('Error:', error);
+            
+            return true; // El producto cumple todos los filtros
+        });
+
+        // Aplicar filtro de marca si está activo
+        if (selectedBrand) {
+            productosFiltrados = productosFiltrados.filter(product => 
+                String(product.marca_id) === String(selectedBrand)
+            );
         }
-    };
+
+        setProductos(productosFiltrados);
+        setMostrarProductos(true);
+
+    } catch (error) {
+        console.error('Error al filtrar productos:', error);
+        // En caso de error, mostrar productos originales
+        setProductos(productosOriginales);
+        setMostrarProductos(true);
+    }
+};
+const cumpleCondicionFiltro = (producto, opcion, filtro) => {
+    const valorOpcion = opcion.valor.toLowerCase();
+    
+    // Buscar en diferentes campos del producto
+    const camposABuscar = [
+        producto.caracteristicas,
+        producto.especificaciones_tecnicas,
+        producto.datos_tecnicos,
+        producto.nombre,
+        producto.descripcion
+    ];
+
+    for (const campo of camposABuscar) {
+        if (!campo) continue;
+        
+        let textoABuscar = '';
+        
+        // Si es un objeto (como caracteristicas), convertir a texto
+        if (typeof campo === 'object') {
+            try {
+                textoABuscar = JSON.stringify(campo).toLowerCase();
+            } catch (e) {
+                textoABuscar = String(campo).toLowerCase();
+            }
+        } else {
+            textoABuscar = String(campo).toLowerCase();
+        }
+        
+        // Verificar si el valor de la opción está presente
+        if (textoABuscar.includes(valorOpcion)) {
+            return true;
+        }
+        
+        // También verificar por la etiqueta de la opción
+        const etiquetaOpcion = opcion.etiqueta.toLowerCase();
+        if (textoABuscar.includes(etiquetaOpcion)) {
+            return true;
+        }
+    }
+    
+    return false;
+};
+
+// Función auxiliar para verificar condiciones de rango
+const cumpleCondicionRango = (producto, valorSeleccionado, filtro) => {
+    const valor = parseFloat(valorSeleccionado);
+    
+    // Determinar qué campo usar según el nombre del filtro
+    const nombreFiltro = filtro.nombre.toLowerCase();
+    let valorProducto = null;
+    
+    if (nombreFiltro.includes('precio')) {
+        valorProducto = parseFloat(producto.precio_igv);
+    } else if (nombreFiltro.includes('temperatura')) {
+        // Buscar temperatura en características
+        if (producto.caracteristicas?.Temperatura) {
+            // Extraer número de strings como "+ 5 a 80°C" o "- 10 a 80°C"
+            const tempMatch = producto.caracteristicas.Temperatura.match(/-?\d+/);
+            if (tempMatch) {
+                valorProducto = parseFloat(tempMatch[0]);
+            }
+        }
+    } else if (nombreFiltro.includes('velocidad')) {
+        // Buscar velocidad en características
+        if (producto.caracteristicas?.Velocidad) {
+            // Extraer número de strings como "10 a 500 Rpm"
+            const velMatch = producto.caracteristicas.Velocidad.match(/\d+/);
+            if (velMatch) {
+                valorProducto = parseFloat(velMatch[0]);
+            }
+        }
+    } else if (nombreFiltro.includes('capacidad')) {
+        // Buscar capacidad en características
+        if (producto.caracteristicas?.Capacidad) {
+            // Extraer número de strings como "90 Litros" o "50 litros"
+            const capMatch = producto.caracteristicas.Capacidad.match(/\d+/);
+            if (capMatch) {
+                valorProducto = parseFloat(capMatch[0]);
+            }
+        }
+    } else if (nombreFiltro.includes('potencia')) {
+        // Buscar potencia en características
+        if (producto.caracteristicas?.Potencia) {
+            // Extraer número de strings como "1120W"
+            const potMatch = producto.caracteristicas.Potencia.match(/\d+/);
+            if (potMatch) {
+                valorProducto = parseFloat(potMatch[0]);
+            }
+        }
+    }
+    
+    // Si no se encontró un valor, buscar en especificaciones técnicas
+    if (valorProducto === null && producto.especificaciones_tecnicas) {
+        try {
+            const specs = JSON.parse(producto.especificaciones_tecnicas);
+            if (specs.secciones) {
+                for (const seccion of specs.secciones) {
+                    if (seccion.datos) {
+                        for (const fila of seccion.datos) {
+                            if (Array.isArray(fila) && fila.length >= 2) {
+                                const especificacion = fila[0].toLowerCase();
+                                if (especificacion.includes(nombreFiltro)) {
+                                    const valorMatch = fila[1].match(/\d+/);
+                                    if (valorMatch) {
+                                        valorProducto = parseFloat(valorMatch[0]);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn('Error parsing especificaciones_tecnicas:', e);
+        }
+    }
+    
+    // Comparar valores (por defecto, filtrar por menor o igual)
+    if (valorProducto !== null) {
+        return valorProducto <= valor;
+    }
+    
+    return false;
+};
+
+// Función para limpiar todos los filtros
+const limpiarTodosFiltros = () => {
+    setFiltrosSeleccionados({});
+    if (selectedBrand) {
+        const productosFiltradosPorMarca = productosOriginales.filter(product => 
+            String(product.marca_id) === String(selectedBrand)
+        );
+        setProductos(productosFiltradosPorMarca);
+    } else {
+        setProductos(productosOriginales);
+    }
+    setMostrarProductos(true);
+};
+
 
     // Effect para cargar datos iniciales
     useEffect(() => {
+        console.log('Productos recibidos al abrir el componente:', productosIniciales);
+        
         const cargarDatos = async () => {
             setIsLoading(true);
             const subcategoriaId = getSubcategoriaId();
