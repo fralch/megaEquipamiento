@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from "@inertiajs/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useTheme } from "../storage/ThemeContext";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
@@ -12,42 +12,61 @@ import FiltroConfirmDialog from "../Components/filtros/FiltroConfirmDialog";
 
 const URL_API = import.meta.env.VITE_API_URL;
 
-// Componente de tarjeta de marca
+// ============================================================================
+// COMPONENTES AUXILIARES
+// ============================================================================
+
+// Componente de tarjeta de marca optimizado
 const BrandCard = ({ brand, selectedBrand, isDarkMode, onBrandClick }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
-    const isActive = String(selectedBrand) === String(brand.id_marca);
+    
+    const isActive = useMemo(() => 
+        String(selectedBrand) === String(brand.id_marca), 
+        [selectedBrand, brand.id_marca]
+    );
 
-    const handleClick = (e) => {
+    const handleClick = useCallback((e) => {
         e.preventDefault();
-        if (isSearching) return;
+        if (isSearching || isActive) return;
         
         setIsSearching(true);
         setTimeout(() => {
             onBrandClick(brand.id_marca);
             setIsSearching(false);
         }, 300);
-    };
+    }, [isSearching, isActive, onBrandClick, brand.id_marca]);
 
-    const cardClasses = `relative flex flex-col items-center text-center p-4 group transition-all duration-300 rounded-lg ${
-        isActive 
+    // Clases CSS memoizadas
+    const cardClasses = useMemo(() => `
+        relative flex flex-col items-center text-center p-4 group 
+        transition-all duration-300 rounded-lg
+        ${isActive 
             ? (isDarkMode ? 'bg-blue-900/50 border-2 border-blue-400' : 'bg-blue-100/70 border-2 border-blue-500')
             : (isDarkMode ? 'hover:bg-gray-700/30' : 'hover:bg-gray-100/50')
-    } ${isDarkMode ? 'text-white' : 'text-gray-900'}`;
+        }
+        ${isDarkMode ? 'text-white' : 'text-gray-900'}
+    `, [isActive, isDarkMode]);
 
-    const imageContainerClasses = `w-36 h-36 flex items-center justify-center rounded-full border-2 overflow-hidden transition-all duration-300 bg-white ${
-        isActive
+    const imageContainerClasses = useMemo(() => `
+        w-36 h-36 flex items-center justify-center rounded-full border-2 
+        overflow-hidden transition-all duration-300 bg-white
+        ${isActive
             ? (isDarkMode ? 'border-blue-300 shadow-lg' : 'border-blue-600 shadow-lg')
             : (isDarkMode ? 'border-blue-400' : 'border-blue-500')
-    }`;
+        }
+    `, [isActive, isDarkMode]);
 
-    const buttonClasses = `mt-3 transition-all duration-300 text-white px-4 py-2 rounded flex items-center justify-center transform hover:scale-105 ${
-        isSearching 
+    const buttonClasses = useMemo(() => `
+        mt-3 transition-all duration-300 text-white px-4 py-2 rounded 
+        flex items-center justify-center transform hover:scale-105
+        ${isSearching 
             ? (isDarkMode ? 'bg-gray-600 cursor-wait' : 'bg-gray-400 cursor-wait')
             : isActive
                 ? (isDarkMode ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-gray-400 cursor-not-allowed opacity-50')
                 : (isDarkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600')
-    }`;
+        }
+    `, [isSearching, isActive, isDarkMode]);
 
     return (
         <div className={cardClasses}>
@@ -119,54 +138,37 @@ const BrandCard = ({ brand, selectedBrand, isDarkMode, onBrandClick }) => {
     );
 };
 
-// Componente principal
-export default function Subcategoria({ productos: productosIniciales, marcas }) {
-    const { auth } = usePage().props;
-    const { isDarkMode } = useTheme();
-    
-    // Estados principales
-    const [isOpen, setIsOpen] = useState(false);
-    const [mostrarProductos, setMostrarProductos] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [selectedBrand, setSelectedBrand] = useState(null);
-    
-    // Estados de datos
-    const [productos, setProductos] = useState(productosIniciales || []);
-    const [productosOriginales, setProductosOriginales] = useState(productosIniciales || []);
-    const [filtros, setFiltros] = useState([]);
-    const [filtrosSeleccionados, setFiltrosSeleccionados] = useState({});
-    const [categoriasArray, setCategoriasArray] = useState([]);
-    const [openCategories, setOpenCategories] = useState({});
-    const [activeCategory, setActiveCategory] = useState(null);
-    
-    // Estados de UI
-    const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
-    const [categoriaNombre, setCategoriaNombre] = useState("");
-    const [categoriaId, setCategoriaId] = useState("");
-    const [mostrarFormularioFiltro, setMostrarFormularioFiltro] = useState(false);
-    const [filtroEnEdicion, setFiltroEnEdicion] = useState(null);
-    const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
-    const [filtroAEliminar, setFiltroAEliminar] = useState(null);
-    
-    // Estado del nuevo filtro
-    const [nuevoFiltro, setNuevoFiltro] = useState({
-        nombre: '',
-        tipo_input: 'select',
-        unidad: '',
-        descripcion: '',
-        orden: 0,
-        obligatorio: true,
-        opciones: []
-    });
+// Componente de carga
+const LoadingSpinner = ({ isDarkMode }) => (
+    <div className="space-y-3">
+        {[...Array(3)].map((_, i) => (
+            <div key={i} className={`h-16 rounded-lg animate-pulse ${
+                isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+            }`}></div>
+        ))}
+    </div>
+);
 
-    // Función para obtener ID de subcategoría de la URL
-    const getSubcategoriaId = () => {
-        const urlParts = window.location.pathname.split('/');
-        return urlParts[urlParts.length - 1];
-    };
+// Componente de estado vacío
+const EmptyState = ({ isDarkMode, title, description, icon }) => (
+    <div className={`text-center py-8 rounded-lg border ${
+        isDarkMode 
+            ? 'bg-gray-700/30 border-gray-600/50 text-gray-400' 
+            : 'bg-gray-50 border-gray-200 text-gray-500'
+    } transition-colors duration-200`}>
+        {icon}
+        <p className="text-sm font-medium">{title}</p>
+        <p className="text-xs mt-1">{description}</p>
+    </div>
+);
 
-    // Función para hacer peticiones HTTP
-    const makeRequest = async (url, options = {}) => {
+// ============================================================================
+// HOOKS PERSONALIZADOS
+// ============================================================================
+
+// Hook para manejo de peticiones HTTP
+const useApiRequest = () => {
+    const makeRequest = useCallback(async (url, options = {}) => {
         const defaultHeaders = {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
             'Content-Type': 'application/json',
@@ -188,10 +190,254 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             console.error('Request error:', error);
             throw error;
         }
+    }, []);
+
+    return { makeRequest };
+};
+
+// Hook para manejo de filtros
+const useProductFilters = (productosOriginales) => {
+    const [filtrosSeleccionados, setFiltrosSeleccionados] = useState({});
+    const [selectedBrand, setSelectedBrand] = useState(null);
+
+    // Función para aplicar filtros de marca
+    const applyBrandFilter = useCallback((productos, marcaId) => {
+        if (!marcaId) return productos;
+        return productos.filter(product => 
+            String(product.marca_id) === String(marcaId)
+        );
+    }, []);
+
+    // Función para aplicar filtros de precio
+    const applyPriceFilter = useCallback((productos, minPrice, maxPrice) => {
+        return productos.filter(producto => {
+            const precio = parseFloat(producto.precio_igv);
+            return precio >= (minPrice || 0) && precio <= (maxPrice || Infinity);
+        });
+    }, []);
+
+    // Función principal de filtrado
+    const filterProducts = useCallback((productos, filtros) => {
+        let productosFiltrados = [...productos];
+
+        // Aplicar filtros personalizados
+        if (Object.keys(filtrosSeleccionados).length > 0) {
+            productosFiltrados = productosFiltrados.filter(producto => {
+                return Object.entries(filtrosSeleccionados).every(([filtroId, valorSeleccionado]) => {
+                    const filtro = filtros.find(f => f.id_filtro === parseInt(filtroId));
+                    if (!filtro) return true;
+
+                    return applyFilterCondition(producto, filtro, valorSeleccionado);
+                });
+            });
+        }
+
+        // Aplicar filtro de marca
+        if (selectedBrand) {
+            productosFiltrados = applyBrandFilter(productosFiltrados, selectedBrand);
+        }
+
+        return productosFiltrados;
+    }, [filtrosSeleccionados, selectedBrand, applyBrandFilter]);
+
+    return {
+        filtrosSeleccionados,
+        setFiltrosSeleccionados,
+        selectedBrand,
+        setSelectedBrand,
+        filterProducts,
+        applyPriceFilter
+    };
+};
+
+// ============================================================================
+// FUNCIONES AUXILIARES
+// ============================================================================
+
+// Función para obtener ID de subcategoría de la URL
+const getSubcategoriaId = () => {
+    const urlParts = window.location.pathname.split('/');
+    return urlParts[urlParts.length - 1];
+};
+
+// Función para aplicar condiciones de filtro
+const applyFilterCondition = (producto, filtro, valorSeleccionado) => {
+    switch (filtro.tipo_input) {
+        case 'checkbox':
+            if (Array.isArray(valorSeleccionado) && valorSeleccionado.length > 0) {
+                return valorSeleccionado.some(opcionId => {
+                    const opcion = filtro.opciones?.find(opt => opt.id_opcion === parseInt(opcionId));
+                    return opcion && cumpleCondicionFiltro(producto, opcion, filtro);
+                });
+            }
+            break;
+            
+        case 'radio':
+        case 'select':
+            if (valorSeleccionado) {
+                const opcion = filtro.opciones?.find(opt => opt.id_opcion === parseInt(valorSeleccionado));
+                return opcion ? cumpleCondicionFiltro(producto, opcion, filtro) : true;
+            }
+            break;
+            
+        case 'range':
+            if (valorSeleccionado && !isNaN(valorSeleccionado)) {
+                return cumpleCondicionRango(producto, valorSeleccionado, filtro);
+            }
+            break;
+    }
+    return true;
+};
+
+// Función para verificar condiciones de filtro
+const cumpleCondicionFiltro = (producto, opcion, filtro) => {
+    const valorOpcion = opcion.valor.toLowerCase();
+    const etiquetaOpcion = opcion.etiqueta.toLowerCase();
+    
+    const camposABuscar = [
+        producto.caracteristicas,
+        producto.especificaciones_tecnicas,
+        producto.datos_tecnicos,
+        producto.nombre,
+        producto.descripcion
+    ];
+
+    return camposABuscar.some(campo => {
+        if (!campo) return false;
+        
+        let textoABuscar = '';
+        if (typeof campo === 'object') {
+            try {
+                textoABuscar = JSON.stringify(campo).toLowerCase();
+            } catch (e) {
+                textoABuscar = String(campo).toLowerCase();
+            }
+        } else {
+            textoABuscar = String(campo).toLowerCase();
+        }
+        
+        return textoABuscar.includes(valorOpcion) || textoABuscar.includes(etiquetaOpcion);
+    });
+};
+
+// Función para verificar condiciones de rango
+const cumpleCondicionRango = (producto, valorSeleccionado, filtro) => {
+    const valor = parseFloat(valorSeleccionado);
+    const nombreFiltro = filtro.nombre.toLowerCase();
+    let valorProducto = null;
+    
+    // Mapeo de campos según el nombre del filtro
+    const fieldMapping = {
+        precio: () => parseFloat(producto.precio_igv),
+        temperatura: () => extractNumericValue(producto.caracteristicas?.Temperatura),
+        velocidad: () => extractNumericValue(producto.caracteristicas?.Velocidad),
+        capacidad: () => extractNumericValue(producto.caracteristicas?.Capacidad),
+        potencia: () => extractNumericValue(producto.caracteristicas?.Potencia)
     };
 
+    // Buscar en campos conocidos
+    for (const [key, extractor] of Object.entries(fieldMapping)) {
+        if (nombreFiltro.includes(key)) {
+            valorProducto = extractor();
+            break;
+        }
+    }
+
+    // Si no se encontró, buscar en especificaciones técnicas
+    if (valorProducto === null && producto.especificaciones_tecnicas) {
+        valorProducto = extractFromSpecs(producto.especificaciones_tecnicas, nombreFiltro);
+    }
+    
+    return valorProducto !== null ? valorProducto <= valor : false;
+};
+
+// Función auxiliar para extraer valores numéricos
+const extractNumericValue = (text) => {
+    if (!text) return null;
+    const match = String(text).match(/-?\d+/);
+    return match ? parseFloat(match[0]) : null;
+};
+
+// Función auxiliar para extraer de especificaciones técnicas
+const extractFromSpecs = (specs, nombreFiltro) => {
+    try {
+        const parsedSpecs = JSON.parse(specs);
+        if (parsedSpecs.secciones) {
+            for (const seccion of parsedSpecs.secciones) {
+                if (seccion.datos) {
+                    for (const fila of seccion.datos) {
+                        if (Array.isArray(fila) && fila.length >= 2) {
+                            const especificacion = fila[0].toLowerCase();
+                            if (especificacion.includes(nombreFiltro)) {
+                                return extractNumericValue(fila[1]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('Error parsing especificaciones_tecnicas:', e);
+    }
+    return null;
+};
+
+// ============================================================================
+// COMPONENTE PRINCIPAL
+// ============================================================================
+
+export default function Subcategoria({ productos: productosIniciales, marcas }) {
+    const { auth } = usePage().props;
+    const { isDarkMode } = useTheme();
+    const { makeRequest } = useApiRequest();
+    
+    // Estados principales
+    const [isOpen, setIsOpen] = useState(false);
+    const [mostrarProductos, setMostrarProductos] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    
+    // Estados de datos
+    const [productos, setProductos] = useState(productosIniciales || []);
+    const [productosOriginales, setProductosOriginales] = useState(productosIniciales || []);
+    const [filtros, setFiltros] = useState([]);
+    const [categoriasArray, setCategoriasArray] = useState([]);
+    
+    // Estados de UI
+    const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
+    const [categoriaNombre, setCategoriaNombre] = useState("");
+    const [categoriaId, setCategoriaId] = useState("");
+    const [mostrarFormularioFiltro, setMostrarFormularioFiltro] = useState(false);
+    const [filtroEnEdicion, setFiltroEnEdicion] = useState(null);
+    const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
+    const [filtroAEliminar, setFiltroAEliminar] = useState(null);
+    
+    // Estado del nuevo filtro
+    const [nuevoFiltro, setNuevoFiltro] = useState({
+        nombre: '',
+        tipo_input: 'select',
+        unidad: '',
+        descripcion: '',
+        orden: 0,
+        obligatorio: true,
+        opciones: []
+    });
+
+    // Hook de filtros
+    const {
+        filtrosSeleccionados,
+        setFiltrosSeleccionados,
+        selectedBrand,
+        setSelectedBrand,
+        filterProducts,
+        applyPriceFilter
+    } = useProductFilters(productosOriginales);
+
+    // ============================================================================
+    // HANDLERS
+    // ============================================================================
+
     // Handlers de filtros
-    const handleBrandFilter = (marcaId) => {
+    const handleBrandFilter = useCallback((marcaId) => {
         setSelectedBrand(String(marcaId));
         const productosFiltrados = productosOriginales.filter(product => 
             String(product.marca_id) === String(marcaId)
@@ -199,22 +445,18 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         setProductos(productosFiltrados);
         setMostrarProductos(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    }, [productosOriginales]);
 
-    const clearBrandFilter = () => {
+    const clearBrandFilter = useCallback(() => {
         setSelectedBrand(null);
         setProductos(productosOriginales);
-    };
+    }, [productosOriginales]);
 
-    const filtrarPorPrecio = () => {
+    const filtrarPorPrecio = useCallback(() => {
         const precioMin = parseFloat(document.getElementById('min-price').value) || 0;
         const precioMax = parseFloat(document.getElementById('max-price').value) || Infinity;
         
-        const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
-        let productosFiltrados = productosBase.filter(producto => {
-            const precio = parseFloat(producto.precio_igv);
-            return precio >= precioMin && precio <= precioMax;
-        });
+        let productosFiltrados = applyPriceFilter(productosOriginales, precioMin, precioMax);
         
         if (selectedBrand) {
             productosFiltrados = productosFiltrados.filter(product => 
@@ -224,9 +466,9 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         
         setProductos(productosFiltrados);
         setMostrarProductos(true);
-    };
+    }, [productosOriginales, selectedBrand, applyPriceFilter]);
 
-    const limpiarFiltrosPrecio = () => {
+    const limpiarFiltrosPrecio = useCallback(() => {
         document.getElementById('min-price').value = '';
         document.getElementById('max-price').value = '';
         
@@ -238,10 +480,35 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         } else {
             setProductos(productosOriginales);
         }
-    };
+    }, [productosOriginales, selectedBrand]);
+
+    const buscarProductosFiltrados = useCallback(() => {
+        try {
+            const productosFiltrados = filterProducts(productosOriginales, filtros);
+            setProductos(productosFiltrados);
+            setMostrarProductos(true);
+        } catch (error) {
+            console.error('Error al filtrar productos:', error);
+            setProductos(productosOriginales);
+            setMostrarProductos(true);
+        }
+    }, [filterProducts, productosOriginales, filtros]);
+
+    const limpiarTodosFiltros = useCallback(() => {
+        setFiltrosSeleccionados({});
+        if (selectedBrand) {
+            const productosFiltradosPorMarca = productosOriginales.filter(product => 
+                String(product.marca_id) === String(selectedBrand)
+            );
+            setProductos(productosFiltradosPorMarca);
+        } else {
+            setProductos(productosOriginales);
+        }
+        setMostrarProductos(true);
+    }, [productosOriginales, selectedBrand]);
 
     // Handlers de CRUD de filtros
-    const handleCrearFiltro = async () => {
+    const handleCrearFiltro = useCallback(async () => {
         const subcategoriaId = getSubcategoriaId();
         const opcionesValidas = nuevoFiltro.opciones.filter(opcion => 
             opcion.valor.trim() !== '' && opcion.etiqueta.trim() !== ''
@@ -259,15 +526,15 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                 body: JSON.stringify(filtroData)
             });
 
-            setFiltros([...filtros, responseData]);
+            setFiltros(prev => [...prev, responseData]);
             setMostrarFormularioFiltro(false);
             resetFormulario();
         } catch (error) {
             alert('Error al crear el filtro: ' + error.message);
         }
-    };
+    }, [nuevoFiltro, makeRequest]);
 
-    const handleEditarFiltro = (filtro) => {
+    const handleEditarFiltro = useCallback((filtro) => {
         setFiltroEnEdicion(filtro);
         setNuevoFiltro({
             nombre: filtro.nombre,
@@ -279,9 +546,9 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             opciones: filtro.opciones && filtro.opciones.length > 0 ? filtro.opciones : []
         });
         setMostrarFormularioFiltro(true);
-    };
+    }, []);
 
-    const handleActualizarFiltro = async () => {
+    const handleActualizarFiltro = useCallback(async () => {
         if (!filtroEnEdicion) return;
 
         const opcionesValidas = nuevoFiltro.opciones.filter(opcion => 
@@ -299,7 +566,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                 body: JSON.stringify(filtroData)
             });
 
-            setFiltros(filtros.map(f => 
+            setFiltros(prev => prev.map(f => 
                 f.id_filtro === filtroEnEdicion.id_filtro ? filtroActualizado : f
             ));
             setMostrarFormularioFiltro(false);
@@ -308,9 +575,9 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         } catch (error) {
             alert('Error al actualizar el filtro: ' + error.message);
         }
-    };
+    }, [filtroEnEdicion, nuevoFiltro, makeRequest]);
 
-    const handleEliminarFiltro = async () => {
+    const handleEliminarFiltro = useCallback(async () => {
         if (!filtroAEliminar) return;
 
         try {
@@ -318,24 +585,24 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                 method: 'DELETE'
             });
 
-            setFiltros(filtros.filter(f => f.id_filtro !== filtroAEliminar.id_filtro));
+            setFiltros(prev => prev.filter(f => f.id_filtro !== filtroAEliminar.id_filtro));
             setMostrarConfirmacion(false);
             setFiltroAEliminar(null);
         } catch (error) {
             console.error('Error al eliminar el filtro:', error);
         }
-    };
+    }, [filtroAEliminar, makeRequest]);
 
-    const handleSubmitFiltro = async (e) => {
+    const handleSubmitFiltro = useCallback(async (e) => {
         e.preventDefault();
         if (filtroEnEdicion) {
             await handleActualizarFiltro();
         } else {
             await handleCrearFiltro();
         }
-    };
+    }, [filtroEnEdicion, handleActualizarFiltro, handleCrearFiltro]);
 
-    const resetFormulario = () => {
+    const resetFormulario = useCallback(() => {
         setNuevoFiltro({
             nombre: '',
             tipo_input: 'select',
@@ -345,44 +612,38 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             obligatorio: true,
             opciones: []
         });
-    };
+    }, []);
 
     // Handlers de opciones
-    const agregarOpcion = () => {
-        setNuevoFiltro({
-            ...nuevoFiltro,
+    const agregarOpcion = useCallback(() => {
+        setNuevoFiltro(prev => ({
+            ...prev,
             opciones: [
-                ...nuevoFiltro.opciones,
-                { valor: '', etiqueta: '', color: '', orden: nuevoFiltro.opciones.length }
+                ...prev.opciones,
+                { valor: '', etiqueta: '', color: '', orden: prev.opciones.length }
             ]
-        });
-    };
+        }));
+    }, []);
 
-    const eliminarOpcion = (index) => {
-        setNuevoFiltro({
-            ...nuevoFiltro,
-            opciones: nuevoFiltro.opciones.filter((_, i) => i !== index)
-        });
-    };
+    const eliminarOpcion = useCallback((index) => {
+        setNuevoFiltro(prev => ({
+            ...prev,
+            opciones: prev.opciones.filter((_, i) => i !== index)
+        }));
+    }, []);
 
-    const actualizarOpcion = (index, campo, valor) => {
-        const nuevasOpciones = [...nuevoFiltro.opciones];
-        nuevasOpciones[index] = { ...nuevasOpciones[index], [campo]: valor };
-        setNuevoFiltro({ ...nuevoFiltro, opciones: nuevasOpciones });
-    };
+    const actualizarOpcion = useCallback((index, campo, valor) => {
+        setNuevoFiltro(prev => {
+            const nuevasOpciones = [...prev.opciones];
+            nuevasOpciones[index] = { ...nuevasOpciones[index], [campo]: valor };
+            return { ...prev, opciones: nuevasOpciones };
+        });
+    }, []);
 
     // Otros handlers
-    const toggleCategory = (categoriaNombre) => {
-        setOpenCategories(prevState => ({
-            ...prevState,
-            [categoriaNombre]: !prevState[categoriaNombre],
-        }));
-        setActiveCategory(categoriaNombre);
-    };
+    const toggleMenu = useCallback(() => setIsOpen(prev => !prev), []);
 
-    const toggleMenu = () => setIsOpen(!isOpen);
-
-    const handleMostrarProductos = async () => {
+    const handleMostrarProductos = useCallback(async () => {
         const subcategoriaId = getSubcategoriaId();
         
         try {
@@ -393,239 +654,14 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         } catch (error) {
             console.error('Error cargando productos:', error);
         }
-    };
+    }, [makeRequest]);
 
-   const buscarProductosFiltrados = () => {
-    try {
-        // Si no hay filtros seleccionados, mostrar todos los productos
-        if (Object.keys(filtrosSeleccionados).length === 0) {
-            if (selectedBrand) {
-                const productosFiltradosPorMarca = productosOriginales.filter(product => 
-                    String(product.marca_id) === String(selectedBrand)
-                );
-                setProductos(productosFiltradosPorMarca);
-            } else {
-                setProductos(productosOriginales);
-            }
-            setMostrarProductos(true);
-            return;
-        }
-
-        // Aplicar filtros a los productos originales
-        let productosFiltrados = productosOriginales.filter(producto => {
-            // Verificar cada filtro seleccionado
-            for (const [filtroId, valorSeleccionado] of Object.entries(filtrosSeleccionados)) {
-                // Buscar el filtro en la lista de filtros disponibles
-                const filtro = filtros.find(f => f.id_filtro === parseInt(filtroId));
-                
-                if (!filtro) continue;
-                
-                // Aplicar filtro según su tipo
-                switch (filtro.tipo_input) {
-                    case 'checkbox':
-                        // Para checkbox, valorSeleccionado es un array de IDs de opciones
-                        if (Array.isArray(valorSeleccionado) && valorSeleccionado.length > 0) {
-                            let cumpleFiltro = false;
-                            
-                            for (const opcionId of valorSeleccionado) {
-                                const opcion = filtro.opciones?.find(opt => opt.id_opcion === parseInt(opcionId));
-                                if (opcion && cumpleCondicionFiltro(producto, opcion, filtro)) {
-                                    cumpleFiltro = true;
-                                    break;
-                                }
-                            }
-                            
-                            if (!cumpleFiltro) return false;
-                        }
-                        break;
-                        
-                    case 'radio':
-                    case 'select':
-                        // Para radio y select, valorSeleccionado es un único ID de opción
-                        if (valorSeleccionado) {
-                            const opcion = filtro.opciones?.find(opt => opt.id_opcion === parseInt(valorSeleccionado));
-                            if (opcion && !cumpleCondicionFiltro(producto, opcion, filtro)) {
-                                return false;
-                            }
-                        }
-                        break;
-                        
-                    case 'range':
-                        // Para range, valorSeleccionado es un valor numérico
-                        if (valorSeleccionado && !isNaN(valorSeleccionado)) {
-                            if (!cumpleCondicionRango(producto, valorSeleccionado, filtro)) {
-                                return false;
-                            }
-                        }
-                        break;
-                }
-            }
-            
-            return true; // El producto cumple todos los filtros
-        });
-
-        // Aplicar filtro de marca si está activo
-        if (selectedBrand) {
-            productosFiltrados = productosFiltrados.filter(product => 
-                String(product.marca_id) === String(selectedBrand)
-            );
-        }
-
-        setProductos(productosFiltrados);
-        setMostrarProductos(true);
-
-    } catch (error) {
-        console.error('Error al filtrar productos:', error);
-        // En caso de error, mostrar productos originales
-        setProductos(productosOriginales);
-        setMostrarProductos(true);
-    }
-};
-const cumpleCondicionFiltro = (producto, opcion, filtro) => {
-    const valorOpcion = opcion.valor.toLowerCase();
-    
-    // Buscar en diferentes campos del producto
-    const camposABuscar = [
-        producto.caracteristicas,
-        producto.especificaciones_tecnicas,
-        producto.datos_tecnicos,
-        producto.nombre,
-        producto.descripcion
-    ];
-
-    for (const campo of camposABuscar) {
-        if (!campo) continue;
-        
-        let textoABuscar = '';
-        
-        // Si es un objeto (como caracteristicas), convertir a texto
-        if (typeof campo === 'object') {
-            try {
-                textoABuscar = JSON.stringify(campo).toLowerCase();
-            } catch (e) {
-                textoABuscar = String(campo).toLowerCase();
-            }
-        } else {
-            textoABuscar = String(campo).toLowerCase();
-        }
-        
-        // Verificar si el valor de la opción está presente
-        if (textoABuscar.includes(valorOpcion)) {
-            return true;
-        }
-        
-        // También verificar por la etiqueta de la opción
-        const etiquetaOpcion = opcion.etiqueta.toLowerCase();
-        if (textoABuscar.includes(etiquetaOpcion)) {
-            return true;
-        }
-    }
-    
-    return false;
-};
-
-// Función auxiliar para verificar condiciones de rango
-const cumpleCondicionRango = (producto, valorSeleccionado, filtro) => {
-    const valor = parseFloat(valorSeleccionado);
-    
-    // Determinar qué campo usar según el nombre del filtro
-    const nombreFiltro = filtro.nombre.toLowerCase();
-    let valorProducto = null;
-    
-    if (nombreFiltro.includes('precio')) {
-        valorProducto = parseFloat(producto.precio_igv);
-    } else if (nombreFiltro.includes('temperatura')) {
-        // Buscar temperatura en características
-        if (producto.caracteristicas?.Temperatura) {
-            // Extraer número de strings como "+ 5 a 80°C" o "- 10 a 80°C"
-            const tempMatch = producto.caracteristicas.Temperatura.match(/-?\d+/);
-            if (tempMatch) {
-                valorProducto = parseFloat(tempMatch[0]);
-            }
-        }
-    } else if (nombreFiltro.includes('velocidad')) {
-        // Buscar velocidad en características
-        if (producto.caracteristicas?.Velocidad) {
-            // Extraer número de strings como "10 a 500 Rpm"
-            const velMatch = producto.caracteristicas.Velocidad.match(/\d+/);
-            if (velMatch) {
-                valorProducto = parseFloat(velMatch[0]);
-            }
-        }
-    } else if (nombreFiltro.includes('capacidad')) {
-        // Buscar capacidad en características
-        if (producto.caracteristicas?.Capacidad) {
-            // Extraer número de strings como "90 Litros" o "50 litros"
-            const capMatch = producto.caracteristicas.Capacidad.match(/\d+/);
-            if (capMatch) {
-                valorProducto = parseFloat(capMatch[0]);
-            }
-        }
-    } else if (nombreFiltro.includes('potencia')) {
-        // Buscar potencia en características
-        if (producto.caracteristicas?.Potencia) {
-            // Extraer número de strings como "1120W"
-            const potMatch = producto.caracteristicas.Potencia.match(/\d+/);
-            if (potMatch) {
-                valorProducto = parseFloat(potMatch[0]);
-            }
-        }
-    }
-    
-    // Si no se encontró un valor, buscar en especificaciones técnicas
-    if (valorProducto === null && producto.especificaciones_tecnicas) {
-        try {
-            const specs = JSON.parse(producto.especificaciones_tecnicas);
-            if (specs.secciones) {
-                for (const seccion of specs.secciones) {
-                    if (seccion.datos) {
-                        for (const fila of seccion.datos) {
-                            if (Array.isArray(fila) && fila.length >= 2) {
-                                const especificacion = fila[0].toLowerCase();
-                                if (especificacion.includes(nombreFiltro)) {
-                                    const valorMatch = fila[1].match(/\d+/);
-                                    if (valorMatch) {
-                                        valorProducto = parseFloat(valorMatch[0]);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (e) {
-            console.warn('Error parsing especificaciones_tecnicas:', e);
-        }
-    }
-    
-    // Comparar valores (por defecto, filtrar por menor o igual)
-    if (valorProducto !== null) {
-        return valorProducto <= valor;
-    }
-    
-    return false;
-};
-
-// Función para limpiar todos los filtros
-const limpiarTodosFiltros = () => {
-    setFiltrosSeleccionados({});
-    if (selectedBrand) {
-        const productosFiltradosPorMarca = productosOriginales.filter(product => 
-            String(product.marca_id) === String(selectedBrand)
-        );
-        setProductos(productosFiltradosPorMarca);
-    } else {
-        setProductos(productosOriginales);
-    }
-    setMostrarProductos(true);
-};
-
+    // ============================================================================
+    // EFFECTS
+    // ============================================================================
 
     // Effect para cargar datos iniciales
     useEffect(() => {
-        console.log('Productos recibidos al abrir el componente:', productosIniciales);
-        
         const cargarDatos = async () => {
             setIsLoading(true);
             const subcategoriaId = getSubcategoriaId();
@@ -646,10 +682,12 @@ const limpiarTodosFiltros = () => {
                 setFiltros(filtrosData);
 
                 // Cargar datos de subcategoría
-                const subcategoriaData = await makeRequest(`${URL_API}/subcategoria_id/${subcategoriaId}`);
+                const [subcategoriaData, categoriaData] = await Promise.all([
+                    makeRequest(`${URL_API}/subcategoria_id/${subcategoriaId}`),
+                    makeRequest(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`)
+                ]);
+                
                 setSubcategoriaNombre(subcategoriaData.nombre);
-
-                const categoriaData = await makeRequest(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`);
                 setCategoriaNombre(categoriaData.nombre_categoria);
                 setCategoriaId(categoriaData.id_categoria);
 
@@ -665,28 +703,37 @@ const limpiarTodosFiltros = () => {
         };
 
         cargarDatos();
-    }, []);
+    }, [makeRequest, productosIniciales]);
 
-    // Clases CSS reutilizables
-    const bgClasses = `w-full min-h-screen ${
-        isDarkMode 
-            ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
-            : 'bg-gradient-to-br from-blue-50 via-white to-indigo-50'
-    } transition-all duration-300`;
+    // ============================================================================
+    // CLASES CSS MEMOIZADAS
+    // ============================================================================
 
-    const sidebarClasses = `w-1/6 flex-shrink-0 sticky top-0 h-screen overflow-y-auto p-6 ${
-        isDarkMode 
-            ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-r border-gray-700' 
-            : 'bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200'
-    } shadow-2xl ${isOpen ? 'z-0' : 'z-10'} transition-all duration-300`;
+    const cssClasses = useMemo(() => ({
+        bg: `w-full min-h-screen ${
+            isDarkMode 
+                ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+                : 'bg-gradient-to-br from-blue-50 via-white to-indigo-50'
+        } transition-all duration-300`,
+        
+        sidebar: `w-1/6 flex-shrink-0 sticky top-0 h-screen overflow-y-auto p-6 ${
+            isDarkMode 
+                ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-r border-gray-700' 
+                : 'bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200'
+        } shadow-2xl ${isOpen ? 'z-0' : 'z-10'} transition-all duration-300`,
+        
+        title: `text-2xl lg:text-3xl font-bold mb-2 ${
+            isDarkMode ? 'text-white' : 'text-gray-900'
+        } transition-colors duration-200`,
+        
+        gradientLine: `h-1 w-20 rounded-full ${
+            isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
+        }`
+    }), [isDarkMode, isOpen]);
 
-    const titleClasses = `text-2xl lg:text-3xl font-bold mb-2 ${
-        isDarkMode ? 'text-white' : 'text-gray-900'
-    } transition-colors duration-200`;
-
-    const gradientLine = `h-1 w-20 rounded-full ${
-        isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
-    }`;
+    // ============================================================================
+    // RENDER
+    // ============================================================================
 
     return (
         <div>
@@ -695,10 +742,10 @@ const limpiarTodosFiltros = () => {
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
             
-            <div className={bgClasses}>
+            <div className={cssClasses.bg}>
                 <div className="flex w-full">
                     {/* Sidebar de filtros */}
-                    <div className={sidebarClasses} id="filtros-container">
+                    <div className={cssClasses.sidebar} id="filtros-container">
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <h2 className={`text-xl font-bold mb-2 ${
@@ -791,13 +838,7 @@ const limpiarTodosFiltros = () => {
                         ) : (
                             <>
                                 {isLoading ? (
-                                    <div className="space-y-3">
-                                        {[...Array(3)].map((_, i) => (
-                                            <div key={i} className={`h-16 rounded-lg animate-pulse ${
-                                                isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
-                                            }`}></div>
-                                        ))}
-                                    </div>
+                                    <LoadingSpinner isDarkMode={isDarkMode} />
                                 ) : filtros.length > 0 ? (
                                     <>
                                         <FiltroList
@@ -822,20 +863,19 @@ const limpiarTodosFiltros = () => {
                                         )}
                                     </>
                                 ) : (
-                                    <div className={`text-center py-8 rounded-lg border ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700/30 border-gray-600/50 text-gray-400' 
-                                            : 'bg-gray-50 border-gray-200 text-gray-500'
-                                    } transition-colors duration-200`}>
-                                        <svg className={`mx-auto h-12 w-12 mb-4 ${
-                                            isDarkMode ? 'text-gray-500' : 'text-gray-400'
-                                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} 
-                                                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                                        </svg>
-                                        <p className="text-sm font-medium">No hay filtros disponibles</p>
-                                        <p className="text-xs mt-1">para esta subcategoría</p>
-                                    </div>
+                                    <EmptyState
+                                        isDarkMode={isDarkMode}
+                                        title="No hay filtros disponibles"
+                                        description="para esta subcategoría"
+                                        icon={
+                                            <svg className={`mx-auto h-12 w-12 mb-4 ${
+                                                isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                                            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} 
+                                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                            </svg>
+                                        }
+                                    />
                                 )}
                             </>
                         )}
@@ -848,7 +888,7 @@ const limpiarTodosFiltros = () => {
                                 <>
                                     <div className="mb-8">
                                         <div className="flex items-center justify-between mb-4">
-                                            <h1 className={titleClasses}>
+                                            <h1 className={cssClasses.title}>
                                                 <Link href={`/categorias/${categoriaId}`}>
                                                     <span className={`text-xl lg:text-2xl font-bold hover:underline ${
                                                         isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
@@ -880,7 +920,7 @@ const limpiarTodosFiltros = () => {
                                         } mb-6 transition-colors duration-200`}>
                                             Explora nuestra selección de productos especializados
                                         </p>
-                                        <div className={`${gradientLine} mb-8`}></div>
+                                        <div className={`${cssClasses.gradientLine} mb-8`}></div>
                                     </div>
                                     <div className="animate-fadeIn">
                                         <ProductGrid products={productos} />
@@ -924,7 +964,7 @@ const limpiarTodosFiltros = () => {
                                         } mb-6 transition-colors duration-200`}>
                                             Explora nuestra selección de productos especializados
                                         </p>
-                                        <div className={`${gradientLine} mb-8`}></div>
+                                        <div className={`${cssClasses.gradientLine} mb-8`}></div>
                                     </div>
                                     <div className="animate-fadeIn">
                                         <ProductGrid products={productos} />
@@ -944,7 +984,7 @@ const limpiarTodosFiltros = () => {
                                                 </span>
                                             </Link> {subcategoriaNombre}
                                         </h1>
-                                        <div className={`${gradientLine} mb-8`}></div>
+                                        <div className={`${cssClasses.gradientLine} mb-8`}></div>
                                     </div>
                                     
                                     <div className="text-center py-16 lg:py-24">
