@@ -12,27 +12,143 @@ import FiltroConfirmDialog from "../Components/filtros/FiltroConfirmDialog";
 
 const URL_API = import.meta.env.VITE_API_URL;
 
+// Componente de tarjeta de marca
+const BrandCard = ({ brand, selectedBrand, isDarkMode, onBrandClick }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const isActive = String(selectedBrand) === String(brand.id_marca);
+
+    const handleClick = (e) => {
+        e.preventDefault();
+        if (isSearching) return;
+        
+        setIsSearching(true);
+        setTimeout(() => {
+            onBrandClick(brand.id_marca);
+            setIsSearching(false);
+        }, 300);
+    };
+
+    const cardClasses = `relative flex flex-col items-center text-center p-4 group transition-all duration-300 rounded-lg ${
+        isActive 
+            ? (isDarkMode ? 'bg-blue-900/50 border-2 border-blue-400' : 'bg-blue-100/70 border-2 border-blue-500')
+            : (isDarkMode ? 'hover:bg-gray-700/30' : 'hover:bg-gray-100/50')
+    } ${isDarkMode ? 'text-white' : 'text-gray-900'}`;
+
+    const imageContainerClasses = `w-36 h-36 flex items-center justify-center rounded-full border-2 overflow-hidden transition-all duration-300 bg-white ${
+        isActive
+            ? (isDarkMode ? 'border-blue-300 shadow-lg' : 'border-blue-600 shadow-lg')
+            : (isDarkMode ? 'border-blue-400' : 'border-blue-500')
+    }`;
+
+    const buttonClasses = `mt-3 transition-all duration-300 text-white px-4 py-2 rounded flex items-center justify-center transform hover:scale-105 ${
+        isSearching 
+            ? (isDarkMode ? 'bg-gray-600 cursor-wait' : 'bg-gray-400 cursor-wait')
+            : isActive
+                ? (isDarkMode ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-gray-400 cursor-not-allowed opacity-50')
+                : (isDarkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600')
+    }`;
+
+    return (
+        <div className={cardClasses}>
+            <div className={imageContainerClasses}>
+                <img
+                    src={brand.imagen}
+                    alt={brand.nombre}
+                    className={`object-contain w-32 h-32 transition-opacity duration-300 ${
+                        imageLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    loading="lazy"
+                    onLoad={() => setImageLoaded(true)}
+                    onError={(e) => e.target.style.display = 'none'}
+                />
+                
+                {!imageLoaded && (
+                    <div className={`w-32 h-32 flex items-center justify-center text-4xl font-bold ${
+                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                        {brand.nombre.charAt(0).toUpperCase()}
+                    </div>
+                )}
+            </div>
+
+            <h3 className={`mt-4 text-lg font-semibold transition-colors duration-300 ${
+                isActive 
+                    ? (isDarkMode ? 'text-blue-300' : 'text-blue-700')
+                    : (isDarkMode ? 'text-white' : 'text-gray-900')
+            }`}>
+                {brand.nombre}
+            </h3>
+
+            {brand.descripcion && (
+                <p className={`mt-1 text-sm transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                }`}>
+                    {brand.descripcion}
+                </p>
+            )}
+
+            {isActive && (
+                <div className={`mt-2 px-2 py-1 rounded-full text-xs font-medium ${
+                    isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+                }`}>
+                    Filtro Activo
+                </div>
+            )}
+
+            <button 
+                className={buttonClasses}
+                onClick={handleClick}
+                disabled={isSearching || isActive}
+            >
+                {isSearching ? (
+                    <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Filtrando...
+                    </>
+                ) : isActive ? (
+                    'Filtro Activo'
+                ) : (
+                    'Filtrar por Marca'
+                )}
+            </button>
+        </div>
+    );
+};
+
+// Componente principal
 export default function Subcategoria({ productos: productosIniciales, marcas }) {
     const { auth } = usePage().props;
     const { isDarkMode } = useTheme();
+    
+    // Estados principales
     const [isOpen, setIsOpen] = useState(false);
-    const [categoriasArray, setCategoriasArray] = useState([]);
-    const [openCategories, setOpenCategories] = useState({});
-    const [activeCategory, setActiveCategory] = useState(null);
-    const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
-    const [categoriaNombre, setCategoriaNombre] = useState("");
-    const [categoriaId, setCategoriaId] = useState("");
     const [mostrarProductos, setMostrarProductos] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [selectedBrand, setSelectedBrand] = useState(null);
+    
+    // Estados de datos
     const [productos, setProductos] = useState(productosIniciales || []);
     const [productosOriginales, setProductosOriginales] = useState(productosIniciales || []);
     const [filtros, setFiltros] = useState([]);
     const [filtrosSeleccionados, setFiltrosSeleccionados] = useState({});
+    const [categoriasArray, setCategoriasArray] = useState([]);
+    const [openCategories, setOpenCategories] = useState({});
+    const [activeCategory, setActiveCategory] = useState(null);
+    
+    // Estados de UI
+    const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
+    const [categoriaNombre, setCategoriaNombre] = useState("");
+    const [categoriaId, setCategoriaId] = useState("");
     const [mostrarFormularioFiltro, setMostrarFormularioFiltro] = useState(false);
     const [filtroEnEdicion, setFiltroEnEdicion] = useState(null);
     const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
     const [filtroAEliminar, setFiltroAEliminar] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [selectedBrand, setSelectedBrand] = useState(null);
+    
+    // Estado del nuevo filtro
     const [nuevoFiltro, setNuevoFiltro] = useState({
         nombre: '',
         tipo_input: 'select',
@@ -43,179 +159,111 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         opciones: []
     });
 
-    // Componente de tarjeta de marca integrado
-    const CategoryBrandCard = ({ brand }) => {
-        const [imageLoaded, setImageLoaded] = useState(false);
-        const [isSearching, setIsSearching] = useState(false);
-        const isActive = String(selectedBrand) === String(brand.id_marca);
-
-        const handleBrandClick = (e) => {
-            e.preventDefault();
-            if (isSearching) return;
-            
-            setIsSearching(true);
-            
-            // Aplicar filtro por marca
-            setTimeout(() => {
-                handleBrandFilter(brand.id_marca);
-                setIsSearching(false);
-            }, 300);
-        };
-
-        return (
-            <div
-                className={`relative flex flex-col items-center text-center p-4 group transition-all duration-300 rounded-lg ${
-                    isActive 
-                        ? (isDarkMode ? 'bg-blue-900/50 border-2 border-blue-400' : 'bg-blue-100/70 border-2 border-blue-500')
-                        : (isDarkMode ? 'hover:bg-gray-700/30' : 'hover:bg-gray-100/50')
-                } ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-            >
-                <div className={`w-36 h-36 flex items-center justify-center rounded-full border-2 overflow-hidden transition-all duration-300 bg-white ${
-                    isActive
-                        ? (isDarkMode ? 'border-blue-300 shadow-lg' : 'border-blue-600 shadow-lg')
-                        : (isDarkMode ? 'border-blue-400' : 'border-blue-500')
-                }`}>
-                    
-                    {/* Imagen de la marca */}
-                    <img
-                        src={brand.imagen}
-                        alt={brand.nombre}
-                        className={`object-contain w-32 h-32 transition-opacity duration-300 ${
-                            imageLoaded ? 'opacity-100' : 'opacity-0'
-                        }`}
-                        loading="lazy"
-                        onLoad={() => setImageLoaded(true)}
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                        }}
-                    />
-                    
-                    {/* Fallback si no hay imagen */}
-                    {!imageLoaded && (
-                        <div className={`w-32 h-32 flex items-center justify-center text-4xl font-bold ${
-                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
-                            {brand.nombre.charAt(0).toUpperCase()}
-                        </div>
-                    )}
-                </div>
-
-                {/* Nombre de la marca */}
-                <h3 className={`mt-4 text-lg font-semibold transition-colors duration-300 ${
-                    isActive 
-                        ? (isDarkMode ? 'text-blue-300' : 'text-blue-700')
-                        : (isDarkMode ? 'text-white' : 'text-gray-900')
-                }`}>
-                    {brand.nombre}
-                </h3>
-
-                {/* Descripción */}
-                {brand.descripcion && (
-                    <p className={`mt-1 text-sm transition-colors duration-300 ${
-                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                    }`}>
-                        {brand.descripcion}
-                    </p>
-                )}
-
-                {/* Indicador de filtro activo */}
-                {isActive && (
-                    <div className={`mt-2 px-2 py-1 rounded-full text-xs font-medium ${
-                        isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
-                    }`}>
-                        Filtro Activo
-                    </div>
-                )}
-
-                {/* Botón */}
-                <button 
-                    className={`mt-3 transition-all duration-300 text-white px-4 py-2 rounded flex items-center justify-center transform hover:scale-105 ${
-                        isSearching 
-                            ? (isDarkMode ? 'bg-gray-600 cursor-wait' : 'bg-gray-400 cursor-wait')
-                            : isActive
-                                ? (isDarkMode ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-gray-400 cursor-not-allowed opacity-50')
-                                : (isDarkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600')
-                    }`}
-                    onClick={handleBrandClick}
-                    disabled={isSearching || isActive}
-                >
-                    {isSearching ? (
-                        <>
-                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Filtrando...
-                        </>
-                    ) : isActive ? (
-                        'Filtro Activo'
-                    ) : (
-                        'Filtrar por Marca'
-                    )}
-                </button>
-            </div>
-        );
+    // Función para obtener ID de subcategoría de la URL
+    const getSubcategoriaId = () => {
+        const urlParts = window.location.pathname.split('/');
+        return urlParts[urlParts.length - 1];
     };
 
-    // Función para manejar el filtro por marca desde las tarjetas
+    // Función para hacer peticiones HTTP
+    const makeRequest = async (url, options = {}) => {
+        const defaultHeaders = {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        };
+
+        try {
+            const response = await fetch(url, {
+                headers: { ...defaultHeaders, ...options.headers },
+                ...options
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Request error:', error);
+            throw error;
+        }
+    };
+
+    // Handlers de filtros
     const handleBrandFilter = (marcaId) => {
         setSelectedBrand(String(marcaId));
-        // Aplicar filtro inmediatamente sobre los productos actuales
         const productosFiltrados = productosOriginales.filter(product => 
             String(product.marca_id) === String(marcaId)
         );
         setProductos(productosFiltrados);
         setMostrarProductos(true);
-        // Scroll suave hacia arriba para ver los productos filtrados
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Función para limpiar el filtro de marca
     const clearBrandFilter = () => {
         setSelectedBrand(null);
-        // Restaurar todos los productos originales
         setProductos(productosOriginales);
     };
 
+    const filtrarPorPrecio = () => {
+        const precioMin = parseFloat(document.getElementById('min-price').value) || 0;
+        const precioMax = parseFloat(document.getElementById('max-price').value) || Infinity;
+        
+        const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
+        let productosFiltrados = productosBase.filter(producto => {
+            const precio = parseFloat(producto.precio_igv);
+            return precio >= precioMin && precio <= precioMax;
+        });
+        
+        if (selectedBrand) {
+            productosFiltrados = productosFiltrados.filter(product => 
+                String(product.marca_id) === String(selectedBrand)
+            );
+        }
+        
+        setProductos(productosFiltrados);
+        setMostrarProductos(true);
+    };
+
+    const limpiarFiltrosPrecio = () => {
+        document.getElementById('min-price').value = '';
+        document.getElementById('max-price').value = '';
+        
+        if (selectedBrand) {
+            const productosFiltradosPorMarca = productosOriginales.filter(product => 
+                String(product.marca_id) === String(selectedBrand)
+            );
+            setProductos(productosFiltradosPorMarca);
+        } else {
+            setProductos(productosOriginales);
+        }
+    };
+
+    // Handlers de CRUD de filtros
     const handleCrearFiltro = async () => {
-        const urlParts = window.location.pathname.split('/');
-        const subcategoriaId = urlParts[urlParts.length - 1];
-    
+        const subcategoriaId = getSubcategoriaId();
         const opcionesValidas = nuevoFiltro.opciones.filter(opcion => 
             opcion.valor.trim() !== '' && opcion.etiqueta.trim() !== ''
         );
-    
+
         const filtroData = {
             ...nuevoFiltro,
             subcategorias: [parseInt(subcategoriaId)],
             opciones: ['select', 'checkbox', 'radio'].includes(nuevoFiltro.tipo_input) ? opcionesValidas : []
         };
-    
+
         try {
-            const response = await fetch(`${URL_API}/filtros`, {
+            const responseData = await makeRequest(`${URL_API}/filtros`, {
                 method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
                 body: JSON.stringify(filtroData)
             });
-    
-            const responseData = await response.json();
-            console.log('Respuesta del servidor:', responseData);
-    
-            if (response.ok) {
-                setFiltros([...filtros, responseData]);
-                setMostrarFormularioFiltro(false);
-                resetFormulario();
-            } else {
-                console.error('Error al crear el filtro:', responseData);
-                alert('Error al crear el filtro: ' + (responseData.message || responseData.error || 'Error desconocido'));
-            }
+
+            setFiltros([...filtros, responseData]);
+            setMostrarFormularioFiltro(false);
+            resetFormulario();
         } catch (error) {
-            console.error('Error:', error);
-            alert('Error de conexión al crear el filtro');
+            alert('Error al crear el filtro: ' + error.message);
         }
     };
 
@@ -235,43 +283,55 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
     const handleActualizarFiltro = async () => {
         if (!filtroEnEdicion) return;
-    
+
         const opcionesValidas = nuevoFiltro.opciones.filter(opcion => 
             opcion.valor.trim() !== '' && opcion.etiqueta.trim() !== ''
         );
-    
+
         const filtroData = {
             ...nuevoFiltro,
             opciones: ['select', 'checkbox', 'radio'].includes(nuevoFiltro.tipo_input) ? opcionesValidas : []
         };
-    
+
         try {
-            const response = await fetch(`${URL_API}/filtros/${filtroEnEdicion.id_filtro}`, {
+            const filtroActualizado = await makeRequest(`${URL_API}/filtros/${filtroEnEdicion.id_filtro}`, {
                 method: 'PUT',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
                 body: JSON.stringify(filtroData)
             });
-    
-            if (response.ok) {
-                const filtroActualizado = await response.json();
-                setFiltros(filtros.map(f => 
-                    f.id_filtro === filtroEnEdicion.id_filtro ? filtroActualizado : f
-                ));
-                setMostrarFormularioFiltro(false);
-                setFiltroEnEdicion(null);
-                resetFormulario();
-            } else {
-                const errorData = await response.json();
-                console.error('Error al actualizar el filtro:', errorData);
-                alert('Error al actualizar el filtro: ' + (errorData.message || 'Error desconocido'));
-            }
+
+            setFiltros(filtros.map(f => 
+                f.id_filtro === filtroEnEdicion.id_filtro ? filtroActualizado : f
+            ));
+            setMostrarFormularioFiltro(false);
+            setFiltroEnEdicion(null);
+            resetFormulario();
         } catch (error) {
-            console.error('Error:', error);
-            alert('Error de conexión al actualizar el filtro');
+            alert('Error al actualizar el filtro: ' + error.message);
+        }
+    };
+
+    const handleEliminarFiltro = async () => {
+        if (!filtroAEliminar) return;
+
+        try {
+            await makeRequest(`${URL_API}/filtros/${filtroAEliminar.id_filtro}`, {
+                method: 'DELETE'
+            });
+
+            setFiltros(filtros.filter(f => f.id_filtro !== filtroAEliminar.id_filtro));
+            setMostrarConfirmacion(false);
+            setFiltroAEliminar(null);
+        } catch (error) {
+            console.error('Error al eliminar el filtro:', error);
+        }
+    };
+
+    const handleSubmitFiltro = async (e) => {
+        e.preventDefault();
+        if (filtroEnEdicion) {
+            await handleActualizarFiltro();
+        } else {
+            await handleCrearFiltro();
         }
     };
 
@@ -287,40 +347,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         });
     };
 
-    const handleEliminarFiltro = async () => {
-        if (!filtroAEliminar) return;
-
-        try {
-            const response = await fetch(`${URL_API}/filtros/${filtroAEliminar.id_filtro}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            });
-
-            if (response.ok) {
-                setFiltros(filtros.filter(f => f.id_filtro !== filtroAEliminar.id_filtro));
-                setMostrarConfirmacion(false);
-                setFiltroAEliminar(null);
-            } else {
-                console.error('Error al eliminar el filtro');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    };
-
-    const handleSubmitFiltro = async (e) => {
-        e.preventDefault();
-        if (filtroEnEdicion) {
-            await handleActualizarFiltro();
-        } else {
-            await handleCrearFiltro();
-        }
-    };
-
+    // Handlers de opciones
     const agregarOpcion = () => {
         setNuevoFiltro({
             ...nuevoFiltro,
@@ -340,143 +367,59 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
     const actualizarOpcion = (index, campo, valor) => {
         const nuevasOpciones = [...nuevoFiltro.opciones];
-        nuevasOpciones[index] = {
-            ...nuevasOpciones[index],
-            [campo]: valor
-        };
-        setNuevoFiltro({
-            ...nuevoFiltro,
-            opciones: nuevasOpciones
-        });
+        nuevasOpciones[index] = { ...nuevasOpciones[index], [campo]: valor };
+        setNuevoFiltro({ ...nuevoFiltro, opciones: nuevasOpciones });
     };
 
-    useEffect(() => {
-        setIsLoading(true);
-        // Cargar categorías desde localStorage o desde la API
-        const storedData = localStorage.getItem('categoriasCompleta');
-        if (storedData) {
-            setCategoriasArray(JSON.parse(storedData));
-        } else {
-            fetch(URL_API + "/categorias-completa")
-                .then((response) => response.json())
-                .then((data) => {
-                    setCategoriasArray(data);
-                    localStorage.setItem('categoriasCompleta', JSON.stringify(data));
-                })
-                .catch((error) => console.error('Error fetching data:', error));
-        }
-
-        // Obtener el ID de la subcategoría desde la URL
-        const urlParts = window.location.pathname.split('/');
-        const subcategoriaId = urlParts[urlParts.length - 1];
-
-        // Cargar los filtros de la subcategoría
-        fetch(`${URL_API}/filtros/subcategoria/${subcategoriaId}`)
-            .then((response) => response.json())
-            .then((data) => {
-                setFiltros(data);
-                setIsLoading(false);
-            })
-            .catch((error) => {
-                console.error('Error cargando filtros:', error);
-                setIsLoading(false);
-            });
-
-        console.log("productos");
-        console.log(productos);
-        console.log("marcas");
-        console.log(marcas);
-
-        // Hacer una solicitud a la API para obtener los datos de la subcategoría
-        fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-                setSubcategoriaNombre(data.nombre);
-                // Obtener el nombre de la categoría
-                fetch(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`)
-                    .then((response) => response.json())
-                    .then((data) => {
-                        setCategoriaNombre(data.nombre_categoria);
-                        setCategoriaId(data.id_categoria);
-                    })
-                    .catch((error) => console.error('Error fetching categoria data:', error));
-            })
-            .catch((error) => console.error('Error fetching subcategoria data:', error));
-
-            if (productosIniciales && productosIniciales.length > 0) {
-                setProductosOriginales(productosIniciales);
-            }
-    }, []);
-
+    // Otros handlers
     const toggleCategory = (categoriaNombre) => {
-        setOpenCategories((prevState) => ({
+        setOpenCategories(prevState => ({
             ...prevState,
             [categoriaNombre]: !prevState[categoriaNombre],
         }));
         setActiveCategory(categoriaNombre);
     };
 
-    const toggleMenu = () => {
-        setIsOpen(!isOpen);
-    };
+    const toggleMenu = () => setIsOpen(!isOpen);
 
     const handleMostrarProductos = async () => {
-        const urlParts = window.location.pathname.split('/');
-        const subcategoriaId = urlParts[urlParts.length - 1];
+        const subcategoriaId = getSubcategoriaId();
         
         try {
-            const response = await fetch(`${URL_API}/product/subcategoria/${subcategoriaId}`);
-            if (response.ok) {
-                const productosData = await response.json();
-                setProductos(productosData);
-                setProductosOriginales(productosData);
-            }
+            const productosData = await makeRequest(`${URL_API}/product/subcategoria/${subcategoriaId}`);
+            setProductos(productosData);
+            setProductosOriginales(productosData);
+            setMostrarProductos(true);
         } catch (error) {
             console.error('Error cargando productos:', error);
         }
-        
-        setMostrarProductos(true);
     };
 
     const buscarProductosFiltrados = async () => {
-        const urlParts = window.location.pathname.split('/');
-        const subcategoriaId = urlParts[urlParts.length - 1];
+        const subcategoriaId = getSubcategoriaId();
         
         try {
             if (Object.keys(filtrosSeleccionados).length > 0) {
-                const response = await fetch(`${URL_API}/filtros/filtrar-productos`, {
+                const productosFiltrados = await makeRequest(`${URL_API}/filtros/filtrar-productos`, {
                     method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
                     body: JSON.stringify({
                         subcategoria_id: subcategoriaId,
                         filtros: filtrosSeleccionados
                     })
                 });
-    
-                if (response.ok) {
-                    const productosFiltrados = await response.json();
-                    setMostrarProductos(true);
-                    
-                    // Si hay filtro de marca activo, aplicar filtro adicional
-                    if (selectedBrand) {
-                        const productosFiltradosPorMarca = productosFiltrados.filter(product => 
-                            String(product.marca_id) === String(selectedBrand)
-                        );
-                        setProductos(productosFiltradosPorMarca);
-                    } else {
-                        setProductos(productosFiltrados);
-                        setProductosOriginales(productosFiltrados);
-                    }
+
+                setMostrarProductos(true);
+                
+                if (selectedBrand) {
+                    const productosFiltradosPorMarca = productosFiltrados.filter(product => 
+                        String(product.marca_id) === String(selectedBrand)
+                    );
+                    setProductos(productosFiltradosPorMarca);
                 } else {
-                    console.error('Error al filtrar productos');
+                    setProductos(productosFiltrados);
+                    setProductosOriginales(productosFiltrados);
                 }
             } else {
-                // Si no hay filtros pero hay marca seleccionada
                 if (selectedBrand) {
                     const productosFiltradosPorMarca = productosOriginales.filter(product => 
                         String(product.marca_id) === String(selectedBrand)
@@ -484,14 +427,10 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                     setProductos(productosFiltradosPorMarca);
                     setMostrarProductos(true);
                 } else {
-                    // Sin filtros ni marca, mostrar todos los productos
-                    const response = await fetch(`${URL_API}/product/subcategoria/${subcategoriaId}`);
-                    if (response.ok) {
-                        const todosProductos = await response.json();
-                        setMostrarProductos(true);
-                        setProductos(todosProductos);
-                        setProductosOriginales(todosProductos);
-                    }
+                    const todosProductos = await makeRequest(`${URL_API}/product/subcategoria/${subcategoriaId}`);
+                    setMostrarProductos(true);
+                    setProductos(todosProductos);
+                    setProductosOriginales(todosProductos);
                 }
             }
         } catch (error) {
@@ -499,47 +438,69 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         }
     };
 
-    const buscarProductosFiltradosConMarca = async (marcaId) => {
-        // Eliminar esta función ya que no es necesaria
-    };
+    // Effect para cargar datos iniciales
+    useEffect(() => {
+        const cargarDatos = async () => {
+            setIsLoading(true);
+            const subcategoriaId = getSubcategoriaId();
 
-    const filtrarPorPrecio = () => {
-        const precioMin = parseFloat(document.getElementById('min-price').value) || 0;
-        const precioMax = parseFloat(document.getElementById('max-price').value) || Infinity;
-        
-        const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
-        
-        const productosFiltrados = productosBase.filter(producto => {
-            const precio = parseFloat(producto.precio_igv);
-            return precio >= precioMin && precio <= precioMax;
-        });
-        
-        // Si hay una marca seleccionada, aplicar también ese filtro
-        if (selectedBrand) {
-            const productosFiltradosPorMarcaYPrecio = productosFiltrados.filter(product => 
-                String(product.marca_id) === String(selectedBrand)
-            );
-            setProductos(productosFiltradosPorMarcaYPrecio);
-        } else {
-            setProductos(productosFiltrados);
-        }
-        
-        setMostrarProductos(true);
-    };
+            try {
+                // Cargar categorías
+                const storedData = localStorage.getItem('categoriasCompleta');
+                if (storedData) {
+                    setCategoriasArray(JSON.parse(storedData));
+                } else {
+                    const data = await makeRequest(`${URL_API}/categorias-completa`);
+                    setCategoriasArray(data);
+                    localStorage.setItem('categoriasCompleta', JSON.stringify(data));
+                }
 
-    const limpiarFiltrosPrecio = () => {
-        document.getElementById('min-price').value = '';
-        document.getElementById('max-price').value = '';
-        if (selectedBrand) {
-            // Si hay marca seleccionada, mantener ese filtro
-            const productosFiltradosPorMarca = productosOriginales.filter(product => 
-                String(product.marca_id) === String(selectedBrand)
-            );
-            setProductos(productosFiltradosPorMarca);
-        } else {
-            setProductos(productosOriginales);
-        }
-    };
+                // Cargar filtros
+                const filtrosData = await makeRequest(`${URL_API}/filtros/subcategoria/${subcategoriaId}`);
+                setFiltros(filtrosData);
+
+                // Cargar datos de subcategoría
+                const subcategoriaData = await makeRequest(`${URL_API}/subcategoria_id/${subcategoriaId}`);
+                setSubcategoriaNombre(subcategoriaData.nombre);
+
+                const categoriaData = await makeRequest(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`);
+                setCategoriaNombre(categoriaData.nombre_categoria);
+                setCategoriaId(categoriaData.id_categoria);
+
+                if (productosIniciales && productosIniciales.length > 0) {
+                    setProductosOriginales(productosIniciales);
+                }
+
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        cargarDatos();
+    }, []);
+
+    // Clases CSS reutilizables
+    const bgClasses = `w-full min-h-screen ${
+        isDarkMode 
+            ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+            : 'bg-gradient-to-br from-blue-50 via-white to-indigo-50'
+    } transition-all duration-300`;
+
+    const sidebarClasses = `w-1/6 flex-shrink-0 sticky top-0 h-screen overflow-y-auto p-6 ${
+        isDarkMode 
+            ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-r border-gray-700' 
+            : 'bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200'
+    } shadow-2xl ${isOpen ? 'z-0' : 'z-10'} transition-all duration-300`;
+
+    const titleClasses = `text-2xl lg:text-3xl font-bold mb-2 ${
+        isDarkMode ? 'text-white' : 'text-gray-900'
+    } transition-colors duration-200`;
+
+    const gradientLine = `h-1 w-20 rounded-full ${
+        isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
+    }`;
 
     return (
         <div>
@@ -548,20 +509,10 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
             
-            <div className={`w-full min-h-screen ${
-                isDarkMode 
-                    ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
-                    : 'bg-gradient-to-br from-blue-50 via-white to-indigo-50'
-            } transition-all duration-300`}>
-                
+            <div className={bgClasses}>
                 <div className="flex w-full">
-                    {/* Enhanced Filters Sidebar */}
-                    <div className={`w-1/6 flex-shrink-0 sticky top-0 h-screen overflow-y-auto p-6 ${
-                        isDarkMode 
-                            ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-r border-gray-700' 
-                            : 'bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200'
-                    } shadow-2xl ${isOpen ? 'z-0' : 'z-10'} transition-all duration-300`} id="filtros-container">
-                        
+                    {/* Sidebar de filtros */}
+                    <div className={sidebarClasses} id="filtros-container">
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <h2 className={`text-xl font-bold mb-2 ${
@@ -583,7 +534,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                             )}
                         </div>
 
-                        {/* Enhanced Price Filter */}
+                        {/* Filtro de precio */}
                         <div className={`price-filter-container p-4 rounded-xl shadow-lg mb-6 transition-all duration-200 border ${
                             isDarkMode 
                                 ? 'bg-gray-700/50 border-gray-600/50' 
@@ -595,56 +546,32 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                 Rango de Precios
                             </h3>
                             <div className="flex justify-between mb-4 space-x-2">
-                                <div className="w-5/12">
-                                    <label htmlFor="min-price" className={`block text-sm font-medium mb-2 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    } transition-colors duration-200`}>
-                                        Mínimo
-                                    </label>
-                                    <div className="relative rounded-lg shadow-sm">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span className={`${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            } text-sm transition-colors duration-200`}>$</span>
+                                {['min-price', 'max-price'].map((id, index) => (
+                                    <div key={id} className="w-5/12">
+                                        <label htmlFor={id} className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        } transition-colors duration-200`}>
+                                            {index === 0 ? 'Mínimo' : 'Máximo'}
+                                        </label>
+                                        <div className="relative rounded-lg shadow-sm">
+                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                <span className={`${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                } text-sm transition-colors duration-200`}>$</span>
+                                            </div>
+                                            <input
+                                                type="number"
+                                                id={id}
+                                                className={`focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-3 py-2 text-sm rounded-lg transition-all duration-200 ${
+                                                    isDarkMode 
+                                                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400' 
+                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                }`}
+                                                placeholder={index === 0 ? "0" : "100000"}
+                                            />
                                         </div>
-                                        <input
-                                            type="number"
-                                            name="min-price"
-                                            id="min-price"
-                                            className={`focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-3 py-2 text-sm rounded-lg transition-all duration-200 ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400' 
-                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                            }`}
-                                            placeholder="0"
-                                        />
                                     </div>
-                                </div>
-                                <div className="w-5/12">
-                                    <label htmlFor="max-price" className={`block text-sm font-medium mb-2 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    } transition-colors duration-200`}>
-                                        Máximo
-                                    </label>
-                                    <div className="relative rounded-lg shadow-sm">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span className={`${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            } text-sm transition-colors duration-200`}>$</span>
-                                        </div>
-                                        <input
-                                            type="number"
-                                            name="max-price"
-                                            id="max-price"
-                                            className={`focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-3 py-2 text-sm rounded-lg transition-all duration-200 ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400' 
-                                                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                            }`}
-                                            placeholder="100000"
-                                        />
-                                    </div>
-                                </div>
+                                ))}
                             </div>
 
                             <div className="flex justify-between mt-4 space-x-2">
@@ -663,7 +590,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                             </div>
                         </div>
 
-                        {/* Filters Content */}
+                        {/* Contenido de filtros */}
                         {mostrarFormularioFiltro ? (
                             <FiltroForm
                                 nuevoFiltro={nuevoFiltro}
@@ -728,16 +655,14 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                         )}
                     </div>
 
-                    {/* Enhanced Main Content */}
+                    {/* Contenido principal */}
                     <div className="flex-1 p-6 lg:p-8 w-full space-y-2">
                         <div className="w-full">
                             {productos && productos.length > 0 ? (
                                 <>
                                     <div className="mb-8">
                                         <div className="flex items-center justify-between mb-4">
-                                            <h1 className={`text-2xl lg:text-3xl font-bold mb-2 ${
-                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                            } transition-colors duration-200`}>
+                                            <h1 className={titleClasses}>
                                                 <Link href={`/categorias/${categoriaId}`}>
                                                     <span className={`text-xl lg:text-2xl font-bold hover:underline ${
                                                         isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
@@ -769,9 +694,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                         } mb-6 transition-colors duration-200`}>
                                             Explora nuestra selección de productos especializados
                                         </p>
-                                        <div className={`h-1 w-20 rounded-full ${
-                                            isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
-                                        } mb-8`}></div>
+                                        <div className={`${gradientLine} mb-8`}></div>
                                     </div>
                                     <div className="animate-fadeIn">
                                         <ProductGrid products={productos} />
@@ -815,9 +738,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                         } mb-6 transition-colors duration-200`}>
                                             Explora nuestra selección de productos especializados
                                         </p>
-                                        <div className={`h-1 w-20 rounded-full ${
-                                            isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
-                                        } mb-8`}></div>
+                                        <div className={`${gradientLine} mb-8`}></div>
                                     </div>
                                     <div className="animate-fadeIn">
                                         <ProductGrid products={productos} />
@@ -837,9 +758,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                                 </span>
                                             </Link> {subcategoriaNombre}
                                         </h1>
-                                        <div className={`h-1 w-20 rounded-full ${
-                                            isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
-                                        } mb-8`}></div>
+                                        <div className={`${gradientLine} mb-8`}></div>
                                     </div>
                                     
                                     <div className="text-center py-16 lg:py-24">
@@ -885,7 +804,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                 </>
                             )}
 
-                            {/* Sección de marcas integrada */}
+                            {/* Sección de marcas */}
                             {marcas && (Array.isArray(marcas) ? marcas.length > 0 : true) && (productos.length > 0 || mostrarProductos) && (
                                 <div className={`p-8 mt-8 transition-colors duration-300 ${
                                     isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
@@ -907,9 +826,21 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                     
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                                         {Array.isArray(marcas) ? marcas.map((marca) => (
-                                            <CategoryBrandCard key={marca.id_marca} brand={marca} />
+                                            <BrandCard 
+                                                key={marca.id_marca} 
+                                                brand={marca} 
+                                                selectedBrand={selectedBrand}
+                                                isDarkMode={isDarkMode}
+                                                onBrandClick={handleBrandFilter}
+                                            />
                                         )) : (
-                                            <CategoryBrandCard key={marcas.id_marca} brand={marcas} />
+                                            <BrandCard 
+                                                key={marcas.id_marca} 
+                                                brand={marcas} 
+                                                selectedBrand={selectedBrand}
+                                                isDarkMode={isDarkMode}
+                                                onBrandClick={handleBrandFilter}
+                                            />
                                         )}
                                     </div>
                                 </div>
