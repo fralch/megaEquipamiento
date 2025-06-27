@@ -1,39 +1,56 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Link } from "@inertiajs/react";
 import { useTheme } from "../../storage/ThemeContext";
-const URL_API = import.meta.env.VITE_API_URL;  
 
-const CategoryCard = ({ title, items, categoryId }) => {
+const URL_API = import.meta.env.VITE_API_URL;
+const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 horas
+const IMAGE_ROTATION_INTERVAL = 3000; // 3 segundos  
+
+// Componente memoizado para subcategorías
+const SubcategoryLink = React.memo(({ item, isDarkMode }) => (
+  <Link
+    href={`/subcategoria/${item.id_subcategoria}`}
+    className={`block ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-700'} p-2 rounded-md cursor-pointer transition-colors duration-200`}
+  >
+    {item.nombre}
+  </Link>
+));
+
+SubcategoryLink.displayName = 'SubcategoryLink';
+
+const CategoryCard = React.memo(({ title, items, categoryId }) => {
   const { isDarkMode } = useTheme();
   const [imagePaths, setImagePaths] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const cardRef = useRef(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const intervalRef = useRef(null);
   
+  // Función memoizada para cargar imágenes
+  const loadImages = useCallback(async () => {
+    try {
+      const folderName = title.toLowerCase().replace(/\s+/g, '-');
+      const imageModule = await import.meta.glob('/public/img/categorias/**/*.{jpg,png,webp,webm}', { eager: false });
+      
+      // Filtrar y procesar las rutas
+      const paths = Object.keys(imageModule)
+        .filter(path => path.includes(`/img/categorias/${folderName}/`))
+        .map(path => path.replace('/public', ''));
+      
+      setImagePaths(paths);
+    } catch (error) {
+      console.error('Error loading images:', error);
+      setImagePaths([]);
+    }
+  }, [title]);
+
   // Cargar rutas de imágenes de forma dinámica solo cuando se necesitan
   useEffect(() => {
-    const loadImages = async () => {
-      try {
-        const folderName = title.toLowerCase().replace(/\s+/g, '-');
-        const imageModule = await import.meta.glob('/public/img/categorias/**/*.{jpg,png,webp,webm}', { eager: false });
-        
-        // Filtrar y procesar las rutas
-        const paths = Object.keys(imageModule)
-          .filter(path => path.includes(`/img/categorias/${folderName}/`))
-          .map(path => path.replace('/public', ''));
-        
-        setImagePaths(paths);
-      } catch (error) {
-        console.error('Error loading images:', error);
-        setImagePaths([]);
-      }
-    };
-    
     if (isVisible) {
       loadImages();
     }
-  }, [title, isVisible]);
+  }, [isVisible, loadImages]);
 
   // Observer para lazy loading
   useEffect(() => {
@@ -52,30 +69,49 @@ const CategoryCard = ({ title, items, categoryId }) => {
     }
     
     return () => {
-      if (cardRef.current) {
-        observer.disconnect();
+      observer.disconnect();
+    };
+  }, []);
+
+  // Cambiar imagen activa con cleanup mejorado
+  useEffect(() => {
+    if (imagePaths.length > 0 && isVisible) {
+      intervalRef.current = setInterval(() => {
+        setActiveImageIndex((prevIndex) => (prevIndex + 1) % imagePaths.length);
+      }, IMAGE_ROTATION_INTERVAL);
+      
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      };
+    }
+  }, [imagePaths.length, isVisible]);
+
+  // Cleanup al desmontar
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
       }
     };
   }, []);
 
-  // Cambiar imagen activa cada 3 segundos solo si hay imágenes y el componente es visible
-  useEffect(() => {
-    if (imagePaths.length > 0 && isVisible) {
-      const interval = setInterval(() => {
-        setActiveImageIndex((prevIndex) => (prevIndex + 1) % imagePaths.length);
-      }, 3000);
-      return () => clearInterval(interval);
-    }
-  }, [imagePaths.length, isVisible]);
-
-  // Placeholder o imagen por defecto
-  const placeholderImage = 'https://aringenieriaa.com/storage/servicio/125456545.jpg';
+  // Memoizar valores calculados
+  const placeholderImage = useMemo(() => 'https://aringenieriaa.com/storage/servicio/125456545.jpg', []);
   
-  // Imagen actual a mostrar
-  const currentImage = imagePaths.length > 0 ? imagePaths[activeImageIndex] : placeholderImage;
+  const currentImage = useMemo(() => {
+    return imagePaths.length > 0 ? imagePaths[activeImageIndex] : placeholderImage;
+  }, [imagePaths, activeImageIndex, placeholderImage]);
+
+  // Memoizar handlers
+  const handleImageLoad = useCallback(() => {
+    setImageLoaded(true);
+  }, []);
   
   return (
-    <div ref={cardRef} className="relative group w-full h-96 rounded-lg overflow-hidden shadow-lg m-4">
+    <div ref={cardRef} className="relative group w-full h-96 rounded-lg overflow-hidden shadow-lg">
       {/* Placeholder mientras carga */}
       <div 
         className={`absolute inset-0 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'} transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
@@ -92,7 +128,7 @@ const CategoryCard = ({ title, items, categoryId }) => {
             src={currentImage}
             alt={`${title} background`}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-            onLoad={() => setImageLoaded(true)}
+            onLoad={handleImageLoad}
             loading="lazy"
           />
           
@@ -110,16 +146,14 @@ const CategoryCard = ({ title, items, categoryId }) => {
               <h2 className="text-2xl font-semibold mb-4 text-center">{title}</h2>
             </Link>
 
-            {/* Lista desplazable */}
+            {/* Lista desplazable memoizada */}
             <div className={`space-y-2 h-40 overflow-y-auto scrollbar-thin ${isDarkMode ? 'scrollbar-thumb-gray-500 scrollbar-track-gray-700' : 'scrollbar-thumb-gray-600 scrollbar-track-gray-300'}`}>
               {items.map((item) => (
-                <Link
+                <SubcategoryLink
                   key={item.id_subcategoria}
-                  href={`/subcategoria/${item.id_subcategoria}`}
-                  className={`block ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-700'} p-2 rounded-md cursor-pointer transition-colors duration-200`}
-                >
-                  {item.nombre}
-                </Link>
+                  item={item}
+                  isDarkMode={isDarkMode}
+                />
               ))}
             </div>
 
@@ -135,66 +169,154 @@ const CategoryCard = ({ title, items, categoryId }) => {
       )}
     </div>
   );
-};
+});
+
+CategoryCard.displayName = 'CategoryCard';
 
 const Categories = () => {
   const { isDarkMode } = useTheme();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    // Verifica si los datos ya están en el localStorage
-    const storedData = localStorage.getItem('categoriasCompleta');
-    const storedTimestamp = localStorage.getItem('categoriasCompletaTimestamp');
-    const currentTime = Date.now();
-    const oneDay = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
-    
-    // Usar datos del localStorage si existen y no son más antiguos que un día
-    if (storedData && storedTimestamp && (currentTime - parseInt(storedTimestamp)) < oneDay) {
-      setCategories(JSON.parse(storedData));
-      setLoading(false);
-    } else {
-      // Si no están en el localStorage o son viejos, hacer la solicitud a la API
-      fetch(URL_API + "/categorias-completa")
-        .then((response) => response.json())
-        .then((data) => {
-          setCategories(data);
-          localStorage.setItem('categoriasCompleta', JSON.stringify(data));
-          localStorage.setItem('categoriasCompletaTimestamp', currentTime.toString());
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error fetching data:', error);
-          // Si hay un error pero tenemos datos antiguos, úsalos como respaldo
-          if (storedData) {
-            setCategories(JSON.parse(storedData));
-          }
-          setLoading(false);
-        });
+  // Función memoizada para obtener datos del localStorage
+  const getStoredCategories = useCallback(() => {
+    try {
+      const storedData = localStorage.getItem('categoriasCompleta');
+      const storedTimestamp = localStorage.getItem('categoriasCompletaTimestamp');
+      const currentTime = Date.now();
+      
+      if (storedData && storedTimestamp && (currentTime - parseInt(storedTimestamp)) < CACHE_DURATION) {
+        const parsedData = JSON.parse(storedData);
+        if (Array.isArray(parsedData) && parsedData.length > 0) {
+          return parsedData;
+        }
+      }
+      // Limpiar datos obsoletos
+      localStorage.removeItem('categoriasCompleta');
+      localStorage.removeItem('categoriasCompletaTimestamp');
+      return null;
+    } catch (error) {
+      console.error('Error reading from localStorage:', error);
+      localStorage.removeItem('categoriasCompleta');
+      localStorage.removeItem('categoriasCompletaTimestamp');
+      return null;
     }
   }, []);
 
-  if (loading) {
-    return (
-      <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-white'} transition-colors duration-300`}>
-        <div className={`animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 ${isDarkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
-      </div>
-    );
-  }
+  // Función memoizada para guardar en localStorage
+  const saveCategoriesToStorage = useCallback((data) => {
+    try {
+      localStorage.setItem('categoriasCompleta', JSON.stringify(data));
+      localStorage.setItem('categoriasCompletaTimestamp', Date.now().toString());
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  }, []);
+
+  // Función memoizada para fetch de categorías
+  const fetchCategories = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch(`${URL_API}/categorias-completa`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid API response format');
+      }
+      
+      setCategories(data);
+      saveCategoriesToStorage(data);
+      
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setError(error.message);
+      
+      // Fallback a localStorage si hay error
+      const storedCategories = getStoredCategories();
+      if (storedCategories) {
+        setCategories(storedCategories);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [saveCategoriesToStorage, getStoredCategories]);
+
+  useEffect(() => {
+    const initializeCategories = async () => {
+      // Intentar cargar desde localStorage primero
+      const storedCategories = getStoredCategories();
+      if (storedCategories) {
+        setCategories(storedCategories);
+        setLoading(false);
+      } else {
+        // Si no hay datos en localStorage, hacer fetch
+        await fetchCategories();
+      }
+    };
+
+    initializeCategories();
+  }, [getStoredCategories, fetchCategories]);
+
+  // Componentes memoizados para loading y error
+  const LoadingComponent = useMemo(() => {
+    if (loading && categories.length === 0) {
+      return (
+        <div className={`flex justify-center items-center min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+          <div className="text-center">
+            <div className={`animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 mx-auto mb-4 ${isDarkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Cargando categorías...</p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }, [loading, categories.length, isDarkMode]);
+
+  const ErrorComponent = useMemo(() => {
+    if (error && categories.length === 0) {
+      return (
+        <div className={`flex justify-center items-center min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+          <div className="text-center max-w-md mx-auto p-6">
+            <div className={`text-6xl mb-4 ${isDarkMode ? 'text-red-400' : 'text-red-500'}`}>⚠️</div>
+            <h2 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Error al cargar categorías</h2>
+            <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{error}</p>
+            <button 
+              onClick={fetchCategories}
+              className={`px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+            >
+              Reintentar
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }, [error, categories.length, isDarkMode, fetchCategories]);
+
+  if (LoadingComponent) return LoadingComponent;
+  if (ErrorComponent) return ErrorComponent;
 
   return (
     <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-white'} min-h-screen transition-colors duration-300`}>
       {categories.map((category) => (
-        <div key={category.id_categoria} className="m-4">
-          <CategoryCard 
-            title={category.nombre} 
-            items={category.subcategorias} 
-            categoryId={category.id_categoria}
-          />
-        </div>
+        <CategoryCard 
+          key={`category-${category.id_categoria}`}
+          title={category.nombre} 
+          items={category.subcategorias || []} 
+          categoryId={category.id_categoria}
+        />
       ))}
     </div>
   );
 };
+
+Categories.displayName = 'Categories';
 
 export default Categories;
