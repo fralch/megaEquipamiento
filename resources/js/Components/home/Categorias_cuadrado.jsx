@@ -111,7 +111,10 @@ const CategoryCard = React.memo(({ title, items, categoryId }) => {
   }, []);
   
   return (
-    <div ref={cardRef} className="relative group w-full h-96 rounded-lg overflow-hidden shadow-lg">
+    <div 
+      ref={cardRef} 
+      className={`relative group w-full h-96 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}
+    >
       {/* Placeholder mientras carga */}
       <div 
         className={`absolute inset-0 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'} transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
@@ -127,7 +130,7 @@ const CategoryCard = React.memo(({ title, items, categoryId }) => {
           <img 
             src={currentImage}
             alt={`${title} background`}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 transform group-hover:scale-110 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             onLoad={handleImageLoad}
             loading="lazy"
           />
@@ -268,7 +271,7 @@ const Categories = () => {
   const LoadingComponent = useMemo(() => {
     if (loading && categories.length === 0) {
       return (
-        <div className={`flex justify-center items-center min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+        <div className={`flex justify-center items-center min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
           <div className="text-center">
             <div className={`animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 mx-auto mb-4 ${isDarkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Cargando categorías...</p>
@@ -282,7 +285,7 @@ const Categories = () => {
   const ErrorComponent = useMemo(() => {
     if (error && categories.length === 0) {
       return (
-        <div className={`flex justify-center items-center min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+        <div className={`flex justify-center items-center min-h-screen transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
           <div className="text-center max-w-md mx-auto p-6">
             <div className={`text-6xl mb-4 ${isDarkMode ? 'text-red-400' : 'text-red-500'}`}>⚠️</div>
             <h2 className={`text-xl font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Error al cargar categorías</h2>
@@ -304,15 +307,19 @@ const Categories = () => {
   if (ErrorComponent) return ErrorComponent;
 
   return (
-    <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-white'} min-h-screen transition-colors duration-300`}>
-      {categories.map((category) => (
-        <CategoryCard 
-          key={`category-${category.id_categoria}`}
-          title={category.nombre} 
-          items={category.subcategorias || []} 
-          categoryId={category.id_categoria}
-        />
-      ))}
+    <div className={`transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen`}>
+      <div className="max-w-[95%] mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-8">
+          {categories.map((category) => (
+            <CategoryCard 
+              key={`category-${category.id_categoria}`}
+              title={category.nombre} 
+              items={category.subcategorias || []} 
+              categoryId={category.id_categoria}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
