@@ -2,7 +2,92 @@ import React, { useState, useEffect, useRef, useContext, useCallback, useMemo } 
 import countryCodeMap from './countryJSON.json';
 import { CartContext } from '../../storage/CartContext';
 import { useTheme } from '../../storage/ThemeContext';
+
 const URL_API = import.meta.env.VITE_API_URL;
+const FALLBACK_IMAGE = 'https://megaequipamiento.com/wp-content/uploads/2024/08/MEGA-LOGO.webp';
+const IMAGE_TIMEOUT = 3000; // 3 segundos timeout para imágenes
+
+// Hook personalizado para manejar carga de imágenes con timeout
+const useImageLoader = (src, fallbackSrc = FALLBACK_IMAGE) => {
+  const [imageSrc, setImageSrc] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (!src) {
+      setImageSrc(fallbackSrc);
+      setIsLoaded(true);
+      return;
+    }
+
+    setIsLoaded(false);
+    setIsError(false);
+    
+    const img = new Image();
+    
+    // Timeout para imágenes que tardan mucho en cargar
+    timeoutRef.current = setTimeout(() => {
+      setImageSrc(fallbackSrc);
+      setIsLoaded(true);
+      setIsError(true);
+    }, IMAGE_TIMEOUT);
+
+    img.onload = () => {
+      clearTimeout(timeoutRef.current);
+      setImageSrc(src);
+      setIsLoaded(true);
+      setIsError(false);
+    };
+
+    img.onerror = () => {
+      clearTimeout(timeoutRef.current);
+      setImageSrc(fallbackSrc);
+      setIsLoaded(true);
+      setIsError(true);
+    };
+
+    img.src = src;
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [src, fallbackSrc]);
+
+  return { imageSrc, isLoaded, isError };
+};
+
+// Componente optimizado para imágenes
+const OptimizedImage = React.memo(({ src, alt, className, style, fallbackSrc = FALLBACK_IMAGE }) => {
+  const { imageSrc, isLoaded } = useImageLoader(src, fallbackSrc);
+  const { isDarkMode } = useTheme();
+
+  if (!isLoaded) {
+    return (
+      <div className={`${className} flex items-center justify-center ${
+        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+      }`}>
+        <div className={`animate-pulse h-6 w-6 rounded-full ${
+          isDarkMode ? 'bg-gray-500' : 'bg-gray-400'
+        }`}></div>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={imageSrc}
+      alt={alt}
+      className={className}
+      style={style}
+      loading="lazy"
+    />
+  );
+});
+
+OptimizedImage.displayName = 'OptimizedImage';
 
 const ProductGrid = ({ products: initialProducts }) => {
   const { isDarkMode } = useTheme();
@@ -50,21 +135,29 @@ const ProductGrid = ({ products: initialProducts }) => {
     };
   }, []);
 
-  // Función para obtener productos desde localStorage con validación
+  // Función para obtener productos desde localStorage con validación mejorada
   const getStoredProducts = useCallback(() => {
     try {
       const storedData = localStorage.getItem('products');
       const storedTimestamp = localStorage.getItem('productsTimestamp');
       const currentTime = Date.now();
-      const oneDay = 24 * 60 * 60 * 1000;
+      const oneHour = 60 * 60 * 1000; // Reducido a 1 hora para datos más frescos
 
-      if (storedData && storedTimestamp && (currentTime - parseInt(storedTimestamp)) < oneDay) {
+      if (storedData && storedTimestamp && (currentTime - parseInt(storedTimestamp)) < oneHour) {
         const parsedData = JSON.parse(storedData);
-        return Array.isArray(parsedData) ? parsedData : [];
+        if (Array.isArray(parsedData) && parsedData.length > 0) {
+          return parsedData;
+        }
       }
+      // Limpiar datos obsoletos
+      localStorage.removeItem('products');
+      localStorage.removeItem('productsTimestamp');
       return null;
     } catch (error) {
       console.error('Error reading from localStorage:', error);
+      // Limpiar localStorage corrupto
+      localStorage.removeItem('products');
+      localStorage.removeItem('productsTimestamp');
       return null;
     }
   }, []);
@@ -173,9 +266,9 @@ const ProductGrid = ({ products: initialProducts }) => {
     return Math.ceil(products.length / productsPerPage);
   }, [products.length, productsPerPage]);
 
-  // Función para cambiar de página
+  // Función para cambiar de página con debouncing
   const handlePageChange = useCallback(async (pageNumber) => {
-    if (pageNumber < 1 || pageNumber > totalPages || pageNumber === currentPage) {
+    if (pageNumber < 1 || pageNumber > totalPages || pageNumber === currentPage || loading) {
       return;
     }
   
@@ -188,14 +281,16 @@ const ProductGrid = ({ products: initialProducts }) => {
       const totalProducts = products.length;
       const productsNeeded = pageNumber * productsPerPage;
       
-      if (productsNeeded > totalProducts && !loading && !isAllProducts) {
+      if (productsNeeded > totalProducts && !isAllProducts) {
         const nextPage = Math.ceil(totalProducts / productsPerPage) + 1;
         await fetchProducts(nextPage, true);
       }
     }
     
-    // Scroll suave hacia arriba
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll suave hacia arriba con requestAnimationFrame para mejor rendimiento
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
   }, [currentPage, totalPages, products.length, productsPerPage, loading, isAllProducts, fetchProducts, initialProducts]);
 
   // Generar números de página para la paginación
@@ -247,29 +342,63 @@ const ProductGrid = ({ products: initialProducts }) => {
     return { start, end, total: products.length };
   }, [currentPage, productsPerPage, products.length]);
 
-  if (loading && products.length === 0) {
-    return (
-      <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
-        <div className={`animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 ${isDarkMode ? 'border-blue-400' : 'border-blue-500'}`}></div>
-      </div>
-    );
-  }
-
-  if (error && products.length === 0) {
-    return (
-      <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
-        <div className="text-center">
-          <p className="text-red-600 mb-4">Error al cargar productos: {error}</p>
-          <button 
-            onClick={() => fetchProducts(1)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
-          >
-            Reintentar
-          </button>
+  // Componente de loading optimizado
+  const LoadingComponent = useMemo(() => {
+    if (loading && products.length === 0) {
+      return (
+        <div className={`flex justify-center items-center min-h-screen transition-colors duration-300 ${
+          isDarkMode ? 'bg-gray-900' : 'bg-white'
+        }`}>
+          <div className="text-center">
+            <div className={`animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 mx-auto mb-4 ${
+              isDarkMode ? 'border-blue-400' : 'border-blue-500'
+            }`}></div>
+            <p className={`text-sm ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            }`}>Cargando productos...</p>
+          </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
+    return null;
+  }, [loading, products.length, isDarkMode]);
+
+  // Componente de error optimizado
+  const ErrorComponent = useMemo(() => {
+    if (error && products.length === 0) {
+      return (
+        <div className={`flex justify-center items-center min-h-screen transition-colors duration-300 ${
+          isDarkMode ? 'bg-gray-900' : 'bg-white'
+        }`}>
+          <div className="text-center max-w-md mx-auto p-6">
+            <div className={`text-6xl mb-4 ${
+              isDarkMode ? 'text-red-400' : 'text-red-500'
+            }`}>⚠️</div>
+            <h2 className={`text-xl font-semibold mb-2 ${
+              isDarkMode ? 'text-gray-100' : 'text-gray-800'
+            }`}>Error al cargar productos</h2>
+            <p className={`text-sm mb-4 ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-600'
+            }`}>{error}</p>
+            <button 
+              onClick={() => fetchProducts(1)}
+              className={`px-6 py-3 rounded-lg font-medium transition-colors duration-200 ${
+                isDarkMode 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+              }`}
+            >
+              Reintentar
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  }, [error, products.length, isDarkMode, fetchProducts]);
+
+  if (LoadingComponent) return LoadingComponent;
+  if (ErrorComponent) return ErrorComponent;
 
   return (
     <div className={`container mx-auto px-4 py-8 transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
@@ -350,7 +479,6 @@ const ProductGrid = ({ products: initialProducts }) => {
 
 const Card = React.memo(({ product }) => {
   const { isDarkMode } = useTheme();
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const cardRef = useRef(null);
@@ -417,12 +545,7 @@ const Card = React.memo(({ product }) => {
     console.log('Comparing product:', product.id);
   }, [product.id]);
 
-  // Manejar error de imagen
-  const handleImageError = useCallback((e) => {
-    e.target.onerror = null;
-    e.target.src = 'https://megaequipamiento.com/wp-content/uploads/2024/08/MEGA-LOGO.webp';
-    setImageLoaded(true);
-  }, []);
+
 
   // Renderizar entradas del summary de forma optimizada los 4 primeros
   const summaryEntries = useMemo(() => {
@@ -455,29 +578,14 @@ const Card = React.memo(({ product }) => {
         aria-label={`Ver detalles de ${product.title}`}
       />
 
-      {/* Placeholder mientras carga */}
-      <div
-        className={`absolute inset-0 bg-gray-200 transition-opacity duration-300 ${
-          imageLoaded && isVisible ? 'opacity-0' : 'opacity-100'
-        }`}
-        style={{ zIndex: 1 }}
-      >
-        <div className="h-full w-full flex justify-center items-center">
-          <div className="animate-pulse h-8 w-8 bg-gray-400 rounded-full"></div>
-        </div>
-      </div>
-
       {/* Área de imagen (60% del card) */}
       <div className="flex items-center justify-center p-4 h-3/5">
         {isVisible && (
-          <img
+          <OptimizedImage
             src={product.image}
             alt={product.title}
             className="max-w-full max-h-full object-contain transition-opacity duration-300"
-            style={{ opacity: imageLoaded ? 1 : 0 }}
-            onLoad={() => setImageLoaded(true)}
-            onError={handleImageError}
-            loading="lazy"
+            style={{ opacity: 1 }}
           />
         )}
       </div>
@@ -487,27 +595,19 @@ const Card = React.memo(({ product }) => {
         {isVisible && (
           <>
             {product.marca && (
-              <img
+              <OptimizedImage
                 src={product.marca}
                 alt={`Marca ${product.nombre_marca || 'desconocida'}`}
-                className="h-5 object-cover transition-opacity duration-300" 
-                style={{ opacity: imageLoaded ? 1 : 0 }}
-                loading="lazy"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
+                className="h-5 object-cover transition-opacity duration-300"
+                style={{ opacity: 1 }}
               />
             )}
             {product.flag && (
-              <img
+              <OptimizedImage
                 src={product.flag}
                 alt={`Bandera de ${product.origin || 'origen desconocido'}`}
                 className="w-9 h-5 object-cover transition-opacity duration-300"
-                style={{ opacity: imageLoaded ? 1 : 0 }}
-                loading="lazy"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
+                style={{ opacity: 1 }}
               />
             )}
           </>
