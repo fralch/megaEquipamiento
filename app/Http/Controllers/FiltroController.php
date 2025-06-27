@@ -305,18 +305,17 @@ class FiltroController extends Controller
                     case 'checkbox':
                         // Para checkbox, valorSeleccionado es un array de IDs de opciones
                         if (is_array($valorSeleccionado) && !empty($valorSeleccionado)) {
-                            // Aquí implementamos la lógica para filtrar por opciones múltiples
-                            // Como no hay una relación directa en la base de datos, usamos LIKE en JSON
                             $query->where(function($q) use ($filtro, $valorSeleccionado) {
                                 foreach ($valorSeleccionado as $opcionId) {
-                                    // Buscar en campos JSON como características, datos_técnicos, etc.
                                     $opcion = OpcionFiltro::find($opcionId);
                                     if ($opcion) {
-                                        $q->orWhere('caracteristicas', 'LIKE', '%' . $opcion->valor . '%');
+                                        // Búsqueda más precisa incluyendo comillas
+                                        $q->where('caracteristicas', 'LIKE', '%"' . preg_quote($opcion->valor, '/') . '"%');
                                     }
                                 }
                             });
                         }
+
                         break;
                         
                     case 'radio':
@@ -325,7 +324,7 @@ class FiltroController extends Controller
                         if (!empty($valorSeleccionado)) {
                             $opcion = OpcionFiltro::find($valorSeleccionado);
                             if ($opcion) {
-                                $query->where('caracteristicas', 'LIKE', '%' . $opcion->valor . '%');
+                                $query->where('caracteristicas', 'LIKE', '%"' . preg_quote($opcion->valor, '/') . '"%');
                             }
                         }
                         break;
