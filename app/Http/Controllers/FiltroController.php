@@ -329,14 +329,7 @@ class FiltroController extends Controller
                         }
                         break;
                         
-                    case 'range':
-                        // Para range, valorSeleccionado es un valor numérico
-                        if (is_numeric($valorSeleccionado)) {
-                            // Aquí implementamos la lógica para filtrar por rango
-                            // Como ejemplo, filtramos por precio
-                            $query->where('precio_igv', '<=', $valorSeleccionado);
-                        }
-                        break;
+
                 }
             }
         }
