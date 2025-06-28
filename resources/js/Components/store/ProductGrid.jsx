@@ -544,8 +544,18 @@ const Card = React.memo(({ product }) => {
     e.stopPropagation();
     
     try {
-      dispatch({ type: 'ADD', product: product });
-      console.log('Adding to cart:', product);
+      // Solo enviar los datos necesarios: imagen, título y precios
+      const cartProduct = {
+        id: product.id,
+        title: product.title,
+        image: product.image,
+        price: product.price,
+        priceWithoutProfit: product.priceWithoutProfit,
+        priceWithProfit: product.priceWithProfit
+      };
+      
+      dispatch({ type: 'ADD', product: cartProduct });
+      console.log('Adding to cart:', cartProduct);
       alert(`${product.title} añadido al carrito!`);
     } catch (error) {
       console.error('Error adding to cart:', error);

@@ -1,5 +1,5 @@
 import { Head, usePage, router, Link } from "@inertiajs/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
@@ -8,6 +8,7 @@ import ImageGallery from "../Components/store/ImageGallery";
 import Footer from "../Components/home/Footer";
 import Modal_Features from "./assets/modal_features";
 import { useTheme } from '../storage/ThemeContext';
+import { CartContext } from '../storage/CartContext';
 import axios from "axios";
 
 // Importar componentes modulares
@@ -67,6 +68,33 @@ const ProductPage = ({ producto }) => {
         especificaciones_tecnicas: producto.especificaciones_tecnicas || '',
         relatedProducts: producto.relatedProducts || [] // Se asume que vienen desde el servidor o se inicializa con un array vacío
     });
+
+    // Contexto del carrito
+    const { dispatch } = useContext(CartContext);
+
+    // Función para añadir al carrito
+    const handleAddToCart = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+            // Solo enviar los datos necesarios: imagen, título y precios
+            const cartProduct = {
+                id: productData.id_producto,
+                title: productData.nombre,
+                image: Array.isArray(productData.imagen) ? productData.imagen[0] : productData.imagen,
+                price: parseFloat(productData.precio_igv || 0),
+                priceWithoutProfit: parseFloat(productData.precio_sin_ganancia || 0),
+                priceWithProfit: parseFloat(productData.precio_ganancia || 0)
+            };
+            
+            dispatch({ type: 'ADD', product: cartProduct });
+            console.log('Adding to cart:', cartProduct);
+            alert(`${productData.nombre} añadido al carrito!`);
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+        }
+    }, [dispatch, productData]);
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -972,7 +1000,10 @@ const ProductPage = ({ producto }) => {
 
                         <div className="">
                           <div className="flex items-center space-x-4 mt-6">
-                          <button className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 shadow-md">
+                          <button 
+                                className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 shadow-md"
+                                onClick={handleAddToCart}
+                            >
                                 Agregar al carrito
                             </button>
                             <button className={`px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${

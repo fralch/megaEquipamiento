@@ -4,6 +4,37 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, isDarkMode }) => {
     const [isRemoving, setIsRemoving] = useState(false);
     const [quantity, setQuantity] = useState(item.quantity || 1);
 
+    const getImageUrl = (image) => {
+        if (!image) return '/api/placeholder/120/120';
+        
+        if (Array.isArray(image)) {
+            const firstImage = image[0];
+            if (!firstImage) return '/api/placeholder/120/120';
+            
+            // Limpiar backticks y espacios
+            const cleanUrl = firstImage.toString().replace(/`/g, '').trim();
+            
+            // Si ya es una URL completa, usarla directamente
+            if (cleanUrl.startsWith('http')) {
+                return cleanUrl;
+            }
+            
+            // Si es una ruta relativa, agregar la barra diagonal
+            return `/${cleanUrl}`;
+        }
+        
+        // Limpiar backticks y espacios para imagen individual
+        const cleanUrl = image.toString().replace(/`/g, '').trim();
+        
+        // Si ya es una URL completa, usarla directamente
+        if (cleanUrl.startsWith('http')) {
+            return cleanUrl;
+        }
+        
+        // Si es una ruta relativa, agregar la barra diagonal
+        return `/${cleanUrl}`;
+    };
+
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('es-PE', {
             style: 'currency',
@@ -42,12 +73,8 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, isDarkMode }) => {
                 {/* Imagen del producto */}
                 <div className="relative flex-shrink-0">
                     <img
-                        src={(
-                            Array.isArray(item.image) 
-                                ? (item.image[0] ? `/${item.image[0]}` : '/api/placeholder/120/120')
-                                : (item.image ? `/${item.image}` : '/api/placeholder/120/120')
-                        )}
-                        alt={item.name}
+                        src={getImageUrl(item.image)}
+                        alt={item.title}
                         className="w-20 h-20 object-cover rounded-lg"
                         style={{
                             boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
@@ -65,7 +92,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, isDarkMode }) => {
                     <h3 className={`font-semibold text-lg mb-1 ${
                         isDarkMode ? 'text-gray-100' : 'text-gray-900'
                     }`}>
-                        {item.name}
+                        {item.title}
                     </h3>
                     
                     {item.variant && (

@@ -44,7 +44,7 @@ const CartStep = ({ cartItems, onUpdateQuantity, onRemoveItem, onComplete, isDar
                             key={item.id}
                             item={item}
                             onUpdateQuantity={onUpdateQuantity}
-                            onRemoveItem={onRemoveItem}
+                            onRemove={onRemoveItem}
                             isDarkMode={isDarkMode}
                         />
                     ))}

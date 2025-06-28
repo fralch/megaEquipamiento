@@ -8,6 +8,37 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
     const [orderNumber, setOrderNumber] = useState(null);
     const { checkoutState } = useCheckout();
 
+    const getImageUrl = (image) => {
+        if (!image) return '/api/placeholder/64/64';
+        
+        if (Array.isArray(image)) {
+            const firstImage = image[0];
+            if (!firstImage) return '/api/placeholder/64/64';
+            
+            // Limpiar backticks y espacios
+            const cleanUrl = firstImage.toString().replace(/`/g, '').trim();
+            
+            // Si ya es una URL completa, usarla directamente
+            if (cleanUrl.startsWith('http')) {
+                return cleanUrl;
+            }
+            
+            // Si es una ruta relativa, agregar la barra diagonal
+            return `/${cleanUrl}`;
+        }
+        
+        // Limpiar backticks y espacios para imagen individual
+        const cleanUrl = image.toString().replace(/`/g, '').trim();
+        
+        // Si ya es una URL completa, usarla directamente
+        if (cleanUrl.startsWith('http')) {
+            return cleanUrl;
+        }
+        
+        // Si es una ruta relativa, agregar la barra diagonal
+        return `/${cleanUrl}`;
+    };
+
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('es-PE', {
             style: 'currency',
@@ -210,12 +241,8 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
                                     <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0">
                                         {item.image ? (
                                             <img
-                                                src={(
-                                                    Array.isArray(item.image) 
-                                                        ? (item.image[0] ? `/${item.image[0]}` : '/api/placeholder/64/64')
-                                                        : (item.image ? `/${item.image}` : '/api/placeholder/64/64')
-                                                )}
-                                                alt={item.name}
+                                                src={getImageUrl(item.image)}
+                                                alt={item.title}
                                                 className="w-full h-full object-cover rounded-lg"
                                             />
                                         ) : (
@@ -229,7 +256,7 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
                                     
                                     <div className="flex-1">
                                         <h4 className={`font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
-                                            {item.name}
+                                            {item.title}
                                         </h4>
                                         <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                             Cantidad: {item.quantity || 1}
