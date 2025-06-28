@@ -4,6 +4,7 @@ import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ZoomImage from "../Components/store/ZoomImage";
+import ImageGallery from "../Components/store/ImageGallery";
 import Footer from "../Components/home/Footer";
 import Modal_Features from "./assets/modal_features";
 import { useTheme } from '../storage/ThemeContext';
@@ -778,7 +779,11 @@ const ProductPage = ({ producto }) => {
 
             <main className="p-6">
                 <section className="grid md:grid-cols-2 gap-8">
-                    <ZoomImage imageSrc={producto.imagen.startsWith('http') ? producto.imagen : `/${producto.imagen}`} productId={producto.id_producto} />
+                    <ImageGallery 
+                        images={producto.imagen} 
+                        productId={producto.id_producto}
+                        productName={producto.nombre}
+                    />
 
                     <div className={`max-w-4xl mx-auto p-6 shadow-lg rounded-lg transition-colors duration-300 ${
                         isDarkMode ? 'bg-gray-800' : 'bg-white'

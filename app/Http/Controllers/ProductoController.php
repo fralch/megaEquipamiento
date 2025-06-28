@@ -110,15 +110,29 @@ class ProductoController extends Controller
             'archivos_adicionales' => 'nullable|string',
         ]);
     
-        // Procesar la imagen si se proporciona
-        $imagePath = null;
+        // Procesar las imágenes si se proporcionan
+        $imagenesArray = [];
     
-        if ($request->hasFile('imagen')) {
+        if ($request->hasFile('imagenes')) {
+            try {
+                $imagenes = $request->file('imagenes');
+                foreach ($imagenes as $index => $imagen) {
+                    $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
+                    $imagePath = 'productos/' . $imageName;
+                    $imagen->move(public_path('productos'), $imageName);
+                    $imagenesArray[] = $imagePath;
+                }
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Error al subir las imágenes.'], 500);
+            }
+        } elseif ($request->hasFile('imagen')) {
+            // Mantener compatibilidad con imagen única
             try {
                 $image = $request->file('imagen');
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $imagePath = 'productos/' . $imageName;
                 $image->move(public_path('productos'), $imageName);
+                $imagenesArray[] = $imagePath;
             } catch (\Exception $e) {
                 return response()->json(['error' => 'Error al subir la imagen.'], 500);
             }
@@ -128,8 +142,8 @@ class ProductoController extends Controller
         $caracteristicas = is_string($request->caracteristicas) ? json_decode($request->caracteristicas, true) : $request->caracteristicas;
     
         // Crear el producto
-        $producto = Producto::create(array_merge($request->except('imagen'), [
-            'imagen' => $imagePath,
+        $producto = Producto::create(array_merge($request->except(['imagen', 'imagenes']), [
+            'imagen' => $imagenesArray,
             'caracteristicas' => $caracteristicas,
 
         ]));
@@ -247,26 +261,46 @@ class ProductoController extends Controller
     {
         $request->validate([
             'id_producto' => 'required|exists:productos,id_producto',
-            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagenes.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagen' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Mantener compatibilidad
         ]);
         
         // Buscar el producto por ID
         $producto = Producto::find($request->id_producto);
         
         try {
-            // Eliminar la imagen anterior si existe
-            if ($producto->imagen && file_exists(public_path($producto->imagen))) {
-                unlink(public_path($producto->imagen));
+            // Eliminar las imágenes anteriores si existen
+            if ($producto->imagen) {
+                $imagenesAnteriores = is_array($producto->imagen) ? $producto->imagen : [$producto->imagen];
+                foreach ($imagenesAnteriores as $imagenAnterior) {
+                    if ($imagenAnterior && file_exists(public_path($imagenAnterior))) {
+                        unlink(public_path($imagenAnterior));
+                    }
+                }
             }
             
-            // Procesar la nueva imagen
-            $image = $request->file('imagen');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $imagePath = 'productos/' . $imageName;
-            $image->move(public_path('productos'), $imageName);
+            $imagenesArray = [];
             
-            // Actualizar solo el campo de imagen
-            $producto->imagen = $imagePath;
+            // Procesar múltiples imágenes
+            if ($request->hasFile('imagenes')) {
+                $imagenes = $request->file('imagenes');
+                foreach ($imagenes as $index => $imagen) {
+                    $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
+                    $imagePath = 'productos/' . $imageName;
+                    $imagen->move(public_path('productos'), $imageName);
+                    $imagenesArray[] = $imagePath;
+                }
+            } elseif ($request->hasFile('imagen')) {
+                // Mantener compatibilidad con imagen única
+                $image = $request->file('imagen');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = 'productos/' . $imageName;
+                $image->move(public_path('productos'), $imageName);
+                $imagenesArray[] = $imagePath;
+            }
+            
+            // Actualizar el campo de imágenes
+            $producto->imagen = $imagenesArray;
             $producto->save();
             
             return response()->json([
@@ -441,9 +475,14 @@ class ProductoController extends Controller
             // Buscar el producto
             $producto = Producto::findOrFail($id_producto);
 
-            // Eliminar la imagen si existe
-            if ($producto->imagen && file_exists(public_path($producto->imagen))) {
-                unlink(public_path($producto->imagen));
+            // Eliminar las imágenes si existen
+            if ($producto->imagen) {
+                $imagenes = is_array($producto->imagen) ? $producto->imagen : [$producto->imagen];
+                foreach ($imagenes as $imagen) {
+                    if ($imagen && file_exists(public_path($imagen))) {
+                        unlink(public_path($imagen));
+                    }
+                }
             }
 
             // Eliminar las relaciones bidireccionales

@@ -357,7 +357,11 @@ const RelatedProducts = ({ productId }) => {
             <Link href={`/producto/${product.id_producto}`}>
                 <div className="h-48 overflow-hidden">
                     <img 
-                        src={product.imagen?.startsWith('http') ? product.imagen : `/${product.imagen}`}
+                        src={(
+                            Array.isArray(product.imagen) 
+                                ? (product.imagen[0]?.startsWith('http') ? product.imagen[0] : `/${product.imagen[0]}`)
+                                : (product.imagen?.startsWith('http') ? product.imagen : `/${product.imagen}`)
+                        ) || '/api/placeholder/300/200'}
                         alt={product.nombre} 
                         className="w-full h-full object-cover"
                     />

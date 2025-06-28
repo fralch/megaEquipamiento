@@ -210,7 +210,11 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
                                     <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0">
                                         {item.image ? (
                                             <img
-                                                src={item.image}
+                                                src={(
+                                                    Array.isArray(item.image) 
+                                                        ? (item.image[0] ? `/${item.image[0]}` : '/api/placeholder/64/64')
+                                                        : (item.image ? `/${item.image}` : '/api/placeholder/64/64')
+                                                )}
                                                 alt={item.name}
                                                 className="w-full h-full object-cover rounded-lg"
                                             />

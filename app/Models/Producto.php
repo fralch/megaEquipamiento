@@ -54,7 +54,7 @@ class Producto extends Model
     // Definir los campos que deben ser convertidos a arrays
     protected $casts = [
         'caracteristicas' => 'array',
-
+        'imagen' => 'array', // Convertir a array para múltiples imágenes
         'archivos_adicionales' => 'array', // Cambiado de 'documentos' a 'archivos_adicionales'
     ];
 
@@ -83,5 +83,47 @@ class Producto extends Model
          return $this->belongsToMany(Producto::class, 'producto_relaciones', 'relacionado_id', 'producto_id')
                      ->withPivot('tipo')
                      ->withTimestamps();
+     }
+
+     // Métodos auxiliares para mantener compatibilidad con código existente
+     
+     /**
+      * Obtener la primera imagen (para compatibilidad con código existente)
+      */
+     public function getPrimeraImagenAttribute()
+     {
+         return is_array($this->imagen) && count($this->imagen) > 0 ? $this->imagen[0] : null;
+     }
+
+     /**
+      * Obtener todas las imágenes
+      */
+     public function getImagenesAttribute()
+     {
+         return is_array($this->imagen) ? $this->imagen : ($this->imagen ? [$this->imagen] : []);
+     }
+
+     /**
+      * Agregar una nueva imagen al array
+      */
+     public function agregarImagen($nuevaImagen)
+     {
+         $imagenes = $this->imagenes;
+         $imagenes[] = $nuevaImagen;
+         $this->imagen = $imagenes;
+         return $this;
+     }
+
+     /**
+      * Eliminar una imagen del array por índice
+      */
+     public function eliminarImagen($indice)
+     {
+         $imagenes = $this->imagenes;
+         if (isset($imagenes[$indice])) {
+             unset($imagenes[$indice]);
+             $this->imagen = array_values($imagenes); // Reindexar el array
+         }
+         return $this;
      }
 }

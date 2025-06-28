@@ -105,9 +105,20 @@ const ProductGrid = ({ products: initialProducts }) => {
     
     const countryName = (item.pais || '').toLowerCase();
     const countryCode = countryCodeMap[countryName] || 'unknown';
-    const image = item.imagen && item.imagen.startsWith('http') 
-      ? item.imagen 
-      : `${URL_API}/${item.imagen}`;
+    // Manejar imagen como array o string
+    let image;
+    if (Array.isArray(item.imagen)) {
+      // Si es un array, tomar la primera imagen
+      const firstImage = item.imagen[0];
+      image = firstImage && firstImage.startsWith('http') 
+        ? firstImage 
+        : `${URL_API}/${firstImage}`;
+    } else {
+      // Mantener compatibilidad con string
+      image = item.imagen && item.imagen.startsWith('http') 
+        ? item.imagen 
+        : `${URL_API}/${item.imagen}`;
+    }
     
     return {
       id: item.id_producto,

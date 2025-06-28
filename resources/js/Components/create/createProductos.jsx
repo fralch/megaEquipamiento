@@ -304,17 +304,36 @@ const FeaturesButton = ({ label, value, onClick, onRemoveItem }) => (
   </div>
 );
 
-const ImageUpload = ({ previewImage, handleImageChange, imageName }) => (
+const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName, selectedImages }) => (
   <div className="w-full lg:w-1/2 lg:pr-6 mb-6 lg:mb-0">
-    <div className="border border-gray-300 rounded-lg p-4 mb-4 flex items-center justify-center h-[300px] md:h-[400px]">
-      {previewImage ? (
-        <img
-          src={previewImage}
-          alt="Product Preview"
-          className="max-h-full max-w-full object-contain"
-        />
+    <div className="border border-gray-300 rounded-lg p-4 mb-4 h-[300px] md:h-[400px] overflow-y-auto">
+      {previewImages && previewImages.length > 0 ? (
+        <div className="grid grid-cols-2 gap-2">
+          {previewImages.map((preview, index) => (
+            <div key={index} className="border rounded-lg p-2">
+              <img
+                src={preview}
+                alt={`Product Preview ${index + 1}`}
+                className="w-full h-24 object-contain"
+              />
+              <p className="text-xs text-gray-500 text-center mt-1">
+                {selectedImages && selectedImages[index] ? selectedImages[index].name : `Imagen ${index + 1}`}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : previewImage ? (
+        <div className="flex items-center justify-center h-full">
+          <img
+            src={previewImage}
+            alt="Product Preview"
+            className="max-h-full max-w-full object-contain"
+          />
+        </div>
       ) : (
-        <div className="text-gray-400 text-center">Vista previa de imagen</div>
+        <div className="flex items-center justify-center h-full text-gray-400 text-center">
+          Vista previa de imágenes
+        </div>
       )}
     </div>
     <div>
@@ -324,15 +343,21 @@ const ImageUpload = ({ previewImage, handleImageChange, imageName }) => (
         name="imagen"
         onChange={handleImageChange}
         accept="image/*"
+        multiple
         className="hidden"
       />
       <label
         htmlFor="imagen"
         className="block w-full border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 cursor-pointer bg-white text-indigo-600 py-2 px-4 text-sm font-medium text-center transition duration-150 ease-in-out"
       >
-        Seleccionar archivo
+        Seleccionar archivos
       </label>
-      {imageName && <p className="mt-1 text-sm text-gray-500 text-center">{imageName}</p>}
+      {selectedImages && selectedImages.length > 0 && (
+        <p className="mt-1 text-sm text-gray-500 text-center">
+          {selectedImages.length} archivo(s) seleccionado(s)
+        </p>
+      )}
+      {imageName && !selectedImages && <p className="mt-1 text-sm text-gray-500 text-center">{imageName}</p>}
     </div>
   </div>
 );
@@ -348,6 +373,8 @@ const Productos = ({ onSubmit }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState('');
   const [previewImage, setPreviewImage] = useState(null);
+  const [previewImages, setPreviewImages] = useState([]);
+  const [selectedImages, setSelectedImages] = useState([]);
   const [porcentajeGanancia, setPorcentajeGanancia] = useState('');
   const especificacionesRef = useRef(null);
 
@@ -377,12 +404,36 @@ const Productos = ({ onSubmit }) => {
   }, []);
 
   const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
+    const files = Array.from(event.target.files);
+    if (files.length > 0) {
+      // Para compatibilidad con imagen única
+      const firstFile = files[0];
       const reader = new FileReader();
       reader.onloadend = () => setPreviewImage(reader.result);
-      reader.readAsDataURL(file);
-      setForm(prev => ({ ...prev, imagen: file }));
+      reader.readAsDataURL(firstFile);
+      
+      // Manejar múltiples imágenes
+      setSelectedImages(files);
+      
+      // Crear vistas previas para todas las imágenes
+      const previews = [];
+      files.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          previews[index] = reader.result;
+          if (previews.length === files.length) {
+            setPreviewImages([...previews]);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+      
+      // Actualizar el formulario con las imágenes
+      setForm(prev => ({ 
+        ...prev, 
+        imagen: firstFile, // Mantener compatibilidad
+        imagenes: files // Nuevas múltiples imágenes
+      }));
     }
   };
 
@@ -472,11 +523,17 @@ const Productos = ({ onSubmit }) => {
     
     // Add form fields to FormData
     Object.entries(form).forEach(([key, value]) => {
-      if (key === 'imagen' && value) {
+      if (key === 'imagenes' && value && value.length > 0) {
+        // Agregar múltiples imágenes
+        value.forEach((imagen, index) => {
+          formData.append(`imagenes[${index}]`, imagen);
+        });
+      } else if (key === 'imagen' && value && !form.imagenes) {
+        // Mantener compatibilidad con imagen única si no hay múltiples
         formData.append(key, value);
       } else if (key === 'caracteristicas' && value) {
         formData.append(key, JSON.stringify(value));
-      } else if (value !== null && value !== undefined) {
+      } else if (value !== null && value !== undefined && key !== 'imagen' && key !== 'imagenes') {
         formData.append(key, value);
       }
     });
@@ -704,8 +761,10 @@ const Productos = ({ onSubmit }) => {
         }`}>
           <ImageUpload
             previewImage={previewImage}
+            previewImages={previewImages}
             handleImageChange={handleImageChange}
             imageName={form.imagen?.name}
+            selectedImages={selectedImages}
           />
 
           <div className="w-full lg:w-1/2 lg:pl-6">

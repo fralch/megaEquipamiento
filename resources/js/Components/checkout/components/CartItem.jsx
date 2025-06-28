@@ -42,7 +42,11 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, isDarkMode }) => {
                 {/* Imagen del producto */}
                 <div className="relative flex-shrink-0">
                     <img
-                        src={item.image || '/api/placeholder/120/120'}
+                        src={(
+                            Array.isArray(item.image) 
+                                ? (item.image[0] ? `/${item.image[0]}` : '/api/placeholder/120/120')
+                                : (item.image ? `/${item.image}` : '/api/placeholder/120/120')
+                        )}
                         alt={item.name}
                         className="w-20 h-20 object-cover rounded-lg"
                         style={{
