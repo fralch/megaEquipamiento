@@ -859,7 +859,7 @@ const ProductPage = ({ producto }) => {
                                                 className="text-2xl font-semibold text-green-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('precio_sin_ganancia')}
                                             >
-                                                S/ {productData.precio_ganancia}
+                                                $ {productData.precio_ganancia}
                                             </p>
                                         )}
                                         <p className={`transition-colors duration-300 ${
@@ -902,7 +902,7 @@ const ProductPage = ({ producto }) => {
                                                 }`}
                                                 onDoubleClick={() => toggleEditMode('precio_igv')}
                                             >
-                                                S/ {productData.precio_igv}
+                                                $ {productData.precio_igv}
                                             </p>
                                         )}
                                         <p className={`transition-colors duration-300 ${

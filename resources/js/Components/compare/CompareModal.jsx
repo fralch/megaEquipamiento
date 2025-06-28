@@ -138,7 +138,7 @@ const CompareModal = ({ isOpen, onClose }) => {
                         isDarkMode ? 'border-gray-700 text-white' : 'border-gray-200 text-gray-900'
                       }`}>
                         <span className="text-lg font-bold text-green-600">
-                          S/. {product.precio}
+                          $ {product.precio}
                         </span>
                       </td>
                     ))}
@@ -208,27 +208,7 @@ const CompareModal = ({ isOpen, onClose }) => {
                     ))}
                   </tr>
 
-                  {/* Stock */}
-                  <tr className={isDarkMode ? 'border-gray-700' : 'border-gray-200'}>
-                    <td className={`p-4 border-b font-medium ${
-                      isDarkMode ? 'border-gray-700 text-gray-300' : 'border-gray-200 text-gray-700'
-                    }`}>
-                      Stock
-                    </td>
-                    {compareList.map((product) => (
-                      <td key={product.id} className={`p-4 border-b text-center ${
-                        isDarkMode ? 'border-gray-700' : 'border-gray-200'
-                      }`}>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          product.stock > 0 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {product.stock > 0 ? `${product.stock} disponibles` : 'Sin stock'}
-                        </span>
-                      </td>
-                    ))}
-                  </tr>
+
                 </tbody>
               </table>
             </div>
