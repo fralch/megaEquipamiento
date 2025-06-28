@@ -26,17 +26,12 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                     setCategoriasArray(data);
                     localStorage.setItem('categoriasCompleta', JSON.stringify(data));
                 })
-                .catch((error) => console.error('Error fetching data:', error));
+                .catch((error) => {});
         }
 
         // Obtener el ID de la categoría desde la URL
         const urlParts = window.location.pathname.split('/');
         const categoriaId = urlParts[urlParts.length - 1];
-        console.log(categoriaId);
-        console.log(productos);
-        console.log(subcategorias);
-        console.log(categoria);
-        console.log(marcas);
     }, []);
 
     const toggleMenu = () => {

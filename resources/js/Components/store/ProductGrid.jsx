@@ -103,17 +103,7 @@ const ProductGrid = ({ products: initialProducts }) => {
   // Función para transformar productos con memoización
   const transformProduct = useCallback((item) => {
     if (!item || !item.id_producto) return null;
-    
-    // Debug: verificar datos del API
-    console.log('=== DATOS DEL API PARA PRODUCTO ===');
-    console.log('ID:', item.id_producto);
-    console.log('Nombre:', item.nombre);
-    console.log('Características originales:', item.caracteristicas);
-    console.log('Especificaciones técnicas:', item.especificaciones_tecnicas);
-    console.log('Datos técnicos:', item.datos_tecnicos);
-    console.log('Objeto completo del API:', item);
-    console.log('=== FIN DATOS DEL API ===\n');
-    
+        
     const countryName = (item.pais || '').toLowerCase();
     const countryCode = countryCodeMap[countryName] || 'unknown';
     // Manejar imagen como array o string

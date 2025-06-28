@@ -145,7 +145,15 @@ const CompareModal = ({ isOpen, onClose }) => {
                   </tr>
 
                   {/* Características */}
-                  {(() => {
+                  {(() => {                    
+                    compareList.forEach((product, index) => {
+                      console.log(`Producto ${index + 1}:`, {
+                        id: product.id,
+                        nombre: product.nombre,
+                        caracteristicas: product.caracteristicas
+                      });
+                    });
+                    
                     return compareList.some(product => product.caracteristicas && Object.keys(product.caracteristicas).length > 0);
                   })() && (
                     <>
