@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useContext, useCallback, useMemo } 
 import countryCodeMap from './countryJSON.json';
 import { CartContext } from '../../storage/CartContext';
 import { useTheme } from '../../storage/ThemeContext';
+import { useCompare } from '../../hooks/useCompare';
 
 const URL_API = import.meta.env.VITE_API_URL;
 const FALLBACK_IMAGE = 'https://megaequipamiento.com/wp-content/uploads/2024/08/MEGA-LOGO.webp';
@@ -103,6 +104,16 @@ const ProductGrid = ({ products: initialProducts }) => {
   const transformProduct = useCallback((item) => {
     if (!item || !item.id_producto) return null;
     
+    // Debug: verificar datos del API
+    console.log('=== DATOS DEL API PARA PRODUCTO ===');
+    console.log('ID:', item.id_producto);
+    console.log('Nombre:', item.nombre);
+    console.log('Características originales:', item.caracteristicas);
+    console.log('Especificaciones técnicas:', item.especificaciones_tecnicas);
+    console.log('Datos técnicos:', item.datos_tecnicos);
+    console.log('Objeto completo del API:', item);
+    console.log('=== FIN DATOS DEL API ===\n');
+    
     const countryName = (item.pais || '').toLowerCase();
     const countryCode = countryCodeMap[countryName] || 'unknown';
     // Manejar imagen como array o string
@@ -125,6 +136,7 @@ const ProductGrid = ({ products: initialProducts }) => {
       sku: item.sku || '',
       title: item.nombre || 'Sin título',
       summary: item.caracteristicas || {},
+      caracteristicas: item.caracteristicas || {},
 
       origin: item.pais || '',
       price: parseFloat(item.precio_igv || 0),
@@ -494,6 +506,7 @@ const Card = React.memo(({ product }) => {
   const [showDetails, setShowDetails] = useState(false);
   const cardRef = useRef(null);
   const { dispatch } = useContext(CartContext);
+  const { addToCompare, isInCompare, canAddMore } = useCompare();
 
   // Observer para lazy loading
   useEffect(() => {
@@ -553,8 +566,30 @@ const Card = React.memo(({ product }) => {
   const handleCompare = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Comparing product:', product.id);
-  }, [product.id]);
+    
+    const productForCompare = {
+      id: product.id,
+      nombre: product.title,
+      precio: product.price,
+      descripcion: product.descripcion,
+      imagen: product.image,
+      stock: 1, // Asumiendo stock disponible
+      especificaciones_tecnicas: product.especificaciones_tecnicas || product.summary,
+      caracteristicas: product.caracteristicas || product.summary || {},
+      marca: {
+        nombre: product.nombre_marca
+      }
+    };
+    
+    if (isInCompare(product.id)) {
+      alert('Este producto ya está en el comparador');
+    } else if (canAddMore) {
+      addToCompare(productForCompare);
+      alert(`${product.title} agregado al comparador`);
+    } else {
+      alert('Máximo 4 productos para comparar. Elimina uno para agregar otro.');
+    }
+  }, [product, addToCompare, isInCompare, canAddMore]);
 
 
 
@@ -715,13 +750,20 @@ const Card = React.memo(({ product }) => {
             </button>
             <button 
               className={`font-bold py-2 px-4 rounded-md flex-1 transition-all duration-300 ${
-                isDarkMode 
-                  ? 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg' 
-                  : 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg'
+                isInCompare(product.id)
+                  ? isDarkMode 
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
+                  : isDarkMode 
+                    ? 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg' 
+                    : 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg'
+              } ${
+                !canAddMore && !isInCompare(product.id) ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               onClick={handleCompare}
+              disabled={!canAddMore && !isInCompare(product.id)}
             >
-              Comparar
+              {isInCompare(product.id) ? 'En Comparador' : 'Comparar'}
             </button>
           </div>
         </div>

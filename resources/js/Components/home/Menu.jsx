@@ -1,12 +1,24 @@
 // Menu.jsx
-import React from "react";
+import React, { useState } from "react";
 import { mdiChevronDown, mdiGauge, mdiLayersOutline, mdiWidgetsOutline, mdiPlus } from "@mdi/js";
 import { Link, usePage } from "@inertiajs/react";
 import { useTheme } from '../../storage/ThemeContext';
+import { useCompare } from '../../hooks/useCompare';
+import CompareModal from '../compare/CompareModal';
 
 const Menu = ({ toggleMenu }) => {
     const { auth } = usePage().props;
     const { isDarkMode } = useTheme();
+    const { compareCount } = useCompare();
+    const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+
+    const openCompareModal = () => {
+        setIsCompareModalOpen(true);
+    };
+
+    const closeCompareModal = () => {
+        setIsCompareModalOpen(false);
+    };
 
     return (
         <div className={`rounded px-5 py-3 shadow-xl pb-5 transition-colors duration-300 ${
@@ -110,11 +122,14 @@ const Menu = ({ toggleMenu }) => {
                         </select>
                     </div>
                     
-                    <div className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border w-full md:w-auto transition-colors duration-200 ${
-                        isDarkMode 
-                            ? 'bg-gray-700 border-gray-600' 
-                            : 'bg-gray-50 border-gray-300'
-                    }`}>
+                    <button
+                        onClick={openCompareModal}
+                        className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg border w-full md:w-auto transition-colors duration-200 hover:scale-105 relative ${
+                            isDarkMode 
+                                ? 'bg-gray-700 border-gray-600 hover:bg-gray-600' 
+                                : 'bg-gray-50 border-gray-300 hover:bg-gray-100'
+                        }`}
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
@@ -138,9 +153,20 @@ const Menu = ({ toggleMenu }) => {
                         <span className={`text-sm font-medium ${
                             isDarkMode ? 'text-gray-200' : 'text-gray-700'
                         }`}>Comparador</span>
-                    </div>
+                        {compareCount > 0 && (
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                                {compareCount}
+                            </span>
+                        )}
+                    </button>
                 </div>
             </div>
+            
+            {/* Modal de Comparación */}
+            <CompareModal 
+                isOpen={isCompareModalOpen} 
+                onClose={closeCompareModal} 
+            />
         </div>
     );
 };
