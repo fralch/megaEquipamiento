@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 
 const CartItem = ({ item, onUpdateQuantity, onRemove, isDarkMode }) => {
     const [isRemoving, setIsRemoving] = useState(false);
-    const [quantity, setQuantity] = useState(item.quantity || 1);
+    // Usar directamente la cantidad del item del contexto
+    const quantity = item.quantity || 1;
 
     const getImageUrl = (image) => {
         if (!image) return '/api/placeholder/120/120';
@@ -44,9 +45,11 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, isDarkMode }) => {
     };
 
     const handleQuantityChange = (change) => {
+        // Solo validar que no sea menor a 1 antes de enviar el cambio
         const newQuantity = Math.max(1, quantity + change);
-        setQuantity(newQuantity);
-        onUpdateQuantity(item.id, change);
+        if (newQuantity >= 1) {
+            onUpdateQuantity(item.id, change);
+        }
     };
 
     const handleRemove = () => {
