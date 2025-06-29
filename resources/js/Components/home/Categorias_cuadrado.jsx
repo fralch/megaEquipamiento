@@ -30,15 +30,74 @@ const CategoryCard = React.memo(({ title, items, categoryId }) => {
   // Función memoizada para cargar imágenes
   const loadImages = useCallback(async () => {
     try {
-      const folderName = title.toLowerCase().replace(/\s+/g, '-');
       const imageModule = await import.meta.glob('/public/img/categorias/**/*.{jpg,png,webp,webm}', { eager: false });
+      const allPaths = Object.keys(imageModule);
       
-      // Filtrar y procesar las rutas
-      const paths = Object.keys(imageModule)
-        .filter(path => path.includes(`/img/categorias/${folderName}/`))
-        .map(path => path.replace('/public', ''));
+      // Estrategias de normalización múltiples para aumentar probabilidad de coincidencia
+      const normalizationStrategies = [
+        // Estrategia 1: Guiones bajos (actual)
+        title.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '_')
+          .replace(/\s+/g, '_')
+          .replace(/_+/g, '_')
+          .replace(/^_|_$/g, ''),
+        
+        // Estrategia 2: Guiones
+        title.toLowerCase()
+          .replace(/[^a-z0-9\s]/g, '-')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, ''),
+        
+        // Estrategia 3: Sin espacios ni caracteres especiales
+        title.toLowerCase().replace(/[^a-z0-9]/g, ''),
+        
+        // Estrategia 4: Solo reemplazar espacios con guiones bajos
+        title.toLowerCase().replace(/\s+/g, '_'),
+        
+        // Estrategia 5: Solo reemplazar espacios con guiones
+        title.toLowerCase().replace(/\s+/g, '-'),
+        
+        // Estrategia 6: Búsqueda parcial por palabras clave
+        title.toLowerCase().split(/[^a-z0-9]+/).filter(word => word.length > 2)[0] || title.toLowerCase(),
+        
+        // Estrategia 7: Nombre original en minúsculas
+        title.toLowerCase()
+      ];
       
-      setImagePaths(paths);
+      let foundPaths = [];
+      
+      // Probar cada estrategia hasta encontrar imágenes
+      for (const folderName of normalizationStrategies) {
+        if (!folderName) continue;
+        
+        const paths = allPaths
+          .filter(path => path.includes(`/img/categorias/${folderName}/`))
+          .map(path => path.replace('/public', ''));
+        
+        if (paths.length > 0) {
+          foundPaths = paths;
+          break;
+        }
+      }
+      
+      // Si aún no encuentra, intentar búsqueda parcial más flexible
+      if (foundPaths.length === 0) {
+        const searchTerms = title.toLowerCase().split(/[^a-z0-9]+/).filter(term => term.length > 2);
+        
+        for (const term of searchTerms) {
+          const partialPaths = allPaths
+            .filter(path => path.toLowerCase().includes(term) && path.includes('/img/categorias/'))
+            .map(path => path.replace('/public', ''));
+          
+          if (partialPaths.length > 0) {
+            foundPaths = partialPaths;
+            break;
+          }
+        }
+      }
+      
+      setImagePaths(foundPaths);
     } catch (error) {
       console.error('Error loading images:', error);
       setImagePaths([]);
