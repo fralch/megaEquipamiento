@@ -35,7 +35,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                                 <label key={opcion.id_opcion} className="flex items-center space-x-2">
                                     <input
                                         type="checkbox"
-                                        className="form-checkbox h-4 w-4 text-[#184f96]"
+                                        className="form-checkbox h-4 w-4 text-[#1e3a8a]"
                                         checked={Array.isArray(filtrosSeleccionados[filtro.id_filtro]) && filtrosSeleccionados[filtro.id_filtro].includes(opcion.id_opcion)}
                                         onChange={(e) => {
                                             const currentSelected = filtrosSeleccionados[filtro.id_filtro] || [];
@@ -60,7 +60,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                                     <input
                                         type="radio"
                                         name={`filtro-${filtro.id_filtro}`}
-                                        className="form-radio h-4 w-4 text-[#184f96]"
+                                        className="form-radio h-4 w-4 text-[#1e3a8a]"
                                         checked={filtrosSeleccionados[filtro.id_filtro] === opcion.id_opcion || false}
                                         onChange={() => {
                                             setFiltrosSeleccionados({
@@ -99,7 +99,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                     )}
                     {filtro.tipo_input === 'select' && (
                         <select
-                            className={`w-full rounded focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50 transition-colors duration-200 ${
+                            className={`w-full rounded focus:border-[#1e3a8a] focus:ring focus:ring-[#1e3a8a] focus:ring-opacity-50 transition-colors duration-200 ${
                                 isDarkMode 
                                     ? 'bg-gray-700 border-gray-600 text-white' 
                                     : 'bg-white border-gray-300 text-gray-900'

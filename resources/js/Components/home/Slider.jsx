@@ -117,7 +117,7 @@ const Slider = () => {
                             fontSize: "1.2rem",
                             color: "#fff",
                             textDecoration: "none",
-                            backgroundColor: "#184f96",
+                            backgroundColor: "#1e3a8a",
                             padding: "0.5rem 1rem",
                             borderRadius: "5px",
                             transition: "background-color 0.3s ease",
@@ -170,7 +170,7 @@ const Slider = () => {
                             fontSize: "2.5rem",
                             fontFamily: "verdana, sans-serif, serif, arial",
                             fontWeight: "bold",
-                            color: "#184f96",
+                            color: "#1e3a8a",
                             marginTop: -10,
                         }}
                     >
@@ -182,7 +182,7 @@ const Slider = () => {
                             fontSize: "2.5rem",
                             fontFamily: "verdana, sans-serif, serif, arial",
                             fontWeight: "bold",
-                            color: "#184f96",
+                            color: "#1e3a8a",
                             marginTop: -20,
                         }}
                     >
@@ -209,7 +209,7 @@ const Slider = () => {
                             fontSize: "1.2rem",
                             color: "#fff",
                             textDecoration: "none",
-                            backgroundColor: "#184f96",
+                            backgroundColor: "#1e3a8a",
                             padding: "0.5rem 1rem",
                             borderRadius: "5px",
                             transition: "background-color 0.3s ease",
@@ -268,7 +268,7 @@ const Slider = () => {
                                 fontSize: "2.5rem",
                                 fontFamily: "verdana, sans-serif, serif, arial",
                                 fontWeight: "bold",
-                                color: "#184f96",
+                                color: "#1e3a8a",
                                 marginTop: -10,
                             }}
                         >
@@ -280,7 +280,7 @@ const Slider = () => {
                                 fontSize: "2.5rem",
                                 fontFamily: "verdana, sans-serif, serif, arial",
                                 fontWeight: "bold",
-                                color: "#184f96",
+                                color: "#1e3a8a",
                                 marginTop: -20,
                             }}
                         >
@@ -307,7 +307,7 @@ const Slider = () => {
                                 fontSize: "1.2rem",
                                 color: "#fff",
                                 textDecoration: "none",
-                                backgroundColor: "#184f96",
+                                backgroundColor: "#1e3a8a",
                                 padding: "0.5rem 1rem",
                                 borderRadius: "5px",
                                 transition: "background-color 0.3s ease",

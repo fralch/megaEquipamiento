@@ -26,7 +26,7 @@ export default function FiltroForm({ nuevoFiltro, setNuevoFiltro, filtroEnEdicio
                         type="text"
                         value={nuevoFiltro.nombre}
                         onChange={(e) => setNuevoFiltro({...nuevoFiltro, nombre: e.target.value})}
-                        className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50 transition-colors duration-200 ${
+                        className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#1e3a8a] focus:ring focus:ring-[#1e3a8a] focus:ring-opacity-50 transition-colors duration-200 ${
                             isDarkMode 
                                 ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                                 : 'bg-white border-gray-300 text-gray-900'
@@ -39,7 +39,7 @@ export default function FiltroForm({ nuevoFiltro, setNuevoFiltro, filtroEnEdicio
                     <select
                         value={nuevoFiltro.tipo_input}
                         onChange={(e) => setNuevoFiltro({...nuevoFiltro, tipo_input: e.target.value})}
-                        className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50 transition-colors duration-200 ${
+                        className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#1e3a8a] focus:ring focus:ring-[#1e3a8a] focus:ring-opacity-50 transition-colors duration-200 ${
                             isDarkMode 
                                 ? 'bg-gray-700 border-gray-600 text-white' 
                                 : 'bg-white border-gray-300 text-gray-900'
@@ -57,7 +57,7 @@ export default function FiltroForm({ nuevoFiltro, setNuevoFiltro, filtroEnEdicio
                             type="text"
                             value={nuevoFiltro.unidad}
                             onChange={(e) => setNuevoFiltro({...nuevoFiltro, unidad: e.target.value})}
-                            className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50 transition-colors duration-200 ${
+                            className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#1e3a8a] focus:ring focus:ring-[#1e3a8a] focus:ring-opacity-50 transition-colors duration-200 ${
                                 isDarkMode 
                                     ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                                     : 'bg-white border-gray-300 text-gray-900'
@@ -96,7 +96,7 @@ export default function FiltroForm({ nuevoFiltro, setNuevoFiltro, filtroEnEdicio
                                         type="text"
                                         value={opcion.valor || ''}
                                         onChange={(e) => manejarCambioInput(e, index)}
-                                        className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#184f96] focus:ring focus:ring-[#184f96] focus:ring-opacity-50 transition-colors duration-200 ${
+                                        className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#1e3a8a] focus:ring focus:ring-[#1e3a8a] focus:ring-opacity-50 transition-colors duration-200 ${
                                             isDarkMode 
                                                 ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                                                 : 'bg-white border-gray-300 text-gray-900'
@@ -135,7 +135,7 @@ export default function FiltroForm({ nuevoFiltro, setNuevoFiltro, filtroEnEdicio
                     </button>
                     <button
                         type="submit"
-                        className="px-4 py-2 bg-[#184f96] text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
+                        className="px-4 py-2 bg-[#1e3a8a] text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
                     >
                         Guardar Filtro
                     </button>

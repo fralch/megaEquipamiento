@@ -29,7 +29,7 @@ const Menu = ({ toggleMenu }) => {
                     <li className="relative block w-full md:w-auto mb-2 md:mb-0">
                         <a
                             href="#"
-                            className="mx-1 flex h-12 md:h-10 cursor-pointer items-center justify-center md:justify-start rounded bg-[#184f96] px-6 md:px-4 leading-10 text-white no-underline transition-colors duration-100 hover:no-underline text-lg md:text-base"
+                            className="mx-1 flex h-12 md:h-10 cursor-pointer items-center justify-center md:justify-start rounded bg-[#1e3a8a] px-6 md:px-4 leading-10 text-white no-underline transition-colors duration-100 hover:no-underline text-lg md:text-base"
                             onClick={toggleMenu}
                             id="category-button"
                         >

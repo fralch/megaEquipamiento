@@ -119,7 +119,7 @@ const Carrusel = () => {
                                 </li>
                             </ul>
                             <div className="text-center mt-6">
-                                <button className="bg-[#184f96] text-white px-6 py-3 rounded-full hover:bg-blue-700">
+                                <button className="bg-[#1e3a8a] text-white px-6 py-3 rounded-full hover:bg-blue-700">
                                     Ver productos
                                 </button>
                             </div>
@@ -223,7 +223,7 @@ const Carrusel = () => {
                                 </li>
                             </ul>
                             <div className="text-center mt-6">
-                                <button className="bg-[#184f96] text-white px-6 py-3 rounded-full hover:bg-blue-700">
+                                <button className="bg-[#1e3a8a] text-white px-6 py-3 rounded-full hover:bg-blue-700">
                                     Ver productos
                                 </button>
                             </div>
@@ -326,7 +326,7 @@ const Carrusel = () => {
                                 </li>
                             </ul>
                             <div className="text-center mt-6">
-                                <button className="bg-[#184f96] text-white px-6 py-3 rounded-full hover:bg-blue-700">
+                                <button className="bg-[#1e3a8a] text-white px-6 py-3 rounded-full hover:bg-blue-700">
                                     Ver productos
                                 </button>
                             </div>
@@ -429,7 +429,7 @@ const Carrusel = () => {
                                 </li>
                             </ul>
                             <div className="text-center mt-6">
-                                <button className="bg-[#184f96] text-white px-6 py-3 rounded-full hover:bg-blue-700">
+                                <button className="bg-[#1e3a8a] text-white px-6 py-3 rounded-full hover:bg-blue-700">
                                     Ver productos
                                 </button>
                             </div>
@@ -532,7 +532,7 @@ const Carrusel = () => {
                                 </li>
                             </ul>
                             <div className="text-center mt-6">
-                                <button className="bg-[#184f96] text-white px-6 py-3 rounded-full hover:bg-blue-700">
+                                <button className="bg-[#1e3a8a] text-white px-6 py-3 rounded-full hover:bg-blue-700">
                                     Ver productos
                                 </button>
                             </div>
@@ -635,7 +635,7 @@ const Carrusel = () => {
                                 </li>
                             </ul>
                             <div className="text-center mt-6">
-                                <button className="bg-[#184f96] text-white px-6 py-3 rounded-full hover:bg-blue-700">
+                                <button className="bg-[#1e3a8a] text-white px-6 py-3 rounded-full hover:bg-blue-700">
                                     Ver productos
                                 </button>
                             </div>

@@ -65,7 +65,7 @@ export default function Welcome() {
                 ) : (
                     <Link
                         href="/login"
-                        className={`fixed top-4 right-4 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#184f96] hover:bg-[#123d75]'} text-white px-4 py-2 rounded-md shadow-md transition duration-300 ease-in-out z-50`}
+                        className={`fixed top-4 right-4 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#1e3a8a] hover:bg-[#123d75]'} text-white px-4 py-2 rounded-md shadow-md transition duration-300 ease-in-out z-50`}
                     >
                         Iniciar Sesión
                     </Link>

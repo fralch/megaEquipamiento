@@ -250,8 +250,8 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                                 onClick={toggleSubcategoryDropdown}
                                 className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold ${
                                     isDarkMode
-                                        ? 'bg-[#184f96] text-white shadow-md'
-                                        : 'bg-[#184f96] text-white shadow-md'
+                                        ? 'bg-[#1e3a8a] text-white shadow-md'
+                                        : 'bg-[#1e3a8a] text-white shadow-md'
                                 } flex items-center justify-between animate-slideIn`}
                             >
                                 <span className="font-medium text-sm">
@@ -336,7 +336,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                         <div className="text-center py-10">
                           <p className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} transition-colors duration-200`}>No hay productos relacionados a esta categoría.</p>
                         </div>
-                        <button onClick={handleMostrarProductos} className={`${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#184f96] hover:bg-blue-800'} text-white py-2 px-4 rounded transition-all duration-200 mb-4 mx-auto block`}>Mostrar productos</button>
+                        <button onClick={handleMostrarProductos} className={`${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#1e3a8a] hover:bg-blue-800'} text-white py-2 px-4 rounded transition-all duration-200 mb-4 mx-auto block`}>Mostrar productos</button>
                         {mostrarProductos && <ProductGrid products={filteredProducts} />}
                         </>
                     )}
@@ -370,7 +370,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                     )}
 
                      <div className="flex justify-center">
-                        <Link href="/crear" className={`fixed bottom-8 right-8 w-14 h-14 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#184f96] hover:bg-blue-800'} text-white rounded-full flex items-center justify-center shadow-lg text-2xl transition-all duration-200 hover:scale-110`}>
+                        <Link href="/crear" className={`fixed bottom-8 right-8 w-14 h-14 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#1e3a8a] hover:bg-blue-800'} text-white rounded-full flex items-center justify-center shadow-lg text-2xl transition-all duration-200 hover:scale-110`}>
                             +
                         </Link>
                     </div>
