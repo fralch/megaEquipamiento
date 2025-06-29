@@ -3,6 +3,7 @@ import { useTheme } from "../storage/ThemeContext";
 import { CartContext } from "../storage/CartContext";
 import Header from "@/Components/home/Header";
 import Footer from "@/Components/home/Footer";
+import Menu from "../Components/home/Menu";
 import CheckoutTabs from "../Components/checkout/CheckoutTabs";
 
 // --- Componente Principal ---
@@ -71,6 +72,7 @@ export default function Carrito() {
             }`}
         >
             <Header />
+            <Menu />
 
             <main className="container mx-auto px-4 py-8">
                 <div className="max-w-7xl mx-auto">
