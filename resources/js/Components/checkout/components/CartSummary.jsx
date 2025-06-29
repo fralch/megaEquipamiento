@@ -4,9 +4,9 @@ const CartSummary = ({ total, itemCount, isDarkMode, onProceedToCheckout }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('es-PE', {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'PEN',
+            currency: 'USD',
             minimumFractionDigits: 2
         }).format(amount);
     };

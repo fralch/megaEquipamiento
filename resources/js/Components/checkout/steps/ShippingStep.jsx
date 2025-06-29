@@ -37,9 +37,9 @@ const ShippingStep = ({ onComplete, initialData, addressData, isDarkMode }) => {
     ];
 
     const formatCurrency = (value) => {
-        return new Intl.NumberFormat('es-PE', {
+        return new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: 'PEN',
+            currency: 'USD',
         }).format(value);
     };
 

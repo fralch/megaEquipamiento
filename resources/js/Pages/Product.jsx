@@ -22,6 +22,15 @@ import ModalRelatedProducts from "../Components/product/ModalRelatedProducts";
 import RelatedProducts from "../Components/product/RelatedProducts";
 import ProductCategoryEdit from "../Components/product/ProductCategoryEdit";
 
+// Currency formatting function
+const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2
+    }).format(amount);
+};
+
 const ProductPage = ({ producto }) => {
     console.log("producto", producto);
     const { isDarkMode } = useTheme();
@@ -887,7 +896,7 @@ const ProductPage = ({ producto }) => {
                                                 className="text-2xl font-semibold text-green-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('precio_sin_ganancia')}
                                             >
-                                                $ {productData.precio_ganancia}
+                                                {formatCurrency(productData.precio_ganancia)}
                                             </p>
                                         )}
                                         <p className={`transition-colors duration-300 ${
@@ -930,7 +939,7 @@ const ProductPage = ({ producto }) => {
                                                 }`}
                                                 onDoubleClick={() => toggleEditMode('precio_igv')}
                                             >
-                                                $ {productData.precio_igv}
+                                                {formatCurrency(productData.precio_igv)}
                                             </p>
                                         )}
                                         <p className={`transition-colors duration-300 ${

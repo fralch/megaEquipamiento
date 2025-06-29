@@ -33,6 +33,16 @@ const CartIcon = () => {
     });
   };
 
+
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2
+    }).format(amount);
+  };
+
   useEffect(() => {
     // Calcular el total considerando la cantidad de cada producto
     setTotal(cart.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0));
@@ -453,12 +463,7 @@ const CartIcon = () => {
                                     "text",
                                 }}
                               >
-                                S/{" "}
-                                {item.price
-                                  ? item.price.toFixed(
-                                    2
-                                  )
-                                  : "0.00"}
+                                {formatCurrency(item.price || 0)}
                               </span>
                             </div>
                             
@@ -510,7 +515,7 @@ const CartIcon = () => {
                                   color: isDarkMode ? "#94a3b8" : "#64748b",
                                 }}
                               >
-                                Subtotal: S/ {((item.price || 0) * (item.quantity || 1)).toFixed(2)}
+                                Subtotal: {formatCurrency((item.price || 0) * (item.quantity || 1))}
                               </span>
                             </div>
                           </div>
@@ -614,7 +619,7 @@ const CartIcon = () => {
                           letterSpacing: "0.5px",
                         }}
                       >
-                        S/ {total.toFixed(2)}
+                        {formatCurrency(total)}
                       </span>
                     </div>
                     <button
