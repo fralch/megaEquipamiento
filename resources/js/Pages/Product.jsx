@@ -8,6 +8,7 @@ import ImageGallery from "../Components/store/ImageGallery";
 import Footer from "../Components/home/Footer";
 import Modal_Features from "./assets/modal_features";
 import { useTheme } from '../storage/ThemeContext';
+import { useCurrency } from '../storage/CurrencyContext';
 import { CartContext } from '../storage/CartContext';
 import axios from "axios";
 
@@ -22,18 +23,12 @@ import ModalRelatedProducts from "../Components/product/ModalRelatedProducts";
 import RelatedProducts from "../Components/product/RelatedProducts";
 import ProductCategoryEdit from "../Components/product/ProductCategoryEdit";
 
-// Currency formatting function
-const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2
-    }).format(amount);
-};
+// Currency formatting function moved to CurrencyContext
 
 const ProductPage = ({ producto }) => {
     console.log("producto", producto);
     const { isDarkMode } = useTheme();
+    const { formatPrice } = useCurrency();
     const [categoriaCurrent, setCategoriaCurrent] = useState(null);
     const [subcategoriaCurrent, setSubcategoriaCurrent] = useState(null);
 
@@ -896,7 +891,7 @@ const ProductPage = ({ producto }) => {
                                                 className="text-2xl font-semibold text-green-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('precio_sin_ganancia')}
                                             >
-                                                {formatCurrency(productData.precio_ganancia)}
+                                                {formatPrice(productData.precio_ganancia)}
                                             </p>
                                         )}
                                         <p className={`transition-colors duration-300 ${
@@ -939,7 +934,7 @@ const ProductPage = ({ producto }) => {
                                                 }`}
                                                 onDoubleClick={() => toggleEditMode('precio_igv')}
                                             >
-                                                {formatCurrency(productData.precio_igv)}
+                                                {formatPrice(productData.precio_igv)}
                                             </p>
                                         )}
                                         <p className={`transition-colors duration-300 ${

@@ -3,12 +3,14 @@ import React, { useState } from "react";
 import { mdiChevronDown, mdiGauge, mdiLayersOutline, mdiWidgetsOutline, mdiPlus } from "@mdi/js";
 import { Link, usePage } from "@inertiajs/react";
 import { useTheme } from '../../storage/ThemeContext';
+import { useCurrency } from '../../storage/CurrencyContext';
 import { useCompare } from '../../hooks/useCompare';
 import CompareModal from '../compare/CompareModal';
 
 const Menu = ({ toggleMenu }) => {
     const { auth } = usePage().props;
     const { isDarkMode } = useTheme();
+    const { changeCurrency } = useCurrency();
     const { compareCount } = useCompare();
     const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
@@ -110,14 +112,15 @@ const Menu = ({ toggleMenu }) => {
                         <select
                             name="moneda"
                             id="moneda"
+                            onChange={(e) => changeCurrency(e.target.value)}
                             className={`text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 transition-colors duration-200 ${
                                 isDarkMode 
                                     ? 'bg-gray-700 border-gray-600 text-white' 
                                     : 'bg-gray-50 border-gray-300 text-gray-900'
                             }`}
                         >
-                            <option value="sol">Soles</option>
                             <option value="dollar">Dolares</option>
+                            <option value="sol">Soles</option>
                             <option value="euro">Euros</option>
                         </select>
                     </div>

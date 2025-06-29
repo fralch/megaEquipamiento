@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useCurrency } from '../../../storage/CurrencyContext';
 
-const ShippingStep = ({ onComplete, initialData, addressData, isDarkMode }) => {
-    const [selectedShipping, setSelectedShipping] = useState(initialData?.id || null);
+const ShippingStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
+    const [selectedShipping, setSelectedShipping] = useState(initialData?.option || null);
+    const { formatPrice } = useCurrency();
     const [deliveryDate, setDeliveryDate] = useState(initialData?.deliveryDate || '');
     const [specialInstructions, setSpecialInstructions] = useState(initialData?.specialInstructions || '');
 
@@ -36,12 +38,7 @@ const ShippingStep = ({ onComplete, initialData, addressData, isDarkMode }) => {
         }
     ];
 
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }).format(value);
-    };
+    // formatCurrency moved to CurrencyContext
 
     const getShippingIcon = (iconType) => {
         const icons = {
@@ -190,7 +187,7 @@ const ShippingStep = ({ onComplete, initialData, addressData, isDarkMode }) => {
                                                             ? 'text-green-600'
                                                             : isDarkMode ? 'text-gray-200' : 'text-gray-900'
                                                     }`}>
-                                                        {option.price === 0 ? 'GRATIS' : formatCurrency(option.price)}
+                                                        {option.price === 0 ? 'GRATIS' : formatPrice(option.price)}
                                                     </span>
                                                 </div>
                                                 
@@ -298,7 +295,7 @@ const ShippingStep = ({ onComplete, initialData, addressData, isDarkMode }) => {
                                     }`}>
                                         {shippingOptions.find(opt => opt.id === selectedShipping)?.price === 0
                                             ? 'GRATIS'
-                                            : formatCurrency(shippingOptions.find(opt => opt.id === selectedShipping)?.price || 0)
+                                            : formatPrice(shippingOptions.find(opt => opt.id === selectedShipping)?.price || 0)
                                         }
                                     </span>
                                 </div>

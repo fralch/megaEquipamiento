@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useCheckout } from '../../../storage/CheckoutContext';
+import { useCurrency } from '../../../storage/CurrencyContext';
 
 const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
     const { checkoutState, updateCustomerData } = useCheckout();
+    const { formatPrice } = useCurrency();
     const [selectedPayment, setSelectedPayment] = useState(initialData?.method || null);
     const [paymentData, setPaymentData] = useState({
         // Transferencia bancaria
@@ -49,12 +51,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
         }
     ];
 
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }).format(value);
-    };
+    // formatCurrency moved to CurrencyContext
 
     const calculateTotal = () => {
         const subtotal = orderData?.cartItems?.reduce((sum, item) => {
@@ -160,7 +157,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
                             </div>
                             <div className="flex justify-between font-semibold">
                                 <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Monto a transferir:</span>
-                                <span className={isDarkMode ? 'text-gray-100' : 'text-gray-900'}>{formatCurrency(totals.total)}</span>
+                                <span className={isDarkMode ? 'text-gray-100' : 'text-gray-900'}>{formatPrice(totals.total)}</span>
                             </div>
                         </div>
                         <div className={`mt-4 p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
@@ -194,7 +191,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
                             Pago con {selectedPayment === 'yape' ? 'Yape' : 'Plin'}
                         </h4>
                         <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Monto a pagar: <span className="font-semibold">{formatCurrency(totals.total)}</span>
+                            Monto a pagar: <span className="font-semibold">{formatPrice(totals.total)}</span>
                         </p>
                         <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
                             <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -385,7 +382,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
                                     Subtotal:
                                 </span>
                                 <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                                    {formatCurrency(totals.subtotal)}
+                                    {formatPrice(totals.subtotal)}
                                 </span>
                             </div>
                             
@@ -398,7 +395,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
                                         ? 'text-green-600'
                                         : isDarkMode ? 'text-gray-200' : 'text-gray-800'
                                 }`}>
-                                    {totals.shipping === 0 ? 'GRATIS' : formatCurrency(totals.shipping)}
+                                    {totals.shipping === 0 ? 'GRATIS' : formatPrice(totals.shipping)}
                                 </span>
                             </div>
                             
@@ -407,7 +404,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
                                     IGV (18%):
                                 </span>
                                 <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                                    {formatCurrency(totals.tax)}
+                                    {formatPrice(totals.tax)}
                                 </span>
                             </div>
                             
@@ -417,7 +414,7 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
                                         Total:
                                     </span>
                                     <span className={`font-bold text-lg ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                                        {formatCurrency(totals.total)}
+                                        {formatPrice(totals.total)}
                                     </span>
                                 </div>
                             </div>

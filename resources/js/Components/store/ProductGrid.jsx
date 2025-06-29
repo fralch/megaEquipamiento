@@ -2,20 +2,14 @@ import React, { useState, useEffect, useRef, useContext, useCallback, useMemo } 
 import countryCodeMap from './countryJSON.json';
 import { CartContext } from '../../storage/CartContext';
 import { useTheme } from '../../storage/ThemeContext';
+import { useCurrency } from '../../storage/CurrencyContext';
 import { useCompare } from '../../hooks/useCompare';
 
 const URL_API = import.meta.env.VITE_API_URL;
 const FALLBACK_IMAGE = 'https://megaequipamiento.com/wp-content/uploads/2024/08/MEGA-LOGO.webp';
 const IMAGE_TIMEOUT = 3000; // 3 segundos timeout para imágenes
 
-// Currency formatting function
-const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2
-    }).format(amount);
-};
+// Currency formatting function moved to CurrencyContext
 
 // Hook personalizado para manejar carga de imágenes con timeout
 const useImageLoader = (src, fallbackSrc = FALLBACK_IMAGE) => {
@@ -101,6 +95,7 @@ OptimizedImage.displayName = 'OptimizedImage';
 
 const ProductGrid = ({ products: initialProducts }) => {
   const { isDarkMode } = useTheme();
+  const { formatPrice } = useCurrency();
   const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -108,14 +103,6 @@ const ProductGrid = ({ products: initialProducts }) => {
   const [error, setError] = useState(null);
   
   const productsPerPage = 24;
-
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2
-    }).format(amount);
-  };
 
   // Función para transformar productos con memoización
   const transformProduct = useCallback((item) => {
@@ -509,6 +496,7 @@ const ProductGrid = ({ products: initialProducts }) => {
 
 const Card = React.memo(({ product }) => {
   const { isDarkMode } = useTheme();
+  const { formatPrice } = useCurrency(); // ← Agregar esta línea
   const [isVisible, setIsVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const cardRef = useRef(null);
@@ -693,7 +681,7 @@ const Card = React.memo(({ product }) => {
           <span className={`text-xl font-bold transition-colors duration-300 ${
             isDarkMode ? 'text-blue-400' : 'text-blue-600'
           }`}>
-            {formatCurrency(product.price)}
+            {formatPrice(product.price)}
           </span>
         </div>
       </div>

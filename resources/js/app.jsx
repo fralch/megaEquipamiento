@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { CartProvider } from './storage/CartContext';
 import { CompareProvider } from './storage/CompareContext';
 import { ThemeProvider } from './storage/ThemeContext';
+import { CurrencyProvider } from './storage/CurrencyContext';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -22,11 +23,13 @@ createInertiaApp({
 
         root.render(
             <ThemeProvider>
-                <CartProvider>
-                    <CompareProvider>
-                        <App {...props} />
-                    </CompareProvider>
-                </CartProvider>
+                <CurrencyProvider>
+                    <CartProvider>
+                        <CompareProvider>
+                            <App {...props} />
+                        </CompareProvider>
+                    </CartProvider>
+                </CurrencyProvider>
             </ThemeProvider>
         );
     },

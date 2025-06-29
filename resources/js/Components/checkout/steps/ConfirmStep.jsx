@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import { useCheckout } from '../../../storage/CheckoutContext';
+import { useCurrency } from '../../../storage/CurrencyContext';
 
 const ConfirmStep = ({ orderData, isDarkMode }) => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [orderPlaced, setOrderPlaced] = useState(false);
     const [orderNumber, setOrderNumber] = useState(null);
     const { checkoutState } = useCheckout();
+    const { formatPrice } = useCurrency();
 
     const getImageUrl = (image) => {
         if (!image) return '/api/placeholder/64/64';
@@ -39,12 +41,7 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
         return `/${cleanUrl}`;
     };
 
-    const formatCurrency = (value) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }).format(value);
-    };
+    // formatCurrency moved to CurrencyContext
 
     const calculateTotal = () => {
         const subtotal = orderData?.cartItems?.reduce((sum, item) => {
@@ -264,7 +261,7 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
                                     </div>
                                     
                                     <div className={`font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
-                                        {formatCurrency(item.price * (item.quantity || 1))}
+                                        {formatPrice(item.price * (item.quantity || 1))}
                                     </div>
                                 </div>
                             ))}
@@ -321,7 +318,7 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
                             </div>
                             
                             <div className={`ml-auto font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
-                                {orderData?.shipping?.option?.price === 0 ? 'GRATIS' : formatCurrency(orderData?.shipping?.option?.price)}
+                                {orderData?.shipping?.option?.price === 0 ? 'GRATIS' : formatPrice(orderData?.shipping?.option?.price)}
                             </div>
                         </div>
                         
@@ -377,7 +374,7 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
                                     Subtotal:
                                 </span>
                                 <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                                    {formatCurrency(totals.subtotal)}
+                                    {formatPrice(totals.subtotal)}
                                 </span>
                             </div>
                             
@@ -390,7 +387,7 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
                                         ? 'text-green-600'
                                         : isDarkMode ? 'text-gray-200' : 'text-gray-800'
                                 }`}>
-                                    {totals.shipping === 0 ? 'GRATIS' : formatCurrency(totals.shipping)}
+                                    {totals.shipping === 0 ? 'GRATIS' : formatPrice(totals.shipping)}
                                 </span>
                             </div>
                             
@@ -399,7 +396,7 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
                                     IGV (18%):
                                 </span>
                                 <span className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                                    {formatCurrency(totals.tax)}
+                                    {formatPrice(totals.tax)}
                                 </span>
                             </div>
                             
@@ -409,7 +406,7 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
                                         Total:
                                     </span>
                                     <span className={`font-bold text-lg ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
-                                        {formatCurrency(totals.total)}
+                                        {formatPrice(totals.total)}
                                     </span>
                                 </div>
                             </div>

@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useTheme } from "../../storage/ThemeContext";
+import { useCurrency } from "../../storage/CurrencyContext";
 import { CartContext } from "../../storage/CartContext";
 import { router } from "@inertiajs/react";
 
@@ -7,6 +8,7 @@ const CartIcon = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { cart, dispatch } = useContext(CartContext);
   const { isDarkMode } = useTheme();
+  const { formatPrice } = useCurrency();
   const [total, setTotal] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -35,13 +37,7 @@ const CartIcon = () => {
 
 
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2
-    }).format(amount);
-  };
+  // formatCurrency moved to CurrencyContext
 
   useEffect(() => {
     // Calcular el total considerando la cantidad de cada producto
@@ -463,7 +459,7 @@ const CartIcon = () => {
                                     "text",
                                 }}
                               >
-                                {formatCurrency(item.price || 0)}
+                                {formatPrice(item.price || 0)}
                               </span>
                             </div>
                             
@@ -515,7 +511,7 @@ const CartIcon = () => {
                                   color: isDarkMode ? "#94a3b8" : "#64748b",
                                 }}
                               >
-                                Subtotal: {formatCurrency((item.price || 0) * (item.quantity || 1))}
+                                Subtotal: {formatPrice((item.price || 0) * (item.quantity || 1))}
                               </span>
                             </div>
                           </div>
@@ -619,7 +615,7 @@ const CartIcon = () => {
                           letterSpacing: "0.5px",
                         }}
                       >
-                        {formatCurrency(total)}
+                        {formatPrice(total)}
                       </span>
                     </div>
                     <button

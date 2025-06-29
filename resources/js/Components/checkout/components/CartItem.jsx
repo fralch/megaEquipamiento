@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useCurrency } from '../../../storage/CurrencyContext';
 
 const CartItem = ({ item, onUpdateQuantity, onRemove, isDarkMode }) => {
     const [isRemoving, setIsRemoving] = useState(false);
@@ -36,13 +37,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, isDarkMode }) => {
         return `/${cleanUrl}`;
     };
 
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2
-        }).format(amount);
-    };
+    const { formatPrice } = useCurrency();
 
     const handleQuantityChange = (change) => {
         // Solo validar que no sea menor a 1 antes de enviar el cambio
@@ -114,13 +109,13 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, isDarkMode }) => {
                                 WebkitTextFillColor: 'transparent',
                                 backgroundClip: 'text'
                             }}>
-                            {formatCurrency(item.price)}
+                            {formatPrice(item.price)}
                         </span>
                         {item.originalPrice && (
                             <span className={`text-sm line-through ${
                                 isDarkMode ? 'text-gray-500' : 'text-gray-400'
                             }`}>
-                                {formatCurrency(item.originalPrice)}
+                                {formatPrice(item.originalPrice)}
                             </span>
                         )}
                     </div>
@@ -194,7 +189,7 @@ const CartItem = ({ item, onUpdateQuantity, onRemove, isDarkMode }) => {
                             WebkitTextFillColor: 'transparent',
                             backgroundClip: 'text'
                         }}>
-                        {formatCurrency(item.price * quantity)}
+                        {formatPrice(item.price * quantity)}
                     </span>
                 </div>
             </div>

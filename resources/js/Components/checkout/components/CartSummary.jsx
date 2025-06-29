@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
+import { useCurrency } from '../../../storage/CurrencyContext';
 
 const CartSummary = ({ total, itemCount, isDarkMode, onProceedToCheckout }) => {
     const [isHovered, setIsHovered] = useState(false);
-
-    const formatCurrency = (amount) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2
-        }).format(amount);
-    };
+    const { formatPrice } = useCurrency();
 
     return (
         <>
@@ -61,7 +55,7 @@ const CartSummary = ({ total, itemCount, isDarkMode, onProceedToCheckout }) => {
                             backgroundClip: 'text',
                             letterSpacing: '0.5px'
                         }}>
-                        {formatCurrency(total)}
+                        {formatPrice(total)}
                     </span>
                 </div>
             </div>

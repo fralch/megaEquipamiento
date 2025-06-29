@@ -72,7 +72,7 @@ const CartStep = ({ cartItems, onUpdateQuantity, onRemoveItem, onComplete, isDar
                             Información importante
                         </h3>
                         <ul className={`mt-2 text-sm space-y-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            <li>• Envío gratuito en pedidos superiores a S/ 500</li>
+                            <li>• Envío gratuito en pedidos superiores a $ 500</li>
                             <li>• Los precios incluyen IGV</li>
                             <li>• Tiempo de entrega: 2-5 días hábiles</li>
                             <li>• Garantía en todos nuestros productos</li>
