@@ -1,6 +1,5 @@
 // BrandSection.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "@inertiajs/react";
 import axios from 'axios';
 import { useTheme } from '../../storage/ThemeContext';
 
@@ -9,7 +8,6 @@ const BrandCard = ({ brand }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState([]);
   const cardRef = useRef(null);
 
   // Configurar Intersection Observer para detectar cuando la tarjeta es visible
@@ -35,37 +33,22 @@ const BrandCard = ({ brand }) => {
     };
   }, []);
 
-  const searchMarca = async (nombre) => {
+  const handleBrandClick = (e) => {
+    e.preventDefault();
+    if (isSearching) return;
+    
     setIsSearching(true);
-    console.log('Buscando marca:', nombre);
-    try {
-      const response = await axios.post('/marca/buscar', {
-        nombre: nombre
-      });
-      console.log(response.data);
-      /*
-      {
-          "id_marca": 6,
-          "nombre": "and _discover-precision",
-          "descripcion": "Descripción de and _discover-precision",
-          "imagen": "/img/marcas/and _discover-precision.jpg"
-      }
-       */
-      setSearchResults(response.data);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching marca:', error);
-      throw error;
-    } finally {
+    setTimeout(() => {
+      window.location.href = `/marcas/${brand.id_marca}`;
       setIsSearching(false);
-    }
+    }, 300);
   };
 
   return (
     <div
       ref={cardRef}
-      className={`relative flex flex-col items-center text-center p-4 group transition-colors duration-300 ${
-        isDarkMode ? 'text-white' : 'text-gray-900'
+      className={`relative flex flex-col items-center text-center p-4 group transition-all duration-300 rounded-lg hover:bg-gray-100/50 ${
+        isDarkMode ? 'text-white hover:bg-gray-700/30' : 'text-gray-900'
       }`}
     >
       <div className={`w-36 h-36 flex items-center justify-center rounded-full border-2 overflow-hidden transition-colors duration-300 bg-white ${
@@ -75,48 +58,49 @@ const BrandCard = ({ brand }) => {
         {/* Imagen que solo carga cuando es visible */}
         {isVisible && (
           <img
-            src={brand.image}
-            alt={brand.name}
+            src={brand.imagen}
+            alt={brand.nombre}
             className={`object-contain w-32 h-32 transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             loading="lazy"
             onLoad={() => setImageLoaded(true)}
+            onError={(e) => e.target.style.display = 'none'}
           />
+        )}
+        
+        {!imageLoaded && isVisible && (
+          <div className={`w-32 h-32 flex items-center justify-center text-4xl font-bold ${
+            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+          }`}>
+            {brand.nombre ? brand.nombre.charAt(0).toUpperCase() : '?'}
+          </div>
         )}
       </div>
 
       {/* Name */}
-      <h2 className={`mt-4 text-lg font-semibold transition-colors duration-300 ${
+      <h3 className={`mt-4 text-lg font-semibold transition-colors duration-300 ${
         isDarkMode ? 'text-white' : 'text-gray-900'
       }`}>
-        {brand.name}
-      </h2>
+        {brand.nombre}
+      </h3>
+
+      {/* Description */}
+      {brand.descripcion && (
+        <p className={`mt-1 text-sm transition-colors duration-300 ${
+          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+        }`}>
+          {brand.descripcion}
+        </p>
+      )}
 
       {/* Button */}
-      <Link 
-        href="#" 
-        className={`mt-2 transition-colors duration-300 text-white px-4 py-2 rounded flex items-center justify-center ${
+      <button 
+        className={`mt-3 transition-all duration-300 text-white px-4 py-2 rounded flex items-center justify-center transform hover:scale-105 ${
           isSearching 
             ? (isDarkMode ? 'bg-gray-600 cursor-wait' : 'bg-gray-400 cursor-wait')
             : (isDarkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600')
         }`}
-        onClick={(e) => {
-          if (isSearching) return; // Evitar múltiples clics mientras busca
-          
-          e.preventDefault(); // Prevenir la navegación inmediata
-          searchMarca(brand.name)
-            .then((data) => {
-              // Después de completar la búsqueda, navegar a la página de productos
-              console.log(data);
-              if (data && data.id_marca) {
-                window.location.href = `/marcas/${data.id_marca}`;
-              } else {
-                console.error('No se encontró ID de marca');
-              }
-            })
-            .catch((error) => {
-              console.error('Error en la búsqueda de marca:', error);
-            });
-        }}
+        onClick={handleBrandClick}
+        disabled={isSearching}
       >
         {isSearching ? (
           <>
@@ -124,14 +108,12 @@ const BrandCard = ({ brand }) => {
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Buscando...
+            Cargando...
           </>
         ) : (
           'Ver Productos'
         )}
-      </Link>
-
-    
+      </button>
     </div>
   );
 };
@@ -142,25 +124,12 @@ const BrandSection = () => {
   const [loading, setLoading] = useState(true);
   const sectionRef = useRef(null);
 
-  // Cargar información de marcas solo cuando la sección es visible
+  // Cargar información de marcas desde la API
   useEffect(() => {
     const loadBrands = async () => {
       try {
-        // Usar dynamic import para cargar las imágenes bajo demanda
-        const images = import.meta.glob("/public/img/marcas/**/*.{jpg,png,webp,webm}", { eager: false });
-        
-        // Convertir las rutas de imágenes a objetos de marca
-        const brandPromises = Object.keys(images).map(async (path) => {
-          const name = path.split("/").pop().split(".").shift();
-          const adjustedPath = path.replace("/public", "");
-          
-          return {
-            image: adjustedPath,
-            name          
-          };
-        });
-        
-        const brandsData = await Promise.all(brandPromises);
+        const response = await axios.get('/marca/all');
+        const brandsData = response.data;
         
         // Guardar en localStorage con timestamp para caché
         localStorage.setItem('brandsData', JSON.stringify(brandsData));
@@ -169,7 +138,7 @@ const BrandSection = () => {
         setBrands(brandsData);
         setLoading(false);
       } catch (error) {
-        console.error('Error loading brand images:', error);
+        console.error('Error loading brands from API:', error);
         setLoading(false);
       }
     };
@@ -177,10 +146,10 @@ const BrandSection = () => {
     // Verificar si hay datos en caché
     const cachedBrands = localStorage.getItem('brandsData');
     const cachedTimestamp = localStorage.getItem('brandsDataTimestamp');
-    const oneDay = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+    const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
     
-    if (cachedBrands && cachedTimestamp && (Date.now() - parseInt(cachedTimestamp)) < oneDay) {
-      // Usar datos en caché si son recientes
+    if (cachedBrands && cachedTimestamp && (Date.now() - parseInt(cachedTimestamp)) < oneHour) {
+      // Usar datos en caché si son recientes (1 hora)
       setBrands(JSON.parse(cachedBrands));
       setLoading(false);
     } else {
@@ -222,11 +191,25 @@ const BrandSection = () => {
             isDarkMode ? 'border-blue-400' : 'border-blue-500'
           }`}></div>
         </div>
+      ) : brands && brands.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {Array.isArray(brands) ? brands.map((brand) => (
+            <BrandCard 
+              key={brand.id_marca} 
+              brand={brand} 
+            />
+          )) : (
+            <BrandCard 
+              key={brands.id_marca} 
+              brand={brands} 
+            />
+          )}
+        </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-          {brands.map((brand, index) => (
-            <BrandCard key={index} brand={brand} />
-          ))}
+        <div className={`text-center py-12 ${
+          isDarkMode ? 'text-gray-400' : 'text-gray-600'
+        }`}>
+          <p>No se encontraron marcas disponibles.</p>
         </div>
       )}
     </div>
