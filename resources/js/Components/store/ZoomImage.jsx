@@ -37,14 +37,7 @@ const ZoomImage = ({ imageSrc, productId, imageSize = 100 }) => {
     }
   };
 
-  const handleImageClick = () => {
-    // Solo permitir edición si el usuario está autenticado
-    if (auth && auth.user) {
-      setIsEditing(true);
-      setIsZoomed(false);
-      fileInputRef.current.click();
-    }
-  };
+
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -107,7 +100,7 @@ const ZoomImage = ({ imageSrc, productId, imageSize = 100 }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onMouseMove={handleMouseMove}
-        onClick={!isEditing ? handleImageClick : undefined}
+
         style={{ 
           width: `${imageSize}%`,
           aspectRatio: '1/1',
