@@ -304,13 +304,21 @@ const FeaturesButton = ({ label, value, onClick, onRemoveItem }) => (
   </div>
 );
 
-const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName, selectedImages }) => (
+const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName, selectedImages, removeImage }) => (
   <div className="w-full lg:w-1/2 lg:pr-6 mb-6 lg:mb-0">
     <div className="border border-gray-300 rounded-lg p-4 mb-4 h-[300px] md:h-[400px] overflow-y-auto">
       {previewImages && previewImages.length > 0 ? (
         <div className="grid grid-cols-2 gap-2">
           {previewImages.map((preview, index) => (
-            <div key={index} className="border rounded-lg p-2">
+            <div key={index} className="border rounded-lg p-2 relative">
+              <button
+                type="button"
+                onClick={() => removeImage(index)}
+                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors z-10"
+                title="Eliminar imagen"
+              >
+                ×
+              </button>
               <img
                 src={preview}
                 alt={`Product Preview ${index + 1}`}
@@ -323,7 +331,17 @@ const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName
           ))}
         </div>
       ) : previewImage ? (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-full relative">
+          {removeImage && (
+            <button
+              type="button"
+              onClick={() => removeImage(0)}
+              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors z-10"
+              title="Eliminar imagen"
+            >
+              ×
+            </button>
+          )}
           <img
             src={previewImage}
             alt="Product Preview"
@@ -433,6 +451,40 @@ const Productos = ({ onSubmit }) => {
         ...prev, 
         imagen: firstFile, // Mantener compatibilidad
         imagenes: files // Nuevas múltiples imágenes
+      }));
+    }
+  };
+
+  // Función para eliminar una imagen específica
+  const removeImage = (index) => {
+    const newSelectedImages = [...selectedImages];
+    newSelectedImages.splice(index, 1);
+    setSelectedImages(newSelectedImages);
+    
+    const newPreviewImages = [...previewImages];
+    newPreviewImages.splice(index, 1);
+    setPreviewImages(newPreviewImages);
+    
+    // Si no quedan imágenes, limpiar todo
+    if (newSelectedImages.length === 0) {
+      setPreviewImage(null);
+      setForm(prev => ({ 
+        ...prev, 
+        imagen: null,
+        imagenes: []
+      }));
+    } else {
+      // Actualizar la imagen principal (primera imagen)
+      const firstFile = newSelectedImages[0];
+      const reader = new FileReader();
+      reader.onloadend = () => setPreviewImage(reader.result);
+      reader.readAsDataURL(firstFile);
+      
+      // Actualizar el formulario
+      setForm(prev => ({ 
+        ...prev, 
+        imagen: firstFile,
+        imagenes: newSelectedImages
       }));
     }
   };
@@ -765,6 +817,7 @@ const Productos = ({ onSubmit }) => {
             handleImageChange={handleImageChange}
             imageName={form.imagen?.name}
             selectedImages={selectedImages}
+            removeImage={removeImage}
           />
 
           <div className="w-full lg:w-1/2 lg:pl-6">
