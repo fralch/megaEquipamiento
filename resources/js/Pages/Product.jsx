@@ -815,6 +815,7 @@ const ProductPage = ({ producto }) => {
                         images={productData.imagen} 
                         productId={producto.id_producto}
                         productName={producto.nombre}
+                        canEdit={auth.user ? true : false}
                         onImagesUpdate={(newImages) => {
                             setProductData(prev => ({
                                 ...prev,

@@ -3,11 +3,11 @@ import { useTheme } from '../../storage/ThemeContext';
 import ZoomImage from './ZoomImage';
 import axios from 'axios';
 
-const ImageGallery = ({ images, productId, productName, onImagesUpdate }) => {
+const ImageGallery = ({ images, productId, productName, onImagesUpdate, canEdit = false }) => {
     const { isDarkMode } = useTheme();
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
-    const [isEditing, setIsEditing] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
     const [selectedImages, setSelectedImages] = useState([]);
     const [previewImages, setPreviewImages] = useState([]);
     const [dragActive, setDragActive] = useState(false);
@@ -315,7 +315,7 @@ const ImageGallery = ({ images, productId, productName, onImagesUpdate }) => {
                     {normalizedImages.length} imagen{normalizedImages.length !== 1 ? 'es' : ''}
                 </div>
                 <div className="flex gap-2">
-                    {!isEditing ? (
+                    {!isEditing && canEdit ? (
                         <button
                             onClick={() => setIsEditing(true)}
                             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
@@ -329,7 +329,7 @@ const ImageGallery = ({ images, productId, productName, onImagesUpdate }) => {
                             </svg>
                             {normalizedImages.length === 0 ? 'Agregar Primera Imagen' : 'Agregar Imágenes'}
                         </button>
-                    ) : (
+                    ) : canEdit && isEditing ? (
                         <>
                             <button
                                 onClick={handleSaveImages}
@@ -371,12 +371,12 @@ const ImageGallery = ({ images, productId, productName, onImagesUpdate }) => {
                                 Cancelar
                             </button>
                         </>
-                    )}
+                    ) : null}
                 </div>
             </div>
 
             {/* Modo de edición */}
-            {isEditing && (
+            {isEditing && canEdit && (
                 <div className={`border rounded-lg p-4 mb-4 ${
                     isDarkMode ? 'border-gray-600 bg-gray-800' : 'border-gray-300 bg-gray-50'
                 }`}>
