@@ -812,9 +812,15 @@ const ProductPage = ({ producto }) => {
             <main className="p-6">
                 <section className="grid md:grid-cols-2 gap-8">
                     <ImageGallery 
-                        images={producto.imagen} 
+                        images={productData.imagen} 
                         productId={producto.id_producto}
                         productName={producto.nombre}
+                        onImagesUpdate={(newImages) => {
+                            setProductData(prev => ({
+                                ...prev,
+                                imagen: newImages
+                            }));
+                        }}
                     />
 
                     <div className={`max-w-4xl mx-auto p-6 shadow-lg rounded-lg transition-colors duration-300 ${

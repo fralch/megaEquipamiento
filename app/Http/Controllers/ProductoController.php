@@ -261,8 +261,8 @@ class ProductoController extends Controller
     {
         $request->validate([
             'id_producto' => 'required|exists:productos,id_producto',
+            'imagen.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'imagenes.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'imagen' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Mantener compatibilidad
         ]);
         
         // Buscar el producto por ID
@@ -281,8 +281,20 @@ class ProductoController extends Controller
             
             $imagenesArray = [];
             
-            // Procesar múltiples imágenes
-            if ($request->hasFile('imagenes')) {
+            // Procesar múltiples imágenes con formato imagen[0], imagen[1], etc.
+            if ($request->has('imagen') && is_array($request->file('imagen'))) {
+                $imagenes = $request->file('imagen');
+                foreach ($imagenes as $index => $imagen) {
+                    if ($imagen && $imagen->isValid()) {
+                        $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
+                        $imagePath = 'productos/' . $imageName;
+                        $imagen->move(public_path('productos'), $imageName);
+                        $imagenesArray[] = $imagePath;
+                    }
+                }
+            }
+            // Mantener compatibilidad con el formato anterior 'imagenes'
+            elseif ($request->hasFile('imagenes')) {
                 $imagenes = $request->file('imagenes');
                 foreach ($imagenes as $index => $imagen) {
                     $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
@@ -290,8 +302,9 @@ class ProductoController extends Controller
                     $imagen->move(public_path('productos'), $imageName);
                     $imagenesArray[] = $imagePath;
                 }
-            } elseif ($request->hasFile('imagen')) {
-                // Mantener compatibilidad con imagen única
+            }
+            // Mantener compatibilidad con imagen única
+            elseif ($request->hasFile('imagen') && !is_array($request->file('imagen'))) {
                 $image = $request->file('imagen');
                 $imageName = time() . '.' . $image->getClientOriginalExtension();
                 $imagePath = 'productos/' . $imageName;
@@ -305,14 +318,15 @@ class ProductoController extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => 'Imagen actualizada correctamente',
+                'message' => 'Imágenes actualizadas correctamente',
+                'imagen' => $imagenesArray,
                 'producto' => $producto->fresh('marca')
             ]);
             
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Error al actualizar la imagen: ' . $e->getMessage()
+                'error' => 'Error al actualizar las imágenes: ' . $e->getMessage()
             ], 500);
         }
     }
