@@ -18,7 +18,7 @@ const SubcategoryLink = React.memo(({ item, isDarkMode }) => (
 
 SubcategoryLink.displayName = 'SubcategoryLink';
 
-const CategoryCard = React.memo(({ title, items, categoryId }) => {
+const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
   const { isDarkMode } = useTheme();
   const [imagePaths, setImagePaths] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -27,89 +27,47 @@ const CategoryCard = React.memo(({ title, items, categoryId }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const intervalRef = useRef(null);
   
-  // Función memoizada para cargar imágenes
-  const loadImages = useCallback(async () => {
-    try {
-      const imageModule = await import.meta.glob('/public/img/categorias/**/*.{jpg,png,webp,webm}', { eager: false });
-      const allPaths = Object.keys(imageModule);
-      
-      // Estrategias de normalización múltiples para aumentar probabilidad de coincidencia
-      const normalizationStrategies = [
-        // Estrategia 1: Guiones bajos (actual)
-        title.toLowerCase()
-          .replace(/[^a-z0-9\s]/g, '_')
-          .replace(/\s+/g, '_')
-          .replace(/_+/g, '_')
-          .replace(/^_|_$/g, ''),
-        
-        // Estrategia 2: Guiones
-        title.toLowerCase()
-          .replace(/[^a-z0-9\s]/g, '-')
-          .replace(/\s+/g, '-')
-          .replace(/-+/g, '-')
-          .replace(/^-|-$/g, ''),
-        
-        // Estrategia 3: Sin espacios ni caracteres especiales
-        title.toLowerCase().replace(/[^a-z0-9]/g, ''),
-        
-        // Estrategia 4: Solo reemplazar espacios con guiones bajos
-        title.toLowerCase().replace(/\s+/g, '_'),
-        
-        // Estrategia 5: Solo reemplazar espacios con guiones
-        title.toLowerCase().replace(/\s+/g, '-'),
-        
-        // Estrategia 6: Búsqueda parcial por palabras clave
-        title.toLowerCase().split(/[^a-z0-9]+/).filter(word => word.length > 2)[0] || title.toLowerCase(),
-        
-        // Estrategia 7: Nombre original en minúsculas
-        title.toLowerCase()
-      ];
-      
-      let foundPaths = [];
-      
-      // Probar cada estrategia hasta encontrar imágenes
-      for (const folderName of normalizationStrategies) {
-        if (!folderName) continue;
-        
-        const paths = allPaths
-          .filter(path => path.includes(`/img/categorias/${folderName}/`))
-          .map(path => path.replace('/public', ''));
-        
-        if (paths.length > 0) {
-          foundPaths = paths;
-          break;
-        }
-      }
-      
-      // Si aún no encuentra, intentar búsqueda parcial más flexible
-      if (foundPaths.length === 0) {
-        const searchTerms = title.toLowerCase().split(/[^a-z0-9]+/).filter(term => term.length > 2);
-        
-        for (const term of searchTerms) {
-          const partialPaths = allPaths
-            .filter(path => path.toLowerCase().includes(term) && path.includes('/img/categorias/'))
-            .map(path => path.replace('/public', ''));
-          
-          if (partialPaths.length > 0) {
-            foundPaths = partialPaths;
-            break;
-          }
-        }
-      }
-      
-      setImagePaths(foundPaths);
-    } catch (error) {
-      console.error('Error loading images:', error);
-      setImagePaths([]);
-    }
-  }, [title]);
+  // Función para normalizar nombres de carpetas (reutilizada del componente padre)
+  const normalizeTitle = useCallback((str) => {
+    // Usamos solo la estrategia más robusta que tenías (guiones bajos)
+    // El mapeo se hace en el padre, aquí solo necesitamos una forma de buscar.
+    return str.toLowerCase()
+      .replace(/[^a-z0-9\s]/g, '_')
+      .replace(/\s+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '');
+  }, []);
 
   // Cargar rutas de imágenes de forma dinámica solo cuando se necesitan
   useEffect(() => {
-    if (isVisible) {
-      loadImages();
+    if (isVisible && imageMap) {
+      // Estrategias de búsqueda en el mapa pre-calculado
+      const strategies = [
+        (t) => t.toLowerCase().replace(/[^a-z0-9\s]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, ''),
+        (t) => t.toLowerCase().replace(/[^a-z0-9\s]/g, '-').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, ''),
+        (t) => t.toLowerCase().replace(/[^a-z0-9]/g, ''),
+        (t) => t.toLowerCase().replace(/\s+/g, '_'),
+        (t) => t.toLowerCase().replace(/\s+/g, '-'),
+        (t) => t.toLowerCase()
+      ];
+
+      let foundPaths = [];
+      for (const strategy of strategies) {
+        const key = strategy(title);
+        if (imageMap[key] && imageMap[key].length > 0) {
+          foundPaths = imageMap[key];
+          break;
+        }
+      }
+
+      // Fallback si ninguna estrategia de normalización funcionó
+      if (foundPaths.length === 0) {
+        // Podrías añadir una búsqueda parcial aquí si es necesario, pero el mapa debería ser suficiente
+      }
+
+      setImagePaths(foundPaths);
     }
-  }, [isVisible, loadImages]);
+  }, [isVisible, title, imageMap]);
 
   // Observer para lazy loading
   useEffect(() => {
@@ -147,15 +105,6 @@ const CategoryCard = React.memo(({ title, items, categoryId }) => {
       };
     }
   }, [imagePaths.length, isVisible]);
-
-  // Cleanup al desmontar
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, []);
 
   // Memoizar valores calculados
   const placeholderImage = useMemo(() => 'https://aringenieriaa.com/storage/servicio/125456545.jpg', []);
@@ -240,6 +189,8 @@ const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Nuevo estado para el mapa de imágenes
+  const [imageMap, setImageMap] = useState(null);
 
   // Función memoizada para obtener datos del localStorage
   const getStoredCategories = useCallback(() => {
@@ -326,6 +277,36 @@ const Categories = () => {
     initializeCategories();
   }, [getStoredCategories, fetchCategories]);
 
+  // useEffect para construir el mapa de imágenes UNA SOLA VEZ
+  useEffect(() => {
+    const buildImageMap = async () => {
+      try {
+        const imageModules = await import.meta.glob('/public/img/categorias/*/*.{jpg,png,webp,webm}');
+        const newImageMap = {};
+
+        for (const path in imageModules) {
+            // Extraer el nombre de la carpeta (ej: /public/img/categorias/aires_acondicionados/img1.jpg -> aires_acondicionados)
+            const match = path.match(/\/img\/categorias\/(.*?)\//);
+            if (match && match[1]) {
+                const folderName = match[1];
+                const imagePath = path.replace('/public', '');
+
+                if (!newImageMap[folderName]) {
+                    newImageMap[folderName] = [];
+                }
+                newImageMap[folderName].push(imagePath);
+            }
+        }
+        setImageMap(newImageMap);
+      } catch (e) {
+        console.error("Error building image map:", e);
+        setImageMap({}); // Poner un objeto vacío en caso de error para no bloquear el render
+      }
+    };
+
+    buildImageMap();
+  }, []); // El array vacío asegura que se ejecute solo una vez
+
   // Componentes memoizados para loading y error
   const LoadingComponent = useMemo(() => {
     if (loading && categories.length === 0) {
@@ -375,6 +356,7 @@ const Categories = () => {
               title={category.nombre} 
               items={category.subcategorias || []} 
               categoryId={category.id_categoria}
+              imageMap={imageMap}
             />
           ))}
         </div>
