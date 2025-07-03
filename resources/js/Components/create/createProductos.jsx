@@ -626,10 +626,7 @@ const Productos = ({ onSubmit }) => {
       setForm(prev => {
         const updatedForm = { 
           ...prev, 
-          [modalType]: { 
-            ...prev[modalType], // Mantiene los datos existentes
-            ...jsonValue         // Agrega los nuevos datos
-          } 
+          [modalType]: jsonValue // Reemplaza completamente los datos
         };
         
         return updatedForm;
