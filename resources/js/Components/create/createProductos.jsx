@@ -661,16 +661,26 @@ const Productos = ({ onSubmit }) => {
       case 'tab2': // Características
         return (
           <div className="mb-4 w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Características</label>
-            <div className="p-4 border border-gray-300 rounded-md bg-gray-50">
+            <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>Características</label>
+            <div className={`p-4 border rounded-md transition-colors duration-300 ${
+              isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-gray-50'
+            }`}>
               {Object.keys(form.caracteristicas || {}).length === 0 ? (
-                <p className="text-gray-500">No hay características definidas.</p>
+                <p className={`transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>No hay características definidas.</p>
               ) : (
                 <div className="max-h-60 overflow-y-auto">
                   <ul className="list-disc pl-5">
                     {Object.entries(form.caracteristicas).map(([key, val]) => (
-                      <li key={key} className="mb-1">
-                        <span className="font-medium">{key}:</span> {val}
+                      <li key={key} className={`mb-1 transition-colors duration-300 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                      }`}>
+                        <span className={`font-medium transition-colors duration-300 ${
+                          isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>{key}:</span> {val}
                       </li>
                     ))}
                   </ul>
@@ -679,7 +689,11 @@ const Productos = ({ onSubmit }) => {
               <button
                 type="button"
                 onClick={() => toggleModal('caracteristicas')}
-                className="mt-3 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                className={`mt-3 px-4 py-2 rounded-md transition-colors duration-300 ${
+                  isDarkMode 
+                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
               >
                 Agregar Características
               </button>
@@ -709,9 +723,13 @@ const Productos = ({ onSubmit }) => {
               placeholder="Ingrese los enlaces de documentos o descargas (uno por línea)"
               rows={6}
             />
-            <div className="text-sm text-gray-500">
+            <div className={`text-sm transition-colors duration-300 ${
+              isDarkMode ? 'text-gray-400' : 'text-gray-500'
+            }`}>
               Ingrese cada enlace en una nueva línea. Ejemplo:
-              <pre className="mt-1 p-2 bg-gray-100 rounded">https://ejemplo.com/manual.pdf</pre>
+              <pre className={`mt-1 p-2 rounded transition-colors duration-300 ${
+                isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-900'
+              }`}>https://ejemplo.com/manual.pdf</pre>
             </div>
           </div>
         );
@@ -784,7 +802,9 @@ const Productos = ({ onSubmit }) => {
         );
 
       default:
-        return <div className="p-4">Seleccione una pestaña para ver el contenido</div>;
+        return <div className={`p-4 transition-colors duration-300 ${
+          isDarkMode ? 'text-gray-300' : 'text-gray-900'
+        }`}>Seleccione una pestaña para ver el contenido</div>;
     }
   };
 
