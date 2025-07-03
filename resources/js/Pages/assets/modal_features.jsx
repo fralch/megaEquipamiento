@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../storage/ThemeContext';
 
 const FeatureItem = ({ featureKey, featureValue, onEdit, onDelete }) => {
+  const { isDarkMode } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [editKey, setEditKey] = useState(featureKey);
   const [editValue, setEditValue] = useState(featureValue);
@@ -19,21 +21,21 @@ const FeatureItem = ({ featureKey, featureValue, onEdit, onDelete }) => {
   };
 
   return (
-    <div className="flex items-center justify-between p-2 mb-2 bg-white border rounded">
+    <div className={`flex items-center justify-between p-2 mb-2 ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-300'} border rounded`}>
       {isEditing ? (
         <div className="flex-1 flex gap-2">
           <input
             type="text"
             value={editKey}
             onChange={(e) => setEditKey(e.target.value)}
-            className="flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:border-blue-500"
+            className={`flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:border-blue-500 ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-900 border-gray-300'}`}
             placeholder="Característica"
           />
           <input
             type="text"
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
-            className="flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:border-blue-500"
+            className={`flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:border-blue-500 ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-900 border-gray-300'}`}
             placeholder="Valor"
           />
           <button
@@ -52,8 +54,8 @@ const FeatureItem = ({ featureKey, featureValue, onEdit, onDelete }) => {
       ) : (
         <>
           <div className="flex-1">
-            <span className="font-medium text-sm">{featureKey}:</span>
-            <span className="text-sm ml-2">{featureValue}</span>
+            <span className={`font-medium text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{featureKey}:</span>
+            <span className={`text-sm ml-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{featureValue}</span>
           </div>
           <div className="flex gap-1">
             <button
@@ -82,6 +84,7 @@ const FeatureItem = ({ featureKey, featureValue, onEdit, onDelete }) => {
 };
 
 const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
+  const { isDarkMode } = useTheme();
   const [data, setData] = useState({});
   const [key, setKey] = useState('');
   const [value, setValue] = useState('');
@@ -135,22 +138,22 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+      <div className={`relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-300'}`}>
         <div className="mt-3 text-center">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
+          <h3 className={`text-lg leading-6 font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             Características
           </h3>
           <div className="mt-2 px-7 py-3">
             <input
               type="text"
-              className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none mb-2"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none mb-2 ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`}
               placeholder="ID"
               value={key}
               onChange={(e) => setKey(e.target.value)}
             />
             <input
               type="text"
-              className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none mb-2"
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none mb-2 ${isDarkMode ? 'bg-gray-700 text-white border-gray-600' : 'bg-white text-gray-700 border-gray-300'}`}
               placeholder="Dato"
               value={value}
               onChange={(e) => setValue(e.target.value)}
@@ -163,8 +166,8 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
             </button>
           </div>
           <div className="mt-2 px-7 py-3">
-            <h4 className="text-md font-medium text-gray-700 mb-2">Características actuales:</h4>
-            <div className="max-h-40 overflow-y-auto border rounded-lg p-2 bg-gray-50">
+            <h4 className={`text-md font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Características actuales:</h4>
+            <div className={`max-h-40 overflow-y-auto border rounded-lg p-2 ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}>
               {Object.keys(data).length > 0 ? (
                 Object.entries(data).map(([featureKey, featureValue]) => (
                   <FeatureItem
@@ -176,7 +179,7 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
                   />
                 ))
               ) : (
-                <p className="text-gray-500 text-sm">No hay características agregadas</p>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>No hay características agregadas</p>
               )}
             </div>
           </div>
@@ -189,7 +192,7 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
             </button>
             <button
               onClick={onClose}
-              className="ml-3 px-4 py-2 bg-gray-100 text-gray-800 text-base font-medium rounded-md shadow-sm hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-300"
+              className={`ml-3 px-4 py-2 text-base font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 ${isDarkMode ? 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-500' : 'bg-gray-100 text-gray-800 hover:bg-gray-200 focus:ring-gray-300'}`}
             >
               Cancelar
             </button>
