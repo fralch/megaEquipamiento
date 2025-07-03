@@ -1,5 +1,86 @@
 import React, { useState, useEffect } from 'react';
 
+const FeatureItem = ({ featureKey, featureValue, onEdit, onDelete }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editKey, setEditKey] = useState(featureKey);
+  const [editValue, setEditValue] = useState(featureValue);
+
+  const handleSaveEdit = () => {
+    if (editKey.trim() && editValue.trim()) {
+      onEdit(featureKey, editKey.trim(), editValue.trim());
+      setIsEditing(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditKey(featureKey);
+    setEditValue(featureValue);
+    setIsEditing(false);
+  };
+
+  return (
+    <div className="flex items-center justify-between p-2 mb-2 bg-white border rounded">
+      {isEditing ? (
+        <div className="flex-1 flex gap-2">
+          <input
+            type="text"
+            value={editKey}
+            onChange={(e) => setEditKey(e.target.value)}
+            className="flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:border-blue-500"
+            placeholder="Característica"
+          />
+          <input
+            type="text"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            className="flex-1 px-2 py-1 text-sm border rounded focus:outline-none focus:border-blue-500"
+            placeholder="Valor"
+          />
+          <button
+            onClick={handleSaveEdit}
+            className="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
+          >
+            ✓
+          </button>
+          <button
+            onClick={handleCancelEdit}
+            className="px-2 py-1 bg-gray-500 text-white text-xs rounded hover:bg-gray-600"
+          >
+            ✕
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="flex-1">
+            <span className="font-medium text-sm">{featureKey}:</span>
+            <span className="text-sm ml-2">{featureValue}</span>
+          </div>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+              title="Editar"
+            >
+              <svg viewBox="0 0 512 512" className="w-3 h-3 fill-current">
+              <path d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z"/>
+              </svg>
+            </button>
+            <button
+              onClick={() => onDelete(featureKey)}
+              className="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600"
+              title="Eliminar"
+            >
+              <svg viewBox="0 0 448 512" className="w-3 h-3 fill-current">
+                <path d="M135.2 17.7L128 32 32 32C14.3 32 0 46.3 0 64S14.3 96 32 96l384 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-96 0-7.2-14.3C307.4 6.8 296.3 0 284.2 0L163.8 0c-12.1 0-23.2 6.8-28.6 17.7zM416 128L32 128 53.2 467c1.6 25.3 22.6 45 47.9 45l245.8 0c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+              </svg>
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
   const [data, setData] = useState({});
   const [key, setKey] = useState('');
@@ -29,13 +110,32 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
     }
   };
 
+  const handleDeleteFeature = (keyToDelete) => {
+    setData(prevData => {
+      const newData = { ...prevData };
+      delete newData[keyToDelete];
+      return newData;
+    });
+  };
+
+  const handleEditFeature = (oldKey, newKey, newValue) => {
+    setData(prevData => {
+      const newData = { ...prevData };
+      if (oldKey !== newKey) {
+        delete newData[oldKey];
+      }
+      newData[newKey] = newValue;
+      return newData;
+    });
+  };
+
   const handleSave = () => {
     onSave(JSON.stringify(data));
   };
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
         <div className="mt-3 text-center">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
             Características
@@ -63,12 +163,22 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
             </button>
           </div>
           <div className="mt-2 px-7 py-3">
-            <textarea
-              className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none"
-              rows="4"
-              value={JSON.stringify(data, null, 2)}
-              readOnly
-            />
+            <h4 className="text-md font-medium text-gray-700 mb-2">Características actuales:</h4>
+            <div className="max-h-40 overflow-y-auto border rounded-lg p-2 bg-gray-50">
+              {Object.keys(data).length > 0 ? (
+                Object.entries(data).map(([featureKey, featureValue]) => (
+                  <FeatureItem
+                    key={featureKey}
+                    featureKey={featureKey}
+                    featureValue={featureValue}
+                    onEdit={handleEditFeature}
+                    onDelete={handleDeleteFeature}
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">No hay características agregadas</p>
+              )}
+            </div>
           </div>
           <div className="items-center px-4 py-3">
             <button
