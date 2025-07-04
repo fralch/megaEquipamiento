@@ -25,6 +25,7 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
   const [isVisible, setIsVisible] = useState(false);
   const cardRef = useRef(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [searchedForPaths, setSearchedForPaths] = useState(false);
   const intervalRef = useRef(null);
   
   // Función para normalizar nombres de carpetas (reutilizada del componente padre)
@@ -66,6 +67,7 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
       }
 
       setImagePaths(foundPaths);
+      setSearchedForPaths(true);
     }
   }, [isVisible, title, imageMap]);
 
@@ -107,11 +109,17 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
   }, [imagePaths.length, isVisible]);
 
   // Memoizar valores calculados
-  const placeholderImage = useMemo(() => 'http://127.0.0.1:8000/img/logo2.jpg', []);
+  const placeholderImage = useMemo(() => '/img/logo2.jpg', []);
   
   const currentImage = useMemo(() => {
-    return imagePaths.length > 0 ? imagePaths[activeImageIndex] : placeholderImage;
-  }, [imagePaths, activeImageIndex, placeholderImage]);
+    if (imagePaths.length > 0) {
+      return imagePaths[activeImageIndex];
+    }
+    if (searchedForPaths) {
+      return placeholderImage;
+    }
+    return null;
+  }, [imagePaths, activeImageIndex, searchedForPaths, placeholderImage]);
 
   // Memoizar handlers
   const handleImageLoad = useCallback(() => {
@@ -136,7 +144,7 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
       </div>
       
       {/* Imagen de fondo que rota - solo carga cuando es visible */}
-      {isVisible && (
+      {isVisible && currentImage && (
         <>
           <img 
             src={currentImage}
