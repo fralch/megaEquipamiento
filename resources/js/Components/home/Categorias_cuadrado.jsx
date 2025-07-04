@@ -107,7 +107,7 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
   }, [imagePaths.length, isVisible]);
 
   // Memoizar valores calculados
-  const placeholderImage = useMemo(() => 'https://aringenieriaa.com/storage/servicio/125456545.jpg', []);
+  const placeholderImage = useMemo(() => 'http://127.0.0.1:8000/img/logo2.jpg', []);
   
   const currentImage = useMemo(() => {
     return imagePaths.length > 0 ? imagePaths[activeImageIndex] : placeholderImage;
@@ -123,12 +123,15 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
       ref={cardRef} 
       className={`relative group w-full h-96 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}
     >
-      {/* Placeholder mientras carga */}
+      {/* Loading skeleton mientras carga */}
       <div 
         className={`absolute inset-0 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'} transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
       >
-        <div className="h-full w-full flex justify-center items-center">
-          <div className={`animate-pulse h-8 w-8 ${isDarkMode ? 'bg-gray-600' : 'bg-gray-400'} rounded-full`}></div>
+        <div className="h-full w-full flex flex-col justify-center items-center">
+          {/* Spinner de carga */}
+          <div className={`animate-spin rounded-full h-8 w-8 border-2 border-t-transparent mb-3 ${isDarkMode ? 'border-gray-600' : 'border-gray-400'}`}></div>
+          {/* Texto de carga */}
+          <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Cargando...</p>
         </div>
       </div>
       
@@ -138,9 +141,10 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
           <img 
             src={currentImage}
             alt={`${title} background`}
-            className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 transform group-hover:scale-110 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 w-full h-full object-center transition-all duration-500 transform group-hover:scale-110 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
             onLoad={handleImageLoad}
             loading="lazy"
+            style={{ objectFit: currentImage === placeholderImage ? 'contain' : 'cover' }}
           />
           
           {/* Título visible por defecto pero desaparece con hover */}
