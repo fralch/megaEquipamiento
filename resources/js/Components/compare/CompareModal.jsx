@@ -144,53 +144,106 @@ const CompareModal = ({ isOpen, onClose }) => {
                     ))}
                   </tr>
 
-                  {/* Características */}
-                  {(() => {                    
+                  {/* Características dinámicas */}
+                  {(() => {
+                    // DEBUG: Log completo de cada producto
+                    console.log('=== DEBUG COMPARE MODAL ===');
                     compareList.forEach((product, index) => {
-                      console.log(`Producto ${index + 1}:`, {
+                      console.log(`🔍 Producto ${index + 1}:`, {
                         id: product.id,
                         nombre: product.nombre,
-                        caracteristicas: product.caracteristicas
+                        caracteristicas: product.caracteristicas,
+                        tipo_caracteristicas: typeof product.caracteristicas,
+                        keys_caracteristicas: product.caracteristicas ? Object.keys(product.caracteristicas) : 'No tiene características'
                       });
                     });
                     
-                    return compareList.some(product => product.caracteristicas && Object.keys(product.caracteristicas).length > 0);
-                  })() && (
-                    <>
-                      {/* Obtener todas las características únicas */}
-                      {(() => {
-                        const allCharacteristics = new Set();
-                        compareList.forEach(product => {
-                          if (product.caracteristicas && typeof product.caracteristicas === 'object') {
-                            Object.keys(product.caracteristicas).forEach(key => {
-                              allCharacteristics.add(key);
-                            });
-                          }
+                    // Obtener todas las características únicas
+                    const allCharacteristics = new Set();
+                    const characteristicsByProduct = {};
+                    
+                    compareList.forEach((product, productIndex) => {
+                      characteristicsByProduct[product.id] = {};
+                      
+                      if (product.caracteristicas && typeof product.caracteristicas === 'object') {
+                        Object.keys(product.caracteristicas).forEach(key => {
+                          // Normalizar la clave (lowercase, sin espacios al inicio/final, y reemplazar espacios internos con _)
+                          const normalizedKey = key.toLowerCase().trim().replace(/\s+/g, '_');
+                          
+                          // Limpiar el valor: convertir a minúsculas y eliminar espacios adelante y atrás
+                          const cleanValue = typeof product.caracteristicas[key] === 'string' 
+                            ? product.caracteristicas[key].trim().toLowerCase()
+                            : product.caracteristicas[key];
+                          
+                          // Clave original limpia para mostrar (mantener capitalización para display)
+                          const cleanOriginalKey = key.trim();
+                          
+                          console.log(`🧹 Normalizando: "${key}" -> "${normalizedKey}"`);
+                          console.log(`🧹 Limpiando valor: "${product.caracteristicas[key]}" -> "${cleanValue}"`);
+                          
+                          allCharacteristics.add(normalizedKey);
+                          characteristicsByProduct[product.id][normalizedKey] = {
+                            originalKey: cleanOriginalKey,
+                            value: cleanValue
+                          };
                         });
-                        
-                        return Array.from(allCharacteristics).map(characteristic => (
-                          <tr key={characteristic} className={isDarkMode ? 'border-gray-700' : 'border-gray-200'}>
-                            <td className={`p-4 border-b font-medium ${
-                              isDarkMode ? 'border-gray-700 text-gray-300' : 'border-gray-200 text-gray-700'
-                            }`}>
-                              {characteristic.charAt(0).toUpperCase() + characteristic.slice(1).replace(/_/g, ' ')}
-                            </td>
-                            {compareList.map((product) => (
+                      }
+                    });
+
+                    console.log('🎯 Características únicas encontradas:', Array.from(allCharacteristics));
+                    console.log('📊 Características por producto:', characteristicsByProduct);
+
+                    // Filtrar características que no deben mostrarse aquí (evitar duplicados)
+                    const excludedCharacteristics = ['marca', 'procedencia'];
+                    const filteredCharacteristics = Array.from(allCharacteristics).filter(
+                      char => !excludedCharacteristics.includes(char)
+                    );
+
+                    console.log('✅ Características a mostrar (filtradas):', filteredCharacteristics);
+
+                    // Verificar si hay características para mostrar
+                    if (filteredCharacteristics.length === 0) {
+                      console.log('⚠️ No hay características dinámicas para mostrar');
+                      return null;
+                    }
+
+                    return filteredCharacteristics.map(normalizedCharacteristic => {
+                      // Obtener el nombre original de la característica del primer producto que la tenga
+                      let displayName = normalizedCharacteristic;
+                      for (const productId in characteristicsByProduct) {
+                        if (characteristicsByProduct[productId][normalizedCharacteristic]) {
+                          displayName = characteristicsByProduct[productId][normalizedCharacteristic].originalKey;
+                          break;
+                        }
+                      }
+
+                      console.log(`🏷️ Renderizando característica: ${normalizedCharacteristic} -> ${displayName}`);
+
+                      return (
+                        <tr key={normalizedCharacteristic} className={isDarkMode ? 'border-gray-700' : 'border-gray-200'}>
+                          <td className={`p-4 border-b font-medium ${
+                            isDarkMode ? 'border-gray-700 text-gray-300' : 'border-gray-200 text-gray-700'
+                          }`}>
+                            {displayName.charAt(0).toUpperCase() + displayName.slice(1).replace(/_/g, ' ')}
+                          </td>
+                          {compareList.map((product) => {
+                            const productChar = characteristicsByProduct[product.id][normalizedCharacteristic];
+                            const value = productChar ? productChar.value : 'No especificado';
+                            
+                            console.log(`  🔍 Product ${product.nombre}: ${normalizedCharacteristic} = "${value}"`);
+                            
+                            return (
                               <td key={product.id} className={`p-4 border-b text-center text-sm ${
                                 isDarkMode ? 'border-gray-700 text-gray-300' : 'border-gray-200 text-gray-600'
                               }`}>
-                                {product.caracteristicas && product.caracteristicas[characteristic] 
-                                  ? product.caracteristicas[characteristic] 
-                                  : 'No especificado'
-                                }
+                                {value}
                               </td>
-                            ))}
-                          </tr>
-                        ));
-                      })()
-                      }
-                    </>
-                  )}
+                            );
+                          })}
+                        </tr>
+                      );
+                    });
+                  })()}
 
                   {/* Marca */}
                   <tr className={isDarkMode ? 'border-gray-700' : 'border-gray-200'}>
@@ -208,7 +261,33 @@ const CompareModal = ({ isOpen, onClose }) => {
                     ))}
                   </tr>
 
-
+                  {/* Procedencia */}
+                  <tr className={isDarkMode ? 'border-gray-700' : 'border-gray-200'}>
+                    <td className={`p-4 border-b font-medium ${
+                      isDarkMode ? 'border-gray-700 text-gray-300' : 'border-gray-200 text-gray-700'
+                    }`}>
+                      Procedencia
+                    </td>
+                    {compareList.map((product) => {
+                      // Buscar procedencia en características o como campo directo
+                      let procedencia = 'No especificada';
+                      if (product.procedencia) {
+                        procedencia = product.procedencia;
+                      } else if (product.caracteristicas && product.caracteristicas.procedencia) {
+                        procedencia = product.caracteristicas.procedencia;
+                      } else if (product.caracteristicas && product.caracteristicas.Procedencia) {
+                        procedencia = product.caracteristicas.Procedencia;
+                      }
+                      
+                      return (
+                        <td key={product.id} className={`p-4 border-b text-center ${
+                          isDarkMode ? 'border-gray-700 text-white' : 'border-gray-200 text-gray-900'
+                        }`}>
+                          {procedencia}
+                        </td>
+                      );
+                    })}
+                  </tr>
                 </tbody>
               </table>
             </div>
