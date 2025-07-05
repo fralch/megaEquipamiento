@@ -4,6 +4,7 @@ import { Link, usePage } from "@inertiajs/react";
 import { useTheme } from '../../storage/ThemeContext';
 import { CartContext } from '../../storage/CartContext';
 import { useCurrency } from '../../storage/CurrencyContext';
+import { useCompare } from '../../hooks/useCompare';
 
 const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = [], onSave, onClose, isPendingRelation = false }) => {
     const { isDarkMode } = useTheme();
@@ -204,6 +205,7 @@ const RelatedProducts = ({ productId }) => {
     const { isDarkMode } = useTheme();
     const { formatPrice } = useCurrency();
     const { cart, dispatch } = useContext(CartContext);
+    const { addToCompare, isInCompare, canAddMore } = useCompare();
     const { auth } = usePage().props;
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [relationTypes, setRelationTypes] = useState([]);
@@ -376,6 +378,37 @@ const RelatedProducts = ({ productId }) => {
         }
     }, [dispatch]);
 
+    // Función para comparar
+    const handleCompare = useCallback((e, product) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const productForCompare = {
+            id: product.id_producto,
+            nombre: product.nombre,
+            precio: parseFloat(product.precio_sin_ganancia || 0),
+            descripcion: product.descripcion,
+            imagen: Array.isArray(product.imagen) 
+                ? (product.imagen[0]?.startsWith('http') ? product.imagen[0] : `/${product.imagen[0]}`)
+                : (product.imagen?.startsWith('http') ? product.imagen : `/${product.imagen}`),
+            stock: 1, // Asumiendo stock disponible
+            especificaciones_tecnicas: product.especificaciones_tecnicas || product.caracteristicas || {},
+            caracteristicas: product.caracteristicas || {},
+            marca: {
+                nombre: product.marca?.nombre || ''
+            }
+        };
+        
+        if (isInCompare(product.id_producto)) {
+            alert('Este producto ya está en el comparador');
+        } else if (canAddMore) {
+            addToCompare(productForCompare);
+            alert(`${product.nombre} agregado al comparador`);
+        } else {
+            alert('Máximo 4 productos para comparar. Elimina uno para agregar otro.');
+        }
+    }, [addToCompare, isInCompare, canAddMore]);
+
     const renderProductCard = (product, isPending = false) => {
         const showDetails = hoveredProductId === product.id_producto;
         
@@ -538,24 +571,11 @@ const RelatedProducts = ({ productId }) => {
                                 </div>
                             )}
                             
-                            {/* Precio destacado */}
-                            <div className="mb-4">
-                                <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-blue-300' : 'text-blue-300'
-                                }`}>Precio</h3>
-                                <p className={`text-2xl font-bold transition-colors duration-300 ${
-                                    isDarkMode ? 'text-blue-400' : 'text-blue-400'
-                                }`}>
-                                    {formatPrice(product.precio_sin_ganancia)}
-                                </p>
-                                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-300'}`}>
-                                    SKU: {product.sku}
-                                </p>
-                            </div>
+                           
                         </div>
                         
-                        {/* Botón para añadir al carrito */}
-                        <div className="mt-auto">
+                        {/* Botones de acción */}
+                        <div className="mt-auto space-y-2">
                             <button
                                 onClick={(e) => handleAddToCart(e, product)}
                                 className={`w-full font-bold py-2 px-4 rounded-md transition-all duration-300 ${
@@ -566,28 +586,36 @@ const RelatedProducts = ({ productId }) => {
                             >
                                 Añadir al Carrito
                             </button>
+                            <button 
+                                onClick={(e) => handleCompare(e, product)}
+                                className={`w-full font-bold py-2 px-4 rounded-md transition-all duration-300 ${
+                                    isInCompare(product.id_producto)
+                                        ? isDarkMode 
+                                         ? 'bg-gray-00 hover:bg-gray-700 text-white hover:shadow-lg'  
+                                            : 'bg-gray-900 hover:bg-gray-900 text-white hover:shadow-lg'   
+                                          
+                                        : isDarkMode 
+                                          ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg' 
+                                            : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
+                                           
+                                } ${
+                                    !canAddMore && !isInCompare(product.id_producto) ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
+                                disabled={!canAddMore && !isInCompare(product.id_producto)}
+                            >
+                                {isInCompare(product.id_producto) ? 'En Comparador' : 'Comparar'}
+                            </button>
                         </div>
                     </div>
                 )}
                 
                 {/* Botones de acción en la parte inferior */}
-                <div className={`px-5 pb-4 ${
+                <div className={`px-5 pb-4 space-y-2 ${
                     isDarkMode 
                         ? 'bg-slate-800' 
                         : 'bg-white'
                 }`}>
-                    {/* Botón de carrito - visible para todos */}
-                    <button
-                        onClick={(e) => handleAddToCart(e, product)}
-                        className={`w-full text-sm font-semibold py-2 px-4 rounded-lg transition-all duration-200 mb-2 ${
-                            isDarkMode 
-                                ? 'bg-green-600 hover:bg-green-700 text-white'
-                                : 'bg-green-600 hover:bg-green-700 text-white'
-                        }`}
-                    >
-                        Añadir al Carrito
-                    </button>
-                    
+                                   
                     {/* Botón de administración - Solo visible si está logueado */}
                     {auth.user && (
                         <button
