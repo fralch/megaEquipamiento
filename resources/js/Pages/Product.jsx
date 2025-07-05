@@ -10,6 +10,7 @@ import Modal_Features from "./assets/modal_features";
 import { useTheme } from '../storage/ThemeContext';
 import { useCurrency } from '../storage/CurrencyContext';
 import { CartContext } from '../storage/CartContext';
+import { useRecentlyViewed } from '../storage/RecentlyViewedContext';
 import axios from "axios";
 
 // Importar componentes modulares
@@ -29,8 +30,31 @@ const ProductPage = ({ producto }) => {
     console.log("producto", producto);
     const { isDarkMode } = useTheme();
     const { formatPrice } = useCurrency();
+    const { addRecentlyViewed } = useRecentlyViewed();
     const [categoriaCurrent, setCategoriaCurrent] = useState(null);
     const [subcategoriaCurrent, setSubcategoriaCurrent] = useState(null);
+
+    // Agregar producto a la lista de vistos recientemente cuando se carga la página
+    useEffect(() => {
+        if (producto && producto.id_producto) {
+            const productForRecent = {
+                id: producto.id_producto,
+                title: producto.nombre,
+                image: Array.isArray(producto.imagen) 
+                    ? (producto.imagen[0]?.startsWith('http') ? producto.imagen[0] : `/${producto.imagen[0]}`)
+                    : (producto.imagen?.startsWith('http') ? producto.imagen : `/${producto.imagen}`),
+                price: parseFloat(producto.precio_sin_ganancia || 0),
+                priceWithoutProfit: parseFloat(producto.precio_sin_ganancia || 0),
+                priceWithProfit: parseFloat(producto.precio_ganancia || 0),
+                sku: producto.sku,
+                descripcion: producto.descripcion,
+                marca: producto.marca || { nombre: '' },
+                link: `/producto/${producto.id_producto}`
+            };
+            
+            addRecentlyViewed(productForRecent);
+        }
+    }, [producto]);
 
     useEffect(() => {
         const fetchCategoryData = async () => {
