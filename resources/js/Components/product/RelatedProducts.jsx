@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link, usePage } from "@inertiajs/react";
 import { useTheme } from '../../storage/ThemeContext';
+import { useCurrency } from '../../storage/CurrencyContext';
 
 const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = [], onSave, onClose, isPendingRelation = false }) => {
     const { isDarkMode } = useTheme();
@@ -200,6 +201,7 @@ const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = []
 
 const RelatedProducts = ({ productId }) => {
     const { isDarkMode } = useTheme();
+    const { formatPrice } = useCurrency();
     const { auth } = usePage().props;
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [relationTypes, setRelationTypes] = useState([]);
@@ -423,7 +425,7 @@ const RelatedProducts = ({ productId }) => {
                         {/* Precio y SKU */}
                         <div className="border-t border-slate-600 pt-3">
                             <div className="flex justify-between items-center mb-2">
-                                <span className="text-2xl font-bold text-blue-400">S/ {product.precio_sin_ganancia}</span>
+                                <span className="text-2xl font-bold text-blue-400">{formatPrice(product.precio_sin_ganancia)}</span>
                             </div>
                             <div className="text-xs text-gray-400">
                                 SKU: {product.sku}
@@ -515,7 +517,7 @@ const RelatedProducts = ({ productId }) => {
                                 <p className={`text-2xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-blue-400' : 'text-blue-400'
                                 }`}>
-                                    S/ {product.precio_sin_ganancia}
+                                    {formatPrice(product.precio_sin_ganancia)}
                                 </p>
                                 <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-300'}`}>
                                     SKU: {product.sku}
