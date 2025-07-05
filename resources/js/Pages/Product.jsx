@@ -1319,9 +1319,14 @@ const ProductPage = ({ producto }) => {
                                                         {/* Área de imagen con fondo adaptable */}
                                                         <div className={`h-40 overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
                                                             <img 
-                                                                src={product.image || '/api/placeholder/300/200'}
+                                                                src={product.image ? product.image : '/img/logo2.jpg'}
                                                                 alt={product.title} 
                                                                 className="w-full h-full object-contain p-4"
+                                                                onError={(e) => {
+                                                                    if (e.target.src !== '/img/logo2.jpg') {
+                                                                        e.target.src = '/img/logo2.jpg';
+                                                                    }
+                                                                }}
                                                             />
                                                         </div>
                                                         
@@ -1423,20 +1428,7 @@ const ProductPage = ({ producto }) => {
                                                                     }`}>{product.descripcion}</p>
                                                                 </div>
                                                             )}
-                                                            
-                                                            {/* Precio destacado */}
-                                                            <div className="mb-4">
-                                                                <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                                                    isDarkMode ? 'text-blue-300' : 'text-blue-300'
-                                                                }`}>Precio</h3>
-                                                                <p className={`text-2xl font-bold transition-colors duration-300 ${
-                                                                    isDarkMode ? 'text-blue-400' : 'text-blue-400'
-                                                                }`}>
-                                                                    {formatPrice(product.priceWithoutProfit)}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        
+                                                        </div>                                                       
                                                         {/* Botones de acción */}
                                                         <div className="mt-auto space-y-2">
                                                             <button

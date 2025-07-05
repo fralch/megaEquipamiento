@@ -6,7 +6,7 @@ import { useCurrency } from '../../storage/CurrencyContext';
 import { useCompare } from '../../hooks/useCompare';
 
 const URL_API = import.meta.env.VITE_API_URL;
-const FALLBACK_IMAGE = 'https://megaequipamiento.com/wp-content/uploads/2024/08/MEGA-LOGO.webp';
+const FALLBACK_IMAGE = '/img/logo2.jpg';
 const IMAGE_TIMEOUT = 3000; // 3 segundos timeout para imágenes
 
 // Currency formatting function moved to CurrencyContext
