@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import axios from "axios";
 import { Link, usePage } from "@inertiajs/react";
 import { useTheme } from '../../storage/ThemeContext';
+import { CartContext } from '../../storage/CartContext';
 import { useCurrency } from '../../storage/CurrencyContext';
 
 const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = [], onSave, onClose, isPendingRelation = false }) => {
@@ -202,6 +203,7 @@ const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = []
 const RelatedProducts = ({ productId }) => {
     const { isDarkMode } = useTheme();
     const { formatPrice } = useCurrency();
+    const { cart, dispatch } = useContext(CartContext);
     const { auth } = usePage().props;
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [relationTypes, setRelationTypes] = useState([]);
@@ -346,6 +348,33 @@ const RelatedProducts = ({ productId }) => {
             setIsDeleting(false);
         }
     };
+
+    // Función para añadir al carrito
+    const handleAddToCart = useCallback((e, product) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+            // Transformar los datos del producto para que coincidan con el formato del carrito
+            const cartProduct = {
+                id: product.id_producto,
+                title: product.nombre,
+                image: Array.isArray(product.imagen) 
+                    ? (product.imagen[0]?.startsWith('http') ? product.imagen[0] : `/${product.imagen[0]}`)
+                    : (product.imagen?.startsWith('http') ? product.imagen : `/${product.imagen}`),
+                price: parseFloat(product.precio_igv || product.precio_sin_ganancia || 0),
+                priceWithoutProfit: parseFloat(product.precio_sin_ganancia || 0),
+                priceWithProfit: parseFloat(product.precio_ganancia || 0)
+            };
+            
+            dispatch({ type: 'ADD', product: cartProduct });
+            console.log('Adding to cart:', cartProduct);
+            alert(`${product.nombre} añadido al carrito!`);
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            alert('Error al añadir al carrito');
+        }
+    }, [dispatch]);
 
     const renderProductCard = (product, isPending = false) => {
         const showDetails = hoveredProductId === product.id_producto;
@@ -525,30 +554,42 @@ const RelatedProducts = ({ productId }) => {
                             </div>
                         </div>
                         
-                        {/* Botón para ver más detalles */}
+                        {/* Botón para añadir al carrito */}
                         <div className="mt-auto">
-                            <a
-                                href={`/producto/${product.id_producto}`}
-                                className={`w-full block text-center font-bold py-2 px-4 rounded-md transition-all duration-300 ${
+                            <button
+                                onClick={(e) => handleAddToCart(e, product)}
+                                className={`w-full font-bold py-2 px-4 rounded-md transition-all duration-300 ${
                                     isDarkMode 
-                                        ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg' 
-                                        : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
+                                        ? 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg' 
+                                        : 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg'
                                 }`}
-                                onClick={(e) => e.stopPropagation()}
                             >
-                                Ver Detalles Completos
-                            </a>
+                                Añadir al Carrito
+                            </button>
                         </div>
                     </div>
                 )}
                 
-                {/* Botón de acción - Solo visible si está logueado */}
-                {auth.user && (
-                    <div className={`px-5 pb-4 ${
-                        isDarkMode 
-                            ? 'bg-slate-800' 
-                            : 'bg-white'
-                    }`}>
+                {/* Botones de acción en la parte inferior */}
+                <div className={`px-5 pb-4 ${
+                    isDarkMode 
+                        ? 'bg-slate-800' 
+                        : 'bg-white'
+                }`}>
+                    {/* Botón de carrito - visible para todos */}
+                    <button
+                        onClick={(e) => handleAddToCart(e, product)}
+                        className={`w-full text-sm font-semibold py-2 px-4 rounded-lg transition-all duration-200 mb-2 ${
+                            isDarkMode 
+                                ? 'bg-green-600 hover:bg-green-700 text-white'
+                                : 'bg-green-600 hover:bg-green-700 text-white'
+                        }`}
+                    >
+                        Añadir al Carrito
+                    </button>
+                    
+                    {/* Botón de administración - Solo visible si está logueado */}
+                    {auth.user && (
                         <button
                             onClick={(e) => {
                                 e.preventDefault();
@@ -571,8 +612,8 @@ const RelatedProducts = ({ productId }) => {
                         >
                             {isPending ? 'Establecer Relación' : (isDeleting ? 'Eliminando...' : 'Eliminar Relación')}
                         </button>
-                    </div>
-                )}
+                    )}
+                </div>
                 
                 {/* CSS para el scrollbar personalizado */}
                 <style>{`
