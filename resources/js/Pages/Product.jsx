@@ -11,6 +11,7 @@ import { useTheme } from '../storage/ThemeContext';
 import { useCurrency } from '../storage/CurrencyContext';
 import { CartContext } from '../storage/CartContext';
 import { useRecentlyViewed } from '../storage/RecentlyViewedContext';
+import { useCompare } from '../hooks/useCompare';
 import axios from "axios";
 
 // Importar componentes modulares
@@ -31,8 +32,11 @@ const ProductPage = ({ producto }) => {
     const { isDarkMode } = useTheme();
     const { formatPrice } = useCurrency();
     const { addRecentlyViewed, getRecentlyViewed } = useRecentlyViewed();
+    const { dispatch } = useContext(CartContext);
+    const { addToCompare, isInCompare, canAddMore } = useCompare();
     const [categoriaCurrent, setCategoriaCurrent] = useState(null);
     const [subcategoriaCurrent, setSubcategoriaCurrent] = useState(null);
+    const [hoveredRecentProductId, setHoveredRecentProductId] = useState(null);
 
     // Agregar producto a la lista de vistos recientemente cuando se carga la página
     useEffect(() => {
@@ -86,6 +90,57 @@ const ProductPage = ({ producto }) => {
     const [videoPreview, setVideoPreview] = useState(''); // Estado para la previsualización del video
     const [showRecentlyViewed, setShowRecentlyViewed] = useState(false); // Estado para mostrar productos vistos recientemente
 
+    // Función para añadir al carrito desde productos vistos recientemente
+    const handleAddToCartRecent = useCallback((e, product) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+            const cartProduct = {
+                id: product.id,
+                title: product.title,
+                image: product.image,
+                price: product.price,
+                priceWithoutProfit: product.priceWithoutProfit,
+                priceWithProfit: product.priceWithProfit
+            };
+            
+            dispatch({ type: 'ADD', product: cartProduct });
+            console.log('Adding to cart:', cartProduct);
+            alert(`${product.title} añadido al carrito!`);
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            alert('Error al añadir al carrito');
+        }
+    }, [dispatch]);
+
+    // Función para comparar desde productos vistos recientemente
+    const handleCompareRecent = useCallback((e, product) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const productForCompare = {
+            id: product.id,
+            nombre: product.title,
+            precio: product.priceWithoutProfit,
+            descripcion: product.descripcion,
+            imagen: product.image,
+            stock: 1,
+            especificaciones_tecnicas: {},
+            caracteristicas: {},
+            marca: product.marca || { nombre: '' }
+        };
+        
+        if (isInCompare(product.id)) {
+            alert('Este producto ya está en el comparador');
+        } else if (canAddMore) {
+            addToCompare(productForCompare);
+            alert(`${product.title} agregado al comparador`);
+        } else {
+            alert('Máximo 4 productos para comparar. Elimina uno para agregar otro.');
+        }
+    }, [addToCompare, isInCompare, canAddMore]);
+
     const [productData, setProductData] = useState({
         ...producto,
         caracteristicas: typeof producto.caracteristicas === 'string' ? JSON.parse(producto.caracteristicas) : producto.caracteristicas || {},
@@ -97,9 +152,6 @@ const ProductPage = ({ producto }) => {
         especificaciones_tecnicas: producto.especificaciones_tecnicas || '',
         relatedProducts: producto.relatedProducts || [] // Se asume que vienen desde el servidor o se inicializa con un array vacío
     });
-
-    // Contexto del carrito
-    const { dispatch } = useContext(CartContext);
 
     // Función para añadir al carrito
     const handleAddToCart = useCallback((e) => {
@@ -1231,63 +1283,251 @@ const ProductPage = ({ producto }) => {
                     </div>
 
                     {/* Productos Vistos Recientemente */}
-                    <div className="mt-8">
-                        <h3 className="text-2xl font-bold mb-6 text-center">Productos Vistos Recientemente</h3>
+                    <div className={`py-6 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+                        <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                            Productos Vistos Recientemente
+                        </h2>
                         {(() => {
-                            const recentProducts = getRecentlyViewed();
+                            const recentProducts = getRecentlyViewed().filter(product => product.id !== producto.id_producto);
+                            
                             if (recentProducts.length === 0) {
                                 return (
-                                    <div className="text-gray-500 text-center py-8">
-                                        <p>No hay productos vistos recientemente</p>
+                                    <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        No hay productos vistos recientemente.
                                     </div>
                                 );
                             }
+                            
                             return (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    {recentProducts.slice(0, 8).map((product, index) => (
-                                        <div key={product.id} className="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
-                                            <div className="aspect-square relative">
-                                                <img 
-                                                    src={product.image || '/placeholder.jpg'} 
-                                                    alt={product.title}
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) => {
-                                                        e.target.src = '/placeholder.jpg';
-                                                    }}
-                                                />
-                                            </div>
-                                            <div className="p-4">
-                                                <h4 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
-                                                    {product.title}
-                                                </h4>
-                                                <p className="text-xs text-gray-500 mb-1">
-                                                    SKU: {product.sku || 'N/A'}
-                                                </p>
-                                                <p className="text-xs text-gray-500 mb-2">
-                                                    {product.marca?.nombre || 'Sin marca'}
-                                                </p>
-                                                <div className="mb-3">
-                                                    <p className="text-lg font-bold text-green-600">
-                                                        {formatPrice(product.priceWithoutProfit)}
-                                                    </p>
-                                                    {product.priceWithProfit && (
-                                                        <p className="text-sm text-gray-500">
-                                                            Con ganancia: {formatPrice(product.priceWithProfit)}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                                <p className="text-xs text-gray-400 mb-3">
-                                                    Visto: {new Date(product.viewedAt).toLocaleDateString()}
-                                                </p>
-                                                <Link 
-                                                    href={product.link}
-                                                    className="block w-full text-center bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 text-sm font-medium"
-                                                >
-                                                    Ver producto
+                                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                                    {recentProducts.slice(0, 6).map((product) => {
+                                        const showDetails = hoveredRecentProductId === product.id;
+                                        
+                                        return (
+                                            <div 
+                                                key={product.id} 
+                                                className={`${
+                                                    isDarkMode 
+                                                        ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600' 
+                                                        : 'bg-white border-gray-200 shadow-lg'
+                                                } rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 border relative`}
+                                                onMouseEnter={() => setHoveredRecentProductId(product.id)}
+                                                onMouseLeave={() => setHoveredRecentProductId(null)}
+                                            >
+                                                <Link href={product.link}>
+                                                    <div className="relative">
+                                                        {/* Área de imagen con fondo adaptable */}
+                                                        <div className={`h-40 overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                                            <img 
+                                                                src={product.image || '/api/placeholder/300/200'}
+                                                                alt={product.title} 
+                                                                className="w-full h-full object-contain p-4"
+                                                            />
+                                                        </div>
+                                                        
+                                                        {/* Badge de marca */}
+                                                        <div className="absolute top-3 left-3">
+                                                            <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
+                                                                {product.marca?.nombre || 'PRODUCTO'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    {/* Área de información del producto */}
+                                                    <div className={`p-5 ${
+                                                        isDarkMode 
+                                                            ? 'bg-slate-800 text-white' 
+                                                            : 'bg-white text-gray-800'
+                                                    }`}>
+                                                        <h3 className="text-lg font-bold mb-2 leading-tight" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>
+                                                            {product.title}
+                                                        </h3>
+                                                        
+                                                        {/* Fecha de visualización */}
+                                                        <div className="space-y-2 mb-4">
+                                                            <div className="flex justify-between items-center text-sm">
+                                                                <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Visto:</span>
+                                                                <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
+                                                                    {new Date(product.viewedAt).toLocaleDateString()}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center text-sm">
+                                                                <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>SKU:</span>
+                                                                <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
+                                                                    {product.sku || 'N/A'}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {/* Precio y SKU */}
+                                                        <div className="border-t border-slate-600 pt-3">
+                                                            <div className="flex justify-between items-center mb-2">
+                                                                <span className="text-2xl font-bold text-blue-400">{formatPrice(product.priceWithoutProfit)}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </Link>
+                                                
+                                                {/* Overlay con información detallada para usuarios no autenticados */}
+                                                {!auth.user && showDetails && (
+                                                    <div 
+                                                        className={`absolute inset-0 bg-opacity-95 flex flex-col justify-start z-20 p-4 cursor-pointer transition-all duration-300 ${
+                                                            isDarkMode 
+                                                                ? 'bg-gray-900 text-gray-100' 
+                                                                : 'bg-gray-800 text-white'
+                                                        }`}
+                                                        onClick={(e) => {
+                                                            if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a') {
+                                                                e.stopPropagation();
+                                                            } else {
+                                                                window.location.href = product.link;
+                                                            }
+                                                        }}
+                                                    >
+                                                        <a 
+                                                            href={product.link}
+                                                            className={`text-xl font-semibold mb-2 text-center transition-colors cursor-pointer ${
+                                                                isDarkMode 
+                                                                    ? 'hover:text-blue-300 text-gray-100' 
+                                                                    : 'hover:text-blue-300 text-white'
+                                                            }`}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            {product.title}
+                                                        </a>
+                                                        
+                                                        {/* Contenedor con scroll */}
+                                                        <div className="flex-grow overflow-y-auto mb-4 pr-2 custom-scrollbar">
+                                                            {/* Información del producto visto recientemente */}
+                                                            <div className="mb-4">
+                                                                <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                                                                }`}>Información</h3>
+                                                                <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-gray-200' : 'text-gray-300'
+                                                                }`}>
+                                                                    <p><strong>SKU:</strong> {product.sku || 'N/A'}</p>
+                                                                    <p><strong>Marca:</strong> {product.marca?.nombre || 'Sin marca'}</p>
+                                                                    <p><strong>Visto:</strong> {new Date(product.viewedAt).toLocaleDateString()}</p>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            {/* Descripción del producto */}
+                                                            {product.descripcion && (
+                                                                <div className="mb-4">
+                                                                    <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                                                        isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                                                                    }`}>Descripción</h3>
+                                                                    <p className={`text-sm transition-colors duration-300 ${
+                                                                        isDarkMode ? 'text-gray-100' : 'text-gray-200'
+                                                                    }`}>{product.descripcion}</p>
+                                                                </div>
+                                                            )}
+                                                            
+                                                            {/* Precio destacado */}
+                                                            <div className="mb-4">
+                                                                <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                                                                }`}>Precio</h3>
+                                                                <p className={`text-2xl font-bold transition-colors duration-300 ${
+                                                                    isDarkMode ? 'text-blue-400' : 'text-blue-400'
+                                                                }`}>
+                                                                    {formatPrice(product.priceWithoutProfit)}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        {/* Botones de acción */}
+                                                        <div className="mt-auto space-y-2">
+                                                            <button
+                                                                onClick={(e) => handleAddToCartRecent(e, product)}
+                                                                className={`w-full font-bold py-2 px-4 rounded-md transition-all duration-300 ${
+                                                                    isDarkMode 
+                                                                        ? 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg' 
+                                                                        : 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg'
+                                                                }`}
+                                                            >
+                                                                Añadir al Carrito
+                                                            </button>
+                                                            <button 
+                                                                onClick={(e) => handleCompareRecent(e, product)}
+                                                                className={`w-full font-bold py-2 px-4 rounded-md transition-all duration-300 ${
+                                                                    isInCompare(product.id)
+                                                                        ? isDarkMode 
+                                                                            ? 'bg-gray-600 hover:bg-gray-700 text-white hover:shadow-lg'  
+                                                                            : 'bg-gray-900 hover:bg-gray-900 text-white hover:shadow-lg'
+                                                                        : isDarkMode 
+                                                                            ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg' 
+                                                                            : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
+                                                                } ${
+                                                                    !canAddMore && !isInCompare(product.id) ? 'opacity-50 cursor-not-allowed' : ''
+                                                                }`}
+                                                                disabled={!canAddMore && !isInCompare(product.id)}
+                                                            >
+                                                                {isInCompare(product.id) ? 'En Comparador' : 'Comparar'}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                
+                                                {/* Botones de acción en la parte inferior */}
+                                                <div className={`px-5 pb-4 space-y-2 ${
+                                                    isDarkMode 
+                                                        ? 'bg-slate-800' 
+                                                        : 'bg-white'
+                                                }`}>
+                                                    {/* Botón de carrito - visible para todos */}
+                                                    <button
+                                                        onClick={(e) => handleAddToCartRecent(e, product)}
+                                                        className={`w-full text-sm font-semibold py-2 px-4 rounded-lg transition-all duration-200 ${
+                                                            isDarkMode 
+                                                                ? 'bg-green-600 hover:bg-green-700 text-white'
+                                                                : 'bg-green-600 hover:bg-green-700 text-white'
+                                                        }`}
+                                                    >
+                                                        Añadir al Carrito
+                                                    </button>
+                                                    
+                                                    {/* Botón de comparar - visible para todos */}
+                                                    <button 
+                                                        onClick={(e) => handleCompareRecent(e, product)}
+                                                        className={`w-full text-sm font-semibold py-2 px-4 rounded-lg transition-all duration-200 ${
+                                                            isInCompare(product.id)
+                                                                ? isDarkMode 
+                                                                    ? 'bg-blue-900 hover:bg-blue-900 text-white'
+                                                                    : 'bg-blue-900 hover:bg-blue-900 text-white'
+                                                                : isDarkMode 
+                                                                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                        } ${
+                                                            !canAddMore && !isInCompare(product.id) ? 'opacity-50 cursor-not-allowed' : ''
+                                                        }`}
+                                                        disabled={!canAddMore && !isInCompare(product.id)}
+                                                    >
+                                                        {isInCompare(product.id) ? 'En Comparador' : 'Comparar'}
+                                                    </button>
+                                                </div>
+                                                
+                                                {/* CSS para el scrollbar personalizado */}
+                                                <style>{`
+                                                    .custom-scrollbar::-webkit-scrollbar {
+                                                        width: 6px;
+                                                    }
+                                                    .custom-scrollbar::-webkit-scrollbar-track {
+                                                        background: ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'};
+                                                        border-radius: 10px;
+                                                    }
+                                                    .custom-scrollbar::-webkit-scrollbar-thumb {
+                                                        background: ${isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'};
+                                                        border-radius: 10px;
+                                                    }
+                                                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                                                        background: ${isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'};
+                                                    }
+                                                `}</style>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             );
                         })()}

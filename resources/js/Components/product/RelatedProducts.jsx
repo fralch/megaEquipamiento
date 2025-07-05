@@ -715,9 +715,7 @@ const RelatedProducts = ({ productId }) => {
                     Cargando productos relacionados...
                 </div>
             ) : relatedProducts.length === 0 ? (
-                <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    No hay productos relacionados disponibles.
-                </div>
+               <></>
             ) : (
                 relationTypes.map(type => (
                     renderProductGroup(type.nombre, groupedProducts[type.nombre])
