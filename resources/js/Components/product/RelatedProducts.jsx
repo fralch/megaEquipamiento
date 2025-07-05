@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { useTheme } from '../../storage/ThemeContext';
 
 const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = [], onSave, onClose, isPendingRelation = false }) => {
@@ -200,6 +200,7 @@ const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = []
 
 const RelatedProducts = ({ productId }) => {
     const { isDarkMode } = useTheme();
+    const { auth } = usePage().props;
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [relationTypes, setRelationTypes] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -422,35 +423,37 @@ const RelatedProducts = ({ productId }) => {
                 </div>
             </Link>
             
-            {/* Botón de acción */}
-            <div className={`px-5 pb-4 ${
-                isDarkMode 
-                    ? 'bg-slate-800' 
-                    : 'bg-white'
-            }`}>
-                <button
-                    onClick={(e) => {
-                        e.preventDefault();
-                        if (isPending) {
-                            openRelationModal(product.id_producto, true, product);
-                        } else {
-                            handleRemoveRelationDirectly(product);
-                        }
-                    }}
-                    disabled={isDeleting && !isPending}
-                    className={`w-full text-sm font-semibold py-2 px-4 rounded-lg transition-all duration-200 ${
-                        isPending
-                            ? isDarkMode 
-                                ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
-                                : 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                            : isDarkMode
-                                ? 'bg-red-700 hover:bg-red-800 text-white'
-                                : 'bg-red-600 hover:bg-red-700 text-white'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                    {isPending ? 'Establecer Relación' : (isDeleting ? 'Eliminando...' : 'Eliminar Relación')}
-                </button>
-            </div>
+            {/* Botón de acción - Solo visible si está logueado */}
+            {auth.user && (
+                <div className={`px-5 pb-4 ${
+                    isDarkMode 
+                        ? 'bg-slate-800' 
+                        : 'bg-white'
+                }`}>
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (isPending) {
+                                openRelationModal(product.id_producto, true, product);
+                            } else {
+                                handleRemoveRelationDirectly(product);
+                            }
+                        }}
+                        disabled={isDeleting && !isPending}
+                        className={`w-full text-sm font-semibold py-2 px-4 rounded-lg transition-all duration-200 ${
+                            isPending
+                                ? isDarkMode 
+                                    ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                                    : 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                                : isDarkMode
+                                    ? 'bg-red-700 hover:bg-red-800 text-white'
+                                    : 'bg-red-600 hover:bg-red-700 text-white'
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                        {isPending ? 'Establecer Relación' : (isDeleting ? 'Eliminando...' : 'Eliminar Relación')}
+                    </button>
+                </div>
+            )}
         </div>
     );
 
@@ -472,6 +475,7 @@ const RelatedProducts = ({ productId }) => {
     const renderPendingRelations = () => {
         if (loadingPending) return null;
         if (!filteredPendingRelations || filteredPendingRelations.length === 0) return null;
+        if (!auth.user) return null; // No mostrar si no está logueado
 
         return (
             <div className={`mb-8 p-4 rounded-lg border ${
