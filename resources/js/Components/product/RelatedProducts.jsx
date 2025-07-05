@@ -212,6 +212,7 @@ const RelatedProducts = ({ productId }) => {
     const [isPendingRelation, setIsPendingRelation] = useState(false);
     const [pendingProduct, setPendingProduct] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [hoveredProductId, setHoveredProductId] = useState(null);
 
     // Obtener tipos de relaciones y agrupar productos
     const groupedProducts = relationTypes.reduce((acc, type) => {
@@ -344,118 +345,253 @@ const RelatedProducts = ({ productId }) => {
         }
     };
 
-    const renderProductCard = (product, isPending = false) => (
-        <div key={product.id_producto} className={`${
-            isDarkMode 
-                ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600' 
-                : 'bg-white border-gray-200 shadow-lg'
-        } rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 border`}>
-            <Link href={`/producto/${product.id_producto}`}>
-                <div className="relative">
-                    {/* Área de imagen con fondo adaptable */}
-                    <div className={`h-40 overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                        <img 
-                            src={(
-                                Array.isArray(product.imagen) 
-                                    ? (product.imagen[0]?.startsWith('http') ? product.imagen[0] : `/${product.imagen[0]}`)
-                                    : (product.imagen?.startsWith('http') ? product.imagen : `/${product.imagen}`)
-                            ) || '/api/placeholder/300/200'}
-                            alt={product.nombre} 
-                            className="w-full h-full object-contain p-4"
-                        />
+    const renderProductCard = (product, isPending = false) => {
+        const showDetails = hoveredProductId === product.id_producto;
+        
+        return (
+            <div 
+                key={product.id_producto} 
+                className={`${
+                    isDarkMode 
+                        ? 'bg-gradient-to-br from-gray-800 to-gray-900 border-gray-600' 
+                        : 'bg-white border-gray-200 shadow-lg'
+                } rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 border relative`}
+                onMouseEnter={() => setHoveredProductId(product.id_producto)}
+                onMouseLeave={() => setHoveredProductId(null)}
+            >
+                <Link href={`/producto/${product.id_producto}`}>
+                    <div className="relative">
+                        {/* Área de imagen con fondo adaptable */}
+                        <div className={`h-40 overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                            <img 
+                                src={(
+                                    Array.isArray(product.imagen) 
+                                        ? (product.imagen[0]?.startsWith('http') ? product.imagen[0] : `/${product.imagen[0]}`)
+                                        : (product.imagen?.startsWith('http') ? product.imagen : `/${product.imagen}`)
+                                ) || '/api/placeholder/300/200'}
+                                alt={product.nombre} 
+                                className="w-full h-full object-contain p-4"
+                            />
+                        </div>
+                        
+                        {/* Badge de marca */}
+                        <div className="absolute top-3 left-3">
+                            <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
+                                {product.marca?.nombre || 'PRODUCTO'}
+                            </span>
+                        </div>
                     </div>
                     
-                    {/* Badge de marca */}
-                    <div className="absolute top-3 left-3">
-                        <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
-                            {product.marca?.nombre || 'PRODUCTO'}
-                        </span>
+                    {/* Área de información del producto */}
+                    <div className={`p-5 ${
+                        isDarkMode 
+                            ? 'bg-slate-800 text-white' 
+                            : 'bg-white text-gray-800'
+                    }`}>
+                        <h3 className="text-lg font-bold mb-2 leading-tight" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>
+                            {product.nombre}
+                        </h3>
+                        
+                        {/* Especificaciones técnicas */}
+                        <div className="space-y-2 mb-4">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Capacidad:</span>
+                                <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
+                                    {product.capacidad || '25 Litros'}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Velocidad:</span>
+                                <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
+                                    {product.velocidad || '1000 Rpm'}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Viscosidad:</span>
+                                <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
+                                    {product.viscosidad || '30000 mPa·s'}
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Torque:</span>
+                                <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
+                                    {product.torque || '40 Ncm'}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        {/* Precio y SKU */}
+                        <div className="border-t border-slate-600 pt-3">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-2xl font-bold text-blue-400">S/ {product.precio_sin_ganancia}</span>
+                            </div>
+                            <div className="text-xs text-gray-400">
+                                SKU: {product.sku}
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </Link>
                 
-                {/* Área de información del producto */}
-                <div className={`p-5 ${
-                    isDarkMode 
-                        ? 'bg-slate-800 text-white' 
-                        : 'bg-white text-gray-800'
-                }`}>
-                    <h3 className="text-lg font-bold mb-2 leading-tight" style={{display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>
-                        {product.nombre}
-                    </h3>
-                    
-                    {/* Especificaciones técnicas */}
-                    <div className="space-y-2 mb-4">
-                        <div className="flex justify-between items-center text-sm">
-                            <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Capacidad:</span>
-                            <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
-                                {product.capacidad || '25 Litros'}
-                            </span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Velocidad:</span>
-                            <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
-                                {product.velocidad || '1000 Rpm'}
-                            </span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Viscosidad:</span>
-                            <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
-                                {product.viscosidad || '30000 mPa·s'}
-                            </span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Torque:</span>
-                            <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
-                                {product.torque || '40 Ncm'}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    {/* Precio y SKU */}
-                    <div className="border-t border-slate-600 pt-3">
-                        <div className="flex justify-between items-center mb-2">
-                            <span className="text-2xl font-bold text-blue-400">S/ {product.precio_sin_ganancia}</span>
-                        </div>
-                        <div className="text-xs text-gray-400">
-                            SKU: {product.sku}
-                        </div>
-                    </div>
-                </div>
-            </Link>
-            
-            {/* Botón de acción - Solo visible si está logueado */}
-            {auth.user && (
-                <div className={`px-5 pb-4 ${
-                    isDarkMode 
-                        ? 'bg-slate-800' 
-                        : 'bg-white'
-                }`}>
-                    <button
+                {/* Overlay con información detallada para usuarios no autenticados */}
+                {!auth.user && showDetails && (
+                    <div 
+                        className={`absolute inset-0 bg-opacity-95 flex flex-col justify-start z-20 p-4 cursor-pointer transition-all duration-300 ${
+                            isDarkMode 
+                                ? 'bg-gray-900 text-gray-100' 
+                                : 'bg-gray-800 text-white'
+                        }`}
                         onClick={(e) => {
-                            e.preventDefault();
-                            if (isPending) {
-                                openRelationModal(product.id_producto, true, product);
+                            if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a') {
+                                e.stopPropagation();
                             } else {
-                                handleRemoveRelationDirectly(product);
+                                window.location.href = `/producto/${product.id_producto}`;
                             }
                         }}
-                        disabled={isDeleting && !isPending}
-                        className={`w-full text-sm font-semibold py-2 px-4 rounded-lg transition-all duration-200 ${
-                            isPending
-                                ? isDarkMode 
-                                    ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
-                                    : 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                                : isDarkMode
-                                    ? 'bg-red-700 hover:bg-red-800 text-white'
-                                    : 'bg-red-600 hover:bg-red-700 text-white'
-                        } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
-                        {isPending ? 'Establecer Relación' : (isDeleting ? 'Eliminando...' : 'Eliminar Relación')}
-                    </button>
-                </div>
-            )}
-        </div>
-    );
+                        <a 
+                            href={`/producto/${product.id_producto}`}
+                            className={`text-xl font-semibold mb-2 text-center transition-colors cursor-pointer ${
+                                isDarkMode 
+                                    ? 'hover:text-blue-300 text-gray-100' 
+                                    : 'hover:text-blue-300 text-white'
+                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {product.nombre}
+                        </a>
+                        
+                        {/* Contenedor con scroll */}
+                        <div className="flex-grow overflow-y-auto mb-4 pr-2 custom-scrollbar">
+                            {/* Características del producto */}
+                            {product.caracteristicas && Object.keys(product.caracteristicas).length > 0 && (
+                                <div className="mb-4">
+                                    <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                                    }`}>Características</h3>
+                                    <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-200' : 'text-gray-300'
+                                    }`}>
+                                        {Object.entries(product.caracteristicas).slice(0, 6).map(([key, value], index) => (
+                                            <p key={`characteristics-${key}-${index}`}>
+                                                <strong>{key}:</strong> {value}
+                                            </p>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Especificaciones técnicas básicas */}
+                            <div className="mb-4">
+                                <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                                }`}>Especificaciones</h3>
+                                <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-gray-200' : 'text-gray-300'
+                                }`}>
+                                    <p><strong>Capacidad:</strong> {product.capacidad || '25 Litros'}</p>
+                                    <p><strong>Velocidad:</strong> {product.velocidad || '1000 Rpm'}</p>
+                                    <p><strong>Viscosidad:</strong> {product.viscosidad || '30000 mPa·s'}</p>
+                                    <p><strong>Torque:</strong> {product.torque || '40 Ncm'}</p>
+                                </div>
+                            </div>
+                            
+                            {/* Descripción del producto */}
+                            {product.descripcion && (
+                                <div className="mb-4">
+                                    <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                                    }`}>Descripción</h3>
+                                    <p className={`text-sm transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-100' : 'text-gray-200'
+                                    }`}>{product.descripcion}</p>
+                                </div>
+                            )}
+                            
+                            {/* Precio destacado */}
+                            <div className="mb-4">
+                                <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                    isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                                }`}>Precio</h3>
+                                <p className={`text-2xl font-bold transition-colors duration-300 ${
+                                    isDarkMode ? 'text-blue-400' : 'text-blue-400'
+                                }`}>
+                                    S/ {product.precio_sin_ganancia}
+                                </p>
+                                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-300'}`}>
+                                    SKU: {product.sku}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        {/* Botón para ver más detalles */}
+                        <div className="mt-auto">
+                            <a
+                                href={`/producto/${product.id_producto}`}
+                                className={`w-full block text-center font-bold py-2 px-4 rounded-md transition-all duration-300 ${
+                                    isDarkMode 
+                                        ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg' 
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
+                                }`}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                Ver Detalles Completos
+                            </a>
+                        </div>
+                    </div>
+                )}
+                
+                {/* Botón de acción - Solo visible si está logueado */}
+                {auth.user && (
+                    <div className={`px-5 pb-4 ${
+                        isDarkMode 
+                            ? 'bg-slate-800' 
+                            : 'bg-white'
+                    }`}>
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                if (isPending) {
+                                    openRelationModal(product.id_producto, true, product);
+                                } else {
+                                    handleRemoveRelationDirectly(product);
+                                }
+                            }}
+                            disabled={isDeleting && !isPending}
+                            className={`w-full text-sm font-semibold py-2 px-4 rounded-lg transition-all duration-200 ${
+                                isPending
+                                    ? isDarkMode 
+                                        ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                                        : 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                                    : isDarkMode
+                                        ? 'bg-red-700 hover:bg-red-800 text-white'
+                                        : 'bg-red-600 hover:bg-red-700 text-white'
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                            {isPending ? 'Establecer Relación' : (isDeleting ? 'Eliminando...' : 'Eliminar Relación')}
+                        </button>
+                    </div>
+                )}
+                
+                {/* CSS para el scrollbar personalizado */}
+                <style>{`
+                    .custom-scrollbar::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-track {
+                        background: ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'};
+                        border-radius: 10px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-thumb {
+                        background: ${isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'};
+                        border-radius: 10px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: ${isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'};
+                    }
+                `}</style>
+            </div>
+        );
+    };
 
     const renderProductGroup = (type, products) => {
         if (!products || products.length === 0) return null;
