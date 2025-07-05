@@ -5,6 +5,7 @@ import { useTheme } from '../../storage/ThemeContext';
 import { CartContext } from '../../storage/CartContext';
 import { useCurrency } from '../../storage/CurrencyContext';
 import { useCompare } from '../../hooks/useCompare';
+import countryCodeMap from '../store/countryJSON.json';
 
 const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = [], onSave, onClose, isPendingRelation = false }) => {
     const { isDarkMode } = useTheme();
@@ -438,11 +439,25 @@ const RelatedProducts = ({ productId }) => {
                             />
                         </div>
                         
-                        {/* Badge de marca */}
-                        <div className="absolute top-3 left-3">
+                        {/* Badge de marca y bandera */}
+                        <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
                             <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
                                 {product.marca?.nombre || 'PRODUCTO'}
                             </span>
+                            {product.pais && (() => {
+                                const countryName = (product.pais || '').toLowerCase();
+                                const countryCode = countryCodeMap[countryName] || 'unknown';
+                                return countryCode !== 'unknown' ? (
+                                    <img 
+                                        src={`https://flagcdn.com/w320/${countryCode}.png`}
+                                        alt={product.pais}
+                                        className="w-6 h-4 object-cover rounded shadow-sm"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                        }}
+                                    />
+                                ) : null;
+                            })()}
                         </div>
                     </div>
                     

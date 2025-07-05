@@ -354,7 +354,7 @@ class ProductoController extends Controller
      */
     public function obtenerRelacionados($id)
     {
-        $producto = Producto::with('productosRelacionados')->findOrFail($id);
+        $producto = Producto::with(['productosRelacionados.marca'])->findOrFail($id);
         return response()->json($producto->productosRelacionados);
     }
 
