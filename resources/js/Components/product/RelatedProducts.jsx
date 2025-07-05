@@ -1,6 +1,395 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useContext, useCallback, useMemo } from 'react';
 import axios from "axios";
 import { Link } from "@inertiajs/react";
+import { CartContext } from '../../storage/CartContext';
+import { useTheme } from '../../storage/ThemeContext';
+import { useCurrency } from '../../storage/CurrencyContext';
+import { useCompare } from '../../hooks/useCompare';
+
+const URL_API = import.meta.env.VITE_API_URL;
+const FALLBACK_IMAGE = 'https://megaequipamiento.com/wp-content/uploads/2024/08/MEGA-LOGO.webp';
+const IMAGE_TIMEOUT = 3000; // 3 segundos timeout para imágenes
+
+// Hook personalizado para manejar carga de imágenes con timeout
+const useImageLoader = (src, fallbackSrc = FALLBACK_IMAGE) => {
+  const [imageSrc, setImageSrc] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const timeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (!src) {
+      setImageSrc(fallbackSrc);
+      setIsLoaded(true);
+      return;
+    }
+
+    setIsLoaded(false);
+    setIsError(false);
+    
+    const img = new Image();
+    
+    // Timeout para imágenes que tardan mucho en cargar
+    timeoutRef.current = setTimeout(() => {
+      setImageSrc(fallbackSrc);
+      setIsLoaded(true);
+      setIsError(true);
+    }, IMAGE_TIMEOUT);
+
+    img.onload = () => {
+      clearTimeout(timeoutRef.current);
+      setImageSrc(src);
+      setIsLoaded(true);
+      setIsError(false);
+    };
+
+    img.onerror = () => {
+      clearTimeout(timeoutRef.current);
+      setImageSrc(fallbackSrc);
+      setIsLoaded(true);
+      setIsError(true);
+    };
+
+    img.src = src;
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [src, fallbackSrc]);
+
+  return { imageSrc, isLoaded, isError };
+};
+
+// Componente optimizado para imágenes
+const OptimizedImage = React.memo(({ src, alt, className, style, fallbackSrc = FALLBACK_IMAGE }) => {
+  const { imageSrc, isLoaded } = useImageLoader(src, fallbackSrc);
+  const { isDarkMode } = useTheme();
+
+  if (!isLoaded) {
+    return (
+      <div className={`${className} flex items-center justify-center ${
+        isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
+      }`}>
+        <div className={`animate-pulse h-6 w-6 rounded-full ${
+          isDarkMode ? 'bg-gray-500' : 'bg-gray-400'
+        }`}></div>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={imageSrc}
+      alt={alt}
+      className={className}
+      style={style}
+      loading="lazy"
+    />
+  );
+});
+
+OptimizedImage.displayName = 'OptimizedImage';
+
+
+const Card = React.memo(({ product, isPending, onRemove, onSetRelation, isDeleting }) => {
+    const { isDarkMode } = useTheme();
+    const { formatPrice } = useCurrency();
+    const [isVisible, setIsVisible] = useState(false);
+    const [showDetails, setShowDetails] = useState(false);
+    const cardRef = useRef(null);
+    const { dispatch } = useContext(CartContext);
+    const { addToCompare, isInCompare, canAddMore } = useCompare();
+  
+    // Observer para lazy loading
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            setIsVisible(true);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.1 }
+      );
+  
+      const currentRef = cardRef.current;
+      if (currentRef) {
+        observer.observe(currentRef);
+      }
+  
+      return () => {
+        if (currentRef) {
+          observer.unobserve(currentRef);
+        }
+      };
+    }, []);
+  
+    // Función para manejar la navegación al producto
+    const navigateToProduct = useCallback((e) => {
+      if (showDetails) {
+        e.preventDefault();
+      }
+    }, [showDetails]);
+  
+    // Función para manejar click en overlay
+    const handleOverlayClick = useCallback((e) => {
+      if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a') {
+        e.stopPropagation();
+      } else {
+        window.location.href = product.link;
+      }
+    }, [product.link]);
+  
+    // Función para añadir al carrito
+    const handleAddToCart = useCallback((e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      try {
+        // Solo enviar los datos necesarios: imagen, título y precios
+        const cartProduct = {
+          id: product.id,
+          title: product.title,
+          image: product.image,
+          price: product.price,
+          priceWithoutProfit: product.priceWithoutProfit,
+          priceWithProfit: product.priceWithProfit
+        };
+        
+        dispatch({ type: 'ADD', product: cartProduct });
+        console.log('Adding to cart:', cartProduct);
+        alert(`${product.title} añadido al carrito!`);
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+      }
+    }, [dispatch, product]);
+  
+    // Función para comparar
+    const handleCompare = useCallback((e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const productForCompare = {
+        id: product.id,
+        nombre: product.title,
+        precio: product.price,
+        descripcion: product.descripcion,
+        imagen: product.image,
+        stock: 1, // Asumiendo stock disponible
+        especificaciones_tecnicas: product.especificaciones_tecnicas || product.summary,
+        caracteristicas: product.caracteristicas || product.summary || {},
+        marca: {
+          nombre: product.nombre_marca
+        }
+      };
+      
+      if (isInCompare(product.id)) {
+        alert('Este producto ya está en el comparador');
+      } else if (canAddMore) {
+        addToCompare(productForCompare);
+        alert(`${product.title} agregado al comparador`);
+      } else {
+        alert('Máximo 4 productos para comparar. Elimina uno para agregar otro.');
+      }
+    }, [product, addToCompare, isInCompare, canAddMore]);
+  
+  
+  
+    // Renderizar entradas del summary de forma optimizada los 4 primeros
+    const summaryEntries = useMemo(() => {
+      if (!product.summary || typeof product.summary !== 'object') return [];
+      return Object.entries(product.summary).slice(0, 4);
+    }, [product.summary]);
+  
+  
+    return (
+      <div
+        ref={cardRef}
+        className={`w-full rounded-xl shadow-lg overflow-hidden border h-112 relative flex flex-col transition-all duration-300 hover:shadow-xl ${
+          isDarkMode 
+            ? 'bg-gray-800 hover:bg-gray-750 shadow-gray-900/50 border-gray-700' 
+            : 'bg-white hover:bg-gray-50 border-gray-200'
+        }`}
+        onMouseEnter={() => setShowDetails(true)}
+        onMouseLeave={() => setShowDetails(false)}
+      >
+        {/* Enlace al producto */}
+        <a 
+          href={product.link} 
+          className="absolute inset-0 z-10"
+          onClick={navigateToProduct}
+          aria-label={`Ver detalles de ${product.title}`}
+        />
+  
+        {/* Área de imagen (60% del card) */}
+        <div className="flex items-center justify-center p-3 h-3/5">
+          {isVisible && (
+            <OptimizedImage
+              src={product.image}
+              alt={product.title}
+              className="max-w-full max-h-full object-contain transition-opacity duration-300"
+              style={{ opacity: 1 }}
+            />
+          )}
+        </div>
+  
+        {/* Bandera y marca */}
+        <div className="flex items-center justify-between px-4 mb-2">
+          {isVisible && (
+            <>
+              {product.marca && (
+                <OptimizedImage
+                  src={product.marca}
+                  alt={`Marca ${product.nombre_marca || 'desconocida'}`}
+                  className="h-5 object-cover transition-opacity duration-300"
+                  style={{ opacity: 1 }}
+                />
+              )}
+              {product.flag && (
+                <OptimizedImage
+                  src={product.flag}
+                  alt={`Bandera de ${product.origin || 'origen desconocido'}`}
+                  className="w-9 h-5 object-cover transition-opacity duration-300"
+                  style={{ opacity: 1 }}
+                />
+              )}
+            </>
+          )}
+        </div>
+  
+        {/* Información del producto (40% restante) */}
+        <div className="p-3 flex-grow overflow-y-auto min-h-40">
+          <h2 className={`text-base font-semibold mb-2 transition-colors duration-300 ${
+            isDarkMode ? 'text-gray-100' : 'text-gray-800'
+          }`}>{product.title}</h2>
+          {summaryEntries.map(([key, value], index) => (
+            <p key={`${key}-${index}`} className={`text-sm transition-colors duration-300 ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-600'
+            }`}>
+              <strong>{key}:</strong> {value}
+            </p>
+          ))}
+          <div className="flex justify-between items-center mt-2">
+            <span className={`text-xl font-bold transition-colors duration-300 ${
+              isDarkMode ? 'text-blue-400' : 'text-blue-600'
+            }`}>
+              {formatPrice(product.price)}
+            </span>
+          </div>
+        </div>
+  
+        {/* Overlay con información detallada */}
+        {showDetails && (
+          <div 
+            className={`absolute inset-0 bg-opacity-95 flex flex-col justify-start z-20 p-4 cursor-pointer transition-all duration-300 ${
+              isDarkMode 
+                ? 'bg-gray-900 text-gray-100' 
+                : 'bg-gray-800 text-white'
+            }`}
+            onClick={handleOverlayClick}
+          >
+            <a 
+              href={product.link}
+              className={`text-2xl font-semibold mb-2 text-center transition-colors cursor-pointer ${
+                isDarkMode 
+                  ? 'hover:text-blue-300 text-gray-100' 
+                  : 'hover:text-blue-300 text-white'
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {product.title}
+            </a>
+            
+            {/* Contenedor con scroll */}
+            <div className="flex-grow overflow-y-auto mb-4 pr-2 custom-scrollbar">
+              {/* product.summary */}
+              {product.summary && Object.keys(product.summary).length > 0 && (
+                <div className="mb-4">
+                  <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                    isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                  }`}>Características</h3>
+                  <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-200' : 'text-gray-300'
+                  }`}>
+                    {Object.entries(product.summary).map(([key, value], index) => (
+                      <p key={`summary-${key}-${index}`}>
+                        <strong>{key}:</strong> {value}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Descripción del producto */}
+              {product.descripcion && (
+                <div className="mb-4">
+                  <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                    isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                  }`}>Descripción</h3>
+                  <p className={`text-sm transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-100' : 'text-gray-200'
+                  }`}>{product.descripcion}</p>
+                </div>
+              )}
+            </div>
+            
+            {/* Botones fijos en la parte inferior */}
+            <div className="flex space-x-4 mt-auto">
+              <button
+                className={`font-bold py-2 px-4 rounded-md flex-1 transition-all duration-300 ${
+                  isDarkMode 
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
+                }`}
+                onClick={handleAddToCart}
+              >
+                Añadir al carrito
+              </button>
+              <button 
+                className={`font-bold py-2 px-4 rounded-md flex-1 transition-all duration-300 ${
+                  isInCompare(product.id)
+                    ? isDarkMode 
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg' 
+                      : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
+                    : isDarkMode 
+                      ? 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg' 
+                      : 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg'
+                } ${
+                  !canAddMore && !isInCompare(product.id) ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                onClick={handleCompare}
+                disabled={!canAddMore && !isInCompare(product.id)}
+              >
+                {isInCompare(product.id) ? 'En Comparador' : 'Comparar'}
+              </button>
+            </div>
+          </div>
+        )}
+        
+        {/* CSS para el scrollbar personalizado */}
+        <style>{`
+          .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-track {
+            background: ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'};
+            border-radius: 10px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: ${isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'};
+            border-radius: 10px;
+          }
+          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: ${isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'};
+          }
+        `}</style>
+      </div>
+    );
+  });
+  
+  Card.displayName = 'Card';
 
 const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = [], onSave, onClose, isPendingRelation = false }) => {
     const [relatedProducts, setRelatedProducts] = useState(initialRelated);
@@ -353,51 +742,41 @@ const RelatedProducts = ({ productId }) => {
 
 
     const renderProductCard = (product, isPending = false) => (
-        <div key={product.id_producto} className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105">
-            <Link href={`/producto/${product.id_producto}`}>
-                <div className="h-48 overflow-hidden">
-                    <img 
-                        src={(
-                            Array.isArray(product.imagen) 
-                                ? (product.imagen[0]?.startsWith('http') ? product.imagen[0] : `/${product.imagen[0]}`)
-                                : (product.imagen?.startsWith('http') ? product.imagen : `/${product.imagen}`)
-                        ) || '/api/placeholder/300/200'}
-                        alt={product.nombre} 
-                        className="w-full h-full object-cover"
-                    />
-                </div>
-                <div className="p-4">
-                    <h3 className="text-sm font-medium text-gray-900 truncate">{product.nombre}</h3>
-                    <div className="mt-2 flex justify-between items-center">
-                        <p className="text-lg font-semibold text-green-600">S/ {product.precio_sin_ganancia}</p>
-                        <p className="text-xs text-gray-500">SKU: {product.sku}</p>
-                    </div>
-                </div>
-            </Link>
-            <div className="p-2 bg-gray-100">
-                <button
-                    onClick={(e) => {
-                        e.preventDefault();
-                        if (isPending) {
-                            openRelationModal(product.id_producto, true, product);
-                        } else {
-                            // Llamar a la función de eliminación directa si no es pendiente
-                            handleRemoveRelationDirectly(product);
-                        }
-                    }}
-                    // Deshabilitar si se está eliminando
-                    disabled={isDeleting && !isPending}
-                    className={`w-full text-sm ${
-                        isPending
-                            ? 'bg-yellow-500 hover:bg-yellow-600'
-                            : 'bg-blue-500 hover:bg-blue-600' // Cambiar a color rojo para eliminar 
-                    } text-white py-1 px-2 rounded disabled:opacity-50`}
-                >
-                    {/* Cambiar texto a 'Eliminar Relación' si no es pendiente */}
-                    {isPending ? 'Establecer Relación' : (isDeleting ? 'Eliminando...' : 'Eliminar Relación')}
-                </button>
-            </div>
-        </div>
+        <Card
+        key={product.id_producto}
+        product={{
+            id: product.id_producto,
+            sku: product.sku || '',
+            title: product.nombre || 'Sin título',
+            summary: product.caracteristicas || {},
+            caracteristicas: product.caracteristicas || {},
+            origin: product.pais || '',
+            price: parseFloat(product.precio_igv || 0),
+            priceWithoutProfit: parseFloat(product.precio_sin_ganancia || 0),
+            priceWithProfit: parseFloat(product.precio_ganancia || 0),
+            image: (
+                Array.isArray(product.imagen) 
+                    ? (product.imagen[0]?.startsWith('http') ? product.imagen[0] : `/${product.imagen[0]}`)
+                    : (product.imagen?.startsWith('http') ? product.imagen : `/${product.imagen}`)
+            ) || FALLBACK_IMAGE,
+            flag: '', // No flag for related products
+            marca: product.marca?.imagen || '',
+            nombre_marca: product.marca?.nombre || '',
+            link: `/producto/${product.id_producto}`,
+            descripcion: product.descripcion || '',
+            video: product.video || '',
+            envio: product.envio || '',
+            soporte_tecnico: product.soporte_tecnico || '',
+            archivos_adicionales: product.archivos_adicionales || [],
+            especificaciones_tecnicas: product.especificaciones_tecnicas || {},
+            subcategoria_id: product.id_subcategoria || null,
+            marca_id: product.marca_id || null
+        }}
+        isPending={isPending}
+        onRemove={() => handleRemoveRelationDirectly(product)}
+        onSetRelation={() => openRelationModal(product.id_producto, true, product)}
+        isDeleting={isDeleting}
+    />
     );
 
     const renderProductGroup = (type, products) => {
@@ -408,7 +787,7 @@ const RelatedProducts = ({ productId }) => {
                 <h2 className="text-xl font-bold text-gray-800 mb-4">
                     {type.charAt(0).toUpperCase() + type.slice(1)}
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-6 gap-4">
                     {products.map(product => renderProductCard(product))}
                 </div>
             </div>
@@ -427,7 +806,7 @@ const RelatedProducts = ({ productId }) => {
                 <p className="mb-4 text-yellow-600">
                     Los siguientes productos tienen relación con este producto, pero no existe la relación inversa:
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-6 gap-4">
                     {filteredPendingRelations.map(product => renderProductCard(product, true))}
                 </div>
                 <div className="mt-4 text-sm text-yellow-600">
