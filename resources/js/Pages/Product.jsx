@@ -30,7 +30,7 @@ const ProductPage = ({ producto }) => {
     console.log("producto", producto);
     const { isDarkMode } = useTheme();
     const { formatPrice } = useCurrency();
-    const { addRecentlyViewed } = useRecentlyViewed();
+    const { addRecentlyViewed, getRecentlyViewed } = useRecentlyViewed();
     const [categoriaCurrent, setCategoriaCurrent] = useState(null);
     const [subcategoriaCurrent, setSubcategoriaCurrent] = useState(null);
 
@@ -84,6 +84,7 @@ const ProductPage = ({ producto }) => {
     const [videoUrl, setVideoUrl] = useState(''); // Nuevo estado para la URL del video
     const [showVideoInput, setShowVideoInput] = useState(false); // Estado para mostrar/ocultar el input de video
     const [videoPreview, setVideoPreview] = useState(''); // Estado para la previsualización del video
+    const [showRecentlyViewed, setShowRecentlyViewed] = useState(false); // Estado para mostrar productos vistos recientemente
 
     const [productData, setProductData] = useState({
         ...producto,
@@ -1227,6 +1228,69 @@ const ProductPage = ({ producto }) => {
                                 <span>+</span>
                             </button>
                         )}
+                    </div>
+
+                    {/* Productos Vistos Recientemente */}
+                    <div className="mt-8">
+                        <h3 className="text-2xl font-bold mb-6 text-center">Productos Vistos Recientemente</h3>
+                        {(() => {
+                            const recentProducts = getRecentlyViewed();
+                            if (recentProducts.length === 0) {
+                                return (
+                                    <div className="text-gray-500 text-center py-8">
+                                        <p>No hay productos vistos recientemente</p>
+                                    </div>
+                                );
+                            }
+                            return (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {recentProducts.slice(0, 8).map((product, index) => (
+                                        <div key={product.id} className="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                                            <div className="aspect-square relative">
+                                                <img 
+                                                    src={product.image || '/placeholder.jpg'} 
+                                                    alt={product.title}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.src = '/placeholder.jpg';
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="p-4">
+                                                <h4 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
+                                                    {product.title}
+                                                </h4>
+                                                <p className="text-xs text-gray-500 mb-1">
+                                                    SKU: {product.sku || 'N/A'}
+                                                </p>
+                                                <p className="text-xs text-gray-500 mb-2">
+                                                    {product.marca?.nombre || 'Sin marca'}
+                                                </p>
+                                                <div className="mb-3">
+                                                    <p className="text-lg font-bold text-green-600">
+                                                        {formatPrice(product.priceWithoutProfit)}
+                                                    </p>
+                                                    {product.priceWithProfit && (
+                                                        <p className="text-sm text-gray-500">
+                                                            Con ganancia: {formatPrice(product.priceWithProfit)}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-gray-400 mb-3">
+                                                    Visto: {new Date(product.viewedAt).toLocaleDateString()}
+                                                </p>
+                                                <Link 
+                                                    href={product.link}
+                                                    className="block w-full text-center bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-200 text-sm font-medium"
+                                                >
+                                                    Ver producto
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            );
+                        })()}
                     </div>
                     
                 </div>
