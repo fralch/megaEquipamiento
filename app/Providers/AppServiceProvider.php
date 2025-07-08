@@ -17,18 +17,13 @@ class AppServiceProvider extends ServiceProvider
     }
 
 
-    // public function boot(): void
-    // {
-    //     Vite::prefetch(concurrency: 3);
-        
-    //     // Force HTTPS in production
-    //     if (app()->environment('production')) {
-    //         URL::forceScheme('https');
-    //     }
-    // }
-
-     public function boot(): void
+    public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
+        
+        // Force HTTPS based on environment configuration
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
