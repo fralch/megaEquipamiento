@@ -261,8 +261,8 @@ class ProductoController extends Controller
     {
         $request->validate([
             'id_producto' => 'required|exists:productos,id_producto',
-            'imagen.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'imagenes.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagen.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'imagenes.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
         
         // Buscar el producto por ID

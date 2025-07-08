@@ -1,6 +1,6 @@
 /.phpunit.cache
 /node_modules
-/app/Providers
+/app/Providers/AppServiceProvider.php
 /public/img
 /public/build
 /public/hot
