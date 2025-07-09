@@ -397,7 +397,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
     const buscarProductosFiltrados = async () => {
         const subcategoriaId = getSubcategoriaId();
-        
+
         try {
             if (Object.keys(filtrosSeleccionados).length > 0) {
                 const productosFiltrados = await makeRequest(`${URL_API}/filtros/filtrar-productos`, {
@@ -409,17 +409,17 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                 });
 
                 setMostrarProductos(true);
-                
+
+                let resultado = productosFiltrados;
                 if (selectedBrand) {
-                    const productosFiltradosPorMarca = productosFiltrados.filter(product => 
+                    resultado = productosFiltrados.filter(product => 
                         String(product.marca_id) === String(selectedBrand)
                     );
-                    setProductos(productosFiltradosPorMarca);
-                } else {
-                    setProductos(productosFiltrados);
-                    setProductosOriginales(productosFiltrados);
                 }
+                setProductos(resultado); // Si resultado es [], se muestra vacío
+                setProductosOriginales(productosFiltrados); // Opcional, según tu lógica
             } else {
+                // Si no hay filtros seleccionados, solo filtra por marca si corresponde
                 if (selectedBrand) {
                     const productosFiltradosPorMarca = productosOriginales.filter(product => 
                         String(product.marca_id) === String(selectedBrand)
@@ -427,10 +427,9 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                     setProductos(productosFiltradosPorMarca);
                     setMostrarProductos(true);
                 } else {
-                    const todosProductos = await makeRequest(`${URL_API}/product/subcategoria/${subcategoriaId}`);
+                    // No recargues todos los productos aquí, solo muestra vacío si no hay productos
+                    setProductos([]);
                     setMostrarProductos(true);
-                    setProductos(todosProductos);
-                    setProductosOriginales(todosProductos);
                 }
             }
         } catch (error) {
@@ -740,8 +739,49 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                         </p>
                                         <div className={`${gradientLine} mb-8`}></div>
                                     </div>
-                                    <div className="animate-fadeIn">
-                                        <ProductGrid products={productos} />
+                                    <div className="text-center py-16 lg:py-24">
+                                        <div className="max-w-md mx-auto">
+                                            <div className="mb-8">
+                                                <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 ${
+                                                    isDarkMode 
+                                                        ? 'bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600' 
+                                                        : 'bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-300'
+                                                } shadow-lg transition-all duration-200`}>
+                                                    <svg className={`w-10 h-10 ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                    } transition-colors duration-200`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                                                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                    </svg>
+                                                </div>
+                                                <h2 className={`text-xl lg:text-2xl font-bold mb-4 ${ 
+                                                    isDarkMode ? 'text-white' : 'text-gray-800'
+                                                } transition-colors duration-200`}>
+                                                    {Object.keys(filtrosSeleccionados).length > 0 || selectedBrand
+                                                        ? "No se encontraron productos filtrados"
+                                                        : "No hay productos disponibles"}
+                                                </h2>
+                                                <p className={`text-base mb-8 ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                } transition-colors duration-200`}>
+                                                    {Object.keys(filtrosSeleccionados).length > 0 || selectedBrand
+                                                        ? "Intenta cambiar los filtros seleccionados."
+                                                        : "No hay productos relacionados a esta subcategoría."}
+                                                </p>
+                                                <div className="flex justify-center">
+                                                    <button 
+                                                        onClick={handleMostrarProductos} 
+                                                        className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105 ${
+                                                            isDarkMode 
+                                                                ? 'bg-gradient-to-r from-blue-800 to-green-500 hover:from-blue-700 hover:to-green-400 text-white shadow-lg' 
+                                                                : 'bg-gradient-to-r from-blue-700 to-green-500 hover:from-blue-600 hover:to-green-400 text-white shadow-md'
+                                                        }`}
+                                                    >
+                                                        Mostrar productos
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </>
                             ) : (

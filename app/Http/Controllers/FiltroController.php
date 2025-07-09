@@ -309,8 +309,12 @@ class FiltroController extends Controller
                                 foreach ($valorSeleccionado as $opcionId) {
                                     $opcion = OpcionFiltro::find($opcionId);
                                     if ($opcion) {
-                                        // Búsqueda más precisa incluyendo comillas
-                                        $q->where('caracteristicas', 'LIKE', '%"' . preg_quote($opcion->valor, '/') . '"%');
+                                        // Normalizar el valor para búsqueda flexible
+                                        $valorNormalizado = trim(strtolower($opcion->valor));
+                                        // Búsqueda case-insensitive y flexible con espacios
+                                        $q->orWhere(function($subQ) use ($valorNormalizado) {
+                                            $subQ->whereRaw('LOWER(REPLACE(caracteristicas, " ", "")) LIKE ?', ['%' . str_replace(' ', '', $valorNormalizado) . '%']);
+                                        });
                                     }
                                 }
                             });
@@ -324,7 +328,10 @@ class FiltroController extends Controller
                         if (!empty($valorSeleccionado)) {
                             $opcion = OpcionFiltro::find($valorSeleccionado);
                             if ($opcion) {
-                                $query->where('caracteristicas', 'LIKE', '%"' . preg_quote($opcion->valor, '/') . '"%');
+                                // Normalizar el valor para búsqueda flexible
+                                $valorNormalizado = trim(strtolower($opcion->valor));
+                                // Búsqueda case-insensitive y flexible con espacios
+                                $query->whereRaw('LOWER(REPLACE(caracteristicas, " ", "")) LIKE ?', ['%' . str_replace(' ', '', $valorNormalizado) . '%']);
                             }
                         }
                         break;
