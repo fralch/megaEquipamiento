@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrency } from '../../../storage/CurrencyContext';
+import { useCheckout } from '../../../storage/CheckoutContext';
 
 const ShippingStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
     const [selectedShipping, setSelectedShipping] = useState(initialData?.option || null);
     const { formatPrice } = useCurrency();
+    const { checkoutState } = useCheckout();
+    const addressData = checkoutState.customerData;
     const [deliveryDate, setDeliveryDate] = useState(initialData?.deliveryDate || '');
     const [specialInstructions, setSpecialInstructions] = useState(initialData?.specialInstructions || '');
 
