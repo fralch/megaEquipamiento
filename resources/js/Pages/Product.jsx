@@ -1094,14 +1094,31 @@ const ProductPage = ({ producto }) => {
                             >
                                 Agregar al carrito
                             </button>
-                            <button className={`px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${
+                            <button 
+                                onClick={() => {
+                                    const productTabsSection = document.getElementById('product-tabs');
+                                    if (productTabsSection) {
+                                        productTabsSection.scrollIntoView({ 
+                                            behavior: 'smooth',
+                                            block: 'start'
+                                        });
+                                    }
+                                }}
+                                className={`px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${
                                 isDarkMode 
                                     ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
                                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                             }`}>
                                 Selecciona tus accesorios
                             </button>
-                            <button className={`px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${
+                            <button 
+                                onClick={() => {
+                                    const productUrl = window.location.href;
+                                    const message = `Hola, estoy interesado en la compra de este producto: ${productUrl}`;
+                                    const whatsappUrl = `https://wa.me/51939294882?text=${encodeURIComponent(message)}`;
+                                    window.open(whatsappUrl, '_blank');
+                                }}
+                                className={`px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${
                                 isDarkMode 
                                     ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
                                     : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
@@ -1256,7 +1273,7 @@ const ProductPage = ({ producto }) => {
                 </section>
                 <div className={`w-full shadow-md rounded-md mt-10 transition-colors duration-300 ${
                     isDarkMode ? 'bg-gray-800' : 'bg-white'
-                }`}>
+                }`} id="product-tabs">
                     <ProductTabs
                         tabs={tabs}
                         activeTab={activeTab}
