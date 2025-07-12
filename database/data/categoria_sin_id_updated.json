@@ -1,0 +1,422 @@
+[
+  {
+    "id_categoria": 1,
+    "category_name": "Accesorios de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/accesorios/",
+    "video_link": "https://www.youtube.com/embed/0UzGLBF8z78?mute=1&autoplay=1&loop=1&playlist=0UzGLBF8z78&vq=hd1080"
+  },
+  {
+    "id_categoria": 2,
+    "category_name": "Agitadores de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/agitadores/",
+    "video_link": "https://www.youtube.com/embed/Vj8Hoplk4w8?mute=1&autoplay=1&loop=1&playlist=Vj8Hoplk4w8&vq=hd1080"
+  },
+  {
+    "id_categoria": 3,
+    "category_name": "Analizadores de alimentos",
+    "url": "https://megaequipamiento.com/product-category/analizadores-de-alimentos/",
+    "video_link": "https://www.youtube.com/embed/7rzVYP3txyA?mute=1&autoplay=1&loop=1&playlist=7rzVYP3txyA&vq=hd1080"
+  },
+  {
+    "id_categoria": 4,
+    "category_name": "Analizadores de Gases",
+    "url": "https://megaequipamiento.com/product-category/analizadores-de-gases/",
+    "video_link": "https://www.youtube.com/embed/EGFtZBwl8CE?mute=1&autoplay=1&loop=1&playlist=EGFtZBwl8CE&vq=hd1080"
+  },
+  {
+    "id_categoria": 5,
+    "category_name": "Analizadores de Texturas",
+    "url": "https://megaequipamiento.com/product-category/analizador-de-texturas/",
+    "video_link": "https://www.youtube.com/embed/JMpTzqqTlEk?mute=1&autoplay=1&loop=1&playlist=JMpTzqqTlEk&vq=hd1080"
+  },
+  {
+    "id_categoria": 6,
+    "category_name": "Autoclaves de laboratorio",
+    "url": "https://megaequipamiento.com/product-category/autoclaves-de-laboratorio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 7,
+    "category_name": "Balanzas de laboratorio",
+    "url": "https://megaequipamiento.com/product-category/balanzas/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 8,
+    "category_name": "Baños de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/banos-maria/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 9,
+    "category_name": "Baños Ultrasónicos",
+    "url": "https://megaequipamiento.com/product-category/banos-ultrasonicos/",
+    "video_link": "https://www.youtube.com/embed/bSgBkuCoJsQ?mute=1&autoplay=1&loop=1&playlist=bSgBkuCoJsQ&vq=hd1080"
+  },
+  {
+    "id_categoria": 10,
+    "category_name": "Biorreactores",
+    "url": "https://megaequipamiento.com/product-category/biorreactores/",
+    "video_link": "https://www.youtube.com/embed/Xm54opG3Wmg?mute=1&autoplay=1&loop=1&playlist=Xm54opG3Wmg&vq=hd1080"
+  },
+  {
+    "id_categoria": 11,
+    "category_name": "Bombas y compresores de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/vacios/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 12,
+    "category_name": "Buretas y Dispensadores",
+    "url": "https://megaequipamiento.com/product-category/buretas-y-dispensadores/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 13,
+    "category_name": "Cabinas de Ventilación de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/cabinas-de-flujo-laminar/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 14,
+    "category_name": "Calorímetros",
+    "url": "https://megaequipamiento.com/product-category/calorimetria/",
+    "video_link": "https://www.youtube.com/embed/scjudUpc4Vw?mute=1&autoplay=1&loop=1&playlist=scjudUpc4Vw&vq=hd1080"
+  },
+  {
+    "id_categoria": 15,
+    "category_name": "Cámaras Climáticas de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/camaras-de-laboratorio/",
+    "video_link": "https://www.youtube.com/embed/YAzyav-rnfs?mute=1&autoplay=1&loop=1&playlist=YAzyav-rnfs&vq=hd1080"
+  },
+  {
+    "id_categoria": 16,
+    "category_name": "Campanas Extractoras",
+    "url": "https://megaequipamiento.com/product-category/campanas-extractoras/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 17,
+    "category_name": "Centrífugas",
+    "url": "https://megaequipamiento.com/product-category/centrifugas/",
+    "video_link": "https://www.youtube.com/embed/8dMQ9S95Vcc?mute=1&autoplay=1&loop=1&playlist=8dMQ9S95Vcc&vq=hd1080"
+  },
+  {
+    "id_categoria": 18,
+    "category_name": "Certificado de Calibración",
+    "url": "https://megaequipamiento.com/product-category/certificado-de-calibracion/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 20,
+    "category_name": "Congeladores de laboratorio",
+    "url": "https://megaequipamiento.com/product-category/congeladores-de-laboratorio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 21,
+    "category_name": "Consumibles de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/consumibles/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 22,
+    "category_name": "Contadores de Colonias",
+    "url": "https://megaequipamiento.com/product-category/contadores-de-colonias/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 23,
+    "category_name": "Criostatos",
+    "url": "https://megaequipamiento.com/product-category/criostatos/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 24,
+    "category_name": "Densímetros",
+    "url": "https://megaequipamiento.com/product-category/densimetros/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 25,
+    "category_name": "Destiladores de Agua",
+    "url": "https://megaequipamiento.com/product-category/destiladores-de-agua/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 26,
+    "category_name": "Dispersores de laboratorios",
+    "url": "https://megaequipamiento.com/product-category/dispersores/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 27,
+    "category_name": "Electroquímica",
+    "url": "https://megaequipamiento.com/product-category/electroquimica/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 28,
+    "category_name": "Equipos de seguridad",
+    "url": "https://megaequipamiento.com/product-category/equipos-de-seguridad/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 29,
+    "category_name": "Espectrofotómetros",
+    "url": "https://megaequipamiento.com/product-category/espectrofotometros/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 30,
+    "category_name": "Espectroscopía",
+    "url": "https://megaequipamiento.com/product-category/espectroscopia/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 31,
+    "category_name": "Espectroscopios",
+    "url": "https://megaequipamiento.com/product-category/espectroscopios/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 32,
+    "category_name": "Esterilizadores de laboratorio",
+    "url": "https://megaequipamiento.com/product-category/esterilizadores-de-laboratorio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 33,
+    "category_name": "Estufas de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/estufas/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 36,
+    "category_name": "Fotómetros",
+    "url": "https://megaequipamiento.com/product-category/fotometros/",
+    "video_link": "https://www.youtube.com/embed/MTqs0XSLTUg?mute=1&autoplay=1&loop=1&playlist=MTqs0XSLTUg&vq=hd1080"
+  },
+  {
+    "id_categoria": 37,
+    "category_name": "Generadores de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/generadores-de-laboratorio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 38,
+    "category_name": "Homogenizador de laboratorio",
+    "url": "https://megaequipamiento.com/product-category/homogenizador-de-laboratorio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 39,
+    "category_name": "Hornos",
+    "url": "https://megaequipamiento.com/product-category/hornos/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 40,
+    "category_name": "Incubadoras de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/incubadoras/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 41,
+    "category_name": "Instrumentos Analíticos",
+    "url": "https://megaequipamiento.com/product-category/instrumentos-analiticos/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 42,
+    "category_name": "Lámparas de análisis UV",
+    "url": "https://megaequipamiento.com/product-category/lamparas-de-analisis-uv/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 43,
+    "category_name": "Lavadores de microplacas",
+    "url": "https://megaequipamiento.com/product-category/lavadores-de-microplacas/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 44,
+    "category_name": "Limpiadores a vapor",
+    "url": "https://megaequipamiento.com/product-category/limpiadores-a-vapor/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 45,
+    "category_name": "Liofilizadores para laboratorio",
+    "url": "https://megaequipamiento.com/product-category/liofilizadores-para-laboratorio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 46,
+    "category_name": "Máquina de limpieza de relojes",
+    "url": "https://megaequipamiento.com/product-category/maquina-de-limpieza-de-relojes/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 47,
+    "category_name": "Maquinas Laser",
+    "url": "https://megaequipamiento.com/product-category/maquinas-laser/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 48,
+    "category_name": "Materiales de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/materiales-de-laboratorio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 49,
+    "category_name": "Medidores de punto de fusión",
+    "url": "https://megaequipamiento.com/product-category/medidores-de-punto-de-fusion/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 50,
+    "category_name": "Mezcladores de Laboratotio",
+    "url": "https://megaequipamiento.com/product-category/mezcladores-de-laboratotio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 51,
+    "category_name": "Microscopios",
+    "url": "https://megaequipamiento.com/product-category/microscopios/",
+    "video_link": "https://www.youtube.com/embed/Ly6OmCe8rxs?mute=1&autoplay=1&loop=1&playlist=Ly6OmCe8rxs&vq=hd1080"
+  },
+  {
+    "id_categoria": 52,
+    "category_name": "Mobiliarios de laboratorio",
+    "url": "https://megaequipamiento.com/product-category/mobiliarios-de-laboratorio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 53,
+    "category_name": "Molinos",
+    "url": "https://megaequipamiento.com/product-category/molinos/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 55,
+    "category_name": "Pesas Patrón",
+    "url": "https://megaequipamiento.com/product-category/pesas-patron/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 56,
+    "category_name": "Pipetas de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/pipetas/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 57,
+    "category_name": "Placas de Calentamiento",
+    "url": "https://megaequipamiento.com/product-category/placas-de-calentamiento/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 58,
+    "category_name": "Polarímetros",
+    "url": "https://megaequipamiento.com/product-category/polarimetro/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 59,
+    "category_name": "Reactores de Alta Viscosidad",
+    "url": "https://megaequipamiento.com/product-category/reactores-de-alta-viscosidad/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 60,
+    "category_name": "Reactores de Síntesis",
+    "url": "https://megaequipamiento.com/product-category/reactores-de-sintesis/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 61,
+    "category_name": "Refractómetros",
+    "url": "https://megaequipamiento.com/product-category/refractometros/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 62,
+    "category_name": "Refrigeradores de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/refrigeradores-de-laboratorio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 63,
+    "category_name": "Reómetros",
+    "url": "https://megaequipamiento.com/product-category/reometros/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 64,
+    "category_name": "Rotavapores",
+    "url": "https://megaequipamiento.com/product-category/rotavapores/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 65,
+    "category_name": "Servicio de Mantenimiento Equipos de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/mantenimiento/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 66,
+    "category_name": "Sistemas de Electroforesis",
+    "url": "https://megaequipamiento.com/product-category/sistemas-de-electroforesis/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 67,
+    "category_name": "Sistemas de extracción de ADN-ARN y purificación de proteínas",
+    "url": "https://megaequipamiento.com/product-category/sistemas-de-extraccion-de-adn-arn-y-purificacion-de-proteinas/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 68,
+    "category_name": "Sistemas de Histotecnología",
+    "url": "https://megaequipamiento.com/product-category/sistemas-de-histotecnologia/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 69,
+    "category_name": "Sistemas de Limpieza UV",
+    "url": "https://megaequipamiento.com/product-category/sistemas-de-limpieza-uv/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 70,
+    "category_name": "Software de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/software-de-laboratorio/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 71,
+    "category_name": "Tamizadora",
+    "url": "https://megaequipamiento.com/product-category/tamizadora/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 73,
+    "category_name": "Termobloques",
+    "url": "https://megaequipamiento.com/product-category/termobloques/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 74,
+    "category_name": "Termostatos de Laboratorio",
+    "url": "https://megaequipamiento.com/product-category/termostatos/",
+    "video_link": null
+  },
+  {
+    "id_categoria": 76,
+    "category_name": "Viscosímetros",
+    "url": "https://megaequipamiento.com/product-category/viscosimetros/",
+    "video_link": "https://www.youtube.com/embed/K-tDCq6gdIA?mute=1&autoplay=1&loop=1&playlist=K-tDCq6gdIA&vq=hd1080"
+  }
+]
