@@ -246,37 +246,60 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                         id="nav-fijo"
                     >
                         <div className="space-y-2">
-                            {todasCategorias && todasCategorias.length > 0 ? todasCategorias.map((cat, catIndex) => {
+                            {todasCategorias && todasCategorias.length > 0 ? (() => {
+                                // Ordenar categorías: la seleccionada primero, luego las demás
+                                const categoriasOrdenadas = [...todasCategorias].sort((a, b) => {
+                                    const aEsActual = categoria && categoria.id_categoria === a.id_categoria;
+                                    const bEsActual = categoria && categoria.id_categoria === b.id_categoria;
+                                    
+                                    if (aEsActual && !bEsActual) return -1;
+                                    if (!aEsActual && bEsActual) return 1;
+                                    return 0;
+                                });
+                                
+                                return categoriasOrdenadas.map((cat, catIndex) => {
                                 const isCurrentCategory = categoria && categoria.id_categoria === cat.id_categoria;
                                 return (
                                     <div key={cat.id_categoria} className="space-y-1">
-                                        <Link
-                                            href={`/categorias/${cat.id_categoria}`}
-                                            className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold flex items-center justify-between animate-slideIn ${
-                                                isCurrentCategory
-                                                    ? (isDarkMode ? 'bg-[#1e3a8a] text-white shadow-md' : 'bg-[#1e3a8a] text-white shadow-md')
-                                                    : (isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-800')
-                                            }`}
-                                            style={{ animationDelay: `${catIndex * 0.05}s` }}
-                                        >
-                                            <span className="font-medium text-sm">
-                                                {cat.nombre}
-                                            </span>
-                                            {isCurrentCategory && subcategorias && subcategorias.length > 0 && (
-                                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20">
-                                                    <svg 
-                                                        className={`w-4 h-4 transform transition-transform duration-300 text-white ${
-                                                            isSubcategoryDropdownOpen ? 'rotate-180' : ''
-                                                        }`} 
-                                                        fill="none" 
-                                                        stroke="currentColor" 
-                                                        viewBox="0 0 24 24"
-                                                    >
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                    </svg>
-                                                </div>
-                                            )}
-                                        </Link>
+                                        {isCurrentCategory ? (
+                                            <button
+                                                onClick={toggleSubcategoryDropdown}
+                                                className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold flex items-center justify-between animate-slideIn ${
+                                                    isDarkMode ? 'bg-[#1e3a8a] text-white shadow-md' : 'bg-[#1e3a8a] text-white shadow-md'
+                                                }`}
+                                                style={{ animationDelay: `${catIndex * 0.05}s` }}
+                                            >
+                                                <span className="font-medium text-sm">
+                                                    {cat.nombre}
+                                                </span>
+                                                {subcategorias && subcategorias.length > 0 && (
+                                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20">
+                                                        <svg 
+                                                            className={`w-4 h-4 transform transition-transform duration-300 text-white ${
+                                                                isSubcategoryDropdownOpen ? 'rotate-180' : ''
+                                                            }`} 
+                                                            fill="none" 
+                                                            stroke="currentColor" 
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </div>
+                                                )}
+                                            </button>
+                                        ) : (
+                                            <Link
+                                                href={`/categorias/${cat.id_categoria}`}
+                                                className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold flex items-center justify-between animate-slideIn ${
+                                                    isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                                                }`}
+                                                style={{ animationDelay: `${catIndex * 0.05}s` }}
+                                            >
+                                                <span className="font-medium text-sm">
+                                                    {cat.nombre}
+                                                </span>
+                                            </Link>
+                                        )}
 
                                         {/* Mostrar subcategorías solo para la categoría actual */}
                                         {isCurrentCategory && isSubcategoryDropdownOpen && subcategorias && subcategorias.length > 0 && (
@@ -308,7 +331,8 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                                         )}
                                     </div>
                                 );
-                            }) : (
+                                });
+                            })() : (
                                 <div className={`p-3 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                     <p>No hay categorías disponibles</p>
                                 </div>
