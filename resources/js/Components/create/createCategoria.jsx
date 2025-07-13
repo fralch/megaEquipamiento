@@ -316,200 +316,259 @@ const Categorias = ({ onSubmit }) => {
         </div>
       )}
       
-      <div className={`p-5 rounded-lg mb-8 border transition-colors duration-300 ${
+      <div className={`p-4 rounded-lg mb-6 border transition-colors duration-300 ${
         isDarkMode 
           ? 'bg-gray-700 border-gray-600' 
           : 'bg-gray-50 border-gray-200'
       }`}>
         <form onSubmit={handleSubmit} encType="multipart/form-data">
-          <h2 className={`text-lg font-bold mb-5 border-b pb-2 transition-colors duration-300 ${
-            isDarkMode ? 'text-gray-200 border-gray-600' : 'text-gray-700 border-gray-200'
-          }`}>Agregar Nueva Categoría</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="mb-4">
-              <label htmlFor="nombre" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                Nombre <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="nombre"
-                name="nombre"
-                value={form.nombre}
-                onChange={handleChange}
-                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
-                  isDarkMode 
-                    ? 'bg-gray-600 border-gray-500 text-white focus:border-indigo-400 focus:ring-indigo-400' 
-                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
-                }`}
-                required
-              />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="marca" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                Marca <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="marca"
-                name="marca"
-                value={form.marca}
-                onChange={handleChange}
-                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
-                  isDarkMode 
-                    ? 'bg-gray-600 border-gray-500 text-white focus:border-indigo-400 focus:ring-indigo-400' 
-                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
-                }`}
-                required
-              >
-                <option value="">Selecciona una marca</option>
-                {marcas.map((marca) => (
-                  <option key={marca.id_marca} value={marca.id_marca}>
-                    {marca.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="mb-4 md:col-span-2">
-              <label htmlFor="descripcion" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                Descripción
-              </label>
-              <textarea
-                id="descripcion"
-                name="descripcion"
-                value={form.descripcion}
-                onChange={handleChange}
-                rows="3"
-                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
-                  isDarkMode 
-                    ? 'bg-gray-600 border-gray-500 text-white focus:border-indigo-400 focus:ring-indigo-400' 
-                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
-                }`}
-              />
-            </div>
-
-            <div className="mb-4 md:col-span-2">
-              <label htmlFor="video" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                URL del Video (opcional)
-              </label>
-              <input
-                type="url"
-                id="video"
-                name="video"
-                value={form.video}
-                onChange={handleChange}
-                placeholder="https://www.youtube.com/watch?v=..."
-                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
-                  isDarkMode 
-                    ? 'bg-gray-600 border-gray-500 text-white focus:border-indigo-400 focus:ring-indigo-400' 
-                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
-                }`}
-              />
-              <p className={`mt-1 text-xs transition-colors duration-300 ${
-                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-              }`}>
-                Puedes agregar enlaces de YouTube, Vimeo u otras plataformas de video
-              </p>
-            </div>
-          </div>
-
-          {/* Campo unificado para imágenes */}
-          <div className={`mb-6 mt-4 p-4 border rounded-md transition-colors duration-300 ${
-            isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-white border-gray-200'
+          <h2 className={`text-lg font-semibold mb-4 flex items-center transition-colors duration-300 ${
+            isDarkMode ? 'text-gray-200' : 'text-gray-700'
           }`}>
-            <label htmlFor="imagenes" className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
-              isDarkMode ? 'text-gray-300' : 'text-gray-700'
-            }`}>
-              Imágenes (máximo 5)
-            </label>
-            <div className="flex items-center justify-center w-full">
-              <label className={`flex flex-col w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors duration-300 ${
-                isDarkMode 
-                  ? 'border-gray-500 hover:bg-gray-700' 
-                  : 'border-gray-300 hover:bg-gray-50'
-              }`}>
-                <div className="flex flex-col items-center justify-center pt-7">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                  </svg>
-                  <p className={`pt-1 text-sm transition-colors duration-300 ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                  }`}>Haz clic para seleccionar</p>
-                  <p className={`text-xs transition-colors duration-300 ${
-                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                  }`}>Máximo 5 imágenes (2MB cada una)</p>
-                </div>
-                <input
-                  type="file"
-                  id="imagenes"
-                  name="imagenes"
-                  onChange={handleImagenesChange}
-                  className="hidden"
-                  accept="image/jpeg,image/png,image/jpg,image/gif,image/webm,image/webp" // Añadir image/webp
-                  multiple
-                />
-              </label>
-            </div>
-            
-            {/* Vista previa de imágenes */}
-            {imagenesPreview.length > 0 && (
-              <div className="mt-4">
-                <p className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Agregar Nueva Categoría
+          </h2>
+          
+          {/* Grid principal más compacto */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+            {/* Información básica */}
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="nombre" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>Vistas previas:</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                  {imagenesPreview.map((img, index) => (
-                    <div key={img.id} className="relative group">
-                      <div className={`aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg shadow-sm transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
-                      }`}>
-                        <img 
-                          src={img.preview} 
-                          alt={`Vista previa ${index + 1}`} 
-                          className="h-full w-full object-cover object-center"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md hover:bg-red-600 transition-colors"
-                        title="Eliminar imagen"
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  ))}
+                }`}>
+                  Nombre <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  value={form.nombre}
+                  onChange={handleChange}
+                  placeholder="Ingresa el nombre de la categoría"
+                  className={`w-full px-3 py-2 text-sm rounded-md border transition-colors duration-300 focus:ring-2 focus:ring-opacity-50 ${
+                    isDarkMode 
+                      ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+                  }`}
+                  required
+                />
+              </div>
+
+              <div>
+                <label htmlFor="marca" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  Marca <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    id="marca"
+                    name="marca"
+                    value={form.marca}
+                    onChange={handleChange}
+                    className={`w-full px-3 py-2 text-sm rounded-md border transition-colors duration-300 focus:ring-2 focus:ring-opacity-50 appearance-none ${
+                      isDarkMode 
+                        ? 'bg-gray-600 border-gray-500 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                    }`}
+                    required
+                  >
+                    <option value="">Selecciona una marca</option>
+                    {marcas.map((marca) => (
+                      <option key={marca.id_marca} value={marca.id_marca}>
+                        {marca.nombre}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <svg className={`w-4 h-4 transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
 
-          <div className="flex justify-end mt-6">
+              <div>
+                <label htmlFor="video" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  URL del Video
+                </label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    id="video"
+                    name="video"
+                    value={form.video}
+                    onChange={handleChange}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    className={`w-full px-3 py-2 pl-9 text-sm rounded-md border transition-colors duration-300 focus:ring-2 focus:ring-opacity-50 ${
+                      isDarkMode 
+                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+                    }`}
+                  />
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <svg className={`w-4 h-4 transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+                <p className={`mt-1 text-xs transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                }`}>
+                  Opcional: YouTube, Vimeo u otras plataformas
+                </p>
+              </div>
+            </div>
+
+            {/* Descripción e imágenes */}
+            <div className="space-y-3">
+              <div>
+                <label htmlFor="descripcion" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  Descripción
+                </label>
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  value={form.descripcion}
+                  onChange={handleChange}
+                  rows="3"
+                  placeholder="Describe la categoría (opcional)"
+                  className={`w-full px-3 py-2 text-sm rounded-md border transition-colors duration-300 focus:ring-2 focus:ring-opacity-50 resize-none ${
+                    isDarkMode 
+                      ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+                  }`}
+                />
+              </div>
+
+              {/* Sección de imágenes más compacta */}
+              <div>
+                <label htmlFor="imagenes" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  Imágenes <span className={`text-xs font-normal transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`}>(máx. 5, 2MB c/u)</span>
+                </label>
+                
+                <label className={`flex flex-col w-full h-24 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
+                  isDarkMode 
+                    ? 'border-gray-500 hover:bg-gray-600 hover:border-gray-400' 
+                    : 'border-gray-300 hover:bg-gray-100 hover:border-gray-400'
+                }`}>
+                  <div className="flex flex-col items-center justify-center h-full">
+                    <div className="flex items-center space-x-2">
+                      <svg className={`w-5 h-5 transition-colors duration-300 ${
+                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className={`text-sm font-medium transition-colors duration-300 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                      }`}>
+                        Seleccionar imágenes
+                      </span>
+                    </div>
+                    <span className={`text-xs mt-1 transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                      JPEG, PNG, GIF, WEBP
+                    </span>
+                  </div>
+                  <input
+                    type="file"
+                    id="imagenes"
+                    name="imagenes"
+                    onChange={handleImagenesChange}
+                    className="hidden"
+                    accept="image/jpeg,image/png,image/jpg,image/gif,image/webm,image/webp"
+                    multiple
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          {/* Vista previa de imágenes en una sola fila */}
+          {imagenesPreview.length > 0 && (
+            <div className={`p-3 rounded-md border transition-colors duration-300 ${
+              isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-white border-gray-200'
+            }`}>
+              <div className="flex items-center mb-2">
+                <svg className={`w-4 h-4 mr-1 transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <span className={`text-sm font-medium transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  Vista previa ({imagenesPreview.length})
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {imagenesPreview.map((img, index) => (
+                  <div key={img.id} className="relative group">
+                    <div className="w-16 h-16 rounded-lg overflow-hidden shadow-sm border-2 border-transparent group-hover:border-indigo-300 transition-all duration-200">
+                      <img 
+                        src={img.preview} 
+                        alt={`Preview ${index + 1}`} 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-lg hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                      title="Eliminar"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Botón de envío más prominente */}
+          <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-600">
             <button
               type="submit"
               disabled={loading}
-              className={`px-5 py-2.5 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center ${
+              className={`px-6 py-2.5 text-sm font-medium text-white rounded-lg transition-all duration-200 flex items-center shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95 ${
                 loading 
                   ? (isDarkMode ? 'bg-blue-500' : 'bg-blue-400') 
                   : (isDarkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-600 hover:bg-blue-700')
               }`}
             >
-              {loading && (
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Crear Categoría
+                </>
               )}
-              {loading ? 'Guardando...' : 'Guardar Categoría'}
             </button>
           </div>
         </form>
