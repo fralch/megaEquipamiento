@@ -8,7 +8,7 @@ import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
 const URL_API = import.meta.env.VITE_API_URL;
 
-export default function Categoria({ productos, categoria, subcategorias, marcas }) {
+export default function Categoria({ productos, categoria, subcategorias, marcas, todasCategorias }) {
     const { auth } = usePage().props;
     const { isDarkMode } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
@@ -236,7 +236,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                         </div>
                     </div>
 
-                    {/* Navegación de subcategorías */}
+                    {/* Navegación de categorías */}
                     <nav 
                         className={`p-4 overflow-y-auto shadow-2xl transition-all duration-200 rounded-lg ${
                             isDarkMode 
@@ -246,56 +246,71 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                         id="nav-fijo"
                     >
                         <div className="space-y-2">
-                            <button
-                                onClick={toggleSubcategoryDropdown}
-                                className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold ${
-                                    isDarkMode
-                                        ? 'bg-[#1e3a8a] text-white shadow-md'
-                                        : 'bg-[#1e3a8a] text-white shadow-md'
-                                } flex items-center justify-between animate-slideIn`}
-                            >
-                                <span className="font-medium text-sm">
-                                    {categoria.nombre}
-                                </span>
-                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20">
-                                    <svg 
-                                        className={`w-4 h-4 transform transition-transform duration-300 text-white ${
-                                            isSubcategoryDropdownOpen ? 'rotate-180' : ''
-                                        }`} 
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-                            </button>
-
-                            {isSubcategoryDropdownOpen && subcategorias && (
-                                <div className="ml-3 space-y-1 animate-slideDown">
-                                    {subcategorias.map((subcategoria, subIndex) => (
+                            {todasCategorias && todasCategorias.length > 0 ? todasCategorias.map((cat, catIndex) => {
+                                const isCurrentCategory = categoria && categoria.id_categoria === cat.id_categoria;
+                                return (
+                                    <div key={cat.id_categoria} className="space-y-1">
                                         <Link
-                                            key={subcategoria.id_subcategoria}
-                                            href={`/subcategoria/${subcategoria.id_subcategoria}`}
-                                            className={`group block p-2 pl-4 rounded-md transition-all duration-150 transform hover:scale-[1.02] hover:translate-x-1 ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 border border-gray-600/50 hover:border-gray-500/70' 
-                                                    : 'bg-blue-50/50 hover:bg-blue-100/70 text-gray-800 border border-blue-100 hover:border-blue-200'
-                                            } hover:shadow-sm animate-slideIn`}
-                                            style={{ animationDelay: `${subIndex * 0.03}s` }}
+                                            href={`/categorias/${cat.id_categoria}`}
+                                            className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold flex items-center justify-between animate-slideIn ${
+                                                isCurrentCategory
+                                                    ? (isDarkMode ? 'bg-[#1e3a8a] text-white shadow-md' : 'bg-[#1e3a8a] text-white shadow-md')
+                                                    : (isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-800')
+                                            }`}
+                                            style={{ animationDelay: `${catIndex * 0.05}s` }}
                                         >
-                                            <div className="flex items-center">
-                                                <div className={`w-1.5 h-1.5 rounded-full mr-2 transition-all duration-100 ${
-                                                    isDarkMode 
-                                                        ? 'bg-green-400 group-hover:bg-green-300' 
-                                                        : 'bg-green-500 group-hover:bg-green-600'
-                                                }`}></div>
-                                                <span className="text-sm font-medium group-hover:font-semibold transition-all duration-100">
-                                                    {subcategoria.nombre}
-                                                </span>
-                                            </div>
+                                            <span className="font-medium text-sm">
+                                                {cat.nombre}
+                                            </span>
+                                            {isCurrentCategory && subcategorias && subcategorias.length > 0 && (
+                                                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20">
+                                                    <svg 
+                                                        className={`w-4 h-4 transform transition-transform duration-300 text-white ${
+                                                            isSubcategoryDropdownOpen ? 'rotate-180' : ''
+                                                        }`} 
+                                                        fill="none" 
+                                                        stroke="currentColor" 
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                    </svg>
+                                                </div>
+                                            )}
                                         </Link>
-                                    ))}
+
+                                        {/* Mostrar subcategorías solo para la categoría actual */}
+                                        {isCurrentCategory && isSubcategoryDropdownOpen && subcategorias && subcategorias.length > 0 && (
+                                            <div className="ml-3 space-y-1 animate-slideDown">
+                                                {subcategorias.map((subcategoria, subIndex) => (
+                                                    <Link
+                                                        key={subcategoria.id_subcategoria}
+                                                        href={`/subcategoria/${subcategoria.id_subcategoria}`}
+                                                        className={`group block p-2 pl-4 rounded-md transition-all duration-150 transform hover:scale-[1.02] hover:translate-x-1 ${
+                                                            isDarkMode 
+                                                                ? 'bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 border border-gray-600/50 hover:border-gray-500/70' 
+                                                                : 'bg-blue-50/50 hover:bg-blue-100/70 text-gray-800 border border-blue-100 hover:border-blue-200'
+                                                        } hover:shadow-sm animate-slideIn`}
+                                                        style={{ animationDelay: `${subIndex * 0.03}s` }}
+                                                    >
+                                                        <div className="flex items-center">
+                                                            <div className={`w-1.5 h-1.5 rounded-full mr-2 transition-all duration-100 ${
+                                                                isDarkMode 
+                                                                    ? 'bg-green-400 group-hover:bg-green-300' 
+                                                                    : 'bg-green-500 group-hover:bg-green-600'
+                                                            }`}></div>
+                                                            <span className="text-sm font-medium group-hover:font-semibold transition-all duration-100">
+                                                                {subcategoria.nombre}
+                                                            </span>
+                                                        </div>
+                                                    </Link>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }) : (
+                                <div className={`p-3 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                    <p>No hay categorías disponibles</p>
                                 </div>
                             )}
                         </div>
@@ -308,7 +323,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                         <>
                           <div className="flex items-center justify-between mb-4">
                             <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>
-                                Categoría: {categoria.nombre}
+                                Categoría: {categoria ? categoria.nombre : 'Sin categoría'}
                                 {selectedBrand && (
                                     <span className="text-sm font-normal ml-2 opacity-75">
                                         - Filtrado por marca
@@ -332,7 +347,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas 
                         </>
                     ) : (
                         <>
-                        <h1 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>Categoría: {categoria.nombre}</h1>
+                        <h1 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>Categoría: {categoria ? categoria.nombre : 'Sin categoría'}</h1>
                         <div className="text-center py-10">
                           <p className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} transition-colors duration-200`}>No hay productos relacionados a esta categoría.</p>
                         </div>

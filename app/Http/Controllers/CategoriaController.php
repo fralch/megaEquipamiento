@@ -13,6 +13,9 @@ class CategoriaController extends Controller
    
     public function CategoriasWiew($id_categoria = null)
     {
+        // Obtener todas las categorías para la navegación
+        $todasCategorias = Categoria::all();
+
         if ($id_categoria === null) {
             // Si no se proporciona id_categoria, devolver un array vacío
             $productos = [];
@@ -24,6 +27,7 @@ class CategoriaController extends Controller
                 'categoria' => $categoria,
                 'subcategorias' => $subcategorias,
                 'marcas' => $marcas,
+                'todasCategorias' => $todasCategorias,
             ]);
         }
 
@@ -53,6 +57,7 @@ class CategoriaController extends Controller
             'categoria' => $categoria,
             'subcategorias' => $subcategorias,
             'marcas' => $marcas,
+            'todasCategorias' => $todasCategorias,
         ]);
     }
 
