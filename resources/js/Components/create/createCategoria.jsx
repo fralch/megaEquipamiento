@@ -8,6 +8,7 @@ const Categorias = ({ onSubmit }) => {
   const [form, setForm] = useState({
     nombre: "",
     descripcion: "",
+    video: "",
   });
   const [imagenes, setImagenes] = useState([]); // Array para las imágenes
   const [imagenesPreview, setImagenesPreview] = useState([]); // Array para vistas previas
@@ -178,6 +179,7 @@ const Categorias = ({ onSubmit }) => {
     const formData = new FormData();
     formData.append('nombre', form.nombre);
     formData.append('descripcion', form.descripcion || '');
+    formData.append('video', form.video || '');
     
     // Añadir las imágenes si existen
     if (imagenes.length > 0) {
@@ -217,6 +219,7 @@ const Categorias = ({ onSubmit }) => {
       setForm({
         nombre: "",
         descripcion: "",
+        video: "",
       });
       setImagenes([]);
       setImagenesPreview([]);
@@ -391,6 +394,32 @@ const Categorias = ({ onSubmit }) => {
                 }`}
               />
             </div>
+
+            <div className="mb-4 md:col-span-2">
+              <label htmlFor="video" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                URL del Video (opcional)
+              </label>
+              <input
+                type="url"
+                id="video"
+                name="video"
+                value={form.video}
+                onChange={handleChange}
+                placeholder="https://www.youtube.com/watch?v=..."
+                className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-300 ${
+                  isDarkMode 
+                    ? 'bg-gray-600 border-gray-500 text-white focus:border-indigo-400 focus:ring-indigo-400' 
+                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                }`}
+              />
+              <p className={`mt-1 text-xs transition-colors duration-300 ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}>
+                Puedes agregar enlaces de YouTube, Vimeo u otras plataformas de video
+              </p>
+            </div>
           </div>
 
           {/* Campo unificado para imágenes */}
@@ -511,6 +540,9 @@ const Categorias = ({ onSubmit }) => {
                 }`}>Descripción</th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                }`}>Video</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>Acciones</th>
               </tr>
             </thead>
@@ -532,6 +564,32 @@ const Categorias = ({ onSubmit }) => {
                       isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     }`}>
                       <div className="max-w-xs truncate">{categoria.descripcion || '-'}</div>
+                    </td>
+                    <td className={`px-6 py-4 text-sm transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                      {categoria.video ? (
+                        <a 
+                          href={categoria.video} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium transition-colors duration-300 ${
+                            isDarkMode 
+                              ? 'bg-blue-900 text-blue-300 hover:bg-blue-800' 
+                              : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                          }`}
+                        >
+                          <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                            <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
+                          </svg>
+                          Ver Video
+                        </a>
+                      ) : (
+                        <span className={`text-xs transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                        }`}>Sin video</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       {/* <button 
@@ -559,7 +617,7 @@ const Categorias = ({ onSubmit }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className={`px-6 py-4 text-center transition-colors duration-300 ${
+                  <td colSpan="5" className={`px-6 py-4 text-center transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
                   }`}>
                     No hay categorías disponibles

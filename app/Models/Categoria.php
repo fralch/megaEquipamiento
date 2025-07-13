@@ -23,6 +23,7 @@ class Categoria extends Model
         'nombre',
         'descripcion',
         'img',
+        'video',
     ];
 
     // Definir los campos que deben ser ocultados en arrays

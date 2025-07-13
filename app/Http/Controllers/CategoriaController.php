@@ -86,6 +86,7 @@ class CategoriaController extends Controller
         $request->validate([
             'nombre' => 'required|max:200',
             'descripcion' => 'nullable|string',
+            'video' => 'nullable|url|max:500', // Validación para URL de video
             'imagenes.*' =>  'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048', // Validación para múltiples imágenes
             'imagenes' => 'max:5', // Máximo 5 imágenes
         ]);
@@ -95,6 +96,7 @@ class CategoriaController extends Controller
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
             'img' => null, // Mantenemos el campo principal de imagen
+            'video' => $request->video,
         ];
     
         // Crear la categoría primero
