@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\Categoria;
 use App\Models\Subcategoria;
 use App\Models\Producto;
+use Illuminate\Support\Facades\DB;
 
 class CategoriaController extends Controller
 {
@@ -160,7 +161,10 @@ class CategoriaController extends Controller
     
         // Agregamos las imágenes al resultado para devolverlas
         // Note: You might want to save $imagenesGuardadas to the database if needed permanently
-        $categoria->imagenes_adicionales = $imagenesGuardadas; 
+        $categoria->imagenes_adicionales = $imagenesGuardadas;
+        
+        // Ejecutar la lógica de la migración para actualizar relaciones marca-categoria
+        $this->actualizarRelacionesMarcaCategoria();
     
         return response()->json($categoria);
     }
@@ -268,5 +272,28 @@ class CategoriaController extends Controller
         $subcategorias = $categoria->subcategorias;
         
         return response()->json($subcategorias);
+    }
+
+    /**
+     * Actualizar relaciones marca-categoria basándose en productos existentes
+     */
+    private function actualizarRelacionesMarcaCategoria()
+    {
+        // Insertar las relaciones marca-categoria basadas en los productos existentes
+        $query = "
+            INSERT INTO marca_categoria (marca_id, categoria_id, created_at, updated_at)
+            SELECT DISTINCT 
+                p.marca_id,
+                s.id_categoria,
+                NOW(),
+                NOW()
+            FROM productos p
+            INNER JOIN subcategorias s ON p.id_subcategoria = s.id_subcategoria
+            WHERE p.marca_id IS NOT NULL 
+            AND s.id_categoria IS NOT NULL
+            ON DUPLICATE KEY UPDATE updated_at = NOW()
+        ";
+        
+        DB::statement($query);
     }
 }
