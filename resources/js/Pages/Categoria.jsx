@@ -32,7 +32,15 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
         // Obtener el ID de la categoría desde la URL
         const urlParts = window.location.pathname.split('/');
         const categoriaId = urlParts[urlParts.length - 1];
+        console.log('Categoría seleccionada ID:', categoriaId);
+        console.log('Objeto completo de la categoría:', categoria);
     }, []);
+
+    useEffect(() => {
+        if (categoria) {
+            console.log('Categoría prop recibida:', categoria);
+        }
+    }, [categoria])
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -343,6 +351,28 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
 
                 {/* Contenido principal */}
                 <div className={`flex-1 p-4 transition-colors duration-200`}>
+                    {/* Video de la categoría */}
+                    {categoria && categoria.video && (
+                        <div className={`mb-8 p-6 rounded-lg transition-colors duration-200 ${
+                            isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
+                        }`}>
+                            <h2 className={`text-xl font-bold mb-4 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            }`}>
+                                Categoría: {categoria.nombre}
+                            </h2>
+                            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                                <iframe
+                                    src={categoria.video}
+                                    className="absolute top-0 left-0 w-full h-full rounded-lg"
+                                    frameBorder="0"
+                                    allowFullScreen
+                                    title={`Video de ${categoria.nombre}`}
+                                ></iframe>
+                            </div>
+                        </div>
+                    )}
+                    
                     {productos && productos.length > 0 ? (
                         <>
                           <div className="flex items-center justify-between mb-4">
