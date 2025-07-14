@@ -160,9 +160,13 @@ const PaymentStep = ({ onComplete, initialData, orderData, isDarkMode }) => {
                                 <span className={isDarkMode ? 'text-gray-100' : 'text-gray-900'}>{formatPrice(totals.total)}</span>
                             </div>
                         </div>
-                        <div className={`mt-4 p-3 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-white'}`}>
-                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                📧 Envía el comprobante de transferencia a: pagos@megaequipamiento.com
+                        <div className={`mt-4 p-4 rounded-lg border-2 border-blue-500 ${isDarkMode ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
+                            <p className={`text-sm font-medium flex items-center ${isDarkMode ? 'text-blue-300' : 'text-blue-700'}`}>
+                                <span className="text-lg mr-2">📧</span>
+                                <span>
+                                    Envía el comprobante de transferencia a:{' '}
+                                    <span className="font-bold">pagos@megaequipamiento.com</span>
+                                </span>
                             </p>
                         </div>
                     </div>
