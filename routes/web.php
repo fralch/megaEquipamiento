@@ -106,3 +106,11 @@ Route::post('/tipos-relacion-productos', [TiposRelacionProductosController::clas
 // Rutas para relación marca-categoría
 Route::post('/marca-categoria/create', [MarcaCategoriaController::class, 'store'])->name('marca-categoria.create');
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestMail;
+
+Route::get('/test-email', function () {
+    Mail::to('test@example.com')->send(new TestMail());
+    return 'Email sent!';
+});
+
