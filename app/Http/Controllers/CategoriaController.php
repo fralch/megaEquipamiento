@@ -173,16 +173,29 @@ class CategoriaController extends Controller
     /**
      * Actualizar una categoría y devolver el id
      */
-    public function update(Request $request, Categoria $categoria)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'nombre' => 'required|max:200',
             'descripcion' => 'nullable|string',
+            'video' => 'nullable|url|max:500', // Validación para URL de video
         ]);
 
-        $categoria->update($request->all());
+        // Buscar la categoría por ID
+        $categoria = Categoria::find($id);
+        
+        if (!$categoria) {
+            return response()->json(['error' => 'Categoría no encontrada'], 404);
+        }
 
-         return response()->json($categoria);
+        // Actualizar solo los campos proporcionados
+        $categoria->update([
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
+            'video' => $request->video,
+        ]);
+
+        return response()->json($categoria);
     }
     /**
      * Eliminar una categoría y devolver el id

@@ -19,6 +19,13 @@ const Categorias = ({ onSubmit }) => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [marcas, setMarcas] = useState([]); // Array para las marcas
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingCategoria, setEditingCategoria] = useState(null);
+  const [editForm, setEditForm] = useState({
+    nombre: "",
+    descripcion: "",
+    video: "",
+  });
 
 
   // Función para cargar las categorías
@@ -126,6 +133,61 @@ const Categorias = ({ onSubmit }) => {
     const newPreviews = [...imagenesPreview];
     newPreviews.splice(index, 1);
     setImagenesPreview(newPreviews);
+  };
+
+  // Función para abrir modal de edición
+  const handleEditCategoria = (categoria) => {
+    setEditingCategoria(categoria);
+    setEditForm({
+      nombre: categoria.nombre,
+      descripcion: categoria.descripcion || "",
+      video: categoria.video || "",
+    });
+    setShowEditModal(true);
+  };
+
+  // Función para cerrar modal de edición
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditingCategoria(null);
+    setEditForm({
+      nombre: "",
+      descripcion: "",
+      video: "",
+    });
+  };
+
+  // Manejar cambios en el formulario de edición
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm({ ...editForm, [name]: value });
+  };
+
+  // Función para actualizar categoría
+  const handleUpdateCategoria = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+        }
+      };
+      
+      await axios.put(`/categoria/update/${editingCategoria.id_categoria}`, editForm, config);
+      
+      setSuccessMessage('Categoría actualizada exitosamente');
+      loadCategorias();
+      handleCloseEditModal();
+    } catch (error) {
+      console.error('Error updating category:', error);
+      setError(`Error al actualizar la categoría: ${error.response?.data?.error || 'Error desconocido'}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Nueva función para eliminar una categoría
@@ -651,26 +713,32 @@ const Categorias = ({ onSubmit }) => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {/* <button 
-                        onClick={() => console.log('Editar categoría:', categoria.id_categoria)}
-                        className="text-indigo-600 hover:text-indigo-900 mr-3 bg-indigo-50 px-3 py-1 rounded-md hover:bg-indigo-100 transition-colors"
-                      >
-                        Editar
-                      </button> */}
-                      <button 
-                        onClick={() => handleDeleteCategoria(categoria.id_categoria, categoria.nombre)}
-                        disabled={deleteLoading}
-                        className={`px-3 py-1 rounded-md transition-colors duration-300 ${
-                          deleteLoading 
-                            ? (isDarkMode ? 'bg-red-900 text-red-400' : 'bg-red-100 text-red-300') 
-                            : (isDarkMode 
-                                ? 'bg-red-900 text-red-300 hover:text-red-200 hover:bg-red-800' 
-                                : 'bg-red-50 text-red-600 hover:text-red-900 hover:bg-red-100'
-                              )
-                        }`}
-                      >
-                        {deleteLoading ? 'Eliminando...' : 'Eliminar'}
-                      </button>
+                      <div className="flex space-x-2">
+                        <button 
+                          onClick={() => handleEditCategoria(categoria)}
+                          className={`px-3 py-1 rounded-md transition-colors duration-300 ${
+                            isDarkMode 
+                              ? 'bg-indigo-900 text-indigo-300 hover:text-indigo-200 hover:bg-indigo-800' 
+                              : 'bg-indigo-50 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-100'
+                          }`}
+                        >
+                          Editar
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteCategoria(categoria.id_categoria, categoria.nombre)}
+                          disabled={deleteLoading}
+                          className={`px-3 py-1 rounded-md transition-colors duration-300 ${
+                            deleteLoading 
+                              ? (isDarkMode ? 'bg-red-900 text-red-400' : 'bg-red-100 text-red-300') 
+                              : (isDarkMode 
+                                  ? 'bg-red-900 text-red-300 hover:text-red-200 hover:bg-red-800' 
+                                  : 'bg-red-50 text-red-600 hover:text-red-900 hover:bg-red-100'
+                                )
+                          }`}
+                        >
+                          {deleteLoading ? 'Eliminando...' : 'Eliminar'}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -809,6 +877,125 @@ const Categorias = ({ onSubmit }) => {
           )}
         </div>
       </div>
+
+      {/* Modal de edición */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className={`rounded-lg p-6 w-full max-w-md mx-4 transition-colors duration-300 ${
+            isDarkMode ? 'bg-gray-800' : 'bg-white'
+          }`}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}>
+                Editar Categoría
+              </h3>
+              <button
+                onClick={handleCloseEditModal}
+                className={`p-1 rounded-md transition-colors duration-300 ${
+                  isDarkMode 
+                    ? 'text-gray-400 hover:text-gray-300 hover:bg-gray-700' 
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form onSubmit={handleUpdateCategoria}>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="edit-nombre" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    Nombre <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="edit-nombre"
+                    name="nombre"
+                    value={editForm.nombre}
+                    onChange={handleEditChange}
+                    className={`w-full px-3 py-2 text-sm rounded-md border transition-colors duration-300 focus:ring-2 focus:ring-opacity-50 ${
+                      isDarkMode 
+                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+                    }`}
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="edit-descripcion" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    Descripción
+                  </label>
+                  <textarea
+                    id="edit-descripcion"
+                    name="descripcion"
+                    value={editForm.descripcion}
+                    onChange={handleEditChange}
+                    rows="3"
+                    className={`w-full px-3 py-2 text-sm rounded-md border transition-colors duration-300 focus:ring-2 focus:ring-opacity-50 resize-none ${
+                      isDarkMode 
+                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+                    }`}
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="edit-video" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    URL del Video
+                  </label>
+                  <input
+                    type="url"
+                    id="edit-video"
+                    name="video"
+                    value={editForm.video}
+                    onChange={handleEditChange}
+                    className={`w-full px-3 py-2 text-sm rounded-md border transition-colors duration-300 focus:ring-2 focus:ring-opacity-50 ${
+                      isDarkMode 
+                        ? 'bg-gray-600 border-gray-500 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500'
+                    }`}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  type="button"
+                  onClick={handleCloseEditModal}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-colors duration-300 ${
+                    isDarkMode 
+                      ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-4 py-2 text-sm font-medium text-white rounded-md transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    loading 
+                      ? (isDarkMode ? 'bg-blue-500' : 'bg-blue-400') 
+                      : (isDarkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-600 hover:bg-blue-700')
+                  }`}
+                >
+                  {loading ? 'Actualizando...' : 'Actualizar'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
