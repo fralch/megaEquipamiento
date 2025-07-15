@@ -217,46 +217,116 @@ const ProductPage = ({ producto }) => {
 
     const handleSave = async (field) => {
         try {
-            setProductData(prev => ({
-                ...prev,
-                [field]: tempInputs[field]
-            }));
-
-            setEditMode(prev => ({
-                ...prev,
-                [field]: false
-            }));
-
-            setTempInputs({});
-
-            const response = await axios.post('/product/update', {
+            let valueToSave = tempInputs[field];
+            
+            // Validación básica
+            if (valueToSave === undefined || valueToSave === null) {
+                valueToSave = '';
+            }
+            
+            // Solo limpiar texto para campos específicos y solo si es necesario
+            if ((field === 'soporte_tecnico' || field === 'envio') && valueToSave.includes('*')) {
+                const originalValue = valueToSave;
+                valueToSave = cleanAndFormatText(valueToSave);
+                console.log('Texto antes de limpiar:', originalValue);
+                console.log('Texto después de limpiar:', valueToSave);
+            }
+            
+            // Validar que el texto no esté vacío después de la limpieza
+            if (!valueToSave.trim()) {
+                alert('El contenido no puede estar vacío.');
+                return;
+            }
+            
+            // Validar longitud del texto según los límites de la base de datos
+            const maxLength = field === 'soporte_tecnico' ? 800 : (field === 'envio' ? 100 : 255);
+            if (valueToSave.length > maxLength) {
+                alert(`El texto es demasiado largo. Máximo ${maxLength} caracteres. Actual: ${valueToSave.length} caracteres.`);
+                return;
+            }
+            
+            // Preparar datos para enviar
+            const dataToSend = {
                 id_producto: producto.id_producto,
-                [field]: tempInputs[field]
-            }, {
+                [field]: valueToSave
+            };
+            
+            console.log('Enviando al servidor:', dataToSend);
+            
+            // Enviar al servidor con timeout y mejor manejo de errores
+            const response = await axios.post('/product/update', dataToSend, {
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
-                }
+                },
+                timeout: 10000 // 10 segundos de timeout
             });
 
-            if (response.data) {
-                console.log("Product updated successfully:", response.data);
-                setProductData(response.data);
+            console.log('Respuesta del servidor:', response);
+
+            // Solo actualizar el estado si todo salió bien
+            if (response.status === 200) {
+                setProductData(prev => ({
+                    ...prev,
+                    [field]: valueToSave
+                }));
+
+                setEditMode(prev => ({
+                    ...prev,
+                    [field]: false
+                }));
+
+                setTempInputs(prev => {
+                    const newInputs = { ...prev };
+                    delete newInputs[field];
+                    return newInputs;
+                });
+                
+                console.log("Guardado exitoso para el campo:", field);
             }
         } catch (error) {
-            console.error("Error updating product:", error);
-
-            setProductData(prev => ({
-                ...prev,
-                [field]: producto[field]
-            }));
-            setEditMode(prev => ({
-                ...prev,
-                [field]: false
-            }));
+            console.error("Error detallado al guardar:", error);
+            
+            // Manejo específico de errores
+            if (error.response) {
+                // Error del servidor (4xx, 5xx)
+                console.error('Error del servidor:', error.response.status, error.response.data);
+                alert(`Error del servidor (${error.response.status}): ${error.response.data?.message || 'Error desconocido'}`);
+            } else if (error.request) {
+                // Error de red
+                console.error('Error de red:', error.request);
+                alert('Error de conexión. Verifica tu conexión a internet.');
+            } else {
+                // Error en la configuración de la petición
+                console.error('Error de configuración:', error.message);
+                alert('Error interno. Por favor, recarga la página e intenta de nuevo.');
+            }
+            
+            // No revertir cambios automáticamente - dejar que el usuario decida
         }
     };
+
+   const handlePaste = (e, field) => {
+        // Solo procesar si contiene asteriscos
+        setTimeout(() => {
+            const textarea = e.target;
+            const currentValue = textarea.value;
+            
+            if (currentValue.includes('*')) {
+                try {
+                    const cleanedText = cleanAndFormatText(currentValue);
+                    if (cleanedText !== currentValue) {
+                        handleInputChange(field, cleanedText);
+                    }
+                } catch (error) {
+                    console.error('Error al procesar texto pegado:', error);
+                    // No hacer nada si hay error, mantener texto original
+                }
+            }
+        }, 50);
+    };
+
 
     const handleSaveFeatures = async (jsonData) => {
         try {
@@ -456,6 +526,29 @@ const ProductPage = ({ producto }) => {
         updateContent(nuevasSecciones, contenidoTabla.textoActual);
     };
 
+    const cleanAndFormatText = (text) => {
+        if (!text || typeof text !== 'string') return '';
+        
+        try {
+            return text
+                // Convertir asteriscos a viñetas de forma simple
+                .replace(/^\*\s+/gm, '• ')
+                .replace(/\n\*\s+/g, '\n• ')
+                // Limpiar caracteres problemáticos básicos
+                .replace(/\u00A0/g, ' ') // Non-breaking spaces
+                .replace(/\r\n/g, '\n')
+                .replace(/\r/g, '\n')
+                // Limpiar espacios extra sin ser agresivo
+                .replace(/[ \t]+/g, ' ')
+                .replace(/\n\s*\n\s*\n+/g, '\n\n')
+                .trim();
+        } catch (error) {
+            console.error('Error cleaning text:', error);
+            // Si hay error en la limpieza, devolver el texto original
+            return text.trim();
+        }
+    };
+
     const renderTabla = (seccion) => (
         <table style={{ width: '100%' }} className="border-collapse border border-gray-300">
             <thead>
@@ -653,12 +746,22 @@ const ProductPage = ({ producto }) => {
                                             className="w-full p-2 border rounded"
                                             value={tempInputs.envio}
                                             onChange={(e) => handleInputChange('envio', e.target.value)}
-                                           
+                                            rows={6}
+                                            placeholder="Ingrese el contenido de envío"
                                         />
+                                        <div className="mt-2 text-xs">
+                                            <span className={`${(tempInputs.envio || '').length > 100 ? 'text-red-600 font-bold' : 'text-gray-500'}`}>
+                                                Caracteres: {(tempInputs.envio || '').length} / 100
+                                            </span>
+                                            {(tempInputs.envio || '').length > 100 && (
+                                                <span className="text-red-500 font-bold ml-2">¡Excede el límite!</span>
+                                            )}
+                                        </div>
                                         <div className="mt-2">
                                             <button
                                                 onClick={() => handleSave('envio')}
-                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2 disabled:opacity-50"
+                                                disabled={!tempInputs.envio?.trim() || (tempInputs.envio || '').length > 100}
                                             >
                                                 Guardar
                                             </button>
@@ -693,12 +796,21 @@ const ProductPage = ({ producto }) => {
                                             value={tempInputs.envio}
                                             onChange={(e) => handleInputChange('envio', e.target.value)}
                                             placeholder="Ingrese el contenido de envío"
-                                          
+                                            rows={6}
                                         />
+                                        <div className="mt-2 text-xs">
+                                            <span className={`${(tempInputs.envio || '').length > 100 ? 'text-red-600 font-bold' : 'text-gray-500'}`}>
+                                                Caracteres: {(tempInputs.envio || '').length} / 100
+                                            </span>
+                                            {(tempInputs.envio || '').length > 100 && (
+                                                <span className="text-red-500 font-bold ml-2">¡Excede el límite!</span>
+                                            )}
+                                        </div>
                                         <div className="mt-2">
                                             <button
                                                 onClick={() => handleSave('envio')}
-                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2 disabled:opacity-50"
+                                                disabled={!tempInputs.envio?.trim() || (tempInputs.envio || '').length > 100}
                                             >
                                                 Guardar
                                             </button>
@@ -732,36 +844,110 @@ const ProductPage = ({ producto }) => {
                             <div>
                                 {editMode.soporte_tecnico ? (
                                     <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Información de Soporte Técnico
+                                        </label>
+                                        <div className="mb-3 text-sm text-blue-600 bg-blue-50 p-3 rounded">
+                                            <strong>💡 Consejos:</strong>
+                                            <ul className="mt-1 ml-4 space-y-1">
+                                                <li>• Puedes pegar texto con asteriscos (*) - se convertirán a viñetas (•)</li>
+                                                <li>• Usa Enter para nuevas líneas</li>
+                                                <li>• Usa el botón "Limpiar" si el formato se ve extraño</li>
+                                            </ul>
+                                        </div>
+                                        
                                         <textarea
-                                            className="w-full p-2 border rounded"
-                                            value={tempInputs.soporte_tecnico}
+                                            className="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            value={tempInputs.soporte_tecnico || ''}
                                             onChange={(e) => handleInputChange('soporte_tecnico', e.target.value)}
-                                          
+                                            onPaste={(e) => handlePaste(e, 'soporte_tecnico')}
+                                            placeholder="Ejemplo:
+                                            • GARANTÍA: Certificado por 24 meses
+                                            • SERVICIO TÉCNICO: Equipo especializado
+                                            • CALIBRACIÓN: Laboratorio propio
+                                            • CONVENIOS: Asesoría permanente"
+                                            rows={15}
+                                            style={{
+                                                minHeight: '300px',
+                                                resize: 'vertical',
+                                                fontSize: '14px',
+                                                lineHeight: '1.5'
+                                            }}
                                         />
-                                        <div className="mt-2">
+                                        
+                                        <div className="mt-4 flex flex-wrap gap-2">
                                             <button
                                                 onClick={() => handleSave('soporte_tecnico')}
-                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                                className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 font-medium disabled:opacity-50"
+                                                disabled={!tempInputs.soporte_tecnico?.trim() || (tempInputs.soporte_tecnico || '').length > 800}
                                             >
                                                 Guardar
                                             </button>
                                             <button
-                                                onClick={() => toggleEditMode('soporte_tecnico')}
-                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                                onClick={() => {
+                                                    setEditMode(prev => ({ ...prev, soporte_tecnico: false }));
+                                                    setTempInputs(prev => {
+                                                        const newInputs = { ...prev };
+                                                        delete newInputs.soporte_tecnico;
+                                                        return newInputs;
+                                                    });
+                                                }}
+                                                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors duration-200"
                                             >
                                                 Cancelar
                                             </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const currentText = tempInputs.soporte_tecnico || '';
+                                                    if (currentText.includes('*')) {
+                                                        const cleanedText = cleanAndFormatText(currentText);
+                                                        handleInputChange('soporte_tecnico', cleanedText);
+                                                    }
+                                                }}
+                                                className="px-3 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 text-sm transition-colors duration-200"
+                                                disabled={!tempInputs.soporte_tecnico?.includes('*')}
+                                            >
+                                                Limpiar
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="mt-2 text-xs">
+                                            <span className={`${(tempInputs.soporte_tecnico || '').length > 800 ? 'text-red-600 font-bold' : 'text-gray-500'}`}>
+                                                Caracteres: {(tempInputs.soporte_tecnico || '').length} / 800
+                                            </span>
+                                            {(tempInputs.soporte_tecnico || '').length > 800 && (
+                                                <span className="text-red-500 font-bold ml-2">¡Excede el límite!</span>
+                                            )}
                                         </div>
                                     </div>
                                 ) : (
                                     <div>
-                                        <div className="whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: productData.soporte_tecnico.replace(/•/g, '<li style="list-style-type: none;">').replace(/\n•/g, '</li>\n<li style="list-style-type: none;">').replace(/^•/, '<ul style="padding-left: 0;"><li style="list-style-type: none;">') + (productData.soporte_tecnico.includes('•') ? '</li></ul>' : '') }} />
+                                        <div 
+                                            className="whitespace-pre-wrap bg-gray-50 p-4 rounded-md border min-h-[100px]" 
+                                            style={{ lineHeight: '1.6' }}
+                                            dangerouslySetInnerHTML={{ 
+                                                __html: productData.soporte_tecnico
+                                                    .replace(/•/g, '<li style="list-style-type: disc; margin-left: 20px; margin-bottom: 4px;">')
+                                                    .replace(/\n•/g, '</li>\n<li style="list-style-type: disc; margin-left: 20px; margin-bottom: 4px;">')
+                                                    .replace(/^•/, '<ul style="padding-left: 0;"><li style="list-style-type: disc; margin-left: 20px; margin-bottom: 4px;">')
+                                                    + (productData.soporte_tecnico.includes('•') ? '</li></ul>' : '')
+                                                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                                    .replace(/\n/g, '<br>')
+                                            }} 
+                                        />
                                         {auth.user && (
                                             <button
-                                                onClick={() => toggleEditMode('soporte_tecnico')}
-                                                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                                onClick={() => {
+                                                    setTempInputs(prev => ({
+                                                        ...prev,
+                                                        soporte_tecnico: productData.soporte_tecnico || ''
+                                                    }));
+                                                    toggleEditMode('soporte_tecnico');
+                                                }}
+                                                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200"
                                             >
-                                                Editar soporte técnico
+                                                Editar Soporte
                                             </button>
                                         )}
                                     </div>
@@ -771,37 +957,36 @@ const ProductPage = ({ producto }) => {
                             <div>
                                 {editMode.soporte_tecnico ? (
                                     <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Información de Soporte Técnico
+                                        </label>
                                         <textarea
-                                            className="w-full p-2 border rounded"
-                                            value={tempInputs.soporte_tecnico}
+                                            className="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            value={tempInputs.soporte_tecnico || ''}
                                             onChange={(e) => handleInputChange('soporte_tecnico', e.target.value)}
-                                            placeholder="Ingrese la información de soporte técnico"
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault();
-                                                    const cursorPosition = e.target.selectionStart;
-                                                    const textBeforeCursor = tempInputs.soporte_tecnico.substring(0, cursorPosition);
-                                                    const textAfterCursor = tempInputs.soporte_tecnico.substring(cursorPosition);
-                                                    const newText = textBeforeCursor + '\n• ' + textAfterCursor;
-                                                    handleInputChange('soporte_tecnico', newText);
-                                                    // Establecer el cursor después del punto de la lista
-                                                    setTimeout(() => {
-                                                        e.target.selectionStart = cursorPosition + 3;
-                                                        e.target.selectionEnd = cursorPosition + 3;
-                                                    }, 0);
-                                                }
-                                            }}
+                                            onPaste={(e) => handlePaste(e, 'soporte_tecnico')}
+                                            placeholder="Ingrese la información de soporte técnico..."
+                                            rows={8}
                                         />
-                                        <div className="mt-2">
+                                        <div className="mt-2 text-xs">
+                                            <span className={`${(tempInputs.soporte_tecnico || '').length > 800 ? 'text-red-600 font-bold' : 'text-gray-500'}`}>
+                                                Caracteres: {(tempInputs.soporte_tecnico || '').length} / 800
+                                            </span>
+                                            {(tempInputs.soporte_tecnico || '').length > 800 && (
+                                                <span className="text-red-500 font-bold ml-2">¡Excede el límite!</span>
+                                            )}
+                                        </div>
+                                        <div className="mt-4 flex space-x-2">
                                             <button
                                                 onClick={() => handleSave('soporte_tecnico')}
-                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
+                                                disabled={!tempInputs.soporte_tecnico?.trim() || (tempInputs.soporte_tecnico || '').length > 800}
                                             >
                                                 Guardar
                                             </button>
                                             <button
                                                 onClick={() => toggleEditMode('soporte_tecnico')}
-                                                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                                             >
                                                 Cancelar
                                             </button>
@@ -809,13 +994,21 @@ const ProductPage = ({ producto }) => {
                                     </div>
                                 ) : (
                                     <div>
-                                        <p>No hay información de soporte técnico disponible.</p>
-                                        <button
-                                            onClick={() => toggleEditMode('soporte_tecnico')}
-                                            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        >
-                                            Agregar soporte técnico
-                                        </button>
+                                        <p className="text-gray-500 mb-4">No hay información de soporte técnico disponible.</p>
+                                        {auth.user && (
+                                            <button
+                                                onClick={() => {
+                                                    setTempInputs(prev => ({
+                                                        ...prev,
+                                                        soporte_tecnico: ''
+                                                    }));
+                                                    toggleEditMode('soporte_tecnico');
+                                                }}
+                                                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                            >
+                                                ➕ Agregar
+                                            </button>
+                                        )}
                                     </div>
                                 )}
                             </div>
