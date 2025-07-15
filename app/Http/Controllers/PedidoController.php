@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\PedidoConfirmacion;
 use App\Models\Pedido;
 use App\Models\Usuario;
+use Inertia\Inertia;
 
 class PedidoController extends Controller
 {
@@ -86,5 +89,72 @@ class PedidoController extends Controller
 
         return redirect()->route('pedidos.index')
                          ->with('success', 'Pedido eliminado exitosamente.');
+    }
+
+    /**
+     * Confirmar pedido y enviar correo de confirmación
+     */
+    public function confirmarPedido(Request $request)
+    {
+        try {
+            // Validar los datos del pedido
+            $validated = $request->validate([
+                'orderData' => 'required|array',
+                'checkoutState' => 'required|array',
+                'totals' => 'required|array',
+                'orderNumber' => 'required|string'
+            ]);
+
+            // Extraer datos del cliente
+            $customerData = $validated['checkoutState']['customerData'] ?? [];
+            $shippingData = $validated['checkoutState']['shippingData'] ?? [];
+            $paymentData = $validated['checkoutState']['paymentData'] ?? [];
+            
+            // Preparar datos para el correo
+            $datosCorreo = [
+                'orderNumber' => $validated['orderNumber'],
+                'customerData' => $customerData,
+                'shippingData' => $shippingData,
+                'paymentData' => $paymentData,
+                'orderData' => $validated['orderData'],
+                'totals' => $validated['totals'],
+                'datosBancarios' => [
+                    'banco' => 'Banco de Crédito del Perú (BCP)',
+                    'titular' => 'MegaEquipamiento S.A.C.',
+                    'numeroCuenta' => '194-2345678-0-12',
+                    'cuentaInterbancaria' => '002-194-002345678012-34',
+                    'ruc' => '20123456789',
+                    'email' => 'ventas@megaequipamiento.com',
+                    'telefono' => '+51 1 234-5678'
+                ]
+            ];
+
+            // Enviar correo de confirmación
+            if (isset($customerData['email']) && !empty($customerData['email'])) {
+                Mail::to($customerData['email'])->send(new PedidoConfirmacion($datosCorreo));
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pedido confirmado y correo enviado exitosamente',
+                'orderNumber' => $validated['orderNumber']
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar el pedido: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Ver detalles del pedido
+     */
+    public function verPedido($orderNumber)
+    {
+        return Inertia::render('Pedido/Detalle', [
+            'orderNumber' => $orderNumber
+        ]);
     }
 }

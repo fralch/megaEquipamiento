@@ -96,19 +96,40 @@ const ConfirmStep = ({ orderData, isDarkMode }) => {
         setIsProcessing(true);
         
         try {
-            // Simular procesamiento del pedido
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
             // Generar número de orden
             const orderNum = 'ORD-' + Date.now().toString().slice(-8);
-            setOrderNumber(orderNum);
-            setOrderPlaced(true);
             
-            // Aquí iría la llamada real a la API
-            // router.post('/orders', orderData);
+            // Preparar datos para enviar al backend
+            const datosCompletos = {
+                orderNumber: orderNum,
+                orderData: orderData,
+                checkoutState: checkoutState,
+                totals: totals
+            };
+            
+            // Enviar datos al backend para confirmar pedido y enviar correo
+            const response = await fetch('/pedido/confirmar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: JSON.stringify(datosCompletos)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                setOrderNumber(orderNum);
+                setOrderPlaced(true);
+                console.log('Pedido confirmado y correo enviado:', result.message);
+            } else {
+                throw new Error(result.message || 'Error al procesar el pedido');
+            }
             
         } catch (error) {
             console.error('Error al procesar el pedido:', error);
+            alert('Error al procesar el pedido: ' + error.message);
         } finally {
             setIsProcessing(false);
         }

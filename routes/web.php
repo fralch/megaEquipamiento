@@ -10,6 +10,7 @@ use App\Http\Controllers\FiltroController;
 use App\Http\Controllers\TiposRelacionProductosController;
 use App\Http\Controllers\MarcaCategoriaController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PedidoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -106,11 +107,70 @@ Route::post('/tipos-relacion-productos', [TiposRelacionProductosController::clas
 // Rutas para relación marca-categoría
 Route::post('/marca-categoria/create', [MarcaCategoriaController::class, 'store'])->name('marca-categoria.create');
 
+// Rutas para pedidos
+Route::post('/pedido/confirmar', [PedidoController::class, 'confirmarPedido'])->name('pedido.confirmar');
+Route::get('/orders/{orderNumber}', [PedidoController::class, 'verPedido'])->name('pedido.ver');
+
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
 
 Route::get('/test-email', function () {
     Mail::to('test@example.com')->send(new TestMail());
     return 'Email sent!';
+});
+
+Route::get('/test-pedido-email', function () {
+    $datosPrueba = [
+        'orderNumber' => 'ORD-12345678',
+        'customerData' => [
+            'firstName' => 'Juan',
+            'lastName' => 'Pérez',
+            'email' => 'juan.perez@example.com',
+            'phone' => '+51 987 654 321',
+            'documentType' => 'DNI',
+            'documentNumber' => '12345678'
+        ],
+        'shippingData' => [
+            'address' => 'Av. Ejemplo 123, Dpto 456',
+            'city' => 'Lima',
+            'state' => 'Lima',
+            'zipCode' => '15001'
+        ],
+        'paymentData' => [
+            'method' => 'transfer'
+        ],
+        'orderData' => [
+            'cartItems' => [
+                [
+                    'title' => 'Producto de Prueba 1',
+                    'price' => 150.00,
+                    'quantity' => 2
+                ],
+                [
+                    'title' => 'Producto de Prueba 2',
+                    'price' => 75.50,
+                    'quantity' => 1
+                ]
+            ]
+        ],
+        'totals' => [
+            'subtotal' => 375.50,
+            'shipping' => 25.00,
+            'tax' => 67.59,
+            'total' => 468.09
+        ],
+        'datosBancarios' => [
+            'banco' => 'Banco de Crédito del Perú (BCP)',
+            'titular' => 'MegaEquipamiento S.A.C.',
+            'numeroCuenta' => '194-2345678-0-12',
+            'cuentaInterbancaria' => '002-194-002345678012-34',
+            'ruc' => '20123456789',
+            'email' => 'ventas@megaequipamiento.com',
+            'telefono' => '+51 1 234-5678'
+        ]
+    ];
+    
+    Mail::to('test@example.com')->send(new \App\Mail\PedidoConfirmacion($datosPrueba));
+    return 'Email de pedido enviado!';
 });
 
