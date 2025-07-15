@@ -238,12 +238,7 @@ const ProductPage = ({ producto }) => {
                 return;
             }
             
-            // Validar longitud del texto según los límites de la base de datos
-            const maxLength = field === 'soporte_tecnico' ? 800 : (field === 'envio' ? 100 : 255);
-            if (valueToSave.length > maxLength) {
-                alert(`El texto es demasiado largo. Máximo ${maxLength} caracteres. Actual: ${valueToSave.length} caracteres.`);
-                return;
-            }
+            // No hay restricciones de longitud para ningún campo
             
             // Preparar datos para enviar
             const dataToSend = {
@@ -750,18 +745,15 @@ const ProductPage = ({ producto }) => {
                                             placeholder="Ingrese el contenido de envío"
                                         />
                                         <div className="mt-2 text-xs">
-                                            <span className={`${(tempInputs.envio || '').length > 100 ? 'text-red-600 font-bold' : 'text-gray-500'}`}>
-                                                Caracteres: {(tempInputs.envio || '').length} / 100
+                                            <span className="text-gray-500">
+                                                Caracteres: {(tempInputs.envio || '').length}
                                             </span>
-                                            {(tempInputs.envio || '').length > 100 && (
-                                                <span className="text-red-500 font-bold ml-2">¡Excede el límite!</span>
-                                            )}
                                         </div>
                                         <div className="mt-2">
                                             <button
                                                 onClick={() => handleSave('envio')}
                                                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2 disabled:opacity-50"
-                                                disabled={!tempInputs.envio?.trim() || (tempInputs.envio || '').length > 100}
+                                                disabled={!tempInputs.envio?.trim()}
                                             >
                                                 Guardar
                                             </button>
@@ -799,18 +791,15 @@ const ProductPage = ({ producto }) => {
                                             rows={6}
                                         />
                                         <div className="mt-2 text-xs">
-                                            <span className={`${(tempInputs.envio || '').length > 100 ? 'text-red-600 font-bold' : 'text-gray-500'}`}>
-                                                Caracteres: {(tempInputs.envio || '').length} / 100
+                                            <span className="text-gray-500">
+                                                Caracteres: {(tempInputs.envio || '').length}
                                             </span>
-                                            {(tempInputs.envio || '').length > 100 && (
-                                                <span className="text-red-500 font-bold ml-2">¡Excede el límite!</span>
-                                            )}
                                         </div>
                                         <div className="mt-2">
                                             <button
                                                 onClick={() => handleSave('envio')}
                                                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2 disabled:opacity-50"
-                                                disabled={!tempInputs.envio?.trim() || (tempInputs.envio || '').length > 100}
+                                                disabled={!tempInputs.envio?.trim()}
                                             >
                                                 Guardar
                                             </button>
@@ -879,7 +868,7 @@ const ProductPage = ({ producto }) => {
                                             <button
                                                 onClick={() => handleSave('soporte_tecnico')}
                                                 className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 font-medium disabled:opacity-50"
-                                                disabled={!tempInputs.soporte_tecnico?.trim() || (tempInputs.soporte_tecnico || '').length > 800}
+                                                disabled={!tempInputs.soporte_tecnico?.trim()}
                                             >
                                                 Guardar
                                             </button>
@@ -913,12 +902,9 @@ const ProductPage = ({ producto }) => {
                                         </div>
                                         
                                         <div className="mt-2 text-xs">
-                                            <span className={`${(tempInputs.soporte_tecnico || '').length > 800 ? 'text-red-600 font-bold' : 'text-gray-500'}`}>
-                                                Caracteres: {(tempInputs.soporte_tecnico || '').length} / 800
+                                            <span className="text-gray-500">
+                                                Caracteres: {(tempInputs.soporte_tecnico || '').length}
                                             </span>
-                                            {(tempInputs.soporte_tecnico || '').length > 800 && (
-                                                <span className="text-red-500 font-bold ml-2">¡Excede el límite!</span>
-                                            )}
                                         </div>
                                     </div>
                                 ) : (
@@ -969,18 +955,15 @@ const ProductPage = ({ producto }) => {
                                             rows={8}
                                         />
                                         <div className="mt-2 text-xs">
-                                            <span className={`${(tempInputs.soporte_tecnico || '').length > 800 ? 'text-red-600 font-bold' : 'text-gray-500'}`}>
-                                                Caracteres: {(tempInputs.soporte_tecnico || '').length} / 800
+                                            <span className="text-gray-500">
+                                                Caracteres: {(tempInputs.soporte_tecnico || '').length}
                                             </span>
-                                            {(tempInputs.soporte_tecnico || '').length > 800 && (
-                                                <span className="text-red-500 font-bold ml-2">¡Excede el límite!</span>
-                                            )}
                                         </div>
                                         <div className="mt-4 flex space-x-2">
                                             <button
                                                 onClick={() => handleSave('soporte_tecnico')}
                                                 className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50"
-                                                disabled={!tempInputs.soporte_tecnico?.trim() || (tempInputs.soporte_tecnico || '').length > 800}
+                                                disabled={!tempInputs.soporte_tecnico?.trim()}
                                             >
                                                 Guardar
                                             </button>
