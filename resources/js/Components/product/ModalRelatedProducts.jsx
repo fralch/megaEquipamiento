@@ -90,7 +90,13 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
             setSearchResults([]);
         } catch (error) {
             console.error('Error al relacionar productos:', error);
-            alert('Error al relacionar los productos');
+            
+            // Verificar si es un error de relación duplicada
+            if (error.response && error.response.status === 409) {
+                alert('El producto ya está relacionado con el tipo seleccionado');
+            } else {
+                alert('Error al relacionar los productos');
+            }
         }
     };
 
