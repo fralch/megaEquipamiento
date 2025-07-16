@@ -345,6 +345,18 @@ class ProductoController extends Controller
     {
         $producto = Producto::findOrFail($request->id);
 
+        // Validar si la relación ya existe
+        $relacionExistente = $producto->productosRelacionados()
+            ->where('relacionado_id', $request->relacionado_id)
+            ->wherePivot('tipo', $request->tipo)
+            ->exists();
+
+        if ($relacionExistente) {
+            return response()->json([
+                'message' => 'La relación ya existe entre estos productos con el mismo tipo'
+            ], 409); // 409 Conflict
+        }
+
         $producto->productosRelacionados()->attach($request->relacionado_id, ['tipo' => $request->tipo]);
 
         return response()->json(['message' => 'Relación agregada correctamente']);
