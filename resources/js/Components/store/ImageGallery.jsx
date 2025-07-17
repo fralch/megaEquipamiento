@@ -13,6 +13,8 @@ const ImageGallery = ({ images, productId, productName, onImagesUpdate, canEdit 
     const [dragActive, setDragActive] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [errors, setErrors] = useState([]);
+    const [draggedIndex, setDraggedIndex] = useState(null);
+    const [dragOverIndex, setDragOverIndex] = useState(null);
     const thumbnailsRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -115,6 +117,41 @@ const ImageGallery = ({ images, productId, productName, onImagesUpdate, canEdit 
             processFiles(e.dataTransfer.files);
         }
     }, [processFiles]);
+
+    // Funciones para reordenar imágenes mediante drag and drop
+    const handleDragStart = (e, index) => {
+        setDraggedIndex(index);
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', e.target.outerHTML);
+        e.target.style.opacity = '0.5';
+    };
+
+    const handleDragEnd = (e) => {
+        e.target.style.opacity = '1';
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
+
+    const handleDragOver = (e, index) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (draggedIndex !== null && draggedIndex !== index) {
+            setDragOverIndex(index);
+        }
+    };
+
+    const handleDragLeave = () => {
+        setDragOverIndex(null);
+    };
+
+    const handleDropReorder = (e, dropIndex) => {
+        e.preventDefault();
+        if (draggedIndex !== null && draggedIndex !== dropIndex) {
+            handleReorderImage(draggedIndex, dropIndex);
+        }
+        setDraggedIndex(null);
+        setDragOverIndex(null);
+    };
 
     // Función para cambiar imagen actual
     const handleImageChange = (index) => {
@@ -463,24 +500,65 @@ const ImageGallery = ({ images, productId, productName, onImagesUpdate, canEdit 
                     {/* Vista previa de nuevas imágenes */}
                     {previewImages.length > 0 && (
                         <div className="mt-4">
-                            <h4 className={`text-sm font-medium mb-3 ${
-                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                            }`}>
-                                Imágenes seleccionadas ({previewImages.length})
-                            </h4>
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className={`text-sm font-medium ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    Imágenes seleccionadas ({previewImages.length})
+                                </h4>
+                                <p className={`text-xs ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`}>
+                                    Arrastra para reordenar
+                                </p>
+                            </div>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                 {previewImages.map((preview, index) => (
-                                    <div key={index} className={`relative border rounded-lg p-2 group ${
-                                        isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'
-                                    }`}>
+                                    <div 
+                                        key={index} 
+                                        className={`relative border rounded-lg p-2 group cursor-move transition-all duration-200 ${
+                                            draggedIndex === index 
+                                                ? 'opacity-50 scale-95' 
+                                                : dragOverIndex === index 
+                                                    ? isDarkMode 
+                                                        ? 'border-blue-400 bg-blue-900/30 scale-105' 
+                                                        : 'border-blue-500 bg-blue-100 scale-105'
+                                                    : isDarkMode 
+                                                        ? 'border-gray-600 bg-gray-700 hover:border-blue-400' 
+                                                        : 'border-gray-300 bg-white hover:border-blue-400'
+                                        }`}
+                                        draggable={true}
+                                        onDragStart={(e) => handleDragStart(e, index)}
+                                        onDragEnd={handleDragEnd}
+                                        onDragOver={(e) => handleDragOver(e, index)}
+                                        onDragLeave={handleDragLeave}
+                                        onDrop={(e) => handleDropReorder(e, index)}
+                                    >
+                                        {/* Indicador de orden */}
+                                        <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                            isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+                                        } shadow-lg`}>
+                                            {index + 1}
+                                        </div>
+                                        
+                                        {/* Icono de arrastrar */}
+                                        <div className={`absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                                        }`}>
+                                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                            </svg>
+                                        </div>
+                                        
                                         <img
                                             src={preview.url}
                                             alt={`Preview ${index + 1}`}
                                             className="w-full h-24 object-cover rounded"
+                                            draggable={false}
                                         />
                                         <button
                                             onClick={() => handleRemovePreview(index)}
-                                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 z-10"
                                         >
                                             ×
                                         </button>
