@@ -1,4 +1,4 @@
-name: Auto Deploy Laravel + React (Robusto)
+name: Auto Deploy Laravel + React (Fixed)
 
 on:
   push:
@@ -20,11 +20,20 @@ jobs:
         script: |
           set -e  # Detener si hay errores
           
+          # Cargar variables de entorno (para npm/node)
+          source ~/.bashrc
+          source ~/.nvm/nvm.sh || true
+          
           # Ir al directorio del proyecto
           cd ${{ secrets.PROJECT_PATH }}
           
           echo "🚀 Iniciando deploy..."
           echo "📍 Directorio actual: $(pwd)"
+          
+          # Verificar versiones
+          echo "🔍 Verificando herramientas..."
+          node --version || echo "❌ Node.js no encontrado"
+          npm --version || echo "❌ npm no encontrado"
           
           # Verificar que estamos en una rama limpia
           if [ -n "$(git status --porcelain)" ]; then
@@ -34,7 +43,7 @@ jobs:
           
           # Hacer git pull
           echo "🔄 Haciendo git pull..."
-          git pull 
+          git pull origin main
           
           # Verificar si composer.json cambió
           if git diff --name-only HEAD~1 HEAD | grep -q "composer.json\|composer.lock"; then
@@ -47,7 +56,6 @@ jobs:
             echo "📦 Instalando dependencias de npm..."
             npm install
           fi
-          
           
           # Ejecutar migraciones (solo si hay migraciones pendientes)
           echo "🗄️ Verificando migraciones..."
@@ -77,7 +85,4 @@ jobs:
           echo "🔐 Estableciendo permisos..."
           chmod -R 775 storage bootstrap/cache
           
-      
-          
           echo "✅ Deploy completado exitosamente!"
-          echo "🌐 Tu aplicación está lista en: https://${{ secrets.SSH_HOST }}"
