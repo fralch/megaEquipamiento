@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useTheme } from '../../storage/ThemeContext';
 
 const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose }) => {
+    const { isDarkMode } = useTheme();
     const [relatedProducts, setRelatedProducts] = useState(initialRelated);
     const [pendingRelations, setPendingRelations] = useState([]); // Estado temporal para relaciones pendientes
     const [searchTerm, setSearchTerm] = useState('');
@@ -146,17 +148,21 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
-            <div className="bg-white rounded-lg shadow-lg z-50 max-w-md w-full p-6">
+            <div className={`${isDarkMode ? 'bg-gray-800 text-white' : 'bg-white'} rounded-lg shadow-lg z-50 max-w-md w-full p-6`}>
                 <h3 className="text-lg font-bold mb-4">Agregar Productos Relacionados</h3>
 
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                         Tipo de relación
                     </label>
                     <select
                         value={selectedType}
                         onChange={(e) => setSelectedType(e.target.value)}
-                        className="w-full border rounded px-3 py-2 mb-3"
+                        className={`w-full border rounded px-3 py-2 mb-3 ${
+                            isDarkMode 
+                                ? 'bg-gray-700 border-gray-600 text-white focus:border-gray-500' 
+                                : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
+                        }`}
                     >
                         {relationTypes.map(type => (
                             <option key={type.id} value={type.nombre}>
@@ -170,20 +176,30 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                         placeholder="Buscar productos..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full border rounded px-3 py-2"
+                        className={`w-full border rounded px-3 py-2 ${
+                            isDarkMode 
+                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-gray-500' 
+                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-500'
+                        }`}
                     />
 
                     {/* Sección de resultados de búsqueda */}
                     {isLoading ? (
-                        <div className="text-sm text-gray-500 mt-2">Buscando...</div>
+                        <div className={`text-sm mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Buscando...</div>
                     ) : (
                         <>
                             {searchResults.length > 0 ? (
-                                <div className="mt-2 border rounded-md max-h-60 overflow-y-auto">
+                                <div className={`mt-2 border rounded-md max-h-60 overflow-y-auto ${
+                                    isDarkMode ? 'border-gray-600' : 'border-gray-300'
+                                }`}>
                                     {searchResults.map(product => (
                                         <div
                                             key={product.id_producto}
-                                            className="p-2 hover:bg-gray-100 cursor-pointer border-b"
+                                            className={`p-2 cursor-pointer border-b ${
+                                                isDarkMode 
+                                                    ? 'hover:bg-gray-700 border-gray-600' 
+                                                    : 'hover:bg-gray-100 border-gray-200'
+                                            }`}
                                             onClick={() => handleAddProduct({
                                                 id: product.id_producto,
                                                 nombre: product.nombre,
@@ -191,7 +207,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                                             })}
                                         >
                                             <div className="font-medium">{product.nombre}</div>
-                                            <div className="text-sm text-gray-600">
+                                            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                                 SKU: {product.sku}
                                                 {product.marca && (
                                                     <span className="ml-2">
@@ -205,7 +221,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                                 </div>
                             ) : (
                                 searchTerm.length >= 2 && (
-                                    <div className="text-sm text-gray-500 mt-2">
+                                    <div className={`text-sm mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                         No se encontraron resultados para "{searchTerm}"
                                     </div>
                                 )
@@ -217,19 +233,27 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                 {/* Sección de relaciones pendientes */}
                 {pendingRelations.length > 0 && (
                     <div className="mb-4">
-                        <h4 className="font-semibold mb-2 text-orange-600">Relaciones pendientes por guardar:</h4>
-                        <div className="divide-y bg-orange-50 rounded p-2">
+                        <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`}>Relaciones pendientes por guardar:</h4>
+                        <div className={`divide-y rounded p-2 ${
+                            isDarkMode 
+                                ? 'bg-orange-900/20 divide-gray-600' 
+                                : 'bg-orange-50 divide-gray-200'
+                        }`}>
                             {pendingRelations.map((product, index) => (
                                 <div key={`${product.id}-${product.tipo}-${index}`} className="py-2 flex justify-between items-center">
                                     <div>
                                         <div className="font-medium">{product.nombre}</div>
-                                        <div className="text-sm text-gray-600">
+                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                             SKU: {product.sku} | Tipo: {product.tipo}
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => handleRemovePendingProduct(product)}
-                                        className="text-red-500 hover:text-red-700 text-sm"
+                                        className={`text-sm ${
+                                            isDarkMode 
+                                                ? 'text-red-400 hover:text-red-300' 
+                                                : 'text-red-500 hover:text-red-700'
+                                        }`}
                                     >
                                         Quitar
                                     </button>
