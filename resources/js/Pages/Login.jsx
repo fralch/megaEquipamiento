@@ -49,7 +49,7 @@ export default function Login() {
                     <h2 className={`mt-6 text-center text-3xl font-extrabold transition-colors duration-300 ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     } flex-1`}>
-                        {isLogin ? 'Iniciar Sesión' : 'Registrarse'}
+                        {isLogin ? 'Iniciar Sesiónnnn' : 'Registrarse'}
                     </h2>
                     <button
                         onClick={toggleDarkMode}
