@@ -26,6 +26,7 @@ import RelatedProducts from "../Components/product/RelatedProducts";
 import ProductCategoryEdit from "../Components/product/ProductCategoryEdit";
 
 // Currency formatting function moved to CurrencyContext
+// probando github actions
 
 const ProductPage = ({ producto }) => {
     console.log("producto", producto);
