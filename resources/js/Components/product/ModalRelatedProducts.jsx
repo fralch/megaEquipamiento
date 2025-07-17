@@ -3,9 +3,11 @@ import axios from 'axios';
 
 const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose }) => {
     const [relatedProducts, setRelatedProducts] = useState(initialRelated);
+    const [pendingRelations, setPendingRelations] = useState([]); // Estado temporal para relaciones pendientes
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false); // Estado para el botón guardar
     const [selectedType, setSelectedType] = useState('accesorio');
     const [relationTypes, setRelationTypes] = useState([]);
 
@@ -65,39 +67,24 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
-    const handleAddProduct = async (selectedProduct) => {
-        try {
-            console.log({
-                id: productId,
-                relacionado_id: selectedProduct.id,
-                tipo: selectedType
-            })
-            const response = await axios.post('/product/agregar-relacion', {
-                id: productId,
-                relacionado_id: selectedProduct.id,
-                tipo: selectedType
-            });
+    const handleAddProduct = (selectedProduct) => {
+        // Verificar si el producto ya está en relaciones existentes o pendientes
+        const isAlreadyRelated = relatedProducts.some(p => p.id === selectedProduct.id && p.tipo === selectedType);
+        const isAlreadyPending = pendingRelations.some(p => p.id === selectedProduct.id && p.tipo === selectedType);
 
-            console.log(response.data);
-            
-
-            setRelatedProducts(prev => [...prev, {
-                ...selectedProduct,
-                tipo: selectedType
-            }]);
-            
-            setSearchTerm('');
-            setSearchResults([]);
-        } catch (error) {
-            console.error('Error al relacionar productos:', error);
-            
-            // Verificar si es un error de relación duplicada
-            if (error.response && error.response.status === 409) {
-                alert('El producto ya está relacionado con el tipo seleccionado');
-            } else {
-                alert('Error al relacionar los productos');
-            }
+        if (isAlreadyRelated || isAlreadyPending) {
+            alert('El producto ya está relacionado con el tipo seleccionado');
+            return;
         }
+
+        // Agregar al estado temporal
+        setPendingRelations(prev => [...prev, {
+            ...selectedProduct,
+            tipo: selectedType
+        }]);
+
+        setSearchTerm('');
+        setSearchResults([]);
     };
 
     const handleRemoveProduct = async (relatedProduct) => {
@@ -110,12 +97,58 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
         }
     };
 
+    const handleRemovePendingProduct = (productToRemove) => {
+        setPendingRelations(prev => prev.filter(p =>
+            !(p.id === productToRemove.id && p.tipo === productToRemove.tipo)
+        ));
+    };
+
+    const handleSaveRelations = async () => {
+        if (pendingRelations.length === 0) {
+            alert('No hay relaciones pendientes para guardar');
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            // Guardar cada relación pendiente
+            for (const relation of pendingRelations) {
+                await axios.post('/product/agregar-relacion', {
+                    id: productId,
+                    relacionado_id: relation.id,
+                    tipo: relation.tipo
+                });
+            }
+
+            // Mover las relaciones pendientes a relaciones guardadas
+            setRelatedProducts(prev => [...prev, ...pendingRelations]);
+            setPendingRelations([]);
+
+            alert('Relaciones guardadas exitosamente');
+
+            // Llamar a onSave si está definido
+            if (onSave) {
+                onSave();
+            }
+        } catch (error) {
+            console.error('Error al guardar relaciones:', error);
+
+            if (error.response && error.response.status === 409) {
+                alert('Una o más relaciones ya existen');
+            } else {
+                alert('Error al guardar las relaciones');
+            }
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50">
             <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
             <div className="bg-white rounded-lg shadow-lg z-50 max-w-md w-full p-6">
-                <h3 className="text-lg font-bold mb-4">Agregar Productos Relacionadossss</h3>
-                
+                <h3 className="text-lg font-bold mb-4">Agregar Productos Relacionados</h3>
+
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Tipo de relación
@@ -139,7 +172,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full border rounded px-3 py-2"
                     />
-                    
+
                     {/* Sección de resultados de búsqueda */}
                     {isLoading ? (
                         <div className="text-sm text-gray-500 mt-2">Buscando...</div>
@@ -166,7 +199,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                                                     </span>
                                                 )}
                                             </div>
-                                           
+
                                         </div>
                                     ))}
                                 </div>
@@ -181,8 +214,33 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                     )}
                 </div>
 
+                {/* Sección de relaciones pendientes */}
+                {pendingRelations.length > 0 && (
+                    <div className="mb-4">
+                        <h4 className="font-semibold mb-2 text-orange-600">Relaciones pendientes por guardar:</h4>
+                        <div className="divide-y bg-orange-50 rounded p-2">
+                            {pendingRelations.map((product, index) => (
+                                <div key={`${product.id}-${product.tipo}-${index}`} className="py-2 flex justify-between items-center">
+                                    <div>
+                                        <div className="font-medium">{product.nombre}</div>
+                                        <div className="text-sm text-gray-600">
+                                            SKU: {product.sku} | Tipo: {product.tipo}
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => handleRemovePendingProduct(product)}
+                                        className="text-red-500 hover:text-red-700 text-sm"
+                                    >
+                                        Quitar
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div className="mb-4">
-                    <h4 className="font-semibold mb-2">Productos relacionados:</h4>
+                    <h4 className="font-semibold mb-2">Productos relacionados guardados:</h4>
                     {relatedProducts.length > 0 ? (
                         <div className="divide-y">
                             {relatedProducts.map((product) => (
@@ -203,11 +261,20 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                             ))}
                         </div>
                     ) : (
-                        <p className="text-gray-500 text-sm">No hay productos relacionados.</p>
+                        <p className="text-gray-500 text-sm">No hay productos relacionados guardados.</p>
                     )}
                 </div>
 
                 <div className="flex justify-end space-x-2">
+                    {pendingRelations.length > 0 && (
+                        <button
+                            onClick={handleSaveRelations}
+                            disabled={isSaving}
+                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-blue-300"
+                        >
+                            {isSaving ? 'Guardando...' : 'Guardar Relaciones'}
+                        </button>
+                    )}
                     <button
                         onClick={onClose}
                         className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
