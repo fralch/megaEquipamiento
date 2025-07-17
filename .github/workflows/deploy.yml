@@ -1,0 +1,88 @@
+name: Auto Deploy Laravel + React (Robusto)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT || 22 }}
+        script: |
+          set -e  # Detener si hay errores
+          
+          # Ir al directorio del proyecto
+          cd ${{ secrets.PROJECT_PATH }}
+          
+          echo "🚀 Iniciando deploy..."
+          echo "📍 Directorio actual: $(pwd)"
+          
+          # Verificar que estamos en una rama limpia
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "⚠️ Hay cambios sin commitear, haciendo stash..."
+            git stash
+          fi
+          
+          # Hacer git pull
+          echo "🔄 Haciendo git pull..."
+          git pull 
+          
+          # Verificar si composer.json cambió
+          if git diff --name-only HEAD~1 HEAD | grep -q "composer.json\|composer.lock"; then
+            echo "📦 Instalando dependencias de Composer..."
+            composer install --no-dev --optimize-autoloader --no-interaction
+          fi
+          
+          # Verificar si package.json cambió
+          if git diff --name-only HEAD~1 HEAD | grep -q "package.json\|package-lock.json"; then
+            echo "📦 Instalando dependencias de npm..."
+            npm install
+          fi
+          
+          # Poner la aplicación en modo mantenimiento
+          echo "🔒 Poniendo en modo mantenimiento..."
+          php artisan down --render="errors::503" --retry=60
+          
+          # Ejecutar migraciones (solo si hay migraciones pendientes)
+          echo "🗄️ Verificando migraciones..."
+          if php artisan migrate:status | grep -q "Ran?.*No"; then
+            echo "🗄️ Ejecutando migraciones..."
+            php artisan migrate --force
+          else
+            echo "✅ No hay migraciones pendientes"
+          fi
+          
+          # Construir assets con Vite
+          echo "🏗️ Construyendo assets con Vite..."
+          npm run build
+          
+          # Limpiar y optimizar cache
+          echo "🧹 Limpiando cache..."
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
+          
+          echo "⚡ Optimizando para producción..."
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          
+          # Establecer permisos correctos
+          echo "🔐 Estableciendo permisos..."
+          chmod -R 775 storage bootstrap/cache
+          
+          # Quitar modo mantenimiento
+          echo "🔓 Quitando modo mantenimiento..."
+          php artisan up
+          
+          echo "✅ Deploy completado exitosamente!"
+          echo "🌐 Tu aplicación está lista en: https://${{ secrets.SSH_HOST }}"
