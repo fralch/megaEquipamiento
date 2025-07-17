@@ -48,9 +48,6 @@ jobs:
             npm install
           fi
           
-          # Poner la aplicación en modo mantenimiento
-          echo "🔒 Poniendo en modo mantenimiento..."
-          php artisan down --render="errors::503" --retry=60
           
           # Ejecutar migraciones (solo si hay migraciones pendientes)
           echo "🗄️ Verificando migraciones..."
@@ -80,9 +77,7 @@ jobs:
           echo "🔐 Estableciendo permisos..."
           chmod -R 775 storage bootstrap/cache
           
-          # Quitar modo mantenimiento
-          echo "🔓 Quitando modo mantenimiento..."
-          php artisan up
+      
           
           echo "✅ Deploy completado exitosamente!"
           echo "🌐 Tu aplicación está lista en: https://${{ secrets.SSH_HOST }}"
