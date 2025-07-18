@@ -7,7 +7,7 @@ import { useCurrency } from '../../storage/CurrencyContext';
 import { useCompare } from '../../hooks/useCompare';
 import countryCodeMap from '../store/countryJSON.json';
 
-const ModalRelatedProducts = ({ productId, relatedProductId, initialRelated = [], onSave, onClose, isPendingRelation = false }) => {
+const ModalPendingRelation = ({ productId, relatedProductId, initialRelated = [], onSave, onClose, isPendingRelation = false }) => {
     const { isDarkMode } = useTheme();
     const [relatedProducts, setRelatedProducts] = useState(initialRelated);
     const [selectedType, setSelectedType] = useState('accesorio');
@@ -738,7 +738,7 @@ const RelatedProducts = ({ productId }) => {
             )}
 
             {showModal && (
-                <ModalRelatedProducts 
+                <ModalPendingRelation 
                     productId={productId}
                     relatedProductId={selectedProductId}
                     initialRelated={relatedProducts.filter(p => p.id_producto === selectedProductId)}
