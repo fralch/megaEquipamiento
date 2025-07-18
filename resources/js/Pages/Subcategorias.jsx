@@ -563,7 +563,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                             return (
                                                 <Link
                                                     key={subcategoria.id_subcategoria}
-                                                    href={`/subcategorias/${subcategoria.id_subcategoria}`}
+                                                    href={`/subcategoria/${subcategoria.id_subcategoria}`}
                                                     className={`group block p-2 pl-4 rounded-md transition-all duration-150 transform hover:scale-[1.02] hover:translate-x-1 ${
                                                         isCurrentSubcategoria
                                                             ? (isDarkMode 
