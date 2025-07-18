@@ -521,6 +521,64 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                 <div className="flex w-full">
                     {/* Sidebar de filtros */}
                     <div className={sidebarClasses} id="filtros-container">
+                         {/* Subcategorías de la categoría */}
+                        {subcategoriasCategoria && subcategoriasCategoria.length > 0 && (
+                            <div className={`p-4 rounded-xl shadow-lg mb-6 transition-all duration-200 border ${
+                                isDarkMode 
+                                    ? 'bg-gray-700/50 border-gray-600/50' 
+                                    : 'bg-white border-gray-200'
+                            }`}>
+                                <h3 className={`text-lg font-semibold mb-4 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                } transition-colors duration-200`}>
+                                    Subcategorías de {categoriaNombre}
+                                </h3>
+                                <div className="space-y-1">
+                                    {subcategoriasCategoria.map((subcategoria, subIndex) => {
+                                        const isCurrentSubcategoria = subcategoria.id_subcategoria === parseInt(getSubcategoriaId());
+                                        return (
+                                            <Link
+                                                key={subcategoria.id_subcategoria}
+                                                href={`/subcategorias/${subcategoria.id_subcategoria}`}
+                                                className={`group block p-2 pl-4 rounded-md transition-all duration-150 transform hover:scale-[1.02] hover:translate-x-1 ${
+                                                    isCurrentSubcategoria
+                                                        ? (isDarkMode 
+                                                            ? 'bg-blue-600/50 border border-blue-400 text-blue-200' 
+                                                            : 'bg-blue-100/70 border border-blue-200 text-blue-800')
+                                                        : (isDarkMode 
+                                                            ? 'bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 border border-gray-600/50 hover:border-gray-500/70' 
+                                                            : 'bg-blue-50/50 hover:bg-blue-100/70 text-gray-800 border border-blue-100 hover:border-blue-200')
+                                                } hover:shadow-sm`}
+                                                style={{ animationDelay: `${subIndex * 0.03}s` }}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center">
+                                                        <div className={`w-1.5 h-1.5 rounded-full mr-2 transition-all duration-100 ${
+                                                            isCurrentSubcategoria
+                                                                ? (isDarkMode ? 'bg-blue-300' : 'bg-blue-600')
+                                                                : (isDarkMode 
+                                                                    ? 'bg-green-400 group-hover:bg-green-300' 
+                                                                    : 'bg-green-500 group-hover:bg-green-600')
+                                                        }`}></div>
+                                                        <span className="text-sm font-medium group-hover:font-semibold transition-all duration-100">
+                                                            {subcategoria.nombre}
+                                                        </span>
+                                                    </div>
+                                                    {isCurrentSubcategoria && (
+                                                        <span className={`text-xs px-2 py-1 rounded-full ${
+                                                            isDarkMode ? 'bg-blue-500 text-white' : 'bg-blue-500 text-white'
+                                                        }`}>
+                                                            Actual
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                        
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <h2 className={`text-xl font-bold mb-2 ${
@@ -542,53 +600,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                             )}
                         </div>
 
-                        {/* Subcategorías de la categoría */}
-                        {subcategoriasCategoria && subcategoriasCategoria.length > 0 && (
-                            <div className={`p-4 rounded-xl shadow-lg mb-6 transition-all duration-200 border ${
-                                isDarkMode 
-                                    ? 'bg-gray-700/50 border-gray-600/50' 
-                                    : 'bg-white border-gray-200'
-                            }`}>
-                                <h3 className={`text-lg font-semibold mb-4 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                } transition-colors duration-200`}>
-                                    Subcategorías de {categoriaNombre}
-                                </h3>
-                                <div className="space-y-2">
-                                    {subcategoriasCategoria.map((subcategoria) => {
-                                        const isCurrentSubcategoria = subcategoria.id_subcategoria === parseInt(getSubcategoriaId());
-                                        return (
-                                            <Link
-                                                key={subcategoria.id_subcategoria}
-                                                href={`/subcategorias/${subcategoria.id_subcategoria}`}
-                                                className={`block p-3 rounded-lg transition-all duration-200 ${
-                                                    isCurrentSubcategoria
-                                                        ? (isDarkMode 
-                                                            ? 'bg-blue-600/50 border border-blue-400 text-blue-200' 
-                                                            : 'bg-blue-100 border border-blue-300 text-blue-800')
-                                                        : (isDarkMode 
-                                                            ? 'hover:bg-gray-600/50 text-gray-300 hover:text-white' 
-                                                            : 'hover:bg-gray-100 text-gray-700 hover:text-gray-900')
-                                                }`}
-                                            >
-                                                <div className="flex items-center justify-between">
-                                                    <span className="text-sm font-medium">
-                                                        {subcategoria.nombre}
-                                                    </span>
-                                                    {isCurrentSubcategoria && (
-                                                        <span className={`text-xs px-2 py-1 rounded-full ${
-                                                            isDarkMode ? 'bg-blue-500 text-white' : 'bg-blue-500 text-white'
-                                                        }`}>
-                                                            Actual
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </Link>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
+                       
 
                         {/* Filtro de precio */}
                         <div className={`price-filter-container p-4 rounded-xl shadow-lg mb-6 transition-all duration-200 border ${
