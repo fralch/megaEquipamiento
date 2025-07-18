@@ -531,7 +531,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                 <h3 className={`text-lg font-semibold mb-4 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                 } transition-colors duration-200`}>
-                                    Subcategorías de {categoriaNombre}
+                                    {categoriaNombre}
                                 </h3>
                                 <div className="space-y-1">
                                     {subcategoriasCategoria.map((subcategoria, subIndex) => {
