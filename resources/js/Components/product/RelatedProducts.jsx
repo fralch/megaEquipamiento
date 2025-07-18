@@ -247,6 +247,7 @@ const RelatedProducts = ({ productId }) => {
             try {
                 setLoading(true);
                 const response = await axios.get(`/product/relacion/${productId}`);
+                console.log('Productos relacionados recibidos de la API:', response.data);
                 setRelatedProducts(response.data);
                 setLoading(false);
             } catch (err) {
@@ -472,32 +473,18 @@ const RelatedProducts = ({ productId }) => {
                         </h3>
                         
                         {/* Especificaciones técnicas */}
-                        <div className="space-y-2 mb-4">
-                            <div className="flex justify-between items-center text-sm">
-                                <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Capacidad:</span>
-                                <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
-                                    {product.capacidad || '25 Litros'}
-                                </span>
+                        {product.caracteristicas && Object.keys(product.caracteristicas).length > 0 && (
+                            <div className="space-y-2 mb-4">
+                                {Object.entries(product.caracteristicas).slice(0, 4).map(([key, value], index) => (
+                                    <div key={`spec-${key}-${index}`} className="flex justify-between items-center text-sm">
+                                        <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>{key}:</span>
+                                        <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
+                                            {value}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Velocidad:</span>
-                                <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
-                                    {product.velocidad || '1000 Rpm'}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Viscosidad:</span>
-                                <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
-                                    {product.viscosidad || '30000 mPa·s'}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                                <span className={isDarkMode ? "text-gray-400" : "text-gray-600"}>Torque:</span>
-                                <span className={`font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
-                                    {product.torque || '40 Ncm'}
-                                </span>
-                            </div>
-                        </div>
+                        )}
                         
                         {/* Precio y SKU */}
                         <div className="border-t border-slate-600 pt-3">
@@ -560,19 +547,20 @@ const RelatedProducts = ({ productId }) => {
                             )}
                             
                             {/* Especificaciones técnicas básicas */}
-                            <div className="mb-4">
-                                <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-blue-300' : 'text-blue-300'
-                                }`}>Especificaciones</h3>
-                                <div className={`text-sm space-y-2 transition-colors duration-300 ${
-                                    isDarkMode ? 'text-gray-200' : 'text-gray-300'
-                                }`}>
-                                    <p><strong>Capacidad:</strong> {product.capacidad || '25 Litros'}</p>
-                                    <p><strong>Velocidad:</strong> {product.velocidad || '1000 Rpm'}</p>
-                                    <p><strong>Viscosidad:</strong> {product.viscosidad || '30000 mPa·s'}</p>
-                                    <p><strong>Torque:</strong> {product.torque || '40 Ncm'}</p>
+                            {product.caracteristicas && Object.keys(product.caracteristicas).length > 0 && (
+                                <div className="mb-4">
+                                    <h3 className={`text-sm font-medium mb-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-blue-300' : 'text-blue-300'
+                                    }`}>Especificaciones</h3>
+                                    <div className={`text-sm space-y-2 transition-colors duration-300 ${
+                                        isDarkMode ? 'text-gray-200' : 'text-gray-300'
+                                    }`}>
+                                        {Object.entries(product.caracteristicas).slice(0, 4).map(([key, value], index) => (
+                                            <p key={`overlay-spec-${key}-${index}`}><strong>{key}:</strong> {value}</p>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                             
                             {/* Descripción del producto */}
                             {product.descripcion && (
