@@ -143,6 +143,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
     const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
     const [categoriaNombre, setCategoriaNombre] = useState("");
     const [categoriaId, setCategoriaId] = useState("");
+    const [subcategoriasCategoria, setSubcategoriasCategoria] = useState([]);
     const [mostrarFormularioFiltro, setMostrarFormularioFiltro] = useState(false);
     const [filtroEnEdicion, setFiltroEnEdicion] = useState(null);
     const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
@@ -466,6 +467,14 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                 setCategoriaNombre(categoriaData.nombre_categoria);
                 setCategoriaId(categoriaData.id_categoria);
 
+                console.log('Categoria ID:', categoriaData.id_categoria); // Debug
+                console.log('Categoria Data:', categoriaData); // Debug
+
+                // Cargar subcategorías de la categoría actual
+                const subcategoriasData = await makeRequest(`${URL_API}/categoria/${categoriaData.id_categoria}/subcategorias`);
+                console.log('Subcategorias Data:', subcategoriasData); // Debug
+                setSubcategoriasCategoria(subcategoriasData);
+
                 if (productosIniciales && productosIniciales.length > 0) {
                     setProductosOriginales(productosIniciales);
                 }
@@ -532,6 +541,54 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                 </button>
                             )}
                         </div>
+
+                        {/* Subcategorías de la categoría */}
+                        {subcategoriasCategoria && subcategoriasCategoria.length > 0 && (
+                            <div className={`p-4 rounded-xl shadow-lg mb-6 transition-all duration-200 border ${
+                                isDarkMode 
+                                    ? 'bg-gray-700/50 border-gray-600/50' 
+                                    : 'bg-white border-gray-200'
+                            }`}>
+                                <h3 className={`text-lg font-semibold mb-4 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                } transition-colors duration-200`}>
+                                    Subcategorías de {categoriaNombre}
+                                </h3>
+                                <div className="space-y-2">
+                                    {subcategoriasCategoria.map((subcategoria) => {
+                                        const isCurrentSubcategoria = subcategoria.id_subcategoria === parseInt(getSubcategoriaId());
+                                        return (
+                                            <Link
+                                                key={subcategoria.id_subcategoria}
+                                                href={`/subcategorias/${subcategoria.id_subcategoria}`}
+                                                className={`block p-3 rounded-lg transition-all duration-200 ${
+                                                    isCurrentSubcategoria
+                                                        ? (isDarkMode 
+                                                            ? 'bg-blue-600/50 border border-blue-400 text-blue-200' 
+                                                            : 'bg-blue-100 border border-blue-300 text-blue-800')
+                                                        : (isDarkMode 
+                                                            ? 'hover:bg-gray-600/50 text-gray-300 hover:text-white' 
+                                                            : 'hover:bg-gray-100 text-gray-700 hover:text-gray-900')
+                                                }`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm font-medium">
+                                                        {subcategoria.nombre}
+                                                    </span>
+                                                    {isCurrentSubcategoria && (
+                                                        <span className={`text-xs px-2 py-1 rounded-full ${
+                                                            isDarkMode ? 'bg-blue-500 text-white' : 'bg-blue-500 text-white'
+                                                        }`}>
+                                                            Actual
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Filtro de precio */}
                         <div className={`price-filter-container p-4 rounded-xl shadow-lg mb-6 transition-all duration-200 border ${
