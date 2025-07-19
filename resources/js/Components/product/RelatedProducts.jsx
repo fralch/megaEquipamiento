@@ -220,6 +220,7 @@ const RelatedProducts = ({ productId }) => {
     const [pendingProduct, setPendingProduct] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [hoveredProductId, setHoveredProductId] = useState(null);
+    const [expandedTypes, setExpandedTypes] = useState({});
 
     // Obtener tipos de relaciones y agrupar productos
     const groupedProducts = relationTypes.reduce((acc, type) => {
@@ -670,14 +671,42 @@ const RelatedProducts = ({ productId }) => {
     const renderProductGroup = (type, products) => {
         if (!products || products.length === 0) return null;
         
+        const isExpanded = expandedTypes[type];
+        const itemsPerRow = window.innerWidth >= 1536 ? 6 : window.innerWidth >= 1280 ? 5 : window.innerWidth >= 1024 ? 4 : window.innerWidth >= 640 ? 3 : 1;
+        const displayedProducts = isExpanded ? products : products.slice(0, itemsPerRow);
+        const hasMoreProducts = products.length > itemsPerRow;
+        
+        const toggleExpanded = () => {
+            setExpandedTypes(prev => ({
+                ...prev,
+                [type]: !prev[type]
+            }));
+        };
+        
         return (
             <div key={type} className="mb-8">
-                <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
-                    {products.map(product => renderProductCard(product))}
+                <div className="mb-4">
+                    <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </h2>
                 </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                    {displayedProducts.map(product => renderProductCard(product))}
+                </div>
+                {hasMoreProducts && (
+                    <div className="flex justify-center mt-6">
+                        <button
+                            onClick={toggleExpanded}
+                            className={`px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                            }`}
+                        >
+                            {isExpanded ? `Ocultar (${products.length - itemsPerRow})` : `Ver todos (${products.length})`}
+                        </button>
+                    </div>
+                )}
             </div>
         );
     };
