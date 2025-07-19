@@ -697,10 +697,10 @@ const RelatedProducts = ({ productId }) => {
                     <div className="flex justify-center mt-6">
                         <button
                             onClick={toggleExpanded}
-                            className={`px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                            className={`w-[95%] px-6 py-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                                 isDarkMode 
-                                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                    ? 'bg-green-600 hover:bg-green-700 text-white' 
+                                    : 'bg-green-500 hover:bg-green-600 text-white'
                             }`}
                         >
                             {isExpanded ? `Ocultar (${products.length - itemsPerRow})` : `Ver todos (${products.length})`}
