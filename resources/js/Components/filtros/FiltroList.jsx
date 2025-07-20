@@ -2,15 +2,13 @@ import React, { useState } from "react";
 import { RotateCcw } from "lucide-react";
 import { useTheme } from "../../storage/ThemeContext";
 
-// Componente Range Slider Mejorado
-const ImprovedRangeSlider = ({ filtro, filtrosSeleccionados, setFiltrosSeleccionados, isDarkMode }) => {
+// Componente Range Slider Simplificado
+const SimplifiedRangeSlider = ({ filtro, filtrosSeleccionados, setFiltrosSeleccionados, isDarkMode }) => {
   const currentMin = filtrosSeleccionados[filtro.id_filtro]?.min ?? filtro.min_value ?? 0;
   const currentMax = filtrosSeleccionados[filtro.id_filtro]?.max ?? filtro.max_value ?? 100;
   const minValue = filtro.min_value ?? 0;
   const maxValue = filtro.max_value ?? 100;
-  
-  const [isDragging, setIsDragging] = useState(false);
-  
+
   const hasChanges = currentMin !== minValue || currentMax !== maxValue;
 
   const updateRange = (newMin, newMax) => {
@@ -31,168 +29,93 @@ const ImprovedRangeSlider = ({ filtro, filtrosSeleccionados, setFiltrosSeleccion
     setFiltrosSeleccionados(newFiltros);
   };
 
-  return (
-    <div className="space-y-4">
-      {/* Displays de valores mejorados */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className={`relative overflow-hidden rounded-xl p-3 transition-all duration-300 ${
-          isDarkMode 
-            ? 'bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50' 
-            : 'bg-gradient-to-br from-white to-gray-50/80 border border-gray-200/50 shadow-sm'
-        }`}>
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent"></div>
-          <div className="relative">
-            <div className={`text-xs font-medium uppercase tracking-wider mb-1 ${
-              isDarkMode ? 'text-gray-400' : 'text-gray-500'
-            }`}>
-              Mínimo
-            </div>
-            <div className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {currentMin.toLocaleString()}
-              <span className={`text-xs font-normal ml-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                {filtro.unidad}
-              </span>
-            </div>
-          </div>
-        </div>
+  // Función para formatear números con coma como separador de miles
+  const formatNumber = (num) => {
+    return num.toLocaleString('es-PE');
+  };
 
-        <div className={`relative overflow-hidden rounded-xl p-3 transition-all duration-300 ${
-          isDarkMode 
-            ? 'bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50' 
-            : 'bg-gradient-to-br from-white to-gray-50/80 border border-gray-200/50 shadow-sm'
-        }`}>
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent"></div>
-          <div className="relative">
-            <div className={`text-xs font-medium uppercase tracking-wider mb-1 ${
-              isDarkMode ? 'text-gray-400' : 'text-gray-500'
-            }`}>
-              Máximo
-            </div>
-            <div className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {currentMax.toLocaleString()}
-              <span className={`text-xs font-normal ml-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                {filtro.unidad}
-              </span>
-            </div>
-          </div>
+  return (
+    <div className="space-y-3">
+      {/* Valores actuales */}
+      <div className="flex justify-between items-center">
+        <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          <span className="font-medium">{formatNumber(currentMin)}</span>
+          <span className="ml-1">{filtro.unidad}</span>
+        </div>
+        <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          <span className="font-medium">{formatNumber(currentMax)}</span>
+          <span className="ml-1">{filtro.unidad}</span>
         </div>
       </div>
 
-      {/* Slider Container Mejorado */}
-      <div className={`relative p-4 rounded-xl transition-all duration-300 ${
-        isDarkMode 
-          ? 'bg-gradient-to-br from-gray-800/60 to-gray-900/60 border border-gray-700/30' 
-          : 'bg-gradient-to-br from-gray-50/80 to-white border border-gray-200/50'
-      }`}>
-        <div className="relative py-6">
-          {/* Labels de límites */}
-          <div className="flex justify-between mb-4">
-            <div className={`text-xs font-medium px-2 py-1 rounded-full ${
-              isDarkMode ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-100 text-gray-500'
-            }`}>
-              {minValue} {filtro.unidad}
-            </div>
-            <div className={`text-xs font-medium px-2 py-1 rounded-full ${
-              isDarkMode ? 'bg-gray-700/50 text-gray-400' : 'bg-gray-100 text-gray-500'
-            }`}>
-              {maxValue} {filtro.unidad}
-            </div>
-          </div>
+      {/* Slider Container */}
+      <div className="relative py-4">
+        <div className="relative h-2">
+          {/* Background track */}
+          <div className={`absolute w-full h-2 rounded-full ${
+            isDarkMode ? 'bg-gray-600' : 'bg-gray-200'
+          }`}></div>
 
-          <div className="relative h-3">
-            {/* Background track con gradiente */}
-            <div className={`absolute w-full h-3 rounded-full transition-all duration-300 ${
-              isDarkMode 
-                ? 'bg-gradient-to-r from-gray-700/80 to-gray-600/80' 
-                : 'bg-gradient-to-r from-gray-200 to-gray-300'
-            }`}>
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-            </div>
+          {/* Active track */}
+          <div
+            className="absolute h-2 rounded-full bg-blue-500"
+            style={{
+              left: `${((currentMin - minValue) / (maxValue - minValue)) * 100}%`,
+              right: `${100 - ((currentMax - minValue) / (maxValue - minValue)) * 100}%`
+            }}
+          ></div>
 
-            {/* Active track con gradiente animado */}
-            <div
-              className={`absolute h-3 rounded-full transition-all duration-300 shadow-lg ${
-                isDragging ? 'shadow-blue-500/50' : 'shadow-blue-500/30'
-              }`}
-              style={{
-                left: `${((currentMin - minValue) / (maxValue - minValue)) * 100}%`,
-                right: `${100 - ((currentMax - minValue) / (maxValue - minValue)) * 100}%`,
-                background: isDarkMode 
-                  ? 'linear-gradient(135deg, #3b82f6, #1d4ed8, #1e40af)' 
-                  : 'linear-gradient(135deg, #60a5fa, #3b82f6, #2563eb)'
-              }}
-            >
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/20 via-transparent to-white/20"></div>
-              {isDragging && (
-                <div className="absolute inset-0 rounded-full animate-pulse bg-white/20"></div>
-              )}
-            </div>
+          {/* Min slider */}
+          <input
+            type="range"
+            min={minValue}
+            max={maxValue}
+            step="1"
+            className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-moz-range-thumb]:pointer-events-auto range-slider-simple"
+            value={currentMin}
+            onChange={(e) => {
+              const newMin = parseFloat(e.target.value);
+              updateRange(newMin, currentMax);
+            }}
+          />
 
-            {/* Min slider */}
-            <input
-              type="range"
-              min={minValue}
-              max={maxValue}
-              step="1"
-              className="absolute w-full h-3 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-moz-range-thumb]:pointer-events-auto range-slider-improved"
-              value={currentMin}
-              onMouseDown={() => setIsDragging(true)}
-              onMouseUp={() => setIsDragging(false)}
-              onChange={(e) => {
-                const newMin = parseFloat(e.target.value);
-                updateRange(newMin, currentMax);
-              }}
-            />
-
-            {/* Max slider */}
-            <input
-              type="range"
-              min={minValue}
-              max={maxValue}
-              step="1"
-              className="absolute w-full h-3 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-moz-range-thumb]:pointer-events-auto range-slider-improved"
-              value={currentMax}
-              onMouseDown={() => setIsDragging(true)}
-              onMouseUp={() => setIsDragging(false)}
-              onChange={(e) => {
-                const newMax = parseFloat(e.target.value);
-                updateRange(currentMin, newMax);
-              }}
-            />
-          </div>
-
-          {/* Indicador de progreso */}
-          <div className="flex justify-between items-center mt-4 px-1">
-            <div className={`flex items-center gap-2 text-sm ${
-              isDarkMode ? 'text-gray-400' : 'text-gray-500'
-            }`}>
-              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-              Rango seleccionado
-            </div>
-            <div className={`text-sm font-medium ${
-              isDarkMode ? 'text-gray-300' : 'text-gray-600'
-            }`}>
-              {Math.round(((currentMax - currentMin) / (maxValue - minValue)) * 100)}%
-            </div>
-          </div>
+          {/* Max slider */}
+          <input
+            type="range"
+            min={minValue}
+            max={maxValue}
+            step="1"
+            className="absolute w-full h-2 bg-transparent appearance-none pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-moz-range-thumb]:pointer-events-auto range-slider-simple"
+            value={currentMax}
+            onChange={(e) => {
+              const newMax = parseFloat(e.target.value);
+              updateRange(currentMin, newMax);
+            }}
+          />
         </div>
+      </div>
+
+      {/* Límites */}
+      <div className="flex justify-between">
+        <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+          {formatNumber(minValue)} {filtro.unidad}
+        </span>
+        <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+          {formatNumber(maxValue)} {filtro.unidad}
+        </span>
       </div>
 
       {/* Reset button */}
       {hasChanges && (
-        <div className="flex justify-center">
-          <button
-            onClick={resetRange}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 hover:scale-105 ${
-              isDarkMode
-                ? 'text-blue-400 hover:bg-gray-800/80 hover:text-blue-300 bg-gray-800/40 border border-gray-700/50'
-                : 'text-blue-600 hover:bg-blue-50 hover:text-blue-700 bg-blue-50/50 border border-blue-200/50'
-            }`}
-          >
-            <RotateCcw size={14} />
-            Resetear rango
-          </button>
-        </div>
+        <button
+          onClick={resetRange}
+          className={`inline-flex items-center gap-1 text-sm hover:underline transition-colors duration-200 ${
+            isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+          }`}
+        >
+          <RotateCcw size={14} />
+          Resetear
+        </button>
       )}
     </div>
   );
@@ -283,7 +206,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                     )}
                     
                     {filtro.tipo_input === 'range' && (
-                        <ImprovedRangeSlider
+                        <SimplifiedRangeSlider
                             filtro={filtro}
                             filtrosSeleccionados={filtrosSeleccionados}
                             setFiltrosSeleccionados={setFiltrosSeleccionados}
@@ -336,86 +259,67 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                 </div>
             )}
 
-            {/* Estilos CSS mejorados para los sliders */}
+            {/* Estilos CSS simplificados para los sliders */}
             <style jsx global>{`
-                .range-slider-improved {
+                .range-slider-simple {
                     -webkit-appearance: none;
                     appearance: none;
                     background: transparent;
                     cursor: pointer;
                 }
 
-                .range-slider-improved::-webkit-slider-thumb {
+                .range-slider-simple::-webkit-slider-thumb {
                     -webkit-appearance: none;
                     appearance: none;
-                    height: 24px;
-                    width: 24px;
+                    height: 20px;
+                    width: 20px;
                     border-radius: 50%;
-                    background: linear-gradient(135deg, #ffffff, #f8fafc);
-                    border: 3px solid #3b82f6;
-                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+                    background: #3b82f6;
+                    border: 2px solid #ffffff;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
                     cursor: pointer;
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition: all 0.2s ease;
                     pointer-events: auto;
                 }
 
-                .range-slider-improved::-webkit-slider-thumb:hover {
-                    transform: scale(1.15);
-                    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5), 0 4px 8px rgba(0, 0, 0, 0.15);
-                    border-color: #2563eb;
+                .range-slider-simple::-webkit-slider-thumb:hover {
+                    transform: scale(1.1);
+                    background: #2563eb;
                 }
 
-                .range-slider-improved::-webkit-slider-thumb:active {
-                    transform: scale(1.2);
-                    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.6), 0 4px 8px rgba(0, 0, 0, 0.2);
-                }
-
-                .range-slider-improved::-moz-range-thumb {
-                    height: 24px;
-                    width: 24px;
+                .range-slider-simple::-moz-range-thumb {
+                    height: 20px;
+                    width: 20px;
                     border-radius: 50%;
-                    background: linear-gradient(135deg, #ffffff, #f8fafc);
-                    border: 3px solid #3b82f6;
-                    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1);
+                    background: #3b82f6;
+                    border: 2px solid #ffffff;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
                     cursor: pointer;
-                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                    transition: all 0.2s ease;
                     pointer-events: auto;
                 }
 
-                .range-slider-improved::-moz-range-thumb:hover {
-                    transform: scale(1.15);
-                    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5), 0 4px 8px rgba(0, 0, 0, 0.15);
-                    border-color: #2563eb;
+                .range-slider-simple::-moz-range-thumb:hover {
+                    transform: scale(1.1);
+                    background: #2563eb;
                 }
 
-                .range-slider-improved::-moz-range-track {
+                .range-slider-simple::-moz-range-track {
                     background: transparent;
-                    height: 12px;
-                    border-radius: 6px;
+                    height: 8px;
+                    border-radius: 4px;
                     border: none;
                 }
 
                 /* Dark mode adjustments */
-                .dark .range-slider-improved::-webkit-slider-thumb {
-                    background: linear-gradient(135deg, #1f2937, #374151);
-                    border-color: #60a5fa;
-                    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+                .dark .range-slider-simple::-webkit-slider-thumb {
+                    border-color: #374151;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
                 }
                 
-                .dark .range-slider-improved::-webkit-slider-thumb:hover {
-                    border-color: #93c5fd;
-                    box-shadow: 0 6px 16px rgba(96, 165, 250, 0.5), 0 4px 8px rgba(0, 0, 0, 0.4);
-                }
-
-                .dark .range-slider-improved::-moz-range-thumb {
-                    background: linear-gradient(135deg, #1f2937, #374151);
-                    border-color: #60a5fa;
-                    box-shadow: 0 4px 12px rgba(96, 165, 250, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
-                }
-                
-                .dark .range-slider-improved::-moz-range-thumb:hover {
-                    border-color: #93c5fd;
-                    box-shadow: 0 6px 16px rgba(96, 165, 250, 0.5), 0 4px 8px rgba(0, 0, 0, 0.4);
+                .dark .range-slider-simple::-moz-range-thumb {
+                    border-color: #374151;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
                 }
             `}</style>
         </>
