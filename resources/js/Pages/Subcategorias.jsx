@@ -158,7 +158,9 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         descripcion: '',
         orden: 0,
         obligatorio: true,
-        opciones: []
+        opciones: [],
+        min_value: '',
+        max_value: ''
     });
 
     // Función para obtener ID de subcategoría de la URL
@@ -278,7 +280,9 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             descripcion: filtro.descripcion || '',
             orden: filtro.orden,
             obligatorio: true,
-            opciones: filtro.opciones && filtro.opciones.length > 0 ? filtro.opciones : []
+            opciones: filtro.opciones && filtro.opciones.length > 0 ? filtro.opciones : [],
+            min_value: filtro.min_value || '',
+            max_value: filtro.max_value || ''
         });
         setMostrarFormularioFiltro(true);
     };
@@ -345,7 +349,9 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             descripcion: '',
             orden: 0,
             obligatorio: true,
-            opciones: []
+            opciones: [],
+            min_value: '',
+            max_value: ''
         });
     };
 

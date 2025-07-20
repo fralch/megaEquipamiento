@@ -48,23 +48,56 @@ export default function FiltroForm({ nuevoFiltro, setNuevoFiltro, filtroEnEdicio
                         <option value="select">Select</option>
                         <option value="checkbox">Checkbox</option>
                         <option value="radio">Radio</option>
+                        <option value="range">Rango Numérico</option>
                     </select>
                 </div>
                 {nuevoFiltro.tipo_input === 'range' && (
-                    <div>
-                        <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Unidad</label>
-                        <input
-                            type="text"
-                            value={nuevoFiltro.unidad}
-                            onChange={(e) => setNuevoFiltro({...nuevoFiltro, unidad: e.target.value})}
-                            className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#1e3a8a] focus:ring focus:ring-[#1e3a8a] focus:ring-opacity-50 transition-colors duration-200 ${
-                                isDarkMode 
-                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                                    : 'bg-white border-gray-300 text-gray-900'
-                            }`}
-                            placeholder="ej: kg, cm, etc."
-                        />
-                    </div>
+                    <>
+                        <div>
+                            <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Unidad</label>
+                            <input
+                                type="text"
+                                value={nuevoFiltro.unidad}
+                                onChange={(e) => setNuevoFiltro({...nuevoFiltro, unidad: e.target.value})}
+                                className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#1e3a8a] focus:ring focus:ring-[#1e3a8a] focus:ring-opacity-50 transition-colors duration-200 ${
+                                    isDarkMode 
+                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                        : 'bg-white border-gray-300 text-gray-900'
+                                }`}
+                                placeholder="ej: kg, cm, etc."
+                            />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Valor Mínimo</label>
+                                <input
+                                    type="number"
+                                    value={nuevoFiltro.min_value || ''}
+                                    onChange={(e) => setNuevoFiltro({...nuevoFiltro, min_value: e.target.value})}
+                                    className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#1e3a8a] focus:ring focus:ring-[#1e3a8a] focus:ring-opacity-50 transition-colors duration-200 ${
+                                        isDarkMode 
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                    placeholder="0"
+                                />
+                            </div>
+                            <div>
+                                <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Valor Máximo</label>
+                                <input
+                                    type="number"
+                                    value={nuevoFiltro.max_value || ''}
+                                    onChange={(e) => setNuevoFiltro({...nuevoFiltro, max_value: e.target.value})}
+                                    className={`mt-1 block w-full rounded-md shadow-sm focus:border-[#1e3a8a] focus:ring focus:ring-[#1e3a8a] focus:ring-opacity-50 transition-colors duration-200 ${
+                                        isDarkMode 
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                    placeholder="100"
+                                />
+                            </div>
+                        </div>
+                    </>
                 )}
 
 

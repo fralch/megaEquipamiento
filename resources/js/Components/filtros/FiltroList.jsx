@@ -75,26 +75,82 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                         </div>
                     )}
                     {filtro.tipo_input === 'range' && (
-                        <div className="space-y-2">
-                            <input
-                                type="range"
-                                min="0"
-                                max="100"
-                                className="w-full"
-                                value={filtrosSeleccionados[filtro.id_filtro] !== undefined ? filtrosSeleccionados[filtro.id_filtro] : 0}
-                                onChange={(e) => {
-                                    setFiltrosSeleccionados({
-                                        ...filtrosSeleccionados,
-                                        [filtro.id_filtro]: e.target.value
-                                    });
-                                }}
-                            />
-                            <div className={`flex justify-between text-sm transition-colors duration-200 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                                <span>0 {filtro.unidad}</span>
-                                <span>100 {filtro.unidad}</span>
+                        <div className="space-y-3">
+                            <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                Rango de {filtro.nombre}
                             </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className={`block text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>
+                                        Mínimo {filtro.unidad ? `(${filtro.unidad})` : ''}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        className={`w-full px-3 py-2 text-sm rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${
+                                            isDarkMode 
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                        }`}
+                                        placeholder="Min"
+                                        value={
+                                            filtrosSeleccionados[filtro.id_filtro] && 
+                                            filtrosSeleccionados[filtro.id_filtro].min !== undefined
+                                                ? filtrosSeleccionados[filtro.id_filtro].min
+                                                : ''
+                                        }
+                                        onChange={(e) => {
+                                            const currentRange = filtrosSeleccionados[filtro.id_filtro] || {};
+                                            setFiltrosSeleccionados({
+                                                ...filtrosSeleccionados,
+                                                [filtro.id_filtro]: {
+                                                    ...currentRange,
+                                                    min: e.target.value ? parseFloat(e.target.value) : null
+                                                }
+                                            });
+                                        }}
+                                    />
+                                </div>
+                                <div>
+                                    <label className={`block text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>
+                                        Máximo {filtro.unidad ? `(${filtro.unidad})` : ''}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        className={`w-full px-3 py-2 text-sm rounded border focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200 ${
+                                            isDarkMode 
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                        }`}
+                                        placeholder="Max"
+                                        value={
+                                            filtrosSeleccionados[filtro.id_filtro] && 
+                                            filtrosSeleccionados[filtro.id_filtro].max !== undefined
+                                                ? filtrosSeleccionados[filtro.id_filtro].max
+                                                : ''
+                                        }
+                                        onChange={(e) => {
+                                            const currentRange = filtrosSeleccionados[filtro.id_filtro] || {};
+                                            setFiltrosSeleccionados({
+                                                ...filtrosSeleccionados,
+                                                [filtro.id_filtro]: {
+                                                    ...currentRange,
+                                                    max: e.target.value ? parseFloat(e.target.value) : null
+                                                }
+                                            });
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            {filtrosSeleccionados[filtro.id_filtro] && 
+                             (filtrosSeleccionados[filtro.id_filtro].min || filtrosSeleccionados[filtro.id_filtro].max) && (
+                                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mt-2`}>
+                                    Rango seleccionado: {
+                                        filtrosSeleccionados[filtro.id_filtro].min || 'Sin mín'
+                                    } - {
+                                        filtrosSeleccionados[filtro.id_filtro].max || 'Sin máx'
+                                    } {filtro.unidad}
+                                </div>
+                            )}
                         </div>
                     )}
                     {filtro.tipo_input === 'select' && (

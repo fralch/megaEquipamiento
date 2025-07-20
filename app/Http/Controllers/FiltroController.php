@@ -41,7 +41,9 @@ class FiltroController extends Controller
                 'descripcion' => 'nullable|string',
                 'orden' => 'integer',
                 'obligatorio' => 'boolean',
-                'opciones' => 'required_if:tipo_input,checkbox,select,radio|array|min:1',
+                'max_value' => 'nullable|numeric',
+                'min_value' => 'nullable|numeric',
+                'opciones' => 'required_if:tipo_input,checkbox,select,radio|array',
                 'opciones.*.valor' => 'required_with:opciones|string|max:100',
                 'opciones.*.etiqueta' => 'required_with:opciones|string|max:100',
                 'opciones.*.color' => 'nullable|string|max:7',
@@ -49,6 +51,19 @@ class FiltroController extends Controller
                 'subcategorias' => 'array',
                 'subcategorias.*' => 'exists:subcategorias,id_subcategoria'
             ]);
+
+            // Validación adicional para tipos que requieren opciones
+            if (in_array($validatedData['tipo_input'], ['checkbox', 'select', 'radio'])) {
+                if (!isset($validatedData['opciones']) || count($validatedData['opciones']) < 1) {
+                    return response()->json([
+                        'error' => 'Los filtros de tipo checkbox, select y radio requieren al menos una opción'
+                    ], 422);
+                }
+            }
+
+            // Convertir strings vacíos a null para valores numéricos
+            $validatedData['min_value'] = empty($validatedData['min_value']) ? null : $validatedData['min_value'];
+            $validatedData['max_value'] = empty($validatedData['max_value']) ? null : $validatedData['max_value'];
 
             \Log::info('Datos validados correctamente');
 
@@ -61,7 +76,9 @@ class FiltroController extends Controller
                 'unidad' => $validatedData['unidad'] ?? null,
                 'descripcion' => $validatedData['descripcion'] ?? null,
                 'orden' => $validatedData['orden'] ?? 0,
-                'obligatorio' => $validatedData['obligatorio'] ?? false
+                'obligatorio' => $validatedData['obligatorio'] ?? false,
+                'max_value' => $validatedData['max_value'] ?? null,
+                'min_value' => $validatedData['min_value'] ?? null
             ]);
 
             // Crear opciones si existen
@@ -129,6 +146,8 @@ class FiltroController extends Controller
             'descripcion' => 'nullable|string',
             'orden' => 'integer',
             'obligatorio' => 'boolean',
+            'max_value' => 'nullable|numeric',
+            'min_value' => 'nullable|numeric',
             'opciones' => 'array',
             'opciones.*.id_opcion' => 'nullable|exists:opciones_filtros,id_opcion',
             'opciones.*.valor' => 'required_with:opciones|string|max:100',
@@ -141,6 +160,12 @@ class FiltroController extends Controller
         
 
         try {
+            // Convertir strings vacíos a null para valores numéricos
+            $request->merge([
+                'min_value' => empty($request->min_value) ? null : $request->min_value,
+                'max_value' => empty($request->max_value) ? null : $request->max_value,
+            ]);
+
             // Inicia una transacción de base de datos
             DB::beginTransaction();
 
@@ -152,7 +177,9 @@ class FiltroController extends Controller
                 'unidad' => $request->unidad,
                 'descripcion' => $request->descripcion,
                 'orden' => $request->orden ?? $filtro->orden,
-                'obligatorio' => $request->obligatorio ?? $filtro->obligatorio
+                'obligatorio' => $request->obligatorio ?? $filtro->obligatorio,
+                'max_value' => $request->max_value,
+                'min_value' => $request->min_value
             ]);
 
             // Si hay opciones, actualiza las existentes o crea nuevas
@@ -319,7 +346,6 @@ class FiltroController extends Controller
                                 }
                             });
                         }
-
                         break;
                         
                     case 'radio':
@@ -336,6 +362,38 @@ class FiltroController extends Controller
                         }
                         break;
                         
+                    case 'range':
+                        // Para range, valorSeleccionado es un objeto con min y max
+                        if (is_array($valorSeleccionado) && (isset($valorSeleccionado['min']) || isset($valorSeleccionado['max']))) {
+                            $query->where(function($q) use ($filtro, $valorSeleccionado) {
+                                // Extraer valores numéricos de las características usando regex
+                                // Busca patrones como "5kg", "10.5 cm", "100 watts", etc.
+                                $campoNombre = strtolower($filtro->nombre);
+                                
+                                // Aplicar filtro de valor mínimo si está definido
+                                if (isset($valorSeleccionado['min']) && $valorSeleccionado['min'] !== null && $valorSeleccionado['min'] !== '') {
+                                    $minValue = (float) $valorSeleccionado['min'];
+                                    // Buscar números en las características que coincidan con el nombre del filtro
+                                    $q->whereRaw("CAST(REGEXP_REPLACE(
+                                        LOWER(caracteristicas), 
+                                        CONCAT('.*', ?, '[^0-9]*([0-9]+(?:\.[0-9]+)?).*'), 
+                                        '$1'
+                                    ) AS DECIMAL(10,2)) >= ?", [$campoNombre, $minValue]);
+                                }
+                                
+                                // Aplicar filtro de valor máximo si está definido
+                                if (isset($valorSeleccionado['max']) && $valorSeleccionado['max'] !== null && $valorSeleccionado['max'] !== '') {
+                                    $maxValue = (float) $valorSeleccionado['max'];
+                                    // Buscar números en las características que coincidan con el nombre del filtro
+                                    $q->whereRaw("CAST(REGEXP_REPLACE(
+                                        LOWER(caracteristicas), 
+                                        CONCAT('.*', ?, '[^0-9]*([0-9]+(?:\.[0-9]+)?).*'), 
+                                        '$1'
+                                    ) AS DECIMAL(10,2)) <= ?", [$campoNombre, $maxValue]);
+                                }
+                            });
+                        }
+                        break;
 
                 }
             }
