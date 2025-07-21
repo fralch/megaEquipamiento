@@ -147,10 +147,22 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
             {filtros.map((filtro, index) => (
                 <React.Fragment key={filtro.id_filtro}>
                     <div className="mb-6">
-                        <div className="flex justify-between items-center mb-3">
-                            <h3 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>
-                                {filtro.nombre}
-                            </h3>
+                        <div className="flex justify-between items-center mb-4">
+                            {/* NOMBRE DEL FILTRO RESALTADO */}
+                            <div className={`flex items-center gap-2 px-2 py-1.5 rounded-lg ${
+                                isDarkMode 
+                                    ? 'bg-gray-800/50 shadow-sm' 
+                                    : 'bg-blue-50 shadow-sm'
+                            }`}>
+                                <h3 className={`text-base font-semibold ${
+                                    isDarkMode 
+                                        ? 'text-blue-300' 
+                                        : 'text-blue-700'
+                                } transition-colors duration-200`}>
+                                    {filtro.nombre}
+                                </h3>
+                            </div>
+                            
                             {auth.user && (
                                 <div className="flex space-x-2">
                                     <button
