@@ -143,10 +143,12 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
     const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
     const [categoriaNombre, setCategoriaNombre] = useState("");
     const [categoriaId, setCategoriaId] = useState("");
+    const [subcategoriasCategoria, setSubcategoriasCategoria] = useState([]);
     const [mostrarFormularioFiltro, setMostrarFormularioFiltro] = useState(false);
     const [filtroEnEdicion, setFiltroEnEdicion] = useState(null);
     const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
     const [filtroAEliminar, setFiltroAEliminar] = useState(null);
+    const [subcategoriasColapsadas, setSubcategoriasColapsadas] = useState(false);
     
     // Estado del nuevo filtro
     const [nuevoFiltro, setNuevoFiltro] = useState({
@@ -156,7 +158,9 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         descripcion: '',
         orden: 0,
         obligatorio: true,
-        opciones: []
+        opciones: [],
+        min_value: '',
+        max_value: ''
     });
 
     // Función para obtener ID de subcategoría de la URL
@@ -276,7 +280,9 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             descripcion: filtro.descripcion || '',
             orden: filtro.orden,
             obligatorio: true,
-            opciones: filtro.opciones && filtro.opciones.length > 0 ? filtro.opciones : []
+            opciones: filtro.opciones && filtro.opciones.length > 0 ? filtro.opciones : [],
+            min_value: filtro.min_value || '',
+            max_value: filtro.max_value || ''
         });
         setMostrarFormularioFiltro(true);
     };
@@ -343,7 +349,9 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             descripcion: '',
             orden: 0,
             obligatorio: true,
-            opciones: []
+            opciones: [],
+            min_value: '',
+            max_value: ''
         });
     };
 
@@ -466,6 +474,14 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                 setCategoriaNombre(categoriaData.nombre_categoria);
                 setCategoriaId(categoriaData.id_categoria);
 
+                console.log('Categoria ID:', categoriaData.id_categoria); // Debug
+                console.log('Categoria Data:', categoriaData); // Debug
+
+                // Cargar subcategorías de la categoría actual
+                const subcategoriasData = await makeRequest(`${URL_API}/categoria/${categoriaData.id_categoria}/subcategorias`);
+                console.log('Subcategorias Data:', subcategoriasData); // Debug
+                setSubcategoriasCategoria(subcategoriasData);
+
                 if (productosIniciales && productosIniciales.length > 0) {
                     setProductosOriginales(productosIniciales);
                 }
@@ -512,6 +528,8 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                 <div className="flex w-full">
                     {/* Sidebar de filtros */}
                     <div className={sidebarClasses} id="filtros-container">
+                        
+                        
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <h2 className={`text-xl font-bold mb-2 ${
@@ -651,6 +669,93 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                     </div>
                                 )}
                             </>
+                        )}
+
+                        {/* Separador visual */}
+                        <hr className={`my-6 border-t ${
+                            isDarkMode ? 'border-gray-600/50' : 'border-gray-300/50'
+                        } transition-colors duration-200`} />
+
+                        {/* Subcategorías de la categoría */}
+                        {subcategoriasCategoria && subcategoriasCategoria.length > 0 && (
+                            <div className={`p-4 rounded-xl shadow-lg transition-all duration-200 border ${
+                                isDarkMode 
+                                    ? 'bg-gray-700/50 border-gray-600/50' 
+                                    : 'bg-white border-gray-200'
+                            }`}>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className={`text-lg font-semibold ${
+                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                    } transition-colors duration-200`}>
+                                        {categoriaNombre}
+                                    </h3>
+                                    <button
+                                        onClick={() => setSubcategoriasColapsadas(!subcategoriasColapsadas)}
+                                        className={`p-1 rounded-md transition-all duration-200 ${
+                                            isDarkMode 
+                                                ? 'hover:bg-gray-600/50 text-gray-300 hover:text-white' 
+                                                : 'hover:bg-gray-100 text-gray-600 hover:text-gray-800'
+                                        }`}
+                                        title={subcategoriasColapsadas ? 'Expandir subcategorías' : 'Colapsar subcategorías'}
+                                    >
+                                        <svg 
+                                            className={`w-5 h-5 transform transition-transform duration-200 ${
+                                                subcategoriasColapsadas ? 'rotate-180' : ''
+                                            }`} 
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                {!subcategoriasColapsadas && (
+                                    <div className="space-y-1 animate-fadeIn">
+                                        {subcategoriasCategoria.map((subcategoria, subIndex) => {
+                                            const isCurrentSubcategoria = subcategoria.id_subcategoria === parseInt(getSubcategoriaId());
+                                            return (
+                                                <Link
+                                                    key={subcategoria.id_subcategoria}
+                                                    href={`/subcategoria/${subcategoria.id_subcategoria}`}
+                                                    className={`group block p-2 pl-4 rounded-md transition-all duration-150 transform hover:scale-[1.02] hover:translate-x-1 ${
+                                                        isCurrentSubcategoria
+                                                            ? (isDarkMode 
+                                                                ? 'bg-blue-600/50 border border-blue-400 text-blue-200' 
+                                                                : 'bg-blue-100/70 border border-blue-200 text-blue-800')
+                                                            : (isDarkMode 
+                                                                ? 'bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 border border-gray-600/50 hover:border-gray-500/70' 
+                                                                : 'bg-blue-50/50 hover:bg-blue-100/70 text-gray-800 border border-blue-100 hover:border-blue-200')
+                                                    } hover:shadow-sm`}
+                                                    style={{ animationDelay: `${subIndex * 0.03}s` }}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center">
+                                                            <div className={`w-1.5 h-1.5 rounded-full mr-2 transition-all duration-100 ${
+                                                                isCurrentSubcategoria
+                                                                    ? (isDarkMode ? 'bg-blue-300' : 'bg-blue-600')
+                                                                    : (isDarkMode 
+                                                                        ? 'bg-green-400 group-hover:bg-green-300' 
+                                                                        : 'bg-green-500 group-hover:bg-green-600')
+                                                            }`}></div>
+                                                            <span className="text-sm font-medium group-hover:font-semibold transition-all duration-100">
+                                                                {subcategoria.nombre}
+                                                            </span>
+                                                        </div>
+                                                        {isCurrentSubcategoria && (
+                                                            <span className={`text-xs px-2 py-1 rounded-full ${
+                                                                isDarkMode ? 'bg-blue-500 text-white' : 'bg-blue-500 text-white'
+                                                            }`}>
+                                                                Actual
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
 

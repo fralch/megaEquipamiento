@@ -17,7 +17,9 @@ class Filtro extends Model
         'descripcion',
         'orden',
         'activo',
-        'obligatorio'
+        'obligatorio',
+        'max_value',
+        'min_value'
     ];
 
     protected $casts = [

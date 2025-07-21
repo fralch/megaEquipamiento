@@ -48,8 +48,8 @@ const ProductPage = ({ producto }) => {
                 image: Array.isArray(producto.imagen) 
                     ? (producto.imagen[0]?.startsWith('http') ? producto.imagen[0] : `/${producto.imagen[0]}`)
                     : (producto.imagen?.startsWith('http') ? producto.imagen : `/${producto.imagen}`),
-                price: parseFloat(producto.precio_sin_ganancia || 0),
-                priceWithoutProfit: parseFloat(producto.precio_sin_ganancia || 0),
+                price: parseFloat(producto.precio_ganancia || 0),
+                priceWithoutProfit: parseFloat(producto.precio_ganancia || 0),
                 priceWithProfit: parseFloat(producto.precio_ganancia || 0),
                 sku: producto.sku,
                 descripcion: producto.descripcion,
@@ -166,7 +166,7 @@ const ProductPage = ({ producto }) => {
                 title: productData.nombre,
                 image: Array.isArray(productData.imagen) ? productData.imagen[0] : productData.imagen,
                 price: parseFloat(productData.precio_igv || 0),
-                priceWithoutProfit: parseFloat(productData.precio_sin_ganancia || 0),
+                priceWithoutProfit: parseFloat(productData.precio_ganancia || 0),
                 priceWithProfit: parseFloat(productData.precio_ganancia || 0)
             };
             
@@ -1123,7 +1123,7 @@ const ProductPage = ({ producto }) => {
                             <div className="grid grid-cols-2 gap-8">
                                 <div className="flex text-left space-x-4 flex-col">
                                     <div className="ml-3">
-                                        {editMode.precio_sin_ganancia ? (
+                                        {editMode.precio_ganancia ? (
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     type="number"
@@ -1131,17 +1131,17 @@ const ProductPage = ({ producto }) => {
                                                         isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
                                                     }`}
                                                     value={tempInputs.precio_ganancia || producto.precio_ganancia}
-                                                    onChange={(e) => handleInputChange('precio_sin_ganancia', e.target.value)}
+                                                    onChange={(e) => handleInputChange('precio_ganancia', e.target.value)}
                                                     autoFocus
                                                 />
                                                 <button
-                                                    onClick={() => handleSave('precio_sin_ganancia')}
+                                                    onClick={() => handleSave('precio_ganancia')}
                                                     className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
                                                 >
                                                     ✓
                                                 </button>
                                                 <button
-                                                    onClick={() => toggleEditMode('precio_sin_ganancia')}
+                                                    onClick={() => toggleEditMode('precio_ganancia')}
                                                     className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
                                                 >
                                                     ✕
@@ -1150,7 +1150,7 @@ const ProductPage = ({ producto }) => {
                                         ) : (
                                             <p
                                                 className="text-2xl font-semibold text-green-600 cursor-pointer"
-                                                onDoubleClick={() => toggleEditMode('precio_sin_ganancia')}
+                                                onDoubleClick={() => toggleEditMode('precio_ganancia')}
                                             >
                                                 {formatPrice(productData.precio_ganancia)}
                                             </p>
