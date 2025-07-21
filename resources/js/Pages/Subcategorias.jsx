@@ -551,8 +551,6 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                             )}
                         </div>
 
-                       
-
                         {/* Filtro de precio */}
                         <div className={`price-filter-container p-4 rounded-xl shadow-lg mb-6 transition-all duration-200 border ${
                             isDarkMode 
@@ -672,9 +670,15 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                 )}
                             </>
                         )}
+
+                        {/* Separador visual */}
+                        <hr className={`my-6 border-t ${
+                            isDarkMode ? 'border-gray-600/50' : 'border-gray-300/50'
+                        } transition-colors duration-200`} />
+
                         {/* Subcategorías de la categoría */}
                         {subcategoriasCategoria && subcategoriasCategoria.length > 0 && (
-                            <div className={`p-4 rounded-xl shadow-lg mb-6 transition-all duration-200 border mt-5 ${
+                            <div className={`p-4 rounded-xl shadow-lg transition-all duration-200 border ${
                                 isDarkMode 
                                     ? 'bg-gray-700/50 border-gray-600/50' 
                                     : 'bg-white border-gray-200'
