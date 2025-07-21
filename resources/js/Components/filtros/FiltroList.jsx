@@ -37,14 +37,22 @@ const SimplifiedRangeSlider = ({ filtro, filtrosSeleccionados, setFiltrosSelecci
   return (
     <div className="space-y-3">
       {/* Valores actuales */}
-      <div className="flex justify-between items-center">
-        <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-          <span className="font-medium">{formatNumber(currentMin)}</span>
-          <span className="ml-1">{filtro.unidad}</span>
+      <div className="flex justify-between items-center mb-2">
+        <div className={`text-sm px-3 py-1.5 rounded-lg shadow-sm ${
+          isDarkMode 
+            ? 'bg-gray-700 text-gray-300 border border-gray-600' 
+            : 'bg-gray-50 text-gray-600 border border-gray-200'
+        }`}>
+          <span className="font-semibold">{formatNumber(currentMin)}</span>
+          <span className="ml-1 text-xs uppercase tracking-wide opacity-75">{filtro.unidad}</span>
         </div>
-        <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-          <span className="font-medium">{formatNumber(currentMax)}</span>
-          <span className="ml-1">{filtro.unidad}</span>
+        <div className={`text-sm px-3 py-1.5 rounded-lg shadow-sm ${
+          isDarkMode 
+            ? 'bg-gray-700 text-gray-300 border border-gray-600' 
+            : 'bg-gray-50 text-gray-600 border border-gray-200'
+        }`}>
+          <span className="font-semibold">{formatNumber(currentMax)}</span>
+          <span className="ml-1 text-xs uppercase tracking-wide opacity-75">{filtro.unidad}</span>
         </div>
       </div>
 
