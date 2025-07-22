@@ -186,7 +186,15 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                         </div>
                         
                         {filtro.tipo_input === 'checkbox' && (
-                            <div className="space-y-2">
+                            <div className={`space-y-2 ${
+                                filtro.opciones.length > 6 
+                                    ? `max-h-48 overflow-y-auto pr-2 ${
+                                        isDarkMode 
+                                            ? 'scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800' 
+                                            : 'scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100'
+                                    }` 
+                                    : ''
+                            }`}>
                                 {filtro.opciones.map((opcion) => (
                                     <label key={opcion.id_opcion} className="flex items-center space-x-2 cursor-pointer group">
                                         <input
@@ -213,7 +221,15 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                         )}
                         
                         {filtro.tipo_input === 'radio' && (
-                            <div className="space-y-2">
+                            <div className={`space-y-2 ${
+                                filtro.opciones.length > 6 
+                                    ? `max-h-48 overflow-y-auto pr-2 ${
+                                        isDarkMode 
+                                            ? 'scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800' 
+                                            : 'scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100'
+                                    }` 
+                                    : ''
+                            }`}>
                                 {filtro.opciones.map((opcion) => (
                                     <label key={opcion.id_opcion} className="flex items-center space-x-2 cursor-pointer group">
                                         <input
@@ -296,7 +312,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                 </div>
             )}
             
-            {/* Estilos CSS simplificados para los sliders */}
+            {/* Estilos CSS simplificados para los sliders y scrollbars */}
             <style jsx global>{`
                 .range-slider-simple {
                     -webkit-appearance: none;
@@ -350,6 +366,36 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                 .dark .range-slider-simple::-moz-range-thumb {
                     border-color: #374151;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+                }
+                
+                /* Scrollbar personalizado para filtros */
+                .scrollbar-thin {
+                    scrollbar-width: thin;
+                }
+                .scrollbar-thin::-webkit-scrollbar {
+                    width: 6px;
+                }
+                .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb {
+                    background-color: #d1d5db;
+                    border-radius: 3px;
+                }
+                .scrollbar-thumb-gray-300::-webkit-scrollbar-thumb:hover {
+                    background-color: #9ca3af;
+                }
+                .scrollbar-track-gray-100::-webkit-scrollbar-track {
+                    background-color: #f3f4f6;
+                    border-radius: 3px;
+                }
+                .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb {
+                    background-color: #4b5563;
+                    border-radius: 3px;
+                }
+                .scrollbar-thumb-gray-600::-webkit-scrollbar-thumb:hover {
+                    background-color: #6b7280;
+                }
+                .scrollbar-track-gray-800::-webkit-scrollbar-track {
+                    background-color: #1f2937;
+                    border-radius: 3px;
                 }
             `}</style>
         </>
