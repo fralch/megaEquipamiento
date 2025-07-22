@@ -187,15 +187,19 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                         
                         {filtro.tipo_input === 'checkbox' && (
                             <div className={`space-y-2 ${
-                                filtro.opciones.length > 6 
-                                    ? `max-h-48 overflow-y-auto pr-2 ${
+                                filtro.opciones.length > 4 
+                                    ? `max-h-32 overflow-y-auto pr-2 ${
                                         isDarkMode 
                                             ? 'scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800' 
                                             : 'scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100'
                                     }` 
                                     : ''
                             }`}>
-                                {filtro.opciones.map((opcion) => (
+                                {[...filtro.opciones].sort((a, b) => {
+                                    const numA = parseFloat(a.etiqueta.replace(/[^0-9.]/g, '')) || 0;
+                                    const numB = parseFloat(b.etiqueta.replace(/[^0-9.]/g, '')) || 0;
+                                    return numB - numA;
+                                }).map((opcion) => (
                                     <label key={opcion.id_opcion} className="flex items-center space-x-2 cursor-pointer group">
                                         <input
                                             type="checkbox"
@@ -222,15 +226,19 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
                         
                         {filtro.tipo_input === 'radio' && (
                             <div className={`space-y-2 ${
-                                filtro.opciones.length > 6 
-                                    ? `max-h-48 overflow-y-auto pr-2 ${
+                                filtro.opciones.length > 4 
+                                    ? `max-h-32 overflow-y-auto pr-2 ${
                                         isDarkMode 
                                             ? 'scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800' 
                                             : 'scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100'
                                     }` 
                                     : ''
                             }`}>
-                                {filtro.opciones.map((opcion) => (
+                                {[...filtro.opciones].sort((a, b) => {
+                                    const numA = parseFloat(a.etiqueta.replace(/[^0-9.]/g, '')) || 0;
+                                    const numB = parseFloat(b.etiqueta.replace(/[^0-9.]/g, '')) || 0;
+                                    return numB - numA;
+                                }).map((opcion) => (
                                     <label key={opcion.id_opcion} className="flex items-center space-x-2 cursor-pointer group">
                                         <input
                                             type="radio"
