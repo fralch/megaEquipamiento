@@ -703,7 +703,7 @@ const RelatedProducts = ({ productId }) => {
                                     : 'bg-green-500 hover:bg-green-600 text-white'
                             }`}
                         >
-                            {isExpanded ? `Ocultar (${products.length - itemsPerRow})` : `Ver todos (${products.length})`}
+                            {isExpanded ? `Ocultar (${products.length - itemsPerRow})` : `Cargar más ${type.charAt(0).toUpperCase() + type.slice(1)} (${products.length})`}
                         </button>
                     </div>
                 )}
