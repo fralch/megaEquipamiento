@@ -166,7 +166,7 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
           </div>
           
           {/* Título visible por defecto pero desaparece con hover */}
-          <div className="absolute top-4 left-4 right-4 bg-gray-900/90 backdrop-blur-sm text-white text-lg font-bold py-2 px-3 rounded-lg z-10 transition-opacity duration-300 group-hover:opacity-0 text-center shadow-lg">
+          <div className="absolute bottom-4 left-4 right-4 bg-gray-900/90 backdrop-blur-sm text-white text-lg font-bold py-2 px-3 rounded-lg z-10 transition-opacity duration-300 group-hover:opacity-0 text-center shadow-lg">
             <span className="line-clamp-2">{title}</span>
           </div>
 
