@@ -1627,7 +1627,10 @@ const ProductPage = ({ producto }) => {
                  <section className={`w-full shadow-md rounded-md mt-5 p-6 transition-colors duration-300 ${
                      isDarkMode ? 'bg-gray-800' : 'bg-white'
                  }`} aria-label="Productos relacionados">
-                 <RelatedProducts productId={producto.id_producto} />
+                 <RelatedProducts 
+                                productId={producto.id_producto} 
+                                currentProductSubcategoryId={producto.id_subcategoria}
+                            />
                     <div className="flex justify-center items-center">
                         {auth.user && (
                             <button

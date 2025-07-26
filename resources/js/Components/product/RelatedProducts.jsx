@@ -6,6 +6,7 @@ import { CartContext } from '../../storage/CartContext';
 import { useCurrency } from '../../storage/CurrencyContext';
 import { useCompare } from '../../hooks/useCompare';
 import countryCodeMap from '../store/countryJSON.json';
+import SubcategoryProducts from './SubcategoryProducts';
 
 const ModalPendingRelation = ({ productId, relatedProductId, initialRelated = [], onSave, onClose, isPendingRelation = false }) => {
     const { isDarkMode } = useTheme();
@@ -202,7 +203,7 @@ const ModalPendingRelation = ({ productId, relatedProductId, initialRelated = []
     );
 };
 
-const RelatedProducts = ({ productId }) => {
+const RelatedProducts = ({ productId, currentProductSubcategoryId }) => {
     const { isDarkMode } = useTheme();
     const { formatPrice } = useCurrency();
     const { cart, dispatch } = useContext(CartContext);
@@ -753,6 +754,12 @@ const RelatedProducts = ({ productId }) => {
                     renderProductGroup(type.nombre, groupedProducts[type.nombre])
                 ))
             )}
+
+            {/* Componente de productos de la misma subcategoría */}
+            <SubcategoryProducts 
+                productId={productId}
+                currentProductSubcategoryId={currentProductSubcategoryId}
+            />
 
             {showModal && (
                 <ModalPendingRelation 
