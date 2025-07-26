@@ -10,7 +10,7 @@ const IMAGE_ROTATION_INTERVAL = 3000; // 3 segundos
 const SubcategoryLink = React.memo(({ item, isDarkMode }) => (
   <Link
     href={`/subcategoria/${item.id_subcategoria}`}
-    className={`block ${isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-700'} p-2 rounded-md cursor-pointer transition-colors duration-200`}
+    className="block hover:bg-gray-700 p-2 rounded-md cursor-pointer transition-colors duration-200"
   >
     {item.nombre}
   </Link>
@@ -129,63 +129,78 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
   return (
     <div 
       ref={cardRef} 
-      className={`relative group w-full h-96 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}
+      className="relative group w-full h-96 rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 bg-white border border-gray-200"
     >
       {/* Loading skeleton mientras carga */}
       <div 
-        className={`absolute inset-0 ${isDarkMode ? 'bg-gray-800' : 'bg-gray-200'} transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
+        className={`absolute inset-0 bg-white transition-opacity duration-300 ${imageLoaded ? 'opacity-0' : 'opacity-100'}`}
       >
         <div className="h-full w-full flex flex-col justify-center items-center">
           {/* Spinner de carga */}
-          <div className={`animate-spin rounded-full h-8 w-8 border-2 border-t-transparent mb-3 ${isDarkMode ? 'border-gray-600' : 'border-gray-400'}`}></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-t-transparent mb-3 border-gray-400"></div>
           {/* Texto de carga */}
-          <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Cargando...</p>
+          <p className="text-sm font-medium text-gray-600">Cargando...</p>
         </div>
       </div>
       
       {/* Imagen de fondo que rota - solo carga cuando es visible */}
       {isVisible && currentImage && (
         <>
-          <img 
-            src={currentImage}
-            alt={`${title} background`}
-            className={`absolute inset-0 w-full h-full object-center transition-all duration-500 transform group-hover:scale-110 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-            onLoad={handleImageLoad}
-            loading="lazy"
-            style={{ objectFit: currentImage === placeholderImage ? 'contain' : 'cover' }}
-          />
+          <div className="absolute inset-0 w-full h-full overflow-hidden bg-white">
+            <img 
+              src={currentImage}
+              alt={`${title} background`}
+              className={`w-full h-full transition-all duration-500 transform group-hover:scale-105 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+              onLoad={handleImageLoad}
+              loading="lazy"
+              style={{
+                objectFit: 'contain',
+                objectPosition: 'center center',
+                maxWidth: '100%',
+                maxHeight: '100%',
+                background: 'white'
+              }}
+            />
+            {/* Overlay sutil para mejorar la legibilidad del texto */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/10"></div>
+          </div>
           
           {/* Título visible por defecto pero desaparece con hover */}
-          <div className={`absolute top-4 left-4 ${isDarkMode ? 'bg-gray-800 bg-opacity-90' : 'bg-gray-900 bg-opacity-70'} text-white text-xl font-bold py-2 px-4 rounded-md z-10 transition-opacity duration-300 group-hover:opacity-0`}>
-            {title}
+          <div className="absolute top-4 left-4 right-4 bg-gray-900/90 backdrop-blur-sm text-white text-lg font-bold py-2 px-3 rounded-lg z-10 transition-opacity duration-300 group-hover:opacity-0 text-center shadow-lg">
+            <span className="line-clamp-2">{title}</span>
           </div>
 
           {/* Contenido oculto que aparece con hover */}
-          <div className={`absolute inset-0 ${isDarkMode ? 'bg-gray-900 bg-opacity-95' : 'bg-gray-800 bg-opacity-90'} text-white flex flex-col justify-center items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100`}>
+          <div className="absolute inset-0 bg-gray-800 bg-opacity-90 text-white flex flex-col justify-center items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100 p-4">
             <Link 
               href={`/categorias/${categoryId}`} 
               className="cursor-pointer hover:text-blue-400 transition-colors duration-200"
             >
-              <h2 className="text-2xl font-semibold mb-4 text-center">{title}</h2>
+              <h2 className="text-xl font-semibold mb-4 text-center line-clamp-2">{title}</h2>
             </Link>
 
             {/* Lista desplazable memoizada */}
-            <div className={`space-y-2 h-40 overflow-y-auto scrollbar-thin ${isDarkMode ? 'scrollbar-thumb-gray-500 scrollbar-track-gray-700' : 'scrollbar-thumb-gray-600 scrollbar-track-gray-300'}`}>
-              {items.map((item) => (
+            <div className="space-y-1 max-h-40 overflow-y-auto scrollbar-thin w-full scrollbar-thumb-gray-500 scrollbar-track-gray-700">
+              {items.slice(0, 8).map((item) => (
                 <SubcategoryLink
                   key={item.id_subcategoria}
                   item={item}
                   isDarkMode={isDarkMode}
                 />
               ))}
+              {items.length > 8 && (
+                <p className="text-xs text-center mt-2 text-gray-400">
+                  +{items.length - 8} más...
+                </p>
+              )}
             </div>
 
             {/* Botón que también lleva a los productos de la categoría */}
             <Link 
               href={`/categorias/${categoryId}`}
-              className={`${isDarkMode ? 'bg-blue-700 hover:bg-blue-800' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded-md mt-4 transition-colors duration-200`}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md mt-4 transition-colors duration-200 text-sm"
             >
-              {title}
+              Ver {title}
             </Link>
           </div>
         </>
