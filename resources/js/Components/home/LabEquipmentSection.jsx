@@ -73,10 +73,10 @@ const LabEquipmentSection = () => {
                     análisis y estudios en diferentes disciplinas científicas. Algunos equipos de laboratorio
                     incluyen microscopios, espectrofotómetros, balanzas de laboratorio, centrífugas, autoclaves,
                     agitadores magnéticos, incubadoras, pipetas, y sistemas de cromatografía, entre muchos otros.
-                    Cada equipo tiene su propia utilidad y está diseñado para manipular muestras y realizar
+                    <span className="hidden xl:inline"> Cada equipo tiene su propia utilidad y está diseñado para manipular muestras y realizar
                     mediciones con precisión. Estos instrumentos son esenciales para la investigación científica,
                     el desarrollo de productos, el control de calidad y el análisis en una amplia gama de campos,
-                    como la biología, la química, la física, la medicina, la ingeniería y las ciencias ambientales.
+                    como la biología, la química, la física, la medicina, la ingeniería y las ciencias ambientales.</span>
                 </p>
 
                 {/* Navigation Buttons - Bottom right position */}
@@ -104,8 +104,8 @@ const LabEquipmentSection = () => {
                 </div>
             </div>
 
-            {/* Slider Imagenes */}
-            <div className="w-full md:w-full lg:w-7/12 relative lg:absolute lg:top-24 xl:top-32 lg:right-0 z-10 md:mt-4 lg:mt-0">
+            {/* Slider Imagenes - Centrado verticalmente */}
+            <div className="w-full md:w-full lg:w-7/12 relative lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-0 z-10 md:mt-4 lg:mt-0">
                 <ImageCarousel
                     currentIndex={currentIndex}
                     goToPrevious={goToPrevious}
