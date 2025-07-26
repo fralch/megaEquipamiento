@@ -399,8 +399,8 @@ class FiltroController extends Controller
             }
         }
         
-        // Obtener los productos filtrados
-        $productos = $query->get();
+        // Obtener los productos filtrados con la relación de marca
+        $productos = $query->with('marca')->get();
         
         // Devolver los productos filtrados
         return response()->json($productos);

@@ -183,7 +183,7 @@ class ProductoController extends Controller
     public function getProductosAll(Request $request)
     {
         $perPage = $request->input('per_page', 50); // Default 50 items per page
-        $productos = Producto::paginate($perPage);
+        $productos = Producto::with('marca')->paginate($perPage);
         return response()->json($productos);
     }
     // Obtener todos los productos
@@ -198,7 +198,7 @@ class ProductoController extends Controller
     // Obtener todos los productos con su imagen
     public function getProductosImagen()
     {
-        $productos = Producto::all(); // No es necesario usar 'with' para la imagen
+        $productos = Producto::with('marca')->get(); // Incluir relación de marca
         return response()->json($productos);
     }
 
