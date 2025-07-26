@@ -193,7 +193,7 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
             {/* Botón que también lleva a los productos de la categoría */}
             <Link 
               href={`/categorias/${categoryId}`}
-              className={`${isDarkMode ? 'bg-blue-700 hover:bg-blue-800' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded-md mt-4 transition-colors duration-200`}
+              className={`${isDarkMode ? 'bg-blue-700 hover:bg-blue-800' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded-md mt-4 transition-colors duration-200 z-50`}
             >
               {title}
             </Link>
