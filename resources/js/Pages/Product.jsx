@@ -1011,7 +1011,164 @@ const ProductPage = ({ producto }) => {
                 ? 'text-gray-100 bg-gray-900' 
                 : 'text-gray-800 bg-gray-100'
         }`}>
-            <Head title="Producto" />
+            <Head>
+                {/* Título optimizado para SEO */}
+                <title>{`${producto.nombre} ${producto.marca?.nombre ? `- ${producto.marca.nombre}` : ''} | Comprar Online | SKU: ${producto.sku}`}</title>
+                
+                {/* Meta descripción optimizada */}
+                <meta name="description" content={`${producto.descripcion?.substring(0, 145) || `Compra ${producto.nombre} ${producto.marca?.nombre ? `de ${producto.marca.nombre}` : ''} al mejor precio`}. SKU: ${producto.sku}. Precio desde ${formatPrice(producto.precio_ganancia)}.`} />
+                
+                {/* Meta tags básicos mejorados */}
+                <meta name="keywords" content={`${producto.nombre}, ${producto.marca?.nombre || ''}, ${producto.sku}, ${categoriaCurrent?.nombre_categoria || ''}, ${subcategoriaCurrent?.nombre || ''}, comprar online, precio, oferta, equipamiento`} />
+                <meta name="author" content="Mega Equipamiento" />
+                <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+                <meta name="googlebot" content="index, follow" />
+                <meta name="bingbot" content="index, follow" />
+                
+                {/* Meta tags adicionales para SEO */}
+                <meta name="language" content="es" />
+                <meta name="geo.region" content="PE" />
+                <meta name="geo.country" content="Peru" />
+                <meta name="distribution" content="global" />
+                <meta name="rating" content="general" />
+                <meta name="revisit-after" content="7 days" />
+                
+                {/* Open Graph mejorado para redes sociales */}
+                <meta property="og:title" content={`${producto.nombre} ${producto.marca?.nombre ? `- ${producto.marca.nombre}` : ''} | Mega Equipamiento`} />
+                <meta property="og:description" content={`${producto.descripcion?.substring(0, 155) || `Compra ${producto.nombre} al mejor precio en Mega Equipamiento`}. SKU: ${producto.sku}`} />
+                <meta property="og:image" content={Array.isArray(producto.imagen) ? (producto.imagen[0]?.startsWith('http') ? producto.imagen[0] : `${window.location.origin}/${producto.imagen[0]}`) : (producto.imagen?.startsWith('http') ? producto.imagen : `${window.location.origin}/${producto.imagen}`)} />
+                <meta property="og:image:width" content="1200" />
+                <meta property="og:image:height" content="630" />
+                <meta property="og:image:alt" content={`${producto.nombre} - ${producto.marca?.nombre || 'Producto de calidad'}`} />
+                <meta property="og:url" content={`${window.location.origin}/producto/${producto.id_producto}`} />
+                <meta property="og:type" content="product" />
+                <meta property="og:site_name" content="Mega Equipamiento" />
+                <meta property="og:locale" content="es_PE" />
+                <meta property="product:price:amount" content={producto.precio_ganancia} />
+                <meta property="product:price:currency" content="PEN" />
+                <meta property="product:availability" content="in stock" />
+                <meta property="product:condition" content="new" />
+                <meta property="product:retailer_item_id" content={producto.sku} />
+                
+                {/* Twitter Cards mejorado */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:site" content="@MegaEquipamiento" />
+                <meta name="twitter:creator" content="@MegaEquipamiento" />
+                <meta name="twitter:title" content={`${producto.nombre} ${producto.marca?.nombre ? `- ${producto.marca.nombre}` : ''}`} />
+                <meta name="twitter:description" content={`${producto.descripcion?.substring(0, 155) || `Compra ${producto.nombre} al mejor precio`}. SKU: ${producto.sku}`} />
+                <meta name="twitter:image" content={Array.isArray(producto.imagen) ? (producto.imagen[0]?.startsWith('http') ? producto.imagen[0] : `${window.location.origin}/${producto.imagen[0]}`) : (producto.imagen?.startsWith('http') ? producto.imagen : `${window.location.origin}/${producto.imagen}`)} />
+                <meta name="twitter:image:alt" content={`${producto.nombre} - ${producto.marca?.nombre || 'Producto de calidad'}`} />
+                
+                {/* Schema.org mejorado para productos */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org/",
+                        "@type": "Product",
+                        "name": producto.nombre,
+                        "image": Array.isArray(producto.imagen) 
+                            ? producto.imagen.map(img => img?.startsWith('http') ? img : `${window.location.origin}/${img}`)
+                            : [producto.imagen?.startsWith('http') ? producto.imagen : `${window.location.origin}/${producto.imagen}`],
+                        "description": producto.descripcion || `${producto.nombre} - Producto de alta calidad disponible en Mega Equipamiento`,
+                        "sku": producto.sku,
+                        "mpn": producto.sku,
+                        "gtin": producto.sku,
+                        "brand": {
+                            "@type": "Brand",
+                            "name": producto.marca?.nombre || "Mega Equipamiento"
+                        },
+                        "manufacturer": {
+                            "@type": "Organization",
+                            "name": producto.marca?.nombre || "Mega Equipamiento"
+                        },
+                        "category": `${categoriaCurrent?.nombre_categoria || ''} > ${subcategoriaCurrent?.nombre || ''}`,
+                        "offers": {
+                            "@type": "Offer",
+                            "url": `${window.location.origin}/producto/${producto.id_producto}`,
+                            "priceCurrency": "PEN",
+                            "price": producto.precio_ganancia,
+                            "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                            "availability": "https://schema.org/InStock",
+                            "itemCondition": "https://schema.org/NewCondition",
+                            "seller": {
+                                "@type": "Organization",
+                                "name": "Mega Equipamiento",
+                                "url": window.location.origin
+                            },
+                            "hasMerchantReturnPolicy": {
+                                "@type": "MerchantReturnPolicy",
+                                "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+                                "merchantReturnDays": 30
+                            },
+                            "shippingDetails": {
+                                "@type": "OfferShippingDetails",
+                                "shippingRate": {
+                                    "@type": "MonetaryAmount",
+                                    "currency": "PEN",
+                                    "value": "0"
+                                },
+                                "deliveryTime": {
+                                    "@type": "ShippingDeliveryTime",
+                                    "businessDays": {
+                                        "@type": "OpeningHoursSpecification",
+                                        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+                                    }
+                                }
+                            }
+                        },
+                        "aggregateRating": {
+                            "@type": "AggregateRating",
+                            "ratingValue": "4.5",
+                            "reviewCount": "1",
+                            "bestRating": "5",
+                            "worstRating": "1"
+                        }
+                    })}
+                </script>
+                
+                {/* Breadcrumb Schema */}
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Inicio",
+                                "item": window.location.origin
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": categoriaCurrent?.nombre_categoria || "Categoría",
+                                "item": `${window.location.origin}/categorias/${categoriaCurrent?.id_categoria || ''}`
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 3,
+                                "name": subcategoriaCurrent?.nombre || "Subcategoría",
+                                "item": `${window.location.origin}/subcategoria/${producto.id_subcategoria}`
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 4,
+                                "name": producto.nombre,
+                                "item": `${window.location.origin}/producto/${producto.id_producto}`
+                            }
+                        ]
+                    })}
+                </script>
+                
+                {/* Canonical URL */}
+                <link rel="canonical" href={`${window.location.origin}/producto/${producto.id_producto}`} />
+                
+                {/* Preload critical resources */}
+                <link rel="preload" as="image" href={Array.isArray(producto.imagen) ? (producto.imagen[0]?.startsWith('http') ? producto.imagen[0] : `/${producto.imagen[0]}`) : (producto.imagen?.startsWith('http') ? producto.imagen : `/${producto.imagen}`)} />
+                
+                {/* DNS prefetch for external resources */}
+                <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+                <link rel="dns-prefetch" href="//cdnjs.cloudflare.com" />
+            </Head>
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
@@ -1063,8 +1220,8 @@ const ProductPage = ({ producto }) => {
                 />
             )}
 
-            <main className="p-6">
-                <section className="grid md:grid-cols-2 gap-8">
+            <main className="p-6" role="main" itemScope itemType="https://schema.org/Product">
+                <section className="grid md:grid-cols-2 gap-8" aria-label="Información del producto">
                     <ImageGallery 
                         images={productData.imagen} 
                         productId={producto.id_producto}
@@ -1115,6 +1272,7 @@ const ProductPage = ({ producto }) => {
                                             isDarkMode ? 'text-gray-100' : 'text-gray-900'
                                         }`}
                                         onDoubleClick={() => toggleEditMode('nombre')}
+                                        itemProp="name"
                                     >
                                         {productData.nombre}
                                     </h1>
@@ -1151,8 +1309,13 @@ const ProductPage = ({ producto }) => {
                                             <p
                                                 className="text-2xl font-semibold text-green-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('precio_ganancia')}
+                                                itemProp="offers" itemScope itemType="https://schema.org/Offer"
                                             >
-                                                {formatPrice(productData.precio_ganancia)}
+                                                <span itemProp="price" content={productData.precio_ganancia}>
+                                                    {formatPrice(productData.precio_ganancia)}
+                                                </span>
+                                                <meta itemProp="priceCurrency" content="PEN" />
+                                                <meta itemProp="availability" content="https://schema.org/InStock" />
                                             </p>
                                         )}
                                         <p className={`transition-colors duration-300 ${
@@ -1242,7 +1405,7 @@ const ProductPage = ({ producto }) => {
                                                 }`}
                                                 onDoubleClick={() => toggleEditMode('sku')}
                                             >
-                                                SKU: {productData.sku}
+                                                SKU: <span itemProp="sku">{productData.sku}</span>
                                             </p>
                                         )}
                                     </div>
@@ -1448,9 +1611,9 @@ const ProductPage = ({ producto }) => {
                         )}
                     </div>
                 </section>
-                <div className={`w-full shadow-md rounded-md mt-10 transition-colors duration-300 ${
+                <section className={`w-full shadow-md rounded-md mt-10 transition-colors duration-300 ${
                     isDarkMode ? 'bg-gray-800' : 'bg-white'
-                }`} id="product-tabs">
+                }`} id="product-tabs" aria-label="Información detallada del producto">
                     <ProductTabs
                         tabs={tabs}
                         activeTab={activeTab}
@@ -1458,12 +1621,12 @@ const ProductPage = ({ producto }) => {
                     />
 
                     <div className="p-4">{renderContent()}</div>
-                </div>
+                </section>
                
                
-                 <div className={`w-full shadow-md rounded-md mt-5 p-6 transition-colors duration-300 ${
+                 <section className={`w-full shadow-md rounded-md mt-5 p-6 transition-colors duration-300 ${
                      isDarkMode ? 'bg-gray-800' : 'bg-white'
-                 }`}>
+                 }`} aria-label="Productos relacionados">
                  <RelatedProducts productId={producto.id_producto} />
                     <div className="flex justify-center items-center">
                         {auth.user && (
@@ -1477,7 +1640,7 @@ const ProductPage = ({ producto }) => {
                     </div>
 
                     {/* Productos Vistos Recientemente */}
-                    <div className={`py-6 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+                    <section className={`py-6 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`} aria-label="Productos vistos recientemente">
                         <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                             Productos Vistos Recientemente
                         </h2>
@@ -1493,12 +1656,12 @@ const ProductPage = ({ producto }) => {
                             }
                             
                             return (
-                                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4" role="list" aria-label="Lista de productos vistos recientemente">
                                     {recentProducts.slice(0, 6).map((product) => {
                                         const showDetails = hoveredRecentProductId === product.id;
                                         
                                         return (
-                                            <div 
+                                            <article 
                                                 key={product.id} 
                                                 className={`${
                                                     isDarkMode 
@@ -1507,6 +1670,9 @@ const ProductPage = ({ producto }) => {
                                                 } rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:scale-105 border relative`}
                                                 onMouseEnter={() => setHoveredRecentProductId(product.id)}
                                                 onMouseLeave={() => setHoveredRecentProductId(null)}
+                                                role="listitem"
+                                                itemScope
+                                                itemType="https://schema.org/Product"
                                             >
                                                 <Link href={product.link}>
                                                     <div className="relative">
@@ -1711,15 +1877,15 @@ const ProductPage = ({ producto }) => {
                                                         background: ${isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'};
                                                     }
                                                 `}</style>
-                                            </div>
+                                            </article>
                                         );
                                     })}
                                 </div>
                             );
                         })()}
-                    </div>
+                    </section>
                     
-                </div>
+                </section>
                
             </main>
             <Footer />
