@@ -91,7 +91,7 @@ const Menu = ({ toggleMenu }) => {
                     )}
                     <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0">
                         <a
-                            href="#"
+                            href="/contacto"
                             className={`mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:no-underline ${
                                 isDarkMode 
                                     ? 'text-gray-200 hover:bg-gray-700' 
