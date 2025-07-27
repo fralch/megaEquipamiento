@@ -1416,6 +1416,38 @@ const ProductPage = ({ producto }) => {
                                             Fabricante: {productData.marca?.nombre?.toUpperCase()}
                                         </p>
                                     </div>
+                                    <div>
+                                        <p className={`text-sm transition-colors duration-300 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        }`}>
+                                            Categoría: 
+                                            {categoriaCurrent && (
+                                                <>
+                                                    <Link 
+                                                        href={`/categorias/${categoriaCurrent.id_categoria}`} 
+                                                        className={`hover:text-blue-600 transition-colors duration-200 ml-1 ${
+                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                        }`}
+                                                    >
+                                                        {categoriaCurrent.nombre_categoria}
+                                                    </Link>
+                                                    <span className={`mx-1 ${
+                                                        isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                                                    }`}> - </span>
+                                                </>
+                                            )}
+                                            {subcategoriaCurrent && (
+                                                <Link 
+                                                    href={`/subcategoria/${producto.id_subcategoria}`}
+                                                    className={`hover:text-blue-600 transition-colors duration-200 ${
+                                                        isDarkMode ? 'text-gray-100' : 'text-gray-800'
+                                                    }`}
+                                                >
+                                                    {subcategoriaCurrent.nombre}
+                                                </Link>
+                                            )}
+                                        </p>
+                                    </div>
                                     <p className={`transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-800'
                                     }`}>
