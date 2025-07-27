@@ -503,7 +503,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             : 'bg-gradient-to-br from-blue-50 via-white to-indigo-50'
     } transition-all duration-300`;
 
-    const sidebarClasses = `w-1/6 flex-shrink-0 sticky top-0 h-screen overflow-y-auto p-6 ${
+    const sidebarClasses = `w-1/6 lg:w-1/4 2xl:w-1/5 flex-shrink-0 sticky top-0 h-screen overflow-y-auto p-6 ${
         isDarkMode 
             ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-r border-gray-700' 
             : 'bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200'
