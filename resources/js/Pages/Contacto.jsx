@@ -1,11 +1,146 @@
 import React, { useState } from 'react';
-import { Phone, Mail, MapPin, Star, CheckCircle, Users, Award, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Star, CheckCircle, Users, Award, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Head, usePage } from '@inertiajs/react';
 import Header from "../Components/home/Header";
 import Footer from "../Components/home/Footer";
 import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import { useTheme } from '../storage/ThemeContext';
+
+// Componente de galería mejorado con dos filas
+const GallerySection = ({ galleryImages, isDarkMode }) => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(null);
+  
+  // Configuración: 8 imágenes por página (2 filas de 4)
+  const imagesPerPage = 8;
+  const totalPages = Math.ceil(galleryImages.length / imagesPerPage);
+
+  const nextPage = () => {
+    setCurrentPage((prev) => (prev + 1) % totalPages);
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+  };
+
+  const openModal = (image) => {
+    setSelectedImage(image);
+  };
+
+  const closeModal = () => {
+    setSelectedImage(null);
+  };
+
+  // Obtener las imágenes de la página actual
+  const getCurrentPageImages = () => {
+    const startIndex = currentPage * imagesPerPage;
+    const endIndex = startIndex + imagesPerPage;
+    return galleryImages.slice(startIndex, endIndex);
+  };
+
+  return (
+    <section className={`py-16 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} transition-colors duration-200`}>
+      <div className="container mx-auto px-4">
+        <h2 className={`text-3xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+          Nuestras Instalaciones
+        </h2>
+        
+        {/* Controles de navegación superiores */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mb-8">
+            <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Página {currentPage + 1} de {totalPages} ({galleryImages.length} imágenes en total)
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={prevPage}
+                className={`p-2 rounded-full transition-colors ${
+                  isDarkMode 
+                    ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                }`}
+                disabled={totalPages <= 1}
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={nextPage}
+                className={`p-2 rounded-full transition-colors ${
+                  isDarkMode 
+                    ? 'bg-gray-700 hover:bg-gray-600 text-white' 
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                }`}
+                disabled={totalPages <= 1}
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Grid de imágenes - 2 filas de 4 columnas */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {getCurrentPageImages().map((image, index) => (
+            <div 
+              key={`${currentPage}-${index}`} 
+              className="aspect-square overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300 group cursor-pointer"
+              onClick={() => openModal(image)}
+            >
+              <img 
+                src={image} 
+                alt={`Instalación ${currentPage * imagesPerPage + index + 1}`}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Indicadores de página */}
+        {totalPages > 1 && (
+          <div className="flex justify-center space-x-2">
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentPage(index)}
+                className={`w-3 h-3 rounded-full transition-colors ${
+                  currentPage === index
+                    ? 'bg-blue-600'
+                    : isDarkMode
+                    ? 'bg-gray-600 hover:bg-gray-500'
+                    : 'bg-gray-300 hover:bg-gray-400'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Modal para vista ampliada */}
+        {selectedImage && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"
+            onClick={closeModal}
+          >
+            <div className="relative max-w-4xl max-h-full">
+              <button
+                onClick={closeModal}
+                className="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl font-bold"
+              >
+                ✕
+              </button>
+              <img 
+                src={selectedImage} 
+                alt="Vista ampliada"
+                className="max-w-full max-h-full object-contain rounded-lg"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
 
 // Componente principal ContactPage con Header y Footer
 const ContactPage = () => {
@@ -18,15 +153,45 @@ const ContactPage = () => {
   };
 
   const galleryImages = [
-    'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.29.40-PM-600x450.jpeg',
-    'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.30.46-PM-600x450.jpeg',
-    'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.31.40-PM-600x450.jpeg',
-    'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.32.18-PM-600x450.jpeg',
-    'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.33.49-PM-600x450.jpeg',
-    'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.34.11-PM-600x450.jpeg',
-    'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.47.33-PM-600x450.jpeg',
-    'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.46.38-PM-600x450.jpeg'
-  ];
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.29.40-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.30.46-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.31.40-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.32.18-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.33.49-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.34.11-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.47.33-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.46.38-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.44.55-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.44.15-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.43.53-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.42.49-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.40.59-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.40.16-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.37.23-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-1.01.28-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.00-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.23-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.33-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.43-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.44-PM-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.44-PM-1-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.46-PM-1-600x450.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.46-PM-450x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.45-PM-1-450x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.45-PM-450x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.47-PM-2-450x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.47-PM-1-450x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.47-PM-450x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.46-PM-2-450x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-1.02.41-PM-450x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.32.59-PM-450x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-12.36.00-PM-450x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/10/haciendo-carga-de-equipos-de-laboratorio.png',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.49-PM-2-600x600.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.49-PM-600x270.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.48-PM-600x270.jpeg',
+  'https://megaequipamiento.com/wp-content/uploads/2023/09/WhatsApp-Image-2023-09-04-at-5.57.48-PM-1-600x270.jpeg'
+];
 
   const services = [
     {
@@ -88,7 +253,6 @@ const ContactPage = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
-             
                 <p className={`text-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                   Megaequipamiento es una empresa perteneciente al Grupo EQUINLAB SAC, líder en la venta, 
                   mantenimiento y calibración de equipos de laboratorio en Perú.
@@ -128,16 +292,6 @@ const ContactPage = () => {
                 <h2 className={`text-3xl font-bold mb-8 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Información de Contacto</h2>
                 
                 <div className="space-y-6">
-                  <div className={`flex items-start space-x-4 p-6 rounded-xl shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
-                    <MapPin className="w-6 h-6 text-red-500 mt-1 flex-shrink-0" />
-                    <div>
-                      <h3 className={`font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Dirección</h3>
-                      <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
-                        Av. Angelica Gamarra 1521 - Los Olivos - Lima - Perú
-                      </p>
-                    </div>
-                  </div>
-
                   <div className={`flex items-start space-x-4 p-6 rounded-xl shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                     <Phone className="w-6 h-6 text-blue-500 mt-1 flex-shrink-0" />
                     <div>
@@ -187,28 +341,8 @@ const ContactPage = () => {
           </div>
         </section>
 
-        {/* Gallery Section */}
-        <section className={`py-16 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} transition-colors duration-200`}>
-          <div className="container mx-auto px-4">
-            <h2 className={`text-3xl font-bold text-center mb-12 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-              Nuestras Instalaciones
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {galleryImages.map((image, index) => (
-                <div 
-                  key={index} 
-                  className="aspect-square overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow group"
-                >
-                  <img 
-                    src={image} 
-                    alt={`Instalación ${index + 1}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Gallery Section - Usando el nuevo componente */}
+        <GallerySection galleryImages={galleryImages} isDarkMode={isDarkMode} />
 
         {/* Services Detail Section */}
         <section className={`py-16 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'} transition-colors duration-200`}>
@@ -273,4 +407,4 @@ const ContactPage = () => {
   );
 };
 
-export default ContactPage;
+export default ContactPage; 
