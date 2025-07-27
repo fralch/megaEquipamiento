@@ -1676,7 +1676,7 @@ const ProductPage = ({ producto }) => {
 
                     {/* Productos Vistos Recientemente */}
                     <section className={`py-6 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`} aria-label="Productos vistos recientemente">
-                        <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                        <h2 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                             Productos Vistos Recientemente
                         </h2>
                         {(() => {
