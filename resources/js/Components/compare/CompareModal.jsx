@@ -149,7 +149,7 @@ const CompareModal = ({ isOpen, onClose }) => {
                       }`}>
                         <button
                           onClick={() => removeFromCompare(product.id)}
-                          className="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700 transition-colors"
+                          className="absolute top-2 right-2 p-1 text-red-500 hover:text-red-700 transition-colors z-10"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -157,13 +157,20 @@ const CompareModal = ({ isOpen, onClose }) => {
                         </button>
                         <div className="flex flex-col items-center">
                           {product.imagen && (
-                            <img
-                              src={product.imagen}
-                              alt={product.nombre}
-                              className="w-16 h-16 object-cover rounded-lg mb-2"
-                            />
+                            <div className="relative mb-3 group">
+                              <img
+                                src={product.imagen}
+                                alt={product.nombre}
+                                className="w-32 h-32 object-cover rounded-lg transition-all duration-300 ease-in-out transform group-hover:scale-125 group-hover:shadow-2xl group-hover:z-20 cursor-pointer"
+                                style={{
+                                  filter: 'brightness(1) contrast(1.05)',
+                                }}
+                              />
+                              {/* Overlay sutil para mejorar el efecto hover */}
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-lg transition-all duration-300 ease-in-out"></div>
+                            </div>
                           )}
-                          <h4 className={`text-sm font-medium ${
+                          <h4 className={`text-sm font-medium max-w-32 text-center leading-tight ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                           }`}>
                             {product.nombre}
