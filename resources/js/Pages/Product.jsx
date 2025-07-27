@@ -1413,7 +1413,7 @@ const ProductPage = ({ producto }) => {
                                         <p className={`text-sm transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                         }`}>
-                                            Fabricante: {productData.marca?.nombre}
+                                            Fabricante: {productData.marca?.nombre?.toUpperCase()}
                                         </p>
                                     </div>
                                     <p className={`transition-colors duration-300 ${
