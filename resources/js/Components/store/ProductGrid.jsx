@@ -419,7 +419,8 @@ const ProductGrid = ({ products: initialProducts }) => {
 
   return (
     <div className={`container mx-auto px-4 py-8 transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+      {/* Grid modificado para mostrar 3 columnas en laptop 15" */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mb-8">
         {currentProducts.map((product) => (
           <Card 
             key={`product-${product.id}-${product.sku || 'no-sku'}`} 
@@ -741,36 +742,30 @@ const Card = React.memo(({ product }) => {
             )}
           </div>
           
-          {/* Botones fijos en la parte inferior */}
-          <div className="flex space-x-4 mt-auto">
+          {/* Fixed buttons at bottom */}
+          <div className="flex space-x-2 mt-auto">
             <button
-              className={`font-bold py-2 px-4 rounded-md flex-1 transition-all duration-300 ${
+              className={`text-sm py-1.5 px-3 rounded flex-1 transition ${
                 isDarkMode 
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg' 
-                  : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                  : 'bg-blue-600 hover:bg-blue-700 text-white'
               }`}
               onClick={handleAddToCart}
             >
-              Añadir al carrito
+              Añadir a carrito
             </button>
             <button 
-              className={`font-bold py-2 px-4 rounded-md flex-1 transition-all duration-300 ${
+              className={`text-sm py-1.5 px-3 rounded flex-1 transition ${
                 isInCompare(product.id)
-                  ? isDarkMode 
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg' 
-                    : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-lg'
-                  : isDarkMode 
-                    ? 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg' 
-                    : 'bg-green-600 hover:bg-green-700 text-white hover:shadow-lg'
-              } ${
-                !canAddMore && !isInCompare(product.id) ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                  : 'bg-green-600 hover:bg-green-700 text-white'
+              } ${!canAddMore && !isInCompare(product.id) ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={handleCompare}
               disabled={!canAddMore && !isInCompare(product.id)}
             >
-              {isInCompare(product.id) ? 'En Comparador' : 'Comparar'}
+              {isInCompare(product.id) ? 'En comparador' : 'Comparar'}
             </button>
-          </div>
+                    </div>
         </div>
       )}
       
