@@ -16,12 +16,14 @@ class MarcaController extends Controller
             'descripcion' => 'nullable|string|max:255',
             // Añadido 'webp' a la lista de mimes permitidos
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'video_url' => 'nullable|url|max:500',
         ]);
 
         // Prepare data for creation
         $data = [
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
+            'video_url' => $request->video_url,
         ];
 
         if ($request->hasFile('imagen')) {
@@ -87,6 +89,7 @@ class MarcaController extends Controller
             'descripcion' => 'nullable|string|max:255',
             // Añadido 'webp' a la lista de mimes permitidos
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
+            'video_url' => 'nullable|url|max:500',
         ]);
 
         if ($request->hasFile('imagen')) {

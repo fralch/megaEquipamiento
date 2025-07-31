@@ -92,6 +92,20 @@ const BrandCard = ({ brand }) => {
         </p>
       )}
 
+      {/* Video Link */}
+      {brand.video_url && (
+        <a
+          href={brand.video_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`mt-2 text-sm underline transition-colors duration-300 ${
+            isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+          }`}
+        >
+          Ver Video
+        </a>
+      )}
+
       {/* Button */}
       <button 
         className={`mt-3 transition-all duration-300 text-white px-4 py-2 rounded flex items-center justify-center transform hover:scale-105 ${

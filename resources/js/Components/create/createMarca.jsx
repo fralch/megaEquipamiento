@@ -8,6 +8,8 @@ const Marcas = ({ onSubmit }) => {
   // Add new state for modal
   const [previewImage, setPreviewImage] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [videoPreview, setVideoPreview] = useState(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
   const [marcas, setMarcas] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -15,6 +17,7 @@ const Marcas = ({ onSubmit }) => {
     nombre: "",
     descripcion: "",
     imagen: null,
+    video_url: "",
   });
   // Nuevos estados
   const [deleteLoading, setDeleteLoading] = useState(null); // Para saber qué ID se está eliminando
@@ -23,6 +26,31 @@ const Marcas = ({ onSubmit }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+    
+    // Si es el campo video_url, actualizar la previsualización
+    if (name === 'video_url') {
+      setVideoPreview(getYouTubeEmbedUrl(value));
+    }
+  };
+
+  // Función para convertir URL de YouTube a formato embed
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    
+    // Patrones para diferentes formatos de URL de YouTube
+    const patterns = [
+      /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/,
+      /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([\w-]+)/
+    ];
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return `https://www.youtube.com/embed/${match[1]}`;
+      }
+    }
+    
+    return null;
   };
 
   const handleImageChange = (e) => {
@@ -53,6 +81,7 @@ const Marcas = ({ onSubmit }) => {
     const formData = new FormData();
     formData.append('nombre', form.nombre);
     formData.append('descripcion', form.descripcion);
+    formData.append('video_url', form.video_url);
     if (form.imagen) {
       formData.append('imagen', form.imagen);
     }
@@ -79,7 +108,11 @@ const Marcas = ({ onSubmit }) => {
         nombre: "",
         descripcion: "",
         imagen: null,
+        video_url: "",
       });
+      
+      // Limpiar previsualización de video
+      setVideoPreview(null);
 
       setMessage({ type: 'success', text: 'Marca creada exitosamente!' }); // Actualiza el mensaje
       // onSubmit(formData); // Comentado o eliminado si no se necesita
@@ -184,6 +217,36 @@ const Marcas = ({ onSubmit }) => {
         </div>
       )}
 
+      {/* Video Preview Modal */}
+      {showVideoModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 rounded-lg max-w-4xl max-h-[90vh] overflow-auto transition-colors duration-200`}>
+            <div className="flex justify-end mb-2">
+              <button
+                onClick={() => setShowVideoModal(false)}
+                className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} transition-colors duration-200`}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            {videoPreview && (
+              <iframe
+                width="560"
+                height="315"
+                src={videoPreview}
+                title="Video Preview"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full max-w-2xl h-64 md:h-80"
+              ></iframe>
+            )}
+          </div>
+        </div>
+      )}
+
       <h1 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>Crear Marca</h1>
       {/* Mostrar mensajes de éxito/error */}
       {message.text && (
@@ -251,6 +314,52 @@ const Marcas = ({ onSubmit }) => {
               }`}
             />
           </div>
+
+          <div className="mb-4">
+            <label htmlFor="video_url" className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-200`}>
+              URL del Video
+            </label>
+            <input
+              type="url"
+              id="video_url"
+              name="video_url"
+              value={form.video_url}
+              onChange={handleChange}
+              placeholder="https://www.youtube.com/watch?v=example"
+              className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-200 ${
+                isDarkMode 
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                  : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+              }`}
+            />
+            {/* Previsualización del video */}
+            {videoPreview && (
+              <div className="mt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Vista previa:</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowVideoModal(true)}
+                    className={`text-sm underline transition-colors duration-200 ${
+                      isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                    }`}
+                  >
+                    Ver en pantalla completa
+                  </button>
+                </div>
+                <iframe
+                  width="100%"
+                  height="200"
+                  src={videoPreview}
+                  title="Video Preview"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="rounded-md"
+                ></iframe>
+              </div>
+            )}
+          </div>
         </div>
         <button
           type="submit"
@@ -273,6 +382,7 @@ const Marcas = ({ onSubmit }) => {
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-200 ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Nombre</th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-200 ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Descripción</th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-200 ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Imagen</th>
+                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-200 ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Video</th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider transition-colors duration-200 ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>Acciones</th>
               </tr>
             </thead>
@@ -296,6 +406,22 @@ const Marcas = ({ onSubmit }) => {
                       <span className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} transition-colors duration-200`}>Sin imagen</span> // Mensaje si no hay imagen
                     )}
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {marca.video_url ? (
+                      <a
+                        href={marca.video_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`text-sm underline transition-colors duration-200 ${
+                          isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                        }`}
+                      >
+                        Ver Video
+                      </a>
+                    ) : (
+                      <span className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'} transition-colors duration-200`}>Sin video</span>
+                    )}
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                      {/* Botón Eliminar */}
                     <button
@@ -315,7 +441,7 @@ const Marcas = ({ onSubmit }) => {
                 </tr>
               )) : (
                  <tr>
-                    <td colSpan="4" className={`px-6 py-4 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} transition-colors duration-200`}>No hay marcas para mostrar.</td>
+                    <td colSpan="5" className={`px-6 py-4 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} transition-colors duration-200`}>No hay marcas para mostrar.</td>
                  </tr>
               )}
             </tbody>
