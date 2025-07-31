@@ -1529,12 +1529,124 @@ const ProductPage = ({ producto }) => {
 
                         {producto.video && (
                             <div className="mt-6">
-                                <iframe
-                                    className="w-full h-96 rounded-md shadow-lg"
-                                    src={producto.video.replace("youtu.be", "www.youtube.com/embed")}
-                                    title="Explora las Propiedades Texturales"
-                                    allowFullScreen
-                                ></iframe>
+                                {auth.user && (
+                                    <div className="flex justify-end mb-2">
+                                        <button
+                                            onClick={() => toggleEditMode('video')}
+                                            className={`px-3 py-1 text-sm rounded transition-colors duration-300 ${
+                                                editMode.video
+                                                    ? 'bg-red-500 text-white hover:bg-red-600'
+                                                    : isDarkMode
+                                                        ? 'bg-gray-600 text-gray-200 hover:bg-gray-500'
+                                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                            }`}
+                                        >
+                                            {editMode.video ? 'Cancelar' : 'Editar Video'}
+                                        </button>
+                                    </div>
+                                )}
+                                
+                                {editMode.video ? (
+                                    <div className="space-y-4">
+                                        <div className="flex space-x-2">
+                                            <input 
+                                                type="text" 
+                                                value={tempInputs.video || producto.video}
+                                                onChange={(e) => handleInputChange('video', e.target.value)}
+                                                placeholder="Ingresa la URL del video de YouTube" 
+                                                className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-300 ${
+                                                    isDarkMode 
+                                                        ? 'bg-gray-700 border-gray-600 text-gray-100' 
+                                                        : 'bg-white border-gray-300 text-gray-900'
+                                                }`}
+                                                autoFocus
+                                            />
+                                            <button 
+                                                onClick={() => {
+                                                    // Convertir URL de YouTube a formato de embed para previsualización
+                                                    let embedUrl = tempInputs.video || producto.video;
+                                                    if (embedUrl.includes('youtu.be/')) {
+                                                        embedUrl = embedUrl.replace("youtu.be/", "www.youtube.com/embed/");
+                                                    } else if (embedUrl.includes('youtube.com/watch?v=')) {
+                                                        embedUrl = embedUrl.replace("youtube.com/watch?v=", "youtube.com/embed/");
+                                                    }
+                                                    setVideoPreview(embedUrl);
+                                                }}
+                                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                            >
+                                                Previsualizar
+                                            </button>
+                                            <button
+                                                 onClick={() => handleSave('video')}
+                                                 className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                                             >
+                                                 Guardar
+                                             </button>
+                                             <button
+                                                 onClick={async () => {
+                                                     try {
+                                                         const response = await axios.post('/product/update', {
+                                                             id_producto: producto.id_producto,
+                                                             video: ''
+                                                         }, {
+                                                             headers: {
+                                                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                                                 'Content-Type': 'application/json',
+                                                                 'Accept': 'application/json'
+                                                             }
+                                                         });
+                                                         
+                                                         if (response.status === 200) {
+                                                             setProductData(prev => ({
+                                                                 ...prev,
+                                                                 video: ''
+                                                             }));
+                                                             producto.video = '';
+                                                             setEditMode(prev => ({
+                                                                 ...prev,
+                                                                 video: false
+                                                             }));
+                                                             setTempInputs(prev => {
+                                                                 const newInputs = { ...prev };
+                                                                 delete newInputs.video;
+                                                                 return newInputs;
+                                                             });
+                                                             setVideoPreview('');
+                                                             console.log("Video eliminado exitosamente");
+                                                         }
+                                                     } catch (error) {
+                                                         console.error("Error al eliminar video:", error);
+                                                         alert("Error al eliminar el video. Por favor, inténtalo de nuevo.");
+                                                     }
+                                                 }}
+                                                 className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                             >
+                                                 Eliminar
+                                             </button>
+                                        </div>
+                                        
+                                        {videoPreview && (
+                                            <div className="mt-4">
+                                                <h3 className={`text-lg font-medium mb-2 transition-colors duration-300 ${
+                                                    isDarkMode ? 'text-gray-100' : 'text-gray-900'
+                                                }`}>Previsualización:</h3>
+                                                <iframe
+                                                    className="w-full h-96 rounded-md shadow-lg"
+                                                    src={videoPreview}
+                                                    title="Previsualización del video"
+                                                    allowFullScreen
+                                                ></iframe>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <iframe
+                                        className="w-full h-96 rounded-md shadow-lg"
+                                        src={producto.video.replace("youtu.be", "www.youtube.com/embed")}
+                                        title="Explora las Propiedades Texturales"
+                                        allowFullScreen
+                                    ></iframe>
+                                )}
                             </div>
                         )}
                         
