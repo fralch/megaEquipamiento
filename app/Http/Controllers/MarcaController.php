@@ -16,12 +16,14 @@ class MarcaController extends Controller
             'descripcion' => 'nullable|string|max:255',
             // Añadido 'webp' a la lista de mimes permitidos
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'video_url' => 'nullable|url|max:500',
         ]);
 
         // Prepare data for creation
         $data = [
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
+            'video_url' => $request->video_url,
         ];
 
         if ($request->hasFile('imagen')) {
@@ -80,14 +82,17 @@ class MarcaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Marca $marca)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'nombre' => 'required|max:100',
             'descripcion' => 'nullable|string|max:255',
             // Añadido 'webp' a la lista de mimes permitidos
             'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
+            'video_url' => 'nullable|url|max:500',
         ]);
+
+        $marca = Marca::findOrFail($id);
 
         if ($request->hasFile('imagen')) {
             $imagePath = $request->file('imagen')->store('marcas', 'public');
@@ -95,6 +100,14 @@ class MarcaController extends Controller
         }
 
         $marca->update($request->all());
+
+        // Check if it's an AJAX request (for API usage)
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'message' => 'Marca actualizada exitosamente.',
+                'marca' => $marca
+            ]);
+        }
 
         return redirect()->route('marcas.index')
                          ->with('success', 'Marca actualizada exitosamente.');

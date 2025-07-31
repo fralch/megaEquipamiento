@@ -1,4 +1,4 @@
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, usePage } from "@inertiajs/react";
 import { useEffect, useState } from "react";
 import { useTheme } from "../storage/ThemeContext";
 import Header from "../Components/home/Header";
@@ -64,6 +64,12 @@ const getEmbedUrl = (url) => {
 
 export default function Marcas({ marca, productos }) {
     const { isDarkMode } = useTheme();
+    const { auth } = usePage().props;
+    const [isEditingVideo, setIsEditingVideo] = useState(false);
+    const [editVideoForm, setEditVideoForm] = useState({ video_url: '' });
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [updateMessage, setUpdateMessage] = useState({ type: '', text: '' });
+    const [videoPreview, setVideoPreview] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [openCategories, setOpenCategories] = useState({});
@@ -193,6 +199,77 @@ export default function Marcas({ marca, productos }) {
         setIsOpen(!isOpen);
     };
 
+    // Initialize edit form when marca changes
+    useEffect(() => {
+        if (marca && marca.video_url) {
+            setEditVideoForm({ video_url: marca.video_url });
+            setVideoPreview(getEmbedUrl(marca.video_url));
+        }
+    }, [marca]);
+
+    // Handle edit video form changes
+    const handleEditVideoChange = (e) => {
+        const value = e.target.value;
+        setEditVideoForm({ video_url: value });
+        setVideoPreview(getEmbedUrl(value));
+    };
+
+    // Handle video update submission
+    const handleUpdateVideo = async (e) => {
+        e.preventDefault();
+        if (!marca || !marca.id_marca) return;
+
+        setIsUpdating(true);
+        setUpdateMessage({ type: '', text: '' });
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
+            const formData = new FormData();
+            formData.append('nombre', marca.nombre);
+            formData.append('descripcion', marca.descripcion || '');
+            formData.append('video_url', editVideoForm.video_url);
+
+            const response = await fetch(`/marca/update/${marca.id_marca}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: formData,
+            });
+
+            if (response.ok) {
+                // Update local marca object
+                marca.video_url = editVideoForm.video_url;
+                setUpdateMessage({ type: 'success', text: 'Video actualizado correctamente!' });
+                setIsEditingVideo(false);
+                // Refresh the page after a short delay to show updated content
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al actualizar el video');
+            }
+        } catch (error) {
+            console.error('Error updating video:', error);
+            setUpdateMessage({ type: 'error', text: error.message || 'Error al actualizar el video' });
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    // Auto-clear messages
+    useEffect(() => {
+        if (updateMessage.text) {
+            const timer = setTimeout(() => {
+                setUpdateMessage({ type: '', text: '' });
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [updateMessage]);
+
     return (
         <div className="min-h-screen">
             <Head title="Marca" />
@@ -239,47 +316,71 @@ export default function Marcas({ marca, productos }) {
                                     })()}
                                     
                                     {/* Video de la marca */}
-                                    {marca && marca.video_url && (() => {
-                                        console.log('Renderizando video para marca:', marca.nombre, 'URL original:', marca.video_url);
-                                        const embedUrl = getEmbedUrl(marca.video_url);
-                                        console.log('URL embed procesada:', embedUrl);
+                                    {marca && (marca.video_url || auth?.user) && (() => {
+                                        const embedUrl = marca.video_url ? getEmbedUrl(marca.video_url) : null;
                                         
-                                        return embedUrl ? (
+                                        return (
                                             <div className="mb-8">
                                                 <div className={`rounded-2xl overflow-hidden shadow-2xl ${
                                                     isDarkMode 
                                                         ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' 
                                                         : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
                                                 } transition-all duration-300`}>
-                                                    <div className="aspect-video w-full">
-                                                        <iframe
-                                                            src={embedUrl}
-                                                            className="w-full h-full"
-                                                            frameBorder="0"
-                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                            allowFullScreen
-                                                            title={`Video de ${marca.nombre}`}
-                                                            onLoad={() => {
-                                                                console.log('Video cargado exitosamente:', embedUrl);
-                                                            }}
-                                                            onError={(e) => {
-                                                                console.error('Error cargando iframe:', e);
-                                                                console.error('URL que falló:', embedUrl);
-                                                            }}
-                                                        ></iframe>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="mb-8">
-                                                <div className={`rounded-2xl p-6 text-center ${
-                                                    isDarkMode 
-                                                        ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700 text-gray-300' 
-                                                        : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200 text-gray-600'
-                                                } transition-all duration-300`}>
-                                                    <p>Video no disponible o URL inválida</p>
-                                                    <p className="text-sm mt-2">URL original: {marca.video_url}</p>
-                                                    <p className="text-xs mt-1 opacity-75">URL procesada: {embedUrl || 'null'}</p>
+                                                    
+                                                    {/* Video Header with Edit Button */}
+                                                    {auth?.user && (
+                                                        <div className={`p-4 border-b ${
+                                                            isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                                                        } flex justify-between items-center`}>
+                                                            <h3 className={`text-lg font-semibold ${
+                                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                                            }`}>
+                                                                Video de la Marca
+                                                            </h3>
+                                                            <button
+                                                                onClick={() => setIsEditingVideo(true)}
+                                                                className={`px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                                                    isDarkMode
+                                                                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                                                }`}
+                                                            >
+                                                                {marca.video_url ? 'Editar Video' : 'Agregar Video'}
+                                                            </button>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Video Content */}
+                                                    {embedUrl ? (
+                                                        <div className="aspect-video w-full">
+                                                            <iframe
+                                                                src={embedUrl}
+                                                                className="w-full h-full"
+                                                                frameBorder="0"
+                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                                allowFullScreen
+                                                                title={`Video de ${marca.nombre}`}
+                                                            ></iframe>
+                                                        </div>
+                                                    ) : (
+                                                        <div className={`p-8 text-center ${
+                                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                        }`}>
+                                                            {auth?.user ? (
+                                                                <div>
+                                                                    <svg className={`mx-auto h-12 w-12 mb-4 ${
+                                                                        isDarkMode ? 'text-gray-400' : 'text-gray-300'
+                                                                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                                    </svg>
+                                                                    <p className="text-lg font-medium mb-2">No hay video configurado</p>
+                                                                    <p className="text-sm">Haz clic en "Agregar Video" para añadir un video a esta marca</p>
+                                                                </div>
+                                                            ) : marca.video_url ? (
+                                                                <p>Video no disponible o URL inválida</p>
+                                                            ) : null}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         );
@@ -442,6 +543,149 @@ export default function Marcas({ marca, productos }) {
                     </nav>
                 </div>
             </div>
+            
+            {/* Edit Video Modal */}
+            {isEditingVideo && auth?.user && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-lg shadow-xl ${
+                        isDarkMode ? 'bg-gray-800' : 'bg-white'
+                    } transition-colors duration-200`}>
+                        <div className={`p-6 border-b ${
+                            isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                        }`}>
+                            <div className="flex justify-between items-center">
+                                <h2 className={`text-xl font-bold ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    {marca.video_url ? 'Editar Video' : 'Agregar Video'} - {marca.nombre}
+                                </h2>
+                                <button
+                                    onClick={() => {
+                                        setIsEditingVideo(false);
+                                        setEditVideoForm({ video_url: marca.video_url || '' });
+                                        setVideoPreview(marca.video_url ? getEmbedUrl(marca.video_url) : null);
+                                        setUpdateMessage({ type: '', text: '' });
+                                    }}
+                                    className={`p-2 rounded-md transition-colors duration-200 ${
+                                        isDarkMode 
+                                            ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' 
+                                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                    }`}
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleUpdateVideo} className="p-6">
+                            {/* Update Messages */}
+                            {updateMessage.text && (
+                                <div className={`p-3 mb-4 rounded transition-colors duration-200 ${
+                                    updateMessage.type === 'success' 
+                                        ? (isDarkMode ? 'bg-green-800 text-green-200' : 'bg-green-100 text-green-700')
+                                        : (isDarkMode ? 'bg-red-800 text-red-200' : 'bg-red-100 text-red-700')
+                                }`}>
+                                    {updateMessage.text}
+                                </div>
+                            )}
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className={`block text-sm font-medium mb-2 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        URL del Video
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={editVideoForm.video_url}
+                                        onChange={handleEditVideoChange}
+                                        placeholder="https://www.youtube.com/watch?v=example o https://vimeo.com/123456789"
+                                        className={`w-full px-3 py-2 border rounded-md shadow-sm transition-colors duration-200 ${
+                                            isDarkMode 
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400' 
+                                                : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500'
+                                        }`}
+                                        disabled={isUpdating}
+                                    />
+                                    <p className={`mt-1 text-xs ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>
+                                        Soporta URLs de YouTube y Vimeo. Deja vacío para eliminar el video.
+                                    </p>
+                                </div>
+
+                                {/* Video Preview */}
+                                {videoPreview && (
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Vista Previa
+                                        </label>
+                                        <div className="aspect-video w-full max-w-2xl">
+                                            <iframe
+                                                src={videoPreview}
+                                                className="w-full h-full rounded-md"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                                allowFullScreen
+                                                title="Video Preview"
+                                            ></iframe>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className={`flex justify-end space-x-3 mt-6 pt-4 border-t ${
+                                isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                            }`}>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsEditingVideo(false);
+                                        setEditVideoForm({ video_url: marca.video_url || '' });
+                                        setVideoPreview(marca.video_url ? getEmbedUrl(marca.video_url) : null);
+                                        setUpdateMessage({ type: '', text: '' });
+                                    }}
+                                    disabled={isUpdating}
+                                    className={`px-4 py-2 border rounded-md font-medium transition-colors duration-200 ${
+                                        isDarkMode 
+                                            ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
+                                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                    } disabled:opacity-50`}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isUpdating}
+                                    className={`px-4 py-2 rounded-md font-medium text-white transition-colors duration-200 ${
+                                        isDarkMode
+                                            ? 'bg-blue-600 hover:bg-blue-700'
+                                            : 'bg-blue-500 hover:bg-blue-600'
+                                    } disabled:opacity-50 flex items-center`}
+                                >
+                                    {isUpdating ? (
+                                        <>
+                                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Actualizando...
+                                        </>
+                                    ) : (
+                                        'Guardar Video'
+                                    )}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+            
             <Footer />
 
             <style jsx>{`
