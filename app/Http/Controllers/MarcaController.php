@@ -82,7 +82,7 @@ class MarcaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Marca $marca)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'nombre' => 'required|max:100',
@@ -92,12 +92,22 @@ class MarcaController extends Controller
             'video_url' => 'nullable|url|max:500',
         ]);
 
+        $marca = Marca::findOrFail($id);
+
         if ($request->hasFile('imagen')) {
             $imagePath = $request->file('imagen')->store('marcas', 'public');
             $request->merge(['imagen' => $imagePath]);
         }
 
         $marca->update($request->all());
+
+        // Check if it's an AJAX request (for API usage)
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'message' => 'Marca actualizada exitosamente.',
+                'marca' => $marca
+            ]);
+        }
 
         return redirect()->route('marcas.index')
                          ->with('success', 'Marca actualizada exitosamente.');
