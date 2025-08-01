@@ -198,22 +198,87 @@ const ProductPage = ({ producto }) => {
             return;
         }
 
+        const isCurrentlyEditing = editMode[field];
+        
         setEditMode(prev => ({
             ...prev,
             [field]: !prev[field]
         }));
 
-        setTempInputs(prev => ({
-            ...prev,
-            [field]: productData[field]
-        }));
+        if (isCurrentlyEditing) {
+            // Si se está cancelando la edición, restaurar valores originales
+            setTempInputs(prev => {
+                const newInputs = { ...prev };
+                delete newInputs[field];
+                
+                // Si se cancela la edición de precio_ganancia, también restaurar precio_igv
+                if (field === 'precio_ganancia') {
+                    delete newInputs.precio_igv;
+                    setProductData(prevData => ({
+                        ...prevData,
+                        precio_igv: producto.precio_igv // Restaurar valor original
+                    }));
+                }
+                
+                // Si se cancela la edición de precio_igv, también restaurar precio_ganancia
+                if (field === 'precio_igv') {
+                    delete newInputs.precio_ganancia;
+                    setProductData(prevData => ({
+                        ...prevData,
+                        precio_ganancia: producto.precio_ganancia // Restaurar valor original
+                    }));
+                }
+                
+                return newInputs;
+            });
+        } else {
+            // Si se está iniciando la edición, establecer valores actuales
+            setTempInputs(prev => ({
+                ...prev,
+                [field]: productData[field]
+            }));
+        }
     };
 
     const handleInputChange = (field, value) => {
-        setTempInputs(prev => ({
-            ...prev,
-            [field]: value
-        }));
+        setTempInputs(prev => {
+            const newInputs = {
+                ...prev,
+                [field]: value
+            };
+            
+            // Si se está editando precio_ganancia, calcular automáticamente precio_igv
+            if (field === 'precio_ganancia' && value) {
+                const precioGanancia = parseFloat(value);
+                if (!isNaN(precioGanancia)) {
+                    const precioConIGV = precioGanancia * 1.18;
+                    newInputs.precio_igv = precioConIGV.toFixed(2);
+                    
+                    // Actualizar también el estado productData para reflejar el cambio visualmente
+                    setProductData(prevData => ({
+                        ...prevData,
+                        precio_igv: precioConIGV.toFixed(2)
+                    }));
+                }
+            }
+            
+            // Si se está editando precio_igv, calcular automáticamente precio_ganancia (cálculo inverso)
+            if (field === 'precio_igv' && value) {
+                const precioConIGV = parseFloat(value);
+                if (!isNaN(precioConIGV)) {
+                    const precioGanancia = precioConIGV / 1.18;
+                    newInputs.precio_ganancia = precioGanancia.toFixed(2);
+                    
+                    // Actualizar también el estado productData para reflejar el cambio visualmente
+                    setProductData(prevData => ({
+                        ...prevData,
+                        precio_ganancia: precioGanancia.toFixed(2)
+                    }));
+                }
+            }
+            
+            return newInputs;
+        });
     };
 
     const handleSave = async (field) => {
