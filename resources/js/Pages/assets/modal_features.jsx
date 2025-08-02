@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../storage/ThemeContext';
 
-const FeatureItem = ({ featureKey, featureValue, onEdit, onDelete }) => {
+const FeatureItem = ({ featureKey, featureValue, onEdit, onDelete, onDragStart, onDragOver, onDrop, isDragging }) => {
   const { isDarkMode } = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [editKey, setEditKey] = useState(featureKey);
@@ -21,7 +21,17 @@ const FeatureItem = ({ featureKey, featureValue, onEdit, onDelete }) => {
   };
 
   return (
-    <div className={`flex items-center justify-between p-2 mb-2 ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-300'} border rounded`}>
+    <div 
+      draggable={!isEditing}
+      onDragStart={(e) => onDragStart(e, featureKey)}
+      onDragOver={onDragOver}
+      onDrop={(e) => onDrop(e, featureKey)}
+      className={`flex items-center justify-between p-2 mb-2 border rounded cursor-move transition-all duration-200 ${
+        isDragging ? 'opacity-50 scale-95' : 'opacity-100 scale-100'
+      } ${
+        isDarkMode ? 'bg-gray-800 border-gray-600 hover:bg-gray-700' : 'bg-white border-gray-300 hover:bg-gray-50'
+      }`}
+    >
       {isEditing ? (
         <div className="flex-1 flex gap-2">
           <input
@@ -58,6 +68,11 @@ const FeatureItem = ({ featureKey, featureValue, onEdit, onDelete }) => {
             <span className={`text-sm ml-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{featureValue}</span>
           </div>
           <div className="flex gap-1">
+            <div className="px-2 py-1 text-gray-400 cursor-grab" title="Arrastrar para reordenar">
+              <svg viewBox="0 0 320 512" className="w-3 h-3 fill-current">
+                <path d="M40 352l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40zm192 0l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40zM40 320c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40l-48 0zM232 192l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40zM40 160c-22.1 0-40-17.9-40-40L0 72C0 49.9 17.9 32 40 32l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40l-48 0zM232 32l48 0c22.1 0 40 17.9 40 40l0 48c0 22.1-17.9 40-40 40l-48 0c-22.1 0-40-17.9-40-40l0-48c0-22.1 17.9-40 40-40z"/>
+              </svg>
+            </div>
             <button
               onClick={() => setIsEditing(true)}
               className="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
@@ -88,6 +103,8 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
   const [data, setData] = useState({});
   const [key, setKey] = useState('');
   const [value, setValue] = useState('');
+  const [draggedItem, setDraggedItem] = useState(null);
+  const [dragOverItem, setDragOverItem] = useState(null);
 
   useEffect(() => {
     try {
@@ -130,6 +147,44 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
       newData[newKey] = newValue;
       return newData;
     });
+  };
+
+  const handleDragStart = (e, key) => {
+    setDraggedItem(key);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, targetKey) => {
+    e.preventDefault();
+    
+    if (draggedItem && draggedItem !== targetKey) {
+      const entries = Object.entries(data);
+      const draggedIndex = entries.findIndex(([key]) => key === draggedItem);
+      const targetIndex = entries.findIndex(([key]) => key === targetKey);
+      
+      if (draggedIndex !== -1 && targetIndex !== -1) {
+        // Reordenar las entradas
+        const newEntries = [...entries];
+        const [draggedEntry] = newEntries.splice(draggedIndex, 1);
+        newEntries.splice(targetIndex, 0, draggedEntry);
+        
+        // Crear nuevo objeto con el orden actualizado
+        const newData = {};
+        newEntries.forEach(([key, value]) => {
+          newData[key] = value;
+        });
+        
+        setData(newData);
+      }
+    }
+    
+    setDraggedItem(null);
+    setDragOverItem(null);
   };
 
   const handleSave = () => {
@@ -176,6 +231,10 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
                     featureValue={featureValue}
                     onEdit={handleEditFeature}
                     onDelete={handleDeleteFeature}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    isDragging={draggedItem === featureKey}
                   />
                 ))
               ) : (
