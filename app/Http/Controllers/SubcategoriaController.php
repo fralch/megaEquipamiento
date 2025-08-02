@@ -248,4 +248,18 @@ class SubcategoriaController extends Controller
             ], 500);
         }
     }
+
+    public function moverSubcategorias(Request $request)
+    {
+        $request->validate([
+            'subcategorias' => 'required|array',
+            'subcategorias.*' => 'exists:subcategorias,id_subcategoria',
+            'categoria_destino_id' => 'required|exists:categorias,id_categoria',
+        ]);
+
+        Subcategoria::whereIn('id_subcategoria', $request->subcategorias)
+            ->update(['id_categoria' => $request->categoria_destino_id]);
+
+        return response()->json(['message' => 'Subcategorías movidas con éxito.']);
+    }
 }

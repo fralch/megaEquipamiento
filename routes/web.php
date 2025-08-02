@@ -76,6 +76,7 @@ Route::get('/subcategoria_id/{id}', [SubcategoriaController::class, 'getSubcateg
 Route::get('/subcategoria_get/cat/{id}', [SubcategoriaController::class, 'getCatBySub'])->name('subcategoria.get-categoria');
 Route::get('/catsub_optimizadas/{marca_id?}', [SubcategoriaController::class, 'getCategoriasOptimizadasPorMarca'])->name('categorias.optimizadas-por-marca');
 Route::post('/subcategoria/delete/{id}', [SubcategoriaController::class, 'destroy'])->name('subcategoria.destroy');
+Route::post('/subcategorias/mover', [SubcategoriaController::class, 'moverSubcategorias'])->name('subcategorias.mover');
 
 // Rutas para marcas
 Route::post('/marca/create', [MarcaController::class, 'create'])->name('marca.create');
