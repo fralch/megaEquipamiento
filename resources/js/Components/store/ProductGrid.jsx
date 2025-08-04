@@ -682,7 +682,7 @@ const Card = React.memo(({ product }) => {
           <span className={`text-xl font-bold transition-colors duration-300 ${
             isDarkMode ? 'text-blue-400' : 'text-blue-600'
           }`}>
-            {formatPrice(product.price)}
+            {formatPrice(product.priceWithProfit)}
           </span>
         </div>
       </div>
