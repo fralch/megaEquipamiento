@@ -405,6 +405,14 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
     const buscarProductosFiltrados = async () => {
         const subcategoriaId = getSubcategoriaId();
+        
+        console.log('=== FRONTEND DEBUG ===');
+        console.log('Subcategoria ID:', subcategoriaId);
+        console.log('Filtros seleccionados:', filtrosSeleccionados);
+        console.log('Datos a enviar:', {
+            subcategoria_id: subcategoriaId,
+            filtros: filtrosSeleccionados
+        });
 
         try {
             if (Object.keys(filtrosSeleccionados).length > 0) {
@@ -415,6 +423,8 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                         filtros: filtrosSeleccionados
                     })
                 });
+                
+                console.log('Respuesta del backend:', productosFiltrados);
 
                 setMostrarProductos(true);
 
