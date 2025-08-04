@@ -374,22 +374,30 @@ class FiltroController extends Controller
                                 if (isset($valorSeleccionado['min']) && $valorSeleccionado['min'] !== null && $valorSeleccionado['min'] !== '') {
                                     $minValue = (float) $valorSeleccionado['min'];
                                     // Buscar números en las características que coincidan con el nombre del filtro
-                                    $q->whereRaw("CAST(REGEXP_REPLACE(
-                                        LOWER(caracteristicas), 
-                                        CONCAT('.*', ?, '[^0-9]*([0-9]+(?:\.[0-9]+)?).*'), 
-                                        '$1'
-                                    ) AS DECIMAL(10,2)) >= ?", [$campoNombre, $minValue]);
+                                    $q->whereRaw("
+                                        CAST(
+                                            CASE
+                                                WHEN LOWER(caracteristicas) REGEXP CONCAT('.*', ?, '[^0-9]*[0-9]')
+                                                THEN REGEXP_REPLACE(LOWER(caracteristicas), CONCAT('.*', ?, '[^0-9]*([0-9]+(?:\\.[0-9]+)?).*'), '$1')
+                                                ELSE NULL
+                                            END
+                                        AS DECIMAL(10,2)) >= ?
+                                    ", [$campoNombre, $campoNombre, $minValue]);
                                 }
                                 
                                 // Aplicar filtro de valor máximo si está definido
                                 if (isset($valorSeleccionado['max']) && $valorSeleccionado['max'] !== null && $valorSeleccionado['max'] !== '') {
                                     $maxValue = (float) $valorSeleccionado['max'];
                                     // Buscar números en las características que coincidan con el nombre del filtro
-                                    $q->whereRaw("CAST(REGEXP_REPLACE(
-                                        LOWER(caracteristicas), 
-                                        CONCAT('.*', ?, '[^0-9]*([0-9]+(?:\.[0-9]+)?).*'), 
-                                        '$1'
-                                    ) AS DECIMAL(10,2)) <= ?", [$campoNombre, $maxValue]);
+                                    $q->whereRaw("
+                                        CAST(
+                                            CASE
+                                                WHEN LOWER(caracteristicas) REGEXP CONCAT('.*', ?, '[^0-9]*[0-9]')
+                                                THEN REGEXP_REPLACE(LOWER(caracteristicas), CONCAT('.*', ?, '[^0-9]*([0-9]+(?:\\.[0-9]+)?).*'), '$1')
+                                                ELSE NULL
+                                            END
+                                        AS DECIMAL(10,2)) <= ?
+                                    ", [$campoNombre, $campoNombre, $maxValue]);
                                 }
                             });
                         }
