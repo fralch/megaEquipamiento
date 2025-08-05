@@ -112,8 +112,13 @@ class ProductoController extends Controller
     
         // Procesar las imágenes si se proporcionan
         $imagenesArray = [];
-    
-        if ($request->hasFile('imagenes')) {
+
+        if ($request->has('imagenesDelBanco')) {
+            $imagenesDelBanco = json_decode($request->input('imagenesDelBanco'), true);
+            $imagenesArray = array_map(function($imagen) {
+                return $imagen['url'];
+            }, $imagenesDelBanco);
+        } elseif ($request->hasFile('imagenes')) {
             try {
                 $imagenes = $request->file('imagenes');
                 foreach ($imagenes as $index => $imagen) {
@@ -142,7 +147,7 @@ class ProductoController extends Controller
         $caracteristicas = is_string($request->caracteristicas) ? json_decode($request->caracteristicas, true) : $request->caracteristicas;
     
         // Crear el producto
-        $producto = Producto::create(array_merge($request->except(['imagen', 'imagenes']), [
+        $producto = Producto::create(array_merge($request->except(['imagen', 'imagenes', 'imagenesDelBanco']), [
             'imagen' => $imagenesArray,
             'caracteristicas' => $caracteristicas,
 

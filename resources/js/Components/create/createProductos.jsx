@@ -627,10 +627,7 @@ const Productos = ({ onSubmit }) => {
     // Add form fields to FormData
     Object.entries(form).forEach(([key, value]) => {
       if (key === 'imagenesDelBanco' && value && value.length > 0) {
-        // Enviar URLs de imágenes del banco
-        value.forEach((imagen, index) => {
-          formData.append(`imagenesDelBanco[${index}]`, imagen.url);
-        });
+        formData.append('imagenesDelBanco', JSON.stringify(value));
       } else if (key === 'imagenes' && value && value.length > 0) {
         // Verificar si son imágenes del banco o archivos subidos
         const hasFileImages = value.some(img => !img.isFromBank);
