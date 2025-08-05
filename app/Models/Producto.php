@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Spatie\MediaLibrary\MediaCollections\Models\Collections\MediaCollection;
 
-class Producto extends Model
+class Producto extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     // Definir la tabla asociada al modelo si no sigue la convención de nombres de Laravel
     protected $table = 'productos';
@@ -123,6 +127,74 @@ class Producto extends Model
          if (isset($imagenes[$indice])) {
              unset($imagenes[$indice]);
              $this->imagen = array_values($imagenes); // Reindexar el array
+         }
+         return $this;
+     }
+
+     /**
+      * Configurar las colecciones de media
+      */
+     public function registerMediaCollections(): void
+     {
+         $this->addMediaCollection('imagenes')
+             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+             ->singleFile(false);
+
+         $this->addMediaCollection('imagen_principal')
+             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp'])
+             ->singleFile();
+
+         $this->addMediaCollection('documentos')
+             ->acceptsMimeTypes(['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'])
+             ->singleFile(false);
+
+         $this->addMediaCollection('videos')
+             ->acceptsMimeTypes(['video/mp4', 'video/avi', 'video/mov', 'video/wmv'])
+             ->singleFile(false);
+     }
+
+     /**
+      * Obtener todas las imágenes usando Media Library
+      */
+     public function getImagenesMediaAttribute()
+     {
+         return $this->getMedia('imagenes');
+     }
+
+     /**
+      * Obtener la imagen principal usando Media Library
+      */
+     public function getImagenPrincipalMediaAttribute()
+     {
+         return $this->getFirstMedia('imagen_principal');
+     }
+
+     /**
+      * Obtener todos los documentos usando Media Library
+      */
+     public function getDocumentosMediaAttribute()
+     {
+         return $this->getMedia('documentos');
+     }
+
+     /**
+      * Obtener todos los videos usando Media Library
+      */
+     public function getVideosMediaAttribute()
+     {
+         return $this->getMedia('videos');
+     }
+
+     /**
+      * Agregar imagen desde el banco de imágenes
+      */
+     public function agregarImagenDesdeBanco($mediaId, $coleccion = 'imagenes')
+     {
+         $media = \App\Models\Media::find($mediaId);
+         if ($media) {
+             // Copiar el archivo del banco de imágenes a este producto
+             $this->addMediaFromUrl($media->getUrl())
+                 ->toMediaCollection($coleccion);
          }
          return $this;
      }
