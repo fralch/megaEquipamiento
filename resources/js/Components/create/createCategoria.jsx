@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTheme } from '../../storage/ThemeContext';
+import ImageBankModal from './ImageBankModal';
 
 const Categorias = ({ onSubmit }) => {
   const { isDarkMode } = useTheme();
@@ -12,6 +13,7 @@ const Categorias = ({ onSubmit }) => {
   });
   const [imagenes, setImagenes] = useState([]); // Array para las imágenes
   const [imagenesPreview, setImagenesPreview] = useState([]); // Array para vistas previas
+  const [showImageBank, setShowImageBank] = useState(false); // Para el modal del banco de imágenes
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -135,6 +137,30 @@ const Categorias = ({ onSubmit }) => {
     setImagenesPreview(newPreviews);
   };
 
+  // Manejar selección de imágenes del banco
+  const handleImageBankSelect = (selectedImages) => {
+    if (selectedImages.length > 0) {
+      // Convertir imágenes del banco al formato esperado
+      const bankImages = selectedImages.map(img => ({
+        url: img.url,
+        name: img.name,
+        isFromBank: true
+      }));
+      
+      // Agregar a las imágenes existentes
+      setImagenes(prev => [...prev, ...bankImages]);
+      
+      // Agregar a las previsualizaciones
+      const bankPreviews = selectedImages.map(img => ({
+        id: img.name,
+        preview: img.url
+      }));
+      setImagenesPreview(prev => [...prev, ...bankPreviews]);
+      
+      setShowImageBank(false);
+    }
+  };
+
   // Función para abrir modal de edición
   const handleEditCategoria = (categoria) => {
     setEditingCategoria(categoria);
@@ -246,7 +272,14 @@ const Categorias = ({ onSubmit }) => {
     // Añadir las imágenes si existen
     if (imagenes.length > 0) {
       imagenes.forEach((img, index) => {
-        formData.append(`imagenes[${index}]`, img);
+        if (img.isFromBank) {
+          // Si la imagen es del banco, enviar URL y nombre
+          formData.append(`imagenes_bank[${index}][url]`, img.url);
+          formData.append(`imagenes_bank[${index}][name]`, img.name);
+        } else {
+          // Si es una imagen nueva, enviar el archivo
+          formData.append(`imagenes[${index}]`, img);
+        }
       });
     }
     
@@ -524,40 +557,58 @@ const Categorias = ({ onSubmit }) => {
                   }`}>(máx. 5, 2MB c/u)</span>
                 </label>
                 
-                <label className={`flex flex-col w-full h-24 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
-                  isDarkMode 
-                    ? 'border-gray-500 hover:bg-gray-600 hover:border-gray-400' 
-                    : 'border-gray-300 hover:bg-gray-100 hover:border-gray-400'
-                }`}>
-                  <div className="flex flex-col items-center justify-center h-full">
-                    <div className="flex items-center space-x-2">
-                      <svg className={`w-5 h-5 transition-colors duration-300 ${
+                <div className="flex gap-2">
+                  <label className={`flex flex-col flex-1 h-24 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
+                    isDarkMode 
+                      ? 'border-gray-500 hover:bg-gray-600 hover:border-gray-400' 
+                      : 'border-gray-300 hover:bg-gray-100 hover:border-gray-400'
+                  }`}>
+                    <div className="flex flex-col items-center justify-center h-full">
+                      <div className="flex items-center space-x-2">
+                        <svg className={`w-5 h-5 transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span className={`text-sm font-medium transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                        }`}>
+                          Seleccionar imágenes
+                        </span>
+                      </div>
+                      <span className={`text-xs mt-1 transition-colors duration-300 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span className={`text-sm font-medium transition-colors duration-300 ${
-                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
                       }`}>
-                        Seleccionar imágenes
+                        JPEG, PNG, GIF, WEBP
                       </span>
                     </div>
-                    <span className={`text-xs mt-1 transition-colors duration-300 ${
-                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                    }`}>
-                      JPEG, PNG, GIF, WEBP
-                    </span>
-                  </div>
-                  <input
-                    type="file"
-                    id="imagenes"
-                    name="imagenes"
-                    onChange={handleImagenesChange}
-                    className="hidden"
-                    accept="image/jpeg,image/png,image/jpg,image/gif,image/webm,image/webp"
-                    multiple
-                  />
-                </label>
+                    <input
+                      type="file"
+                      id="imagenes"
+                      name="imagenes"
+                      onChange={handleImagenesChange}
+                      className="hidden"
+                      accept="image/jpeg,image/png,image/jpg,image/gif,image/webm,image/webp"
+                      multiple
+                    />
+                  </label>
+                  
+                  <button
+                    type="button"
+                    onClick={() => setShowImageBank(true)}
+                    className={`px-4 py-2 h-24 border-2 border-dashed rounded-lg transition-all duration-300 hover:scale-[1.02] flex flex-col items-center justify-center ${
+                      isDarkMode 
+                        ? 'border-purple-500 hover:bg-purple-600/20 hover:border-purple-400 text-purple-400' 
+                        : 'border-purple-300 hover:bg-purple-50 hover:border-purple-400 text-purple-600'
+                    }`}
+                    title="Seleccionar del banco de imágenes"
+                  >
+                    <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    <span className="text-xs font-medium">Banco</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -996,6 +1047,12 @@ const Categorias = ({ onSubmit }) => {
           </div>
         </div>
       )}
+      
+      <ImageBankModal
+        isOpen={showImageBank}
+        onClose={() => setShowImageBank(false)}
+        onSelectImages={(images) => handleImageBankSelect(images)}
+      />
     </div>
   );
 };

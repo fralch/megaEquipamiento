@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 // Importa axios si aún no lo has hecho
 import axios from 'axios';
 import { useTheme } from '../../storage/ThemeContext';
+import ImageBankModal from './ImageBankModal';
 
 const Marcas = ({ onSubmit }) => {
   const { isDarkMode } = useTheme();
@@ -10,6 +11,7 @@ const Marcas = ({ onSubmit }) => {
   const [showModal, setShowModal] = useState(false);
   const [videoPreview, setVideoPreview] = useState(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [showImageBank, setShowImageBank] = useState(false);
   const [marcas, setMarcas] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -56,6 +58,35 @@ const Marcas = ({ onSubmit }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setForm({ ...form, imagen: file });
+    
+    // Crear vista previa
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Función para manejar la selección de imágenes del banco
+  const handleImageBankSelect = (bankImages) => {
+    if (bankImages.length > 0) {
+      const selectedImage = bankImages[0]; // Solo tomar la primera imagen para marcas
+      
+      // Actualizar la vista previa
+      setPreviewImage(selectedImage.url);
+      
+      // Actualizar el formulario con la información de la imagen del banco
+      setForm(prev => ({ 
+        ...prev, 
+        imagen: {
+          url: selectedImage.url,
+          name: selectedImage.name,
+          isFromBank: true
+        }
+      }));
+    }
   };
 
   useEffect(() => {
@@ -82,8 +113,17 @@ const Marcas = ({ onSubmit }) => {
     formData.append('nombre', form.nombre);
     formData.append('descripcion', form.descripcion);
     formData.append('video_url', form.video_url);
+    
+    // Manejar imagen del banco vs archivo subido
     if (form.imagen) {
-      formData.append('imagen', form.imagen);
+      if (form.imagen.isFromBank) {
+        // Si es del banco de imágenes, enviar la URL
+        formData.append('imagen_url', form.imagen.url);
+        formData.append('imagen_name', form.imagen.name);
+      } else {
+        // Si es un archivo subido, enviar el archivo
+        formData.append('imagen', form.imagen);
+      }
     }
 
     try {
@@ -111,7 +151,8 @@ const Marcas = ({ onSubmit }) => {
         video_url: "",
       });
       
-      // Limpiar previsualización de video
+      // Limpiar previsualizaciones
+      setPreviewImage(null);
       setVideoPreview(null);
 
       setMessage({ type: 'success', text: 'Marca creada exitosamente!' }); // Actualiza el mensaje
@@ -301,18 +342,53 @@ const Marcas = ({ onSubmit }) => {
             <label htmlFor="imagen" className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-200`}>
               Imagen
             </label>
-            <input
-              type="file"
-              id="imagen"
-              name="imagen"
-              accept="image/*"
-              onChange={handleImageChange}
-              className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-200 ${
-                isDarkMode 
-                  ? 'bg-gray-700 border-gray-600 text-white file:bg-gray-600 file:text-white file:border-gray-500 focus:border-indigo-400 focus:ring-indigo-400' 
-                  : 'bg-white border-gray-300 text-gray-900 file:bg-gray-50 file:text-gray-700 file:border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
-              }`}
-            />
+            <div className="mt-1 flex gap-2">
+              <input
+                type="file"
+                id="imagen"
+                name="imagen"
+                accept="image/*"
+                onChange={handleImageChange}
+                className={`flex-1 rounded-md shadow-sm transition-colors duration-200 ${
+                  isDarkMode 
+                    ? 'bg-gray-700 border-gray-600 text-white file:bg-gray-600 file:text-white file:border-gray-500 focus:border-indigo-400 focus:ring-indigo-400' 
+                    : 'bg-white border-gray-300 text-gray-900 file:bg-gray-50 file:text-gray-700 file:border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowImageBank(true)}
+                className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium transition duration-150 ease-in-out ${
+                  isDarkMode 
+                    ? 'bg-green-600 text-white hover:bg-green-700 border border-green-600' 
+                    : 'bg-green-500 text-white hover:bg-green-600 border border-green-500'
+                }`}
+              >
+                Banco de Imágenes
+              </button>
+            </div>
+            {/* Vista previa de la imagen */}
+            {previewImage && (
+              <div className="mt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Vista previa:</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(true)}
+                    className={`text-sm underline transition-colors duration-200 ${
+                      isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'
+                    }`}
+                  >
+                    Ver en pantalla completa
+                  </button>
+                </div>
+                <img
+                  src={previewImage}
+                  alt="Vista previa"
+                  className="w-full h-32 object-cover rounded-md border"
+                />
+              </div>
+            )}
           </div>
 
           <div className="mb-4">
@@ -466,8 +542,17 @@ const Marcas = ({ onSubmit }) => {
                     </button>
                 ))}
             </div>
-         )}
+         )}         
       </div>
+      
+      {/* Modal del banco de imágenes */}
+      {showImageBank && (
+        <ImageBankModal
+          isOpen={showImageBank}
+          onClose={() => setShowImageBank(false)}
+          onSelectImages={handleImageBankSelect}
+        />
+      )}
     </div>
   );
 }; // End of Marcas component

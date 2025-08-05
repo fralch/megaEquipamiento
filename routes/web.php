@@ -11,6 +11,7 @@ use App\Http\Controllers\TiposRelacionProductosController;
 use App\Http\Controllers\MarcaCategoriaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\BancoImagenesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -111,6 +112,17 @@ Route::post('/marca-categoria/create', [MarcaCategoriaController::class, 'store'
 // Rutas para pedidos
 Route::post('/pedido/confirmar', [PedidoController::class, 'confirmarPedido'])->name('pedido.confirmar');
 Route::get('/orders/{orderNumber}', [PedidoController::class, 'verPedido'])->name('pedido.ver');
+
+// Rutas para banco de imágenes
+Route::middleware('auth')->prefix('banco-imagenes')->group(function () {
+    Route::get('/', [BancoImagenesController::class, 'index'])->name('banco-imagenes.index');
+    Route::get('/api/all', [BancoImagenesController::class, 'getAllImagesJson'])->name('banco-imagenes.api.all');
+    Route::post('/', [BancoImagenesController::class, 'store'])->name('banco-imagenes.store');
+    Route::get('/buscar', [BancoImagenesController::class, 'buscar'])->name('banco-imagenes.buscar');
+    Route::get('/{id}', [BancoImagenesController::class, 'show'])->name('banco-imagenes.show');
+    Route::put('/{id}', [BancoImagenesController::class, 'update'])->name('banco-imagenes.update');
+    Route::delete('/{id}', [BancoImagenesController::class, 'destroy'])->name('banco-imagenes.destroy');
+});
 
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;

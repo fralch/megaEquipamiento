@@ -62,8 +62,8 @@ class AppServiceProvider extends ServiceProvider
 
 
 APP_ENV=production
-APP_URL=https://equipamientoindustriales.hpservidor.com
-ASSET_URL=https://equipamientoindustriales.hpservidor.com
+APP_URL=https://megaequipamiento.pe
+ASSET_URL=https://megaequipamiento.pe
 CACHE_STORE=file
 
 
