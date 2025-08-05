@@ -3,6 +3,7 @@ import { useTheme } from '../../storage/ThemeContext';
 import Modal_Features from './assets/modal_features';
 import EspecificacionesTecnicas from './assets/especificacionesTecnicas';
 import { countryOptions } from '../countrys';
+import ImageBankModal from './ImageBankModal';
 
 const URL_API = import.meta.env.VITE_API_URL;
 
@@ -304,81 +305,102 @@ const FeaturesButton = ({ label, value, onClick, onRemoveItem }) => (
   </div>
 );
 
-const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName, selectedImages, removeImage }) => (
-  <div className="w-full lg:w-1/2 lg:pr-6 mb-6 lg:mb-0">
-    <div className="border border-gray-300 rounded-lg p-4 mb-4 h-[300px] md:h-[400px] overflow-y-auto">
-      {previewImages && previewImages.length > 0 ? (
-        <div className="grid grid-cols-2 gap-2">
-          {previewImages.map((preview, index) => (
-            <div key={index} className="border rounded-lg p-2 relative">
+const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName, selectedImages, removeImage, onImageBankSelect, showImageBank, setShowImageBank }) => {
+  const { isDarkMode } = useTheme();
+
+  return (
+    <div className="w-full lg:w-1/2 lg:pr-6 mb-6 lg:mb-0">
+      <div className="border border-gray-300 rounded-lg p-4 mb-4 h-[300px] md:h-[400px] overflow-y-auto">
+        {previewImages && previewImages.length > 0 ? (
+          <div className="grid grid-cols-2 gap-2">
+            {previewImages.map((preview, index) => (
+              <div key={index} className="border rounded-lg p-2 relative">
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors z-10"
+                  title="Eliminar imagen"
+                >
+                  ×
+                </button>
+                <img
+                  src={preview}
+                  alt={`Product Preview ${index + 1}`}
+                  className="w-full h-24 object-contain"
+                />
+                <p className="text-xs text-gray-500 text-center mt-1">
+                  {selectedImages && selectedImages[index] ? selectedImages[index].name : `Imagen ${index + 1}`}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : previewImage ? (
+          <div className="flex items-center justify-center h-full relative">
+            {removeImage && (
               <button
                 type="button"
-                onClick={() => removeImage(index)}
-                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors z-10"
+                onClick={() => removeImage(0)}
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors z-10"
                 title="Eliminar imagen"
               >
                 ×
               </button>
-              <img
-                src={preview}
-                alt={`Product Preview ${index + 1}`}
-                className="w-full h-24 object-contain"
-              />
-              <p className="text-xs text-gray-500 text-center mt-1">
-                {selectedImages && selectedImages[index] ? selectedImages[index].name : `Imagen ${index + 1}`}
-              </p>
-            </div>
-          ))}
+            )}
+            <img
+              src={previewImage}
+              alt="Product Preview"
+              className="max-h-full max-w-full object-contain"
+            />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full text-gray-400 text-center">
+            Vista previa de imágenes
+          </div>
+        )}
+      </div>
+      <div>
+        <input
+          type="file"
+          id="imagen"
+          name="imagen"
+          onChange={handleImageChange}
+          accept="image/*"
+          multiple
+          className="hidden"
+        />
+        <div className="flex gap-2">
+          <label
+            htmlFor="imagen"
+            className={`flex-1 border rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 cursor-pointer py-2 px-4 text-sm font-medium text-center transition duration-150 ease-in-out ${
+              isDarkMode 
+                ? 'bg-gray-700 border-gray-600 text-indigo-400 hover:bg-gray-600' 
+                : 'bg-white border-gray-300 text-indigo-600 hover:bg-gray-50'
+            }`}
+          >
+            Seleccionar archivos
+          </label>
+          <button
+            type="button"
+            onClick={() => setShowImageBank(true)}
+            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium transition duration-150 ease-in-out ${
+              isDarkMode 
+                ? 'bg-green-600 text-white hover:bg-green-700 border border-green-600' 
+                : 'bg-green-500 text-white hover:bg-green-600 border border-green-500'
+            }`}
+          >
+            Banco de Imágenes
+          </button>
         </div>
-      ) : previewImage ? (
-        <div className="flex items-center justify-center h-full relative">
-          {removeImage && (
-            <button
-              type="button"
-              onClick={() => removeImage(0)}
-              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors z-10"
-              title="Eliminar imagen"
-            >
-              ×
-            </button>
-          )}
-          <img
-            src={previewImage}
-            alt="Product Preview"
-            className="max-h-full max-w-full object-contain"
-          />
-        </div>
-      ) : (
-        <div className="flex items-center justify-center h-full text-gray-400 text-center">
-          Vista previa de imágenes
-        </div>
-      )}
+        {selectedImages && selectedImages.length > 0 && (
+          <p className="mt-1 text-sm text-gray-500 text-center">
+            {selectedImages.length} archivo(s) seleccionado(s)
+          </p>
+        )}
+        {imageName && !selectedImages && <p className="mt-1 text-sm text-gray-500 text-center">{imageName}</p>}
+      </div>
     </div>
-    <div>
-      <input
-        type="file"
-        id="imagen"
-        name="imagen"
-        onChange={handleImageChange}
-        accept="image/*"
-        multiple
-        className="hidden"
-      />
-      <label
-        htmlFor="imagen"
-        className="block w-full border border-gray-300 rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 cursor-pointer bg-white text-indigo-600 py-2 px-4 text-sm font-medium text-center transition duration-150 ease-in-out"
-      >
-        Seleccionar archivos
-      </label>
-      {selectedImages && selectedImages.length > 0 && (
-        <p className="mt-1 text-sm text-gray-500 text-center">
-          {selectedImages.length} archivo(s) seleccionado(s)
-        </p>
-      )}
-      {imageName && !selectedImages && <p className="mt-1 text-sm text-gray-500 text-center">{imageName}</p>}
-    </div>
-  </div>
-);
+  );
+};
 
 const Productos = ({ onSubmit }) => {
   const { isDarkMode } = useTheme();
@@ -394,7 +416,36 @@ const Productos = ({ onSubmit }) => {
   const [previewImages, setPreviewImages] = useState([]);
   const [selectedImages, setSelectedImages] = useState([]);
   const [porcentajeGanancia, setPorcentajeGanancia] = useState('');
+  const [showImageBank, setShowImageBank] = useState(false);
   const especificacionesRef = useRef(null);
+
+  // Función para manejar la selección de imágenes del banco
+  const handleImageBankSelect = (bankImages) => {
+    if (bankImages.length > 0) {
+      // Usar las URLs directamente para las vistas previas
+      const imageUrls = bankImages.map(img => img.url);
+      
+      // Crear objetos que contengan la información necesaria
+      const imageFiles = bankImages.map((img, index) => ({
+        name: img.name,
+        url: img.url,
+        isFromBank: true
+      }));
+      
+      // Actualizar las vistas previas
+      setPreviewImages(imageUrls);
+      setPreviewImage(imageUrls[0]);
+      setSelectedImages(imageFiles);
+      
+      // Actualizar el formulario
+      setForm(prev => ({ 
+        ...prev, 
+        imagen: imageFiles[0],
+        imagenes: imageFiles,
+        imagenesDelBanco: bankImages // Guardar las imágenes del banco por separado
+      }));
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -575,17 +626,28 @@ const Productos = ({ onSubmit }) => {
     
     // Add form fields to FormData
     Object.entries(form).forEach(([key, value]) => {
-      if (key === 'imagenes' && value && value.length > 0) {
-        // Agregar múltiples imágenes
+      if (key === 'imagenesDelBanco' && value && value.length > 0) {
+        // Enviar URLs de imágenes del banco
         value.forEach((imagen, index) => {
-          formData.append(`imagenes[${index}]`, imagen);
+          formData.append(`imagenesDelBanco[${index}]`, imagen.url);
         });
-      } else if (key === 'imagen' && value && !form.imagenes) {
-        // Mantener compatibilidad con imagen única si no hay múltiples
+      } else if (key === 'imagenes' && value && value.length > 0) {
+        // Verificar si son imágenes del banco o archivos subidos
+        const hasFileImages = value.some(img => !img.isFromBank);
+        if (hasFileImages) {
+          // Agregar múltiples imágenes de archivos
+          value.forEach((imagen, index) => {
+            if (!imagen.isFromBank) {
+              formData.append(`imagenes[${index}]`, imagen);
+            }
+          });
+        }
+      } else if (key === 'imagen' && value && !form.imagenes && !value.isFromBank) {
+        // Mantener compatibilidad con imagen única si no hay múltiples y no es del banco
         formData.append(key, value);
       } else if (key === 'caracteristicas' && value) {
         formData.append(key, JSON.stringify(value));
-      } else if (value !== null && value !== undefined && key !== 'imagen' && key !== 'imagenes') {
+      } else if (value !== null && value !== undefined && key !== 'imagen' && key !== 'imagenes' && key !== 'imagenesDelBanco') {
         formData.append(key, value);
       }
     });
@@ -835,6 +897,9 @@ const Productos = ({ onSubmit }) => {
             imageName={form.imagen?.name}
             selectedImages={selectedImages}
             removeImage={removeImage}
+            onImageBankSelect={handleImageBankSelect}
+            showImageBank={showImageBank}
+            setShowImageBank={setShowImageBank}
           />
 
           <div className="w-full lg:w-1/2 lg:pl-6">
@@ -991,6 +1056,14 @@ const Productos = ({ onSubmit }) => {
           type={modalType}
           onSave={saveModalData}
           onClose={() => toggleModal()}
+        />
+      )}
+      
+      {showImageBank && (
+        <ImageBankModal
+          isOpen={showImageBank}
+          onClose={() => setShowImageBank(false)}
+          onSelectImages={handleImageBankSelect}
         />
       )}
     </div>

@@ -81,6 +81,27 @@ class BancoImagenesController extends Controller
         ]);
     }
 
+    public function getAllImagesJson(Request $request)
+    {
+        // Obtener imágenes de la carpeta public/img
+        $imagenesPublic = $this->obtenerImagenesPublic();
+        
+        // Obtener imágenes de Media Library
+        $imagenesMedia = $this->obtenerImagenesMedia();
+        
+        // Combinar ambas fuentes
+        $todasImagenes = collect($imagenesPublic)->merge($imagenesMedia);
+        
+        $imagenesFiltradas = $todasImagenes->filter(function($imagen) {
+            return str_starts_with($imagen['tipo'], 'image');
+        });
+
+        return response()->json([
+            'imagenes' => $imagenesFiltradas->values(),
+            'colecciones' => $this->obtenerTodasColecciones()
+        ]);
+    }
+
     /**
      * Subir nueva imagen al banco
      */

@@ -116,6 +116,7 @@ Route::get('/orders/{orderNumber}', [PedidoController::class, 'verPedido'])->nam
 // Rutas para banco de imágenes
 Route::middleware('auth')->prefix('banco-imagenes')->group(function () {
     Route::get('/', [BancoImagenesController::class, 'index'])->name('banco-imagenes.index');
+    Route::get('/api/all', [BancoImagenesController::class, 'getAllImagesJson'])->name('banco-imagenes.api.all');
     Route::post('/', [BancoImagenesController::class, 'store'])->name('banco-imagenes.store');
     Route::get('/buscar', [BancoImagenesController::class, 'buscar'])->name('banco-imagenes.buscar');
     Route::get('/{id}', [BancoImagenesController::class, 'show'])->name('banco-imagenes.show');

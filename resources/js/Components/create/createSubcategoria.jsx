@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTheme } from '../../storage/ThemeContext';
+import ImageBankModal from './ImageBankModal';
 
 const Subcategorias = ({ onSubmit }) => {
   const { isDarkMode } = useTheme();
@@ -13,6 +14,7 @@ const Subcategorias = ({ onSubmit }) => {
   });
   const [img, setImg] = useState(null); // Para la imagen de subcategoría
   const [imgPreview, setImgPreview] = useState(null); // Para la vista previa
+  const [showImageBank, setShowImageBank] = useState(false); // Para el modal del banco de imágenes
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
@@ -109,6 +111,25 @@ const Subcategorias = ({ onSubmit }) => {
     setImgPreview(null);
   };
 
+  // Manejar selección de imagen del banco
+  const handleImageBankSelect = (selectedImages) => {
+    if (selectedImages.length > 0) {
+      const selectedImage = selectedImages[0]; // Solo tomar la primera imagen
+      
+      // Actualizar la vista previa
+      setImgPreview(selectedImage.url);
+      
+      // Actualizar el estado de la imagen con información del banco
+      setImg({
+        url: selectedImage.url,
+        name: selectedImage.name,
+        isFromBank: true
+      });
+      
+      setShowImageBank(false);
+    }
+  };
+
   // Eliminar una subcategoría
   const handleDeleteSubcategoria = async (id, nombre) => {
     // Confirmar antes de eliminar
@@ -162,9 +183,16 @@ const Subcategorias = ({ onSubmit }) => {
     formData.append('descripcion', form.descripcion || '');
     formData.append('id_categoria', form.id_categoria);
     
-    // Añadir la imagen si existe
+    // Manejar imagen del banco vs archivo subido
     if (img) {
-      formData.append('img', img);
+      if (img.isFromBank) {
+        // Si es del banco de imágenes, enviar la URL
+        formData.append('img_url', img.url);
+        formData.append('img_name', img.name);
+      } else {
+        // Si es un archivo subido, enviar el archivo
+        formData.append('img', img);
+      }
     }
     
     try {
@@ -335,20 +363,33 @@ const Subcategorias = ({ onSubmit }) => {
             <label htmlFor="img" className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Imagen
             </label>
-            <input
-              type="file"
-              id="img"
-              name="img"
-              onChange={handleImageChange}
-              className={`mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors ${
-                isDarkMode 
-                  ? 'bg-gray-600 border-gray-500 text-white file:bg-gray-500 file:text-white file:border-gray-400' 
-                  : 'bg-white border-gray-300 text-gray-900 file:bg-gray-50 file:text-gray-700'
-              }`}
-              accept="image/jpeg,image/png,image/jpg,image/gif,image/webm,image/webp" // Añadido image/webp
-            />
+            <div className="mt-1 flex gap-2">
+              <input
+                type="file"
+                id="img"
+                name="img"
+                onChange={handleImageChange}
+                className={`flex-1 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors ${
+                  isDarkMode 
+                    ? 'bg-gray-600 border-gray-500 text-white file:bg-gray-500 file:text-white file:border-gray-400' 
+                    : 'bg-white border-gray-300 text-gray-900 file:bg-gray-50 file:text-gray-700'
+                }`}
+                accept="image/jpeg,image/png,image/jpg,image/gif,image/webm,image/webp"
+              />
+              <button
+                type="button"
+                onClick={() => setShowImageBank(true)}
+                className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium transition duration-150 ease-in-out ${
+                  isDarkMode 
+                    ? 'bg-green-600 text-white hover:bg-green-700 border border-green-600' 
+                    : 'bg-green-500 text-white hover:bg-green-600 border border-green-500'
+                }`}
+              >
+                Banco de Imágenes
+              </button>
+            </div>
             <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              Tamaño máximo: 2MB. Formatos: JPEG, PNG, JPG, GIF, WEBM, WEBP {/* Añadido WEBP */}
+              Tamaño máximo: 2MB. Formatos: JPEG, PNG, JPG, GIF, WEBM, WEBP
             </p>
 
             {/* Vista previa de imagen */}
@@ -539,6 +580,15 @@ const Subcategorias = ({ onSubmit }) => {
           )}
         </div>
       </div>
+      
+      {/* Modal del banco de imágenes */}
+      {showImageBank && (
+        <ImageBankModal
+          isOpen={showImageBank}
+          onClose={() => setShowImageBank(false)}
+          onSelectImages={handleImageBankSelect}
+        />
+      )}
     </div>
   );
 };
