@@ -64,6 +64,7 @@ Route::get('/categorias-completa', [CategoriaController::class, 'getCategoriasCo
 Route::get('/categoria/{id}', [CategoriaController::class, 'getCategoriaById'])->name('categoria.show');
 Route::post('/categoria/create', [CategoriaController::class, 'store'])->name('categoria.create');
 Route::put('/categoria/update/{id}', [CategoriaController::class, 'update'])->name('categoria.update');
+Route::post('/categoria/update/{id}', [CategoriaController::class, 'update'])->name('categoria.update.post');
 Route::delete('/categoria/delete/{id}', [CategoriaController::class, 'destroy'])->name('categoria.delete');
 Route::get('/categoria/{id}/subcategorias', [CategoriaController::class, 'getSubcategorias'])->name('categoria.subcategorias');
 

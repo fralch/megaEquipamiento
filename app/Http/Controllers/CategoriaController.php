@@ -179,6 +179,8 @@ class CategoriaController extends Controller
             'nombre' => 'required|max:200',
             'descripcion' => 'nullable|string',
             'video' => 'nullable|url|max:500', // Validación para URL de video
+            'imagenes.*' =>  'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048', // Validación para múltiples imágenes
+            'imagenes' => 'max:5', // Máximo 5 imágenes
         ]);
 
         // Buscar la categoría por ID
@@ -188,12 +190,85 @@ class CategoriaController extends Controller
             return response()->json(['error' => 'Categoría no encontrada'], 404);
         }
 
-        // Actualizar solo los campos proporcionados
+        // Actualizar campos básicos
         $categoria->update([
             'nombre' => $request->nombre,
             'descripcion' => $request->descripcion,
             'video' => $request->video,
         ]);
+
+        // Manejar imágenes si se indica que deben actualizarse
+        if ($request->has('update_images') && $request->input('update_images') === 'true') {
+            // Sanitize the category name for the folder path
+            $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($request->nombre));
+            $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized);
+        
+            // Crear directorio específico para esta categoría usando el nombre sanitizado
+            $categoryFolder = 'img/categorias/' . $categoryNameSanitized;
+            $fullPath = public_path($categoryFolder);
+
+            // Eliminar imágenes existentes de la carpeta antes de agregar las nuevas
+            if (file_exists($fullPath) && is_dir($fullPath)) {
+                $files = glob($fullPath . '/*');
+                foreach ($files as $file) {
+                    if (is_file($file)) {
+                        unlink($file);
+                    }
+                }
+            }
+            
+            // Crear el directorio si no existe
+            if (!file_exists($fullPath)) {
+                mkdir($fullPath, 0777, true);
+            }
+
+            // Procesar imágenes adicionales (hasta 5)
+            $imagenesGuardadas = [];
+            
+            if ($request->hasFile('imagenes')) {
+                $imagenes = $request->file('imagenes');
+                $count = 0;
+                
+                foreach ($imagenes as $imagen) {
+                    if ($count >= 5) break; // Limitar a 5 imágenes
+                    
+                    // Use a unique name for each additional image file
+                    $fileName = time() . '_' . uniqid() . '_' . $count . '.' . $imagen->getClientOriginalExtension();
+                    $destinationPath = $fullPath . '/' . $fileName;
+                    
+                    if (move_uploaded_file($imagen->getPathname(), $destinationPath)) {
+                        // Guardar las rutas de las imágenes adicionales
+                        $imagenesGuardadas[] = '/' . $categoryFolder . '/' . $fileName;
+                    }
+                    
+                    $count++;
+                }
+            }
+
+            // Procesar imágenes del banco si existen
+            if ($request->has('imagenes_bank')) {
+                $imagenes_bank = $request->input('imagenes_bank');
+                foreach ($imagenes_bank as $img_bank) {
+                    if (isset($img_bank['url']) && isset($img_bank['name'])) {
+                        // Para imágenes del banco, simplemente agregamos la URL
+                        $imagenesGuardadas[] = $img_bank['url'];
+                    }
+                }
+            }
+
+            // Actualizar la imagen principal con la primera imagen nueva (reemplazar la existente)
+            if (!empty($imagenesGuardadas)) {
+                $categoria->img = $imagenesGuardadas[0];
+                $categoria->save();
+            } else {
+                // Si no hay nuevas imágenes, limpiar la imagen principal también
+                $categoria->img = null;
+                $categoria->save();
+            }
+
+            // Agregamos las imágenes al resultado para devolverlas
+            $categoria->imagenes_adicionales = $imagenesGuardadas;
+        }
 
         return response()->json($categoria);
     }

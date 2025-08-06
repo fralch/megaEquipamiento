@@ -28,6 +28,10 @@ const Categorias = ({ onSubmit }) => {
     descripcion: "",
     video: "",
   });
+  const [editImagenes, setEditImagenes] = useState([]); // Array para las imágenes en edición
+  const [editImagenesPreview, setEditImagenesPreview] = useState([]); // Array para vistas previas en edición
+  const [showEditImageBank, setShowEditImageBank] = useState(false); // Para el modal del banco de imágenes en edición
+  const [shouldClearImages, setShouldClearImages] = useState(false); // Para indicar si se deben limpiar las imágenes
 
 
   // Función para cargar las categorías
@@ -181,12 +185,110 @@ const Categorias = ({ onSubmit }) => {
       descripcion: "",
       video: "",
     });
+    setEditImagenes([]);
+    setEditImagenesPreview([]);
+    setShowEditImageBank(false);
+    setShouldClearImages(false);
   };
 
   // Manejar cambios en el formulario de edición
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditForm({ ...editForm, [name]: value });
+  };
+
+  // Manejar cambio de múltiples imágenes en edición
+  const handleEditImagenesChange = (e) => {
+    const files = Array.from(e.target.files);
+    const newImagenes = [];
+    const newPreviews = [];
+    let hasError = false;
+
+    // Validar que no se seleccionen más de 5 imágenes
+    if (files.length > 5) {
+      setError('No puedes seleccionar más de 5 imágenes');
+      return;
+    }
+
+    // Validar cada archivo
+    for (const file of files) {
+      // Validar tamaño del archivo (2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        setError(`La imagen ${file.name} excede los 2MB`);
+        hasError = true;
+        break;
+      }
+      
+      // Validar tipo de archivo
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webm', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        setError(`Formato de imagen ${file.name} no válido. Use JPEG, PNG, JPG, GIF, WEBM o WEBP`);
+        hasError = true;
+        break;
+      }
+      
+      newImagenes.push(file);
+      
+      // Crear vista previa para cada imagen
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        newPreviews.push({ id: file.name, preview: reader.result });
+        // Si ya tenemos todas las previsualizaciones, actualizamos el estado
+        if (newPreviews.length === files.length) {
+          setEditImagenesPreview([...newPreviews]);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    if (!hasError) {
+      setEditImagenes(newImagenes);
+      setError(null);
+      setShouldClearImages(true); // Marcar que las imágenes deben ser actualizadas
+    }
+  };
+
+  // Eliminar una imagen de la lista en edición
+  const removeEditImage = (index) => {
+    const newImagenes = [...editImagenes];
+    newImagenes.splice(index, 1);
+    setEditImagenes(newImagenes);
+    
+    const newPreviews = [...editImagenesPreview];
+    newPreviews.splice(index, 1);
+    setEditImagenesPreview(newPreviews);
+  };
+
+  // Manejar selección de imágenes del banco en edición
+  const handleEditImageBankSelect = (selectedImages) => {
+    if (selectedImages.length > 0) {
+      // Convertir imágenes del banco al formato esperado
+      const bankImages = selectedImages.map(img => ({
+        url: img.url,
+        name: img.name,
+        isFromBank: true
+      }));
+      
+      // Agregar a las imágenes existentes
+      setEditImagenes(prev => [...prev, ...bankImages]);
+      
+      // Agregar a las previsualizaciones
+      const bankPreviews = selectedImages.map(img => ({
+        id: img.name,
+        preview: img.url
+      }));
+      setEditImagenesPreview(prev => [...prev, ...bankPreviews]);
+      
+      setShowEditImageBank(false);
+      setShouldClearImages(true); // Marcar que las imágenes deben ser actualizadas
+    }
+  };
+
+  // Función para limpiar todas las imágenes
+  const handleClearEditImages = () => {
+    setEditImagenes([]);
+    setEditImagenesPreview([]);
+    setShouldClearImages(true); // Marcar que se deben eliminar las imágenes existentes
   };
 
   // Función para actualizar categoría
@@ -196,14 +298,40 @@ const Categorias = ({ onSubmit }) => {
     setError(null);
     
     try {
+      // Crear un objeto FormData para enviar los datos del formulario incluyendo las imágenes
+      const formData = new FormData();
+      formData.append('_method', 'PUT'); // Method spoofing for Laravel
+      formData.append('nombre', editForm.nombre);
+      formData.append('descripcion', editForm.descripcion || '');
+      formData.append('video', editForm.video || '');
+      
+      // Solo actualizar imágenes si se han seleccionado nuevas imágenes o se marcó para limpiar
+      if (shouldClearImages) {
+        formData.append('update_images', 'true');
+        
+        // Añadir las imágenes si existen
+        if (editImagenes.length > 0) {
+          editImagenes.forEach((img, index) => {
+            if (img.isFromBank) {
+              // Si la imagen es del banco, enviar URL y nombre
+              formData.append(`imagenes_bank[${index}][url]`, img.url);
+              formData.append(`imagenes_bank[${index}][name]`, img.name);
+            } else {
+              // Si es una imagen nueva, enviar el archivo
+              formData.append(`imagenes[${index}]`, img);
+            }
+          });
+        }
+      }
+      
       const config = {
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
         }
       };
       
-      await axios.put(`/categoria/update/${editingCategoria.id_categoria}`, editForm, config);
+      await axios.post(`/categoria/update/${editingCategoria.id_categoria}`, formData, config);
       
       setSuccessMessage('Categoría actualizada exitosamente');
       loadCategorias();
@@ -932,7 +1060,7 @@ const Categorias = ({ onSubmit }) => {
       {/* Modal de edición */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`rounded-lg p-6 w-full max-w-md mx-4 transition-colors duration-300 ${
+          <div className={`rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto transition-colors duration-300 ${
             isDarkMode ? 'bg-gray-800' : 'bg-white'
           }`}>
             <div className="flex justify-between items-center mb-4">
@@ -1017,6 +1145,128 @@ const Categorias = ({ onSubmit }) => {
                     }`}
                   />
                 </div>
+                
+                {/* Sección de imágenes */}
+                <div>
+                  <label htmlFor="edit-imagenes" className={`block text-sm font-medium mb-1 transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                  }`}>
+                    Imágenes <span className={`text-xs font-normal transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>(máx. 5, 2MB c/u)</span>
+                  </label>
+                  
+                  <div className="flex gap-2">
+                    <label className={`flex flex-col flex-1 h-24 border-2 border-dashed rounded-lg cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
+                      isDarkMode 
+                        ? 'border-gray-500 hover:bg-gray-600 hover:border-gray-400' 
+                        : 'border-gray-300 hover:bg-gray-100 hover:border-gray-400'
+                    }`}>
+                      <div className="flex flex-col items-center justify-center h-full">
+                        <div className="flex items-center space-x-2">
+                          <svg className={`w-5 h-5 transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                          }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <span className={`text-sm font-medium transition-colors duration-300 ${
+                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                          }`}>
+                            Seleccionar imágenes
+                          </span>
+                        </div>
+                        <span className={`text-xs mt-1 transition-colors duration-300 ${
+                          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                        }`}>
+                          JPEG, PNG, GIF, WEBP
+                        </span>
+                      </div>
+                      <input
+                        type="file"
+                        id="edit-imagenes"
+                        name="imagenes"
+                        onChange={handleEditImagenesChange}
+                        className="hidden"
+                        accept="image/jpeg,image/png,image/jpg,image/gif,image/webm,image/webp"
+                        multiple
+                      />
+                    </label>
+                    
+                    <button
+                      type="button"
+                      onClick={() => setShowEditImageBank(true)}
+                      className={`px-4 py-2 h-24 border-2 border-dashed rounded-lg transition-all duration-300 hover:scale-[1.02] flex flex-col items-center justify-center ${
+                        isDarkMode 
+                          ? 'border-purple-500 hover:bg-purple-600/20 hover:border-purple-400 text-purple-400' 
+                          : 'border-purple-300 hover:bg-purple-50 hover:border-purple-400 text-purple-600'
+                      }`}
+                      title="Seleccionar del banco de imágenes"
+                    >
+                      <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                      <span className="text-xs font-medium">Banco</span>
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={handleClearEditImages}
+                      className={`px-4 py-2 h-24 border-2 border-dashed rounded-lg transition-all duration-300 hover:scale-[1.02] flex flex-col items-center justify-center ${
+                        isDarkMode 
+                          ? 'border-red-500 hover:bg-red-600/20 hover:border-red-400 text-red-400' 
+                          : 'border-red-300 hover:bg-red-50 hover:border-red-400 text-red-600'
+                      }`}
+                      title="Eliminar todas las imágenes"
+                    >
+                      <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      <span className="text-xs font-medium">Limpiar</span>
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Vista previa de imágenes en edición */}
+                {editImagenesPreview.length > 0 && (
+                  <div className={`p-3 rounded-md border transition-colors duration-300 ${
+                    isDarkMode ? 'bg-gray-600 border-gray-500' : 'bg-white border-gray-200'
+                  }`}>
+                    <div className="flex items-center mb-2">
+                      <svg className={`w-4 h-4 mr-1 transition-colors duration-300 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                      }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      <span className={`text-sm font-medium transition-colors duration-300 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        Vista previa ({editImagenesPreview.length})
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {editImagenesPreview.map((img, index) => (
+                        <div key={img.id} className="relative group">
+                          <div className="w-16 h-16 rounded-lg overflow-hidden shadow-sm border-2 border-transparent group-hover:border-indigo-300 transition-all duration-200">
+                            <img 
+                              src={img.preview} 
+                              alt={`Preview ${index + 1}`} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeEditImage(index)}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-lg hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                            title="Eliminar"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               
               <div className="flex justify-end space-x-3 mt-6">
@@ -1052,6 +1302,13 @@ const Categorias = ({ onSubmit }) => {
         isOpen={showImageBank}
         onClose={() => setShowImageBank(false)}
         onSelectImages={(images) => handleImageBankSelect(images)}
+      />
+      
+      {/* ImageBankModal para edición */}
+      <ImageBankModal
+        isOpen={showEditImageBank}
+        onClose={() => setShowEditImageBank(false)}
+        onSelectImages={(images) => handleEditImageBankSelect(images)}
       />
     </div>
   );
