@@ -207,7 +207,8 @@ class CategoriaController extends Controller
             $categoryFolder = 'img/categorias/' . $categoryNameSanitized;
             $fullPath = public_path($categoryFolder);
 
-            // Eliminar imágenes existentes de la carpeta antes de agregar las nuevas
+            // Solo eliminar archivos físicos de la carpeta de la categoría (no imágenes del banco)
+            // Las imágenes del banco no están en esta carpeta, están en el banco de imágenes
             if (file_exists($fullPath) && is_dir($fullPath)) {
                 $files = glob($fullPath . '/*');
                 foreach ($files as $file) {
@@ -242,17 +243,6 @@ class CategoriaController extends Controller
                     }
                     
                     $count++;
-                }
-            }
-
-            // Procesar imágenes del banco si existen
-            if ($request->has('imagenes_bank')) {
-                $imagenes_bank = $request->input('imagenes_bank');
-                foreach ($imagenes_bank as $img_bank) {
-                    if (isset($img_bank['url']) && isset($img_bank['name'])) {
-                        // Para imágenes del banco, simplemente agregamos la URL
-                        $imagenesGuardadas[] = $img_bank['url'];
-                    }
                 }
             }
 

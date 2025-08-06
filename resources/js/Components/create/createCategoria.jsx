@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTheme } from '../../storage/ThemeContext';
-import ImageBankModal from './ImageBankModal';
 
 const Categorias = ({ onSubmit }) => {
   const { isDarkMode } = useTheme();
@@ -13,7 +12,6 @@ const Categorias = ({ onSubmit }) => {
   });
   const [imagenes, setImagenes] = useState([]); // Array para las imágenes
   const [imagenesPreview, setImagenesPreview] = useState([]); // Array para vistas previas
-  const [showImageBank, setShowImageBank] = useState(false); // Para el modal del banco de imágenes
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,7 +28,6 @@ const Categorias = ({ onSubmit }) => {
   });
   const [editImagenes, setEditImagenes] = useState([]); // Array para las imágenes en edición
   const [editImagenesPreview, setEditImagenesPreview] = useState([]); // Array para vistas previas en edición
-  const [showEditImageBank, setShowEditImageBank] = useState(false); // Para el modal del banco de imágenes en edición
   const [shouldClearImages, setShouldClearImages] = useState(false); // Para indicar si se deben limpiar las imágenes
 
 
@@ -141,29 +138,6 @@ const Categorias = ({ onSubmit }) => {
     setImagenesPreview(newPreviews);
   };
 
-  // Manejar selección de imágenes del banco
-  const handleImageBankSelect = (selectedImages) => {
-    if (selectedImages.length > 0) {
-      // Convertir imágenes del banco al formato esperado
-      const bankImages = selectedImages.map(img => ({
-        url: img.url,
-        name: img.name,
-        isFromBank: true
-      }));
-      
-      // Agregar a las imágenes existentes
-      setImagenes(prev => [...prev, ...bankImages]);
-      
-      // Agregar a las previsualizaciones
-      const bankPreviews = selectedImages.map(img => ({
-        id: img.name,
-        preview: img.url
-      }));
-      setImagenesPreview(prev => [...prev, ...bankPreviews]);
-      
-      setShowImageBank(false);
-    }
-  };
 
   // Función para abrir modal de edición
   const handleEditCategoria = (categoria) => {
@@ -187,7 +161,6 @@ const Categorias = ({ onSubmit }) => {
     });
     setEditImagenes([]);
     setEditImagenesPreview([]);
-    setShowEditImageBank(false);
     setShouldClearImages(false);
   };
 
@@ -259,30 +232,6 @@ const Categorias = ({ onSubmit }) => {
     setEditImagenesPreview(newPreviews);
   };
 
-  // Manejar selección de imágenes del banco en edición
-  const handleEditImageBankSelect = (selectedImages) => {
-    if (selectedImages.length > 0) {
-      // Convertir imágenes del banco al formato esperado
-      const bankImages = selectedImages.map(img => ({
-        url: img.url,
-        name: img.name,
-        isFromBank: true
-      }));
-      
-      // Agregar a las imágenes existentes
-      setEditImagenes(prev => [...prev, ...bankImages]);
-      
-      // Agregar a las previsualizaciones
-      const bankPreviews = selectedImages.map(img => ({
-        id: img.name,
-        preview: img.url
-      }));
-      setEditImagenesPreview(prev => [...prev, ...bankPreviews]);
-      
-      setShowEditImageBank(false);
-      setShouldClearImages(true); // Marcar que las imágenes deben ser actualizadas
-    }
-  };
 
   // Función para limpiar todas las imágenes
   const handleClearEditImages = () => {
@@ -309,17 +258,11 @@ const Categorias = ({ onSubmit }) => {
       if (shouldClearImages) {
         formData.append('update_images', 'true');
         
-        // Añadir las imágenes si existen
+        // Enviar solo archivos subidos
         if (editImagenes.length > 0) {
           editImagenes.forEach((img, index) => {
-            if (img.isFromBank) {
-              // Si la imagen es del banco, enviar URL y nombre
-              formData.append(`imagenes_bank[${index}][url]`, img.url);
-              formData.append(`imagenes_bank[${index}][name]`, img.name);
-            } else {
-              // Si es una imagen nueva, enviar el archivo
-              formData.append(`imagenes[${index}]`, img);
-            }
+            // Solo procesar archivos subidos (no del banco)
+            formData.append(`imagenes[${index}]`, img);
           });
         }
       }
@@ -400,14 +343,8 @@ const Categorias = ({ onSubmit }) => {
     // Añadir las imágenes si existen
     if (imagenes.length > 0) {
       imagenes.forEach((img, index) => {
-        if (img.isFromBank) {
-          // Si la imagen es del banco, enviar URL y nombre
-          formData.append(`imagenes_bank[${index}][url]`, img.url);
-          formData.append(`imagenes_bank[${index}][name]`, img.name);
-        } else {
-          // Si es una imagen nueva, enviar el archivo
-          formData.append(`imagenes[${index}]`, img);
-        }
+        // Solo procesar archivos subidos
+        formData.append(`imagenes[${index}]`, img);
       });
     }
     
@@ -721,21 +658,6 @@ const Categorias = ({ onSubmit }) => {
                     />
                   </label>
                   
-                  <button
-                    type="button"
-                    onClick={() => setShowImageBank(true)}
-                    className={`px-4 py-2 h-24 border-2 border-dashed rounded-lg transition-all duration-300 hover:scale-[1.02] flex flex-col items-center justify-center ${
-                      isDarkMode 
-                        ? 'border-purple-500 hover:bg-purple-600/20 hover:border-purple-400 text-purple-400' 
-                        : 'border-purple-300 hover:bg-purple-50 hover:border-purple-400 text-purple-600'
-                    }`}
-                    title="Seleccionar del banco de imágenes"
-                  >
-                    <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                    <span className="text-xs font-medium">Banco</span>
-                  </button>
                 </div>
               </div>
             </div>
@@ -1192,21 +1114,6 @@ const Categorias = ({ onSubmit }) => {
                       />
                     </label>
                     
-                    <button
-                      type="button"
-                      onClick={() => setShowEditImageBank(true)}
-                      className={`px-4 py-2 h-24 border-2 border-dashed rounded-lg transition-all duration-300 hover:scale-[1.02] flex flex-col items-center justify-center ${
-                        isDarkMode 
-                          ? 'border-purple-500 hover:bg-purple-600/20 hover:border-purple-400 text-purple-400' 
-                          : 'border-purple-300 hover:bg-purple-50 hover:border-purple-400 text-purple-600'
-                      }`}
-                      title="Seleccionar del banco de imágenes"
-                    >
-                      <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                      </svg>
-                      <span className="text-xs font-medium">Banco</span>
-                    </button>
                     
                     <button
                       type="button"
@@ -1298,18 +1205,7 @@ const Categorias = ({ onSubmit }) => {
         </div>
       )}
       
-      <ImageBankModal
-        isOpen={showImageBank}
-        onClose={() => setShowImageBank(false)}
-        onSelectImages={(images) => handleImageBankSelect(images)}
-      />
       
-      {/* ImageBankModal para edición */}
-      <ImageBankModal
-        isOpen={showEditImageBank}
-        onClose={() => setShowEditImageBank(false)}
-        onSelectImages={(images) => handleEditImageBankSelect(images)}
-      />
     </div>
   );
 };
