@@ -14,6 +14,7 @@ import Header from "@/Components/home/Header";
 import LabEquipmentSection from "@/Components/home/LabEquipmentSection";
 import ErrorBoundary from "@/Components/ErrorBoundary";
 import { useTheme } from "@/storage/ThemeContext";
+import UserProfileModal from "@/Components/UserProfileModal";
 
 export default function Welcome() {
     const { auth } = usePage().props;
@@ -21,6 +22,7 @@ export default function Welcome() {
     const [showUIElements, setShowUIElements] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [showProfileModal, setShowProfileModal] = useState(false);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -107,9 +109,12 @@ export default function Welcome() {
                                                 {auth.user?.name || "Usuario"}
                                             </div>
                                             
-                                            <Link
-                                                href="/profile"
-                                                className={`flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-all duration-200 ${
+                                            <button
+                                                onClick={() => {
+                                                    setShowProfileModal(true);
+                                                    setShowUserMenu(false);
+                                                }}
+                                                className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm rounded-lg transition-all duration-200 ${
                                                     isDarkMode
                                                         ? "hover:bg-gray-700 hover:text-white"
                                                         : "hover:bg-blue-50 hover:text-blue-700 hover:shadow-sm"
@@ -117,7 +122,7 @@ export default function Welcome() {
                                             >
                                                 <FiUser size={16} />
                                                 Mi Perfil
-                                            </Link>
+                                            </button>
                                             
                                             <hr className={`my-2 ${isDarkMode ? "border-gray-700" : "border-gray-200"}`} />
                                             
@@ -189,6 +194,13 @@ export default function Welcome() {
                     </main>
                     <Footer />
                 </div>
+
+                {/* User Profile Modal */}
+                <UserProfileModal
+                    isOpen={showProfileModal}
+                    onClose={() => setShowProfileModal(false)}
+                    user={auth.user}
+                />
             </div>
         </>
     );
