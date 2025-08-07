@@ -126,6 +126,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
     
     // Estados principales
     const [isOpen, setIsOpen] = useState(false);
+    const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState(false);
     const [mostrarProductos, setMostrarProductos] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedBrand, setSelectedBrand] = useState(null);
@@ -649,11 +650,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             : 'bg-gradient-to-br from-blue-50 via-white to-indigo-50'
     } transition-all duration-300`;
 
-    const sidebarClasses = `w-1/6 lg:w-1/4 2xl:w-1/5 flex-shrink-0 sticky top-0 h-screen overflow-y-auto p-6 ${
-        isDarkMode 
-            ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-r border-gray-700' 
-            : 'bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200'
-    } shadow-2xl ${isOpen ? 'z-0' : 'z-10'} transition-all duration-300`;
+    const sidebarClasses = `fixed top-0 left-0 z-40 h-screen w-4/5 max-w-sm p-6 overflow-y-auto transition-transform duration-300 ease-in-out ${isFilterSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:sticky lg:top-0 lg:translate-x-0 lg:w-1/4 2xl:w-1/5 lg:flex-shrink-0 ${isDarkMode ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-r border-gray-700' : 'bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200'} shadow-2xl lg:shadow-none`;
 
     const titleClasses = `text-2xl lg:text-3xl font-bold mb-2 ${
         isDarkMode ? 'text-white' : 'text-gray-900'
@@ -670,31 +667,37 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
             
+            {isFilterSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+                    onClick={() => setIsFilterSidebarOpen(false)}
+                ></div>
+            )}
+
             <div className={bgClasses}>
                 <div className="flex w-full">
                     {/* Sidebar de filtros */}
                     <div className={sidebarClasses} id="filtros-container">
-                        
-                        
                         <div className="flex justify-between items-center mb-6">
                             <div>
-                                <h2 className={`text-xl font-bold mb-2 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                } transition-colors duration-200`}>
+                                <h2 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>
                                     Filtros
                                 </h2>
-                                <div className={`h-0.5 w-12 rounded-full ${
-                                    isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
-                                }`}></div>
+                                <div className={`h-0.5 w-12 rounded-full ${isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'}`}></div>
                             </div>
-                            {auth.user && !mostrarFormularioFiltro && (
-                                <button
-                                    onClick={() => setMostrarFormularioFiltro(true)}
-                                    className={`py-1 px-2 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#1e3a8a] hover:bg-blue-700'} text-white rounded transition-colors duration-200 text-sm`}
-                                >
-                                    + Filtro
+                            <div className="flex items-center gap-2">
+                                {auth.user && !mostrarFormularioFiltro && (
+                                    <button
+                                        onClick={() => setMostrarFormularioFiltro(true)}
+                                        className={`py-1 px-2 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#1e3a8a] hover:bg-blue-700'} text-white rounded transition-colors duration-200 text-sm`}
+                                    >
+                                        + Filtro
+                                    </button>
+                                )}
+                                <button onClick={() => setIsFilterSidebarOpen(false)} className={`lg:hidden p-1 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`}>
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                                 </button>
-                            )}
+                            </div>
                         </div>
 
                         {/* Filtro de precio */}
@@ -960,6 +963,17 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
                     {/* Contenido principal */}
                     <div className="flex-1 p-6 lg:p-8 w-full space-y-2">
+                        <button
+                            onClick={() => setIsFilterSidebarOpen(true)}
+                            className={`lg:hidden flex items-center gap-2 px-6 py-3 mb-4 rounded-lg text-sm font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-blue-900 hover:bg-blue-800 text-white transition-colors duration-200' 
+                                    : 'bg-blue-800 hover:bg-blue-700 text-white transition-colors duration-200'
+                            }`}
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            <span>Mostrar Filtros</span>
+                        </button>
                         <div className="w-full">
                             {productos && productos.length > 0 ? (
                                 <>
