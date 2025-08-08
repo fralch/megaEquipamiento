@@ -19,31 +19,40 @@ const getEmbedUrl = (url) => {
     console.log('getEmbedUrl: Procesando URL:', url);
     
     try {
-        // Si ya es una URL embed, devolverla tal como está
+        // Si ya es una URL embed, verificar si es YouTube y agregar autoplay
         if (url.includes('/embed/') || url.includes('player.vimeo.com') || url.includes('player.')) {
-            console.log('getEmbedUrl: URL ya en formato embed, devolviendo tal como está');
+            console.log('getEmbedUrl: URL ya en formato embed');
+            
+            // Si es YouTube embed, agregar autoplay si no lo tiene
+            if (url.includes('youtube.com/embed/')) {
+                const hasAutoplay = url.includes('autoplay=');
+                if (!hasAutoplay) {
+                    const separator = url.includes('?') ? '&' : '?';
+                    return `${url}${separator}autoplay=1&mute=1`;
+                }
+            }
             return url;
         }
         
         // YouTube URLs normales
         if (url.includes('youtube.com/watch')) {
             const videoId = url.split('v=')[1]?.split('&')[0];
-            const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+            const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1` : null;
             console.log('getEmbedUrl: Convertido YouTube watch a embed:', embedUrl);
             return embedUrl;
         }
         
         if (url.includes('youtu.be/')) {
             const videoId = url.split('youtu.be/')[1]?.split('?')[0];
-            const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+            const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1` : null;
             console.log('getEmbedUrl: Convertido YouTube short a embed:', embedUrl);
             return embedUrl;
         }
         
-        // Vimeo URLs normales
+        // Vimeo URLs normales (Vimeo también soporta autoplay)
         if (url.includes('vimeo.com/') && !url.includes('player.vimeo.com')) {
             const videoId = url.split('vimeo.com/')[1]?.split('?')[0];
-            const embedUrl = videoId ? `https://player.vimeo.com/video/${videoId}` : null;
+            const embedUrl = videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1` : null;
             console.log('getEmbedUrl: Convertido Vimeo a embed:', embedUrl);
             return embedUrl;
         }
@@ -61,6 +70,7 @@ const getEmbedUrl = (url) => {
         return null;
     }
 };
+
 
 export default function Marcas({ marca, productos }) {
     const { isDarkMode } = useTheme();
