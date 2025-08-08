@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTheme } from '../../storage/ThemeContext';
-import ImageBankModal from './ImageBankModal';
 
 const EditSubcategoriaModal = ({ isOpen, onClose, subcategoria, onUpdate, categorias }) => {
   const { isDarkMode } = useTheme();
@@ -12,7 +11,6 @@ const EditSubcategoriaModal = ({ isOpen, onClose, subcategoria, onUpdate, catego
   });
   const [img, setImg] = useState(null);
   const [imgPreview, setImgPreview] = useState(null);
-  const [showImageBank, setShowImageBank] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
@@ -73,18 +71,6 @@ const EditSubcategoriaModal = ({ isOpen, onClose, subcategoria, onUpdate, catego
     setImgPreview(null);
   };
 
-  const handleImageBankSelect = (selectedImages) => {
-    if (selectedImages.length > 0) {
-      const selectedImage = selectedImages[0];
-      setImgPreview(selectedImage.url);
-      setImg({
-        url: selectedImage.url,
-        name: selectedImage.name,
-        isFromBank: true,
-      });
-      setShowImageBank(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,12 +89,7 @@ const EditSubcategoriaModal = ({ isOpen, onClose, subcategoria, onUpdate, catego
     formData.append('id_categoria', form.id_categoria);
 
     if (img) {
-      if (img.isFromBank) {
-        formData.append('img_url', img.url);
-        formData.append('img_name', img.name);
-      } else {
-        formData.append('img', img);
-      }
+      formData.append('img', img);
     } else if (imgPreview === null) {
         formData.append('remove_image', '1');
     }
@@ -231,22 +212,15 @@ const EditSubcategoriaModal = ({ isOpen, onClose, subcategoria, onUpdate, catego
               <label htmlFor="edit-img" className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Imagen
               </label>
-              <div className="mt-1 flex gap-2">
+              <div className="mt-1">
                 <input
                   type="file"
                   id="edit-img"
                   name="img"
                   onChange={handleImageChange}
-                  className={`flex-1 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${isDarkMode ? 'bg-gray-600 border-gray-500 text-white file:bg-gray-500 file:text-white file:border-gray-400' : 'bg-white border-gray-300 text-gray-900 file:bg-gray-50 file:text-gray-700'}`}
+                  className={`w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ${isDarkMode ? 'bg-gray-600 border-gray-500 text-white file:bg-gray-500 file:text-white file:border-gray-400' : 'bg-white border-gray-300 text-gray-900 file:bg-gray-50 file:text-gray-700'}`}
                   accept="image/jpeg,image/png,image/jpg,image/gif,image/webm,image/webp"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowImageBank(true)}
-                  className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium ${isDarkMode ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-green-500 text-white hover:bg-green-600'}`}
-                >
-                  Banco de Imágenes
-                </button>
               </div>
               <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 Tamaño máximo: 2MB. Formatos: JPEG, PNG, JPG, GIF, WEBM, WEBP
@@ -290,14 +264,6 @@ const EditSubcategoriaModal = ({ isOpen, onClose, subcategoria, onUpdate, catego
             </button>
           </div>
         </form>
-        
-        {showImageBank && (
-          <ImageBankModal
-            isOpen={showImageBank}
-            onClose={() => setShowImageBank(false)}
-            onSelectImages={handleImageBankSelect}
-          />
-        )}
       </div>
     </div>
   );
