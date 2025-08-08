@@ -461,9 +461,6 @@ const Subcategorias = ({ onSubmit }) => {
                 }`}>ID</th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                }`}>Imagen</th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>Nombre</th>
                 <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
@@ -483,28 +480,6 @@ const Subcategorias = ({ onSubmit }) => {
                 currentItems.map((subcategoria) => (
                   <tr key={subcategoria.id_subcategoria}>
                     <td className={`px-6 py-4 whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{subcategoria.id_subcategoria}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {subcategoria.img ? (
-                        <img 
-                          src={subcategoria.img} 
-                          alt={subcategoria.nombre}
-                          className={`h-12 w-12 object-cover rounded border ${
-                            isDarkMode ? 'border-gray-500' : 'border-gray-300'
-                          }`}
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className={`h-12 w-12 rounded border flex items-center justify-center text-xs ${
-                          isDarkMode ? 'border-gray-500 bg-gray-600 text-gray-400' : 'border-gray-300 bg-gray-100 text-gray-500'
-                        } ${subcategoria.img ? 'hidden' : 'flex'}`}
-                      >
-                        Sin imagen
-                      </div>
-                    </td>
                     <td className={`px-6 py-4 whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{subcategoria.nombre}</td>
                     <td className="px-6 py-4">
                       <div className={`max-w-xs truncate ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{subcategoria.descripcion || '-'}</div>
@@ -533,7 +508,7 @@ const Subcategorias = ({ onSubmit }) => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className={`px-6 py-4 text-center ${
+                  <td colSpan="5" className={`px-6 py-4 text-center ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
                   }`}>
                     No hay subcategorías disponibles
