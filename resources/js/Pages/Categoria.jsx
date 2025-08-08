@@ -12,6 +12,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
     const { auth } = usePage().props;
     const { isDarkMode } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [mostrarProductos, setMostrarProductos] = useState(false);
 
@@ -238,7 +239,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
             <div className={`min-w-screen min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'} flex flex-col md:flex-row transition-colors duration-200`}>
                 {/* Botón para mostrar/ocultar sidebar en móviles */}
                 <button 
-                    onClick={() => setIsOpen(!isOpen)} 
+                    onClick={() => setIsFilterOpen(!isFilterOpen)} 
                     className={`md:hidden fixed bottom-6 left-4 z-50 px-6 py-3 rounded-full 
                         ${isDarkMode 
                             ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white' 
@@ -247,7 +248,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                         shadow-lg flex items-center space-x-2 transition-all duration-300 hover:scale-105 active:scale-95`}
                 >
                     <svg 
-                        className={`w-5 h-5 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+                        className={`w-5 h-5 transition-transform duration-300 ${isFilterOpen ? 'rotate-180' : ''}`}
                         fill="none" 
                         strokeLinecap="round" 
                         strokeLinejoin="round" 
@@ -258,12 +259,12 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                         <path d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                     <span className="font-medium">
-                        {isOpen ? 'Cerrar' : 'Filtros'}
+                        {isFilterOpen ? 'Cerrar' : 'Filtros'}
                     </span>
                 </button>
 
                 {/* Sidebar con filtros y navegación */}
-                <div className={`fixed top-0 left-0 h-full z-40 md:relative md:w-1/4 lg:w-1/5 xl:w-1/6 p-4 space-y-4 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out ${isDarkMode ? 'bg-gray-800' : 'bg-white'} overflow-y-auto`}>
+                <div className={`fixed top-0 left-0 h-full z-40 md:relative md:w-1/4 lg:w-1/5 xl:w-1/6 p-4 space-y-4 transform ${isFilterOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out ${isDarkMode ? 'bg-gray-800' : 'bg-white'} overflow-y-auto`}>
                     {/* Filtro por Marca */}
                     <div className={`p-4 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
                         <h3 className={`font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Filtrar por Marca</h3>
@@ -401,7 +402,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                 </div>
 
                 {/* Contenido principal */}
-                <div className={`flex-1 p-4 transition-colors duration-200 md:ml-0 ${isOpen ? 'ml-0' : 'ml-0'}`}>
+                <div className={`flex-1 p-4 transition-colors duration-200 md:ml-0 ${isFilterOpen ? 'ml-0' : 'ml-0'}`}>
                     {/* Video de la categoría */}
                     {categoria && categoria.video && (
                         <div className={`mb-8 p-2 md:p-6 rounded-lg transition-colors duration-200 ${
