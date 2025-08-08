@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useTheme } from '../../storage/ThemeContext';
 import ImageBankModal from './ImageBankModal';
+import EditSubcategoriaModal from './EditSubcategoriaModal';
 
 const Subcategorias = ({ onSubmit }) => {
   const { isDarkMode } = useTheme();
@@ -22,6 +23,22 @@ const Subcategorias = ({ onSubmit }) => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const totalPages = Math.ceil(subcategorias.length / itemsPerPage);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedSubcategoria, setSelectedSubcategoria] = useState(null);
+
+  const handleOpenEditModal = (subcategoria) => {
+    setSelectedSubcategoria(subcategoria);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedSubcategoria(null);
+  };
+
+  const handleUpdateSubcategoria = (updatedSubcategoria) => {
+    fetchSubcategorias(); // Recargar la lista de subcategorías
+  };
 
   // Function to fetch categories
   const fetchCategorias = async () => {
@@ -471,12 +488,12 @@ const Subcategorias = ({ onSubmit }) => {
                       {categoriasOptions.find(cat => cat.id_categoria === subcategoria.id_categoria)?.nombre || ''}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {/* <button 
-                        onClick={() => console.log('Editar subcategoría:', subcategoria.id_subcategoria)}
+                      <button 
+                        onClick={() => handleOpenEditModal(subcategoria)}
                         className="text-indigo-600 hover:text-indigo-900 mr-3"
                       >
                         Editar
-                      </button> */}
+                      </button>
                       <button 
                         onClick={() => handleDeleteSubcategoria(subcategoria.id_subcategoria, subcategoria.nombre)}
                         disabled={deleteLoading}
@@ -587,6 +604,16 @@ const Subcategorias = ({ onSubmit }) => {
           isOpen={showImageBank}
           onClose={() => setShowImageBank(false)}
           onSelectImages={handleImageBankSelect}
+        />
+      )}
+
+      {isEditModalOpen && (
+        <EditSubcategoriaModal
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          subcategoria={selectedSubcategoria}
+          onUpdate={handleUpdateSubcategoria}
+          categorias={categoriasOptions}
         />
       )}
     </div>
