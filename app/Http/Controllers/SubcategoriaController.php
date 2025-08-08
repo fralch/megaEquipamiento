@@ -102,10 +102,27 @@ class SubcategoriaController extends Controller
             }
 
             $file = $request->file('img');
+            $categoria = Categoria::find($request->id_categoria);
+
+            // Sanitizar nombres para la ruta
+            $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($categoria->nombre));
+            $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized);
+            $subcategoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($request->nombre));
+            $subcategoryNameSanitized = preg_replace('/_+/', '_', $subcategoryNameSanitized);
+
+            // Crear la ruta del directorio
+            $subcategoryFolder = 'img/subcategorias/' . $subcategoryNameSanitized;
+            $fullPath = public_path($subcategoryFolder);
+
+            // Crear el directorio si no existe
+            if (!file_exists($fullPath)) {
+                mkdir($fullPath, 0777, true);
+            }
+
+            // Mover el archivo
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $folder = 'uploads/subcategorias/';
-            $file->move(public_path($folder), $fileName);
-            $subcategoria->img = $folder . $fileName;
+            $file->move($fullPath, $fileName);
+            $subcategoria->img = '/' . $subcategoryFolder . '/' . $fileName;
         } elseif ($request->img_url) {
             // Eliminar imagen anterior si existe
             if ($subcategoria->img && file_exists(public_path($subcategoria->img))) {
