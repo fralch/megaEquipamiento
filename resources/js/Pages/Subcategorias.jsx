@@ -963,16 +963,30 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
                     {/* Contenido principal */}
                     <div className="flex-1 p-6 lg:p-8 w-full space-y-2">
-                        <button
-                            onClick={() => setIsFilterSidebarOpen(true)}
-                            className={`lg:hidden flex items-center gap-2 px-6 py-3 mb-4 rounded-lg text-sm font-semibold shadow-lg transform hover:scale-105 transition-all duration-200 ${
-                                isDarkMode 
-                                    ? 'bg-blue-900 hover:bg-blue-800 text-white transition-colors duration-200' 
-                                    : 'bg-blue-800 hover:bg-blue-700 text-white transition-colors duration-200'
-                            }`}
+                        {/* Botón para mostrar/ocultar sidebar en móviles */}
+                        <button 
+                            onClick={() => setIsFilterSidebarOpen(!isFilterSidebarOpen)} 
+                            className={`lg:hidden fixed bottom-6 left-4 z-50 px-6 py-3 rounded-full 
+                                ${isDarkMode 
+                                    ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white' 
+                                    : 'bg-gradient-to-r from-blue-500 to-blue-700 text-white'
+                                } 
+                                shadow-lg flex items-center space-x-2 transition-all duration-300 hover:scale-105 active:scale-95`}
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                            <span>Mostrar Filtros</span>
+                            <svg 
+                                className={`w-5 h-5 transition-transform duration-300 ${isFilterSidebarOpen ? 'rotate-180' : ''}`}
+                                fill="none" 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth="2" 
+                                viewBox="0 0 24 24" 
+                                stroke="currentColor"
+                            >
+                                <path d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                            <span className="font-medium">
+                                {isFilterSidebarOpen ? 'Cerrar' : 'Filtros'}
+                            </span>
                         </button>
                         <div className="w-full">
                             {productos && productos.length > 0 ? (
