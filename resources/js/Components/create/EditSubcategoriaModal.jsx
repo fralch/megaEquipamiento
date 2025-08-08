@@ -22,7 +22,8 @@ const EditSubcategoriaModal = ({ isOpen, onClose, subcategoria, onUpdate, catego
         descripcion: subcategoria.descripcion || '',
         id_categoria: subcategoria.id_categoria || '',
       });
-      setImgPreview(subcategoria.img ? `/${subcategoria.img}` : null);
+      // La imagen ya viene con la barra inicial desde el backend
+      setImgPreview(subcategoria.img || null);
       setImg(null); // Reset image input on new subcategory
     }
   }, [subcategoria]);
@@ -45,7 +46,8 @@ const EditSubcategoriaModal = ({ isOpen, onClose, subcategoria, onUpdate, catego
     const file = e.target.files[0];
     if (!file) {
       setImg(null);
-      setImgPreview(subcategoria.img ? `/${subcategoria.img}` : null);
+      // La imagen ya viene con la barra inicial desde el backend
+      setImgPreview(subcategoria.img || null);
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
