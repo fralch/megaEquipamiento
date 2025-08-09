@@ -1,4 +1,3 @@
-<?php
 namespace App\Http\Controllers;
 
 use App\Models\Filtro;
@@ -17,7 +16,6 @@ class FiltroController extends Controller
         $filtros = Filtro::with(['opciones', 'subcategorias'])
             ->orderBy('orden')
             ->get();
-
         return response()->json($filtros);
     }
 
@@ -85,6 +83,7 @@ class FiltroController extends Controller
             }
 
             DB::commit();
+
             return response()->json($filtro->load(['opciones', 'subcategorias']), 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
@@ -156,6 +155,7 @@ class FiltroController extends Controller
                     ->toArray();
 
                 $opcionesAEliminar = array_diff($opcionesExistentes, $opcionesEnviadas);
+
                 if (!empty($opcionesAEliminar)) {
                     OpcionFiltro::whereIn('id_opcion', $opcionesAEliminar)->delete();
                 }
@@ -189,6 +189,7 @@ class FiltroController extends Controller
             }
 
             DB::commit();
+
             return response()->json($filtro->load(['opciones', 'subcategorias']));
         } catch (\Exception $e) {
             DB::rollBack();
@@ -248,80 +249,93 @@ class FiltroController extends Controller
         $subcategoriaId = $request->subcategoria_id;
         $query = Producto::where('id_subcategoria', $subcategoriaId);
 
+        // Si hay filtros seleccionados, aplicarlos a la consulta con OR
         if ($request->has('filtros') && !empty($request->filtros)) {
-            foreach ($request->filtros as $filtroId => $valorSeleccionado) {
-                $filtro = Filtro::find($filtroId);
-                if (!$filtro) {
-                    continue;
-                }
+            // Usar orWhere para combinar los filtros con OR en lugar de AND
+            $query->where(function($mainQuery) use ($request) {
+                $isFirstFilter = true;
 
-                switch ($filtro->tipo_input) {
-                    case 'checkbox':
-                        if (is_array($valorSeleccionado) && !empty($valorSeleccionado)) {
-                            $query->where(function($q) use ($filtro, $valorSeleccionado) {
-                                foreach ($valorSeleccionado as $opcionId) {
-                                    $opcion = OpcionFiltro::find($opcionId);
+                foreach ($request->filtros as $filtroId => $valorSeleccionado) {
+                    // Obtener el filtro para conocer su tipo
+                    $filtro = Filtro::find($filtroId);
+
+                    if (!$filtro) continue;
+
+                    // Para el primer filtro usar where, para los siguientes usar orWhere
+                    $whereMethod = $isFirstFilter ? 'where' : 'orWhere';
+                    $isFirstFilter = false;
+
+                    // Aplicar el filtro según su tipo usando OR entre filtros diferentes
+                    $mainQuery->$whereMethod(function($subQuery) use ($filtro, $valorSeleccionado) {
+                        switch ($filtro->tipo_input) {
+                            case 'checkbox':
+                                // Para checkbox, valorSeleccionado es un array de IDs de opciones
+                                if (is_array($valorSeleccionado) && !empty($valorSeleccionado)) {
+                                    $subQuery->where(function($q) use ($filtro, $valorSeleccionado) {
+                                        foreach ($valorSeleccionado as $opcionId) {
+                                            $opcion = OpcionFiltro::find($opcionId);
+                                            if ($opcion) {
+                                                // Normalizar el valor para búsqueda flexible
+                                                $valorNormalizado = trim(strtolower($opcion->valor));
+                                                // Búsqueda case-insensitive y flexible con espacios
+                                                $q->orWhere(function($subQ) use ($valorNormalizado) {
+                                                    $subQ->whereRaw('LOWER(REPLACE(caracteristicas, " ", "")) LIKE ?', ['%' . str_replace(' ', '', $valorNormalizado) . '%']);
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                                break;
+
+                            case 'radio':
+                            case 'select':
+                                // Para radio y select, valorSeleccionado es un único ID de opción
+                                if (!empty($valorSeleccionado)) {
+                                    $opcion = OpcionFiltro::find($valorSeleccionado);
                                     if ($opcion) {
                                         $valorNormalizado = trim(strtolower($opcion->valor));
-                                        $q->orWhere(function($subQ) use ($filtro, $valorNormalizado) {
-                                            $nombreFiltro = $filtro->nombre;
-                                            $jsonPath = '$.' . json_encode($nombreFiltro);
-                                            $subQ->whereRaw('LOWER(JSON_UNQUOTE(JSON_EXTRACT(caracteristicas, ?))) = ?', [$jsonPath, $valorNormalizado]);
-                                        });
+                                        // Búsqueda case-insensitive y flexible con espacios
+                                        $subQuery->whereRaw('LOWER(REPLACE(caracteristicas, " ", "")) LIKE ?', ['%' . str_replace(' ', '', $valorNormalizado) . '%']);
                                     }
                                 }
-                            });
-                        }
-                        break;
+                                break;
 
-                    case 'radio':
-                    case 'select':
-                        if (!empty($valorSeleccionado)) {
-                            $opcion = OpcionFiltro::find($valorSeleccionado);
-                            if ($opcion) {
-                                $valorNormalizado = trim(strtolower($opcion->valor));
-                                $nombreFiltro = $filtro->nombre;
-                                $jsonPath = '$.' . json_encode($nombreFiltro);
-                                $query->whereRaw('LOWER(JSON_UNQUOTE(JSON_EXTRACT(caracteristicas, ?))) = ?', [$jsonPath, $valorNormalizado]);
-                            }
-                        }
-                        break;
+                            case 'range':
+                                // Para range, valorSeleccionado es un objeto con min y max
+                                if (is_array($valorSeleccionado) && (isset($valorSeleccionado['min']) || isset($valorSeleccionado['max']))) {
+                                    $subQuery->where(function($q) use ($filtro, $valorSeleccionado) {
+                                        // Extraer valores numéricos de las características usando regex
+                                        // Busca patrones como "5kg", "10.5 cm", "100 watts", etc.
+                                        $campoNombre = strtolower($filtro->nombre);
 
-                    case 'range':
-                        if (is_array($valorSeleccionado) && (isset($valorSeleccionado['min']) || isset($valorSeleccionado['max']))) {
-                            $query->where(function($q) use ($filtro, $valorSeleccionado) {
-                                $campoNombre = strtolower($filtro->nombre);
+                                        // Aplicar filtro de valor mínimo si está definido
+                                        if (isset($valorSeleccionado['min']) && $valorSeleccionado['min'] !== null && $valorSeleccionado['min'] !== '') {
+                                            $minValue = (float) $valorSeleccionado['min'];
+                                            // Buscar números en las características que coincidan con el nombre del filtro
+                                            $q->whereRaw("CAST(REGEXP_REPLACE(
+                                                LOWER(caracteristicas),
+                                                CONCAT('.*', ?, '[^0-9]*([0-9]+(?:\.[0-9]+)?).*'),
+                                                '$1'
+                                            ) AS DECIMAL(10,2)) >= ?", [$campoNombre, $minValue]);
+                                        }
 
-                                if (isset($valorSeleccionado['min']) && $valorSeleccionado['min'] !== null && $valorSeleccionado['min'] !== '') {
-                                    $minValue = (float) $valorSeleccionado['min'];
-                                    $q->whereRaw("
-                                        CAST(
-                                            CASE
-                                                WHEN LOWER(caracteristicas) REGEXP CONCAT('.*', ?, '[^0-9]*[0-9]')
-                                                THEN REGEXP_REPLACE(LOWER(caracteristicas), CONCAT('.*', ?, '[^0-9]*([0-9]+(?:\\.[0-9]+)?).*'), '$1')
-                                                ELSE NULL
-                                            END
-                                        AS DECIMAL(10,2)) >= ?
-                                    ", [$campoNombre, $campoNombre, $minValue]);
+                                        // Aplicar filtro de valor máximo si está definido
+                                        if (isset($valorSeleccionado['max']) && $valorSeleccionado['max'] !== null && $valorSeleccionado['max'] !== '') {
+                                            $maxValue = (float) $valorSeleccionado['max'];
+                                            // Buscar números en las características que coincidan con el nombre del filtro
+                                            $q->whereRaw("CAST(REGEXP_REPLACE(
+                                                LOWER(caracteristicas),
+                                                CONCAT('.*', ?, '[^0-9]*([0-9]+(?:\.[0-9]+)?).*'),
+                                                '$1'
+                                            ) AS DECIMAL(10,2)) <= ?", [$campoNombre, $maxValue]);
+                                        }
+                                    });
                                 }
-
-                                if (isset($valorSeleccionado['max']) && $valorSeleccionado['max'] !== null && $valorSeleccionado['max'] !== '') {
-                                    $maxValue = (float) $valorSeleccionado['max'];
-                                    $q->whereRaw("
-                                        CAST(
-                                            CASE
-                                                WHEN LOWER(caracteristicas) REGEXP CONCAT('.*', ?, '[^0-9]*[0-9]')
-                                                THEN REGEXP_REPLACE(LOWER(caracteristicas), CONCAT('.*', ?, '[^0-9]*([0-9]+(?:\\.[0-9]+)?).*'), '$1')
-                                                ELSE NULL
-                                            END
-                                        AS DECIMAL(10,2)) <= ?
-                                    ", [$campoNombre, $campoNombre, $maxValue]);
-                                }
-                            });
+                                break;
                         }
-                        break;
+                    });
                 }
-            }
+            });
         }
 
         $productos = $query->with('marca')->get();

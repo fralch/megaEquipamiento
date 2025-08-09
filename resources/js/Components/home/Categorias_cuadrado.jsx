@@ -181,7 +181,7 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
 
             {/* Lista desplazable memoizada */}
             <div className={`space-y-2 h-40 overflow-y-auto scrollbar-thin ${isDarkMode ? 'scrollbar-thumb-gray-500 scrollbar-track-gray-700' : 'scrollbar-thumb-gray-600 scrollbar-track-gray-300'}`}>
-              {items.map((item) => (
+              {[...items].sort((a, b) => a.nombre.localeCompare(b.nombre)).map((item) => (
                 <SubcategoryLink
                   key={item.id_subcategoria}
                   item={item}
@@ -224,7 +224,8 @@ const Categories = () => {
       if (storedData && storedTimestamp && (currentTime - parseInt(storedTimestamp)) < CACHE_DURATION) {
         const parsedData = JSON.parse(storedData);
         if (Array.isArray(parsedData) && parsedData.length > 0) {
-          return parsedData;
+          // Ordenar las categorías alfabéticamente
+          return [...parsedData].sort((a, b) => a.nombre.localeCompare(b.nombre));
         }
       }
       // Limpiar datos obsoletos
@@ -266,8 +267,11 @@ const Categories = () => {
         throw new Error('Invalid API response format');
       }
       
-      setCategories(data);
-      saveCategoriesToStorage(data);
+      // Ordenar las categorías alfabéticamente
+      const sortedData = [...data].sort((a, b) => a.nombre.localeCompare(b.nombre));
+      
+      setCategories(sortedData);
+      saveCategoriesToStorage(sortedData);
       
     } catch (error) {
       console.error('Error fetching categories:', error);
