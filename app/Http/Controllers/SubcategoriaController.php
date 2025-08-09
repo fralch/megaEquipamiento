@@ -78,55 +78,61 @@ class SubcategoriaController extends Controller
             'nombre' => 'required|max:100',
             'descripcion' => 'nullable|string',
             'id_categoria' => 'required|exists:categorias,id_categoria',
-            'img' => 'nullable|file|mimes:jpeg,png,jpg,gif,webm|max:2048',
+            'img' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
+            'img_url' => 'nullable|string',
+            'remove_image' => 'nullable|boolean',
         ]);
-        
+
         // Actualizar campos básicos
         $subcategoria->nombre = $request->nombre;
         $subcategoria->descripcion = $request->descripcion;
-        
-        // Si ha cambiado la categoría
-        if ($subcategoria->id_categoria != $request->id_categoria) {
-            $subcategoria->id_categoria = $request->id_categoria;
-        }
-        
-        // Procesar imagen si existe una nueva
-        if ($request->hasFile('img')) {
-            // Obtener la categoría relacionada
-            $categoria = Categoria::find($request->id_categoria);
-            
-            // Sanitize names
-            $subcategoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($request->nombre));
-            $subcategoryNameSanitized = preg_replace('/_+/', '_', $subcategoryNameSanitized);
-            
-            $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($categoria->nombre));
-            $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized);
-            
-            // Crear directorio específico para esta subcategoría
-            $subcategoryFolder = 'img/categorias/' . $categoryNameSanitized . '/subcategorias/' . $subcategoryNameSanitized;
-            $fullPath = public_path($subcategoryFolder);
-            
-            // Crear el directorio si no existe
-            if (!file_exists($fullPath)) {
-                mkdir($fullPath, 0777, true);
-            }
-            
+        $subcategoria->id_categoria = $request->id_categoria;
+
+        // Procesar imagen
+        if ($request->remove_image) {
             // Eliminar imagen anterior si existe
             if ($subcategoria->img && file_exists(public_path($subcategoria->img))) {
                 unlink(public_path($subcategoria->img));
             }
-            
-            $file = $request->file('img');
-            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $destinationPath = $fullPath . '/' . $fileName;
-            
-            if (move_uploaded_file($file->getPathname(), $destinationPath)) {
-                $subcategoria->img = '/' . $subcategoryFolder . '/' . $fileName;
+            $subcategoria->img = null;
+        } elseif ($request->hasFile('img')) {
+            // Eliminar imagen anterior si existe
+            if ($subcategoria->img && file_exists(public_path($subcategoria->img))) {
+                unlink(public_path($subcategoria->img));
             }
+
+            $file = $request->file('img');
+            $categoria = Categoria::find($request->id_categoria);
+
+            // Sanitizar nombres para la ruta
+            $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($categoria->nombre));
+            $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized);
+            $subcategoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($request->nombre));
+            $subcategoryNameSanitized = preg_replace('/_+/', '_', $subcategoryNameSanitized);
+
+            // Crear la ruta del directorio
+            $subcategoryFolder = 'img/subcategorias/' . $subcategoryNameSanitized;
+            $fullPath = public_path($subcategoryFolder);
+
+            // Crear el directorio si no existe
+            if (!file_exists($fullPath)) {
+                mkdir($fullPath, 0777, true);
+            }
+
+            // Mover el archivo
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($fullPath, $fileName);
+            $subcategoria->img = '/' . $subcategoryFolder . '/' . $fileName;
+        } elseif ($request->img_url) {
+            // Eliminar imagen anterior si existe
+            if ($subcategoria->img && file_exists(public_path($subcategoria->img))) {
+                unlink(public_path($subcategoria->img));
+            }
+            $subcategoria->img = $request->img_url;
         }
-        
+
         $subcategoria->save();
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Subcategoría actualizada exitosamente.',
@@ -169,7 +175,7 @@ class SubcategoriaController extends Controller
     // Obtener todas las subcategorías
     public function getSubcategorias()
     {
-        $subcategorias = Subcategoria::all();
+        $subcategorias = Subcategoria::select('id_subcategoria', 'nombre', 'descripcion', 'id_categoria', 'img')->get();
         return response()->json($subcategorias);
     }
 

@@ -298,9 +298,15 @@ const ProductPage = ({ producto }) => {
                 console.log('Texto después de limpiar:', valueToSave);
             }
             
-            // Validar que el texto no esté vacío después de la limpieza
-            if (!valueToSave.trim()) {
+            // Validar que el texto no esté vacío después de la limpieza (excepto para campos de precio)
+            if (field !== 'precio_ganancia' && field !== 'precio_igv' && !valueToSave.trim()) {
                 alert('El contenido no puede estar vacío.');
+                return;
+            }
+            
+            // Validación especial para campos de precio
+            if ((field === 'precio_ganancia' || field === 'precio_igv') && (valueToSave === '' || isNaN(parseFloat(valueToSave)) || parseFloat(valueToSave) < 0)) {
+                alert('El precio debe ser un número válido mayor o igual a 0.');
                 return;
             }
             
@@ -311,6 +317,16 @@ const ProductPage = ({ producto }) => {
                 id_producto: producto.id_producto,
                 [field]: valueToSave
             };
+            
+            // Si se está guardando precio_ganancia, también incluir el precio_igv calculado
+            if (field === 'precio_ganancia' && tempInputs.precio_igv) {
+                dataToSend.precio_igv = tempInputs.precio_igv;
+            }
+            
+            // Si se está guardando precio_igv, también incluir el precio_ganancia calculado
+            if (field === 'precio_igv' && tempInputs.precio_ganancia) {
+                dataToSend.precio_ganancia = tempInputs.precio_ganancia;
+            }
             
             console.log('Enviando al servidor:', dataToSend);
             
@@ -328,9 +344,22 @@ const ProductPage = ({ producto }) => {
 
             // Solo actualizar el estado si todo salió bien
             if (response.status === 200) {
+                // Actualizar el estado con el campo editado
+                const updateData = { [field]: valueToSave };
+                
+                // Si se guardó precio_ganancia, también actualizar precio_igv
+                if (field === 'precio_ganancia' && tempInputs.precio_igv) {
+                    updateData.precio_igv = tempInputs.precio_igv;
+                }
+                
+                // Si se guardó precio_igv, también actualizar precio_ganancia
+                if (field === 'precio_igv' && tempInputs.precio_ganancia) {
+                    updateData.precio_ganancia = tempInputs.precio_ganancia;
+                }
+
                 setProductData(prev => ({
                     ...prev,
-                    [field]: valueToSave
+                    ...updateData
                 }));
 
                 setEditMode(prev => ({
@@ -341,6 +370,13 @@ const ProductPage = ({ producto }) => {
                 setTempInputs(prev => {
                     const newInputs = { ...prev };
                     delete newInputs[field];
+                    // También limpiar el campo relacionado si existe
+                    if (field === 'precio_ganancia') {
+                        delete newInputs.precio_igv;
+                    }
+                    if (field === 'precio_igv') {
+                        delete newInputs.precio_ganancia;
+                    }
                     return newInputs;
                 });
                 

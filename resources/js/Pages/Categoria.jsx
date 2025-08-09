@@ -12,6 +12,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
     const { auth } = usePage().props;
     const { isDarkMode } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [mostrarProductos, setMostrarProductos] = useState(false);
 
@@ -235,11 +236,37 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
-            <div className={`min-w-screen min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'} flex transition-colors duration-200`}>
+            <div className={`min-w-screen min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'} flex flex-col md:flex-row transition-colors duration-200`}>
+                {/* Botón para mostrar/ocultar sidebar en móviles */}
+                <button 
+                    onClick={() => setIsFilterOpen(!isFilterOpen)} 
+                    className={`md:hidden fixed bottom-6 left-4 z-50 px-6 py-3 rounded-full 
+                        ${isDarkMode 
+                            ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white' 
+                            : 'bg-gradient-to-r from-blue-500 to-blue-700 text-white'
+                        } 
+                        shadow-lg flex items-center space-x-2 transition-all duration-300 hover:scale-105 active:scale-95`}
+                >
+                    <svg 
+                        className={`w-5 h-5 transition-transform duration-300 ${isFilterOpen ? 'rotate-180' : ''}`}
+                        fill="none" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth="2" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                    >
+                        <path d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                    <span className="font-medium">
+                        {isFilterOpen ? 'Cerrar' : 'Filtros'}
+                    </span>
+                </button>
+
                 {/* Sidebar con filtros y navegación */}
-                <div className="w-1/6 p-4 space-y-4">
+                <div className={`fixed top-0 left-0 h-full z-40 md:relative md:w-1/4 lg:w-1/5 xl:w-1/6 p-4 space-y-4 transform ${isFilterOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out ${isDarkMode ? 'bg-gray-800' : 'bg-white'} overflow-y-auto`}>
                     {/* Filtro por Marca */}
-                    <div className={`p-4 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
+                    <div className={`p-4 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
                         <h3 className={`font-bold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Filtrar por Marca</h3>
                         <div className="space-y-2">
                             {/* Opción para mostrar todas las marcas */}
@@ -276,18 +303,16 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                     <nav 
                         className={`p-4 overflow-y-auto shadow-2xl transition-all duration-200 rounded-lg ${
                             isDarkMode 
-                                ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800' 
-                                : 'bg-gradient-to-b from-white via-gray-50 to-white'
+                                ? 'bg-gradient-to-b from-gray-900 via-black to-gray-900' 
+                                : 'bg-gradient-to-b from-gray-100 via-white to-gray-100'
                         }`} 
                         id="nav-fijo"
                     >
                         <div className="space-y-2">
                             {todasCategorias && todasCategorias.length > 0 ? (() => {
-                                // Ordenar categorías: la seleccionada primero, luego las demás
                                 const categoriasOrdenadas = [...todasCategorias].sort((a, b) => {
                                     const aEsActual = categoria && categoria.id_categoria === a.id_categoria;
                                     const bEsActual = categoria && categoria.id_categoria === b.id_categoria;
-                                    
                                     if (aEsActual && !bEsActual) return -1;
                                     if (!aEsActual && bEsActual) return 1;
                                     return 0;
@@ -301,7 +326,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                                             <button
                                                 onClick={toggleSubcategoryDropdown}
                                                 className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold flex items-center justify-between animate-slideIn ${
-                                                    isDarkMode ? 'bg-[#1e3a8a] text-white shadow-md' : 'bg-[#1e3a8a] text-white shadow-md'
+                                                    isDarkMode ? 'bg-blue-800 text-white shadow-md' : 'bg-blue-600 text-white shadow-md'
                                                 }`}
                                                 style={{ animationDelay: `${catIndex * 0.05}s` }}
                                             >
@@ -337,7 +362,6 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                                             </Link>
                                         )}
 
-                                        {/* Mostrar subcategorías solo para la categoría actual */}
                                         {isCurrentCategory && isSubcategoryDropdownOpen && subcategorias && subcategorias.length > 0 && (
                                             <div className="ml-3 space-y-1 animate-slideDown">
                                                 {subcategorias.map((subcategoria, subIndex) => (
@@ -378,13 +402,13 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                 </div>
 
                 {/* Contenido principal */}
-                <div className={`flex-1 p-4 transition-colors duration-200`}>
+                <div className={`flex-1 p-4 transition-colors duration-200 md:ml-0 ${isFilterOpen ? 'ml-0' : 'ml-0'}`}>
                     {/* Video de la categoría */}
                     {categoria && categoria.video && (
-                        <div className={`mb-8 p-6 rounded-lg transition-colors duration-200 ${
+                        <div className={`mb-8 p-2 md:p-6 rounded-lg transition-colors duration-200 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
                         }`}>
-                            <h2 className={`text-xl font-bold mb-4 ${
+                            <h2 className={`text-lg md:text-xl font-bold mb-4 ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
                                 Categoría: {categoria.nombre}
@@ -403,8 +427,8 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                     
                     {productos && productos.length > 0 ? (
                         <>
-                          <div className="flex items-center justify-between mb-4">
-                            <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>
+                          <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4">
+                            <h1 className={`text-xl md:text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200 mb-2 md:mb-0`}>
                                 Categoría: {categoria ? categoria.nombre : 'Sin categoría'}
                                 {selectedBrand && (
                                     <span className="text-sm font-normal ml-2 opacity-75">
@@ -429,24 +453,24 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                         </>
                     ) : (
                         <>
-                        <h1 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>Categoría: {categoria ? categoria.nombre : 'Sin categoría'}</h1>
+                        <h1 className={`text-xl md:text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>Categoría: {categoria ? categoria.nombre : 'Sin categoría'}</h1>
                         <div className="text-center py-10">
-                          <p className={`text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} transition-colors duration-200`}>No hay productos relacionados a esta categoría.</p>
+                          <p className={`text-lg md:text-xl ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} transition-colors duration-200`}>No hay productos relacionados a esta categoría.</p>
                         </div>
-                        <button onClick={handleMostrarProductos} className={`${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#1e3a8a] hover:bg-blue-800'} text-white py-2 px-4 rounded transition-all duration-200 mb-4 mx-auto block`}>Mostrar productos</button>
+                        <button onClick={handleMostrarProductos} className={`${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-700 hover:bg-blue-800'} text-white py-2 px-4 rounded transition-all duration-200 mb-4 mx-auto block`}>Mostrar productos</button>
                         {mostrarProductos && <ProductGrid products={filteredProducts} />}
                         </>
                     )}
 
                     {/* Sección de marcas integrada */}
                     {marcas && marcas.length > 0 && (
-                        <div className={`p-8 mt-8 transition-colors duration-300 ${
+                        <div className={`p-4 md:p-8 mt-8 transition-colors duration-300 ${
                             isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
                         } rounded-lg`}>
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className={`text-2xl font-bold transition-colors duration-300 ${
+                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
+                                <h2 className={`text-xl md:text-2xl font-bold transition-colors duration-300 ${
                                     isDarkMode ? 'text-white' : 'text-gray-900'
-                                }`}>
+                                } mb-2 md:mb-0`}>
                                     Marcas Disponibles en esta Categoría
                                 </h2>
                                 {selectedBrand && (
@@ -458,19 +482,13 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                                 )}
                             </div>
                             
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
                                 {marcas.map((marca) => (
                                     <CategoryBrandCard key={marca.id_marca} brand={marca} />
                                 ))}
                             </div>
                         </div>
                     )}
-
-                     <div className="flex justify-center">
-                        <Link href="/crear" className={`fixed bottom-8 right-8 w-14 h-14 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#1e3a8a] hover:bg-blue-800'} text-white rounded-full flex items-center justify-center shadow-lg text-2xl transition-all duration-200 hover:scale-110`}>
-                            +
-                        </Link>
-                    </div>
                 </div>
             </div>
             <Footer />

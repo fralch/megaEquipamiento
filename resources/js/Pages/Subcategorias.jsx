@@ -126,6 +126,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
     
     // Estados principales
     const [isOpen, setIsOpen] = useState(false);
+    const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState(false);
     const [mostrarProductos, setMostrarProductos] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedBrand, setSelectedBrand] = useState(null);
@@ -149,6 +150,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
     const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
     const [filtroAEliminar, setFiltroAEliminar] = useState(null);
     const [subcategoriasColapsadas, setSubcategoriasColapsadas] = useState(false);
+    const [paisSeleccionado, setPaisSeleccionado] = useState('');
     
     // Estado del nuevo filtro
     const [nuevoFiltro, setNuevoFiltro] = useState({
@@ -167,6 +169,17 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
     const getSubcategoriaId = () => {
         const urlParts = window.location.pathname.split('/');
         return urlParts[urlParts.length - 1];
+    };
+
+    // Función para obtener países únicos de los productos
+    const getPaisesUnicos = () => {
+        const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
+        const paises = productosBase
+            .map(producto => producto.pais)
+            .filter(pais => pais && pais.trim() !== '')
+            .filter((pais, index, self) => self.indexOf(pais) === index)
+            .sort();
+        return paises;
     };
 
     // Función para hacer peticiones HTTP
@@ -197,9 +210,28 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
     // Handlers de filtros
     const handleBrandFilter = (marcaId) => {
         setSelectedBrand(String(marcaId));
-        const productosFiltrados = productosOriginales.filter(product => 
+        
+        let productosFiltrados = productosOriginales.filter(product => 
             String(product.marca_id) === String(marcaId)
         );
+        
+        // Aplicar filtro de país si existe
+        if (paisSeleccionado) {
+            productosFiltrados = productosFiltrados.filter(product => 
+                product.pais === paisSeleccionado
+            );
+        }
+        
+        // Aplicar filtros de precio si existen
+        const precioMin = parseFloat(document.getElementById('min-price')?.value) || 0;
+        const precioMax = parseFloat(document.getElementById('max-price')?.value) || Infinity;
+        if (precioMin > 0 || precioMax < Infinity) {
+            productosFiltrados = productosFiltrados.filter(product => {
+                const precio = parseFloat(product.precio_igv);
+                return precio >= precioMin && precio <= precioMax;
+            });
+        }
+        
         setProductos(productosFiltrados);
         setMostrarProductos(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -207,7 +239,27 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
     const clearBrandFilter = () => {
         setSelectedBrand(null);
-        setProductos(productosOriginales);
+        
+        let productosFiltrados = productosOriginales;
+        
+        // Aplicar filtro de país si existe
+        if (paisSeleccionado) {
+            productosFiltrados = productosFiltrados.filter(product => 
+                product.pais === paisSeleccionado
+            );
+        }
+        
+        // Aplicar filtros de precio si existen
+        const precioMin = parseFloat(document.getElementById('min-price')?.value) || 0;
+        const precioMax = parseFloat(document.getElementById('max-price')?.value) || Infinity;
+        if (precioMin > 0 || precioMax < Infinity) {
+            productosFiltrados = productosFiltrados.filter(product => {
+                const precio = parseFloat(product.precio_igv);
+                return precio >= precioMin && precio <= precioMax;
+            });
+        }
+        
+        setProductos(productosFiltrados);
     };
 
     const filtrarPorPrecio = () => {
@@ -220,9 +272,17 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             return precio >= precioMin && precio <= precioMax;
         });
         
+        // Aplicar filtro de marca si existe
         if (selectedBrand) {
             productosFiltrados = productosFiltrados.filter(product => 
                 String(product.marca_id) === String(selectedBrand)
+            );
+        }
+        
+        // Aplicar filtro de país si existe
+        if (paisSeleccionado) {
+            productosFiltrados = productosFiltrados.filter(product => 
+                product.pais === paisSeleccionado
             );
         }
         
@@ -234,14 +294,81 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         document.getElementById('min-price').value = '';
         document.getElementById('max-price').value = '';
         
+        let productosFiltrados = productosOriginales;
+        
+        // Aplicar filtro de marca si existe
         if (selectedBrand) {
-            const productosFiltradosPorMarca = productosOriginales.filter(product => 
+            productosFiltrados = productosFiltrados.filter(product => 
                 String(product.marca_id) === String(selectedBrand)
             );
-            setProductos(productosFiltradosPorMarca);
-        } else {
-            setProductos(productosOriginales);
         }
+        
+        // Aplicar filtro de país si existe
+        if (paisSeleccionado) {
+            productosFiltrados = productosFiltrados.filter(product => 
+                product.pais === paisSeleccionado
+            );
+        }
+        
+        setProductos(productosFiltrados);
+    };
+
+    const filtrarPorPais = (pais) => {
+        setPaisSeleccionado(pais);
+        
+        let productosFiltrados = productosOriginales;
+        
+        // Aplicar filtro de país
+        if (pais) {
+            productosFiltrados = productosFiltrados.filter(product => 
+                product.pais === pais
+            );
+        }
+        
+        // Aplicar filtro de marca si existe
+        if (selectedBrand) {
+            productosFiltrados = productosFiltrados.filter(product => 
+                String(product.marca_id) === String(selectedBrand)
+            );
+        }
+        
+        // Aplicar filtros de precio si existen
+        const precioMin = parseFloat(document.getElementById('min-price')?.value) || 0;
+        const precioMax = parseFloat(document.getElementById('max-price')?.value) || Infinity;
+        if (precioMin > 0 || precioMax < Infinity) {
+            productosFiltrados = productosFiltrados.filter(product => {
+                const precio = parseFloat(product.precio_igv);
+                return precio >= precioMin && precio <= precioMax;
+            });
+        }
+        
+        setProductos(productosFiltrados);
+        setMostrarProductos(true);
+    };
+
+    const limpiarFiltroPais = () => {
+        setPaisSeleccionado('');
+        
+        let productosFiltrados = productosOriginales;
+        
+        // Aplicar filtro de marca si existe
+        if (selectedBrand) {
+            productosFiltrados = productosFiltrados.filter(product => 
+                String(product.marca_id) === String(selectedBrand)
+            );
+        }
+        
+        // Aplicar filtros de precio si existen
+        const precioMin = parseFloat(document.getElementById('min-price')?.value) || 0;
+        const precioMax = parseFloat(document.getElementById('max-price')?.value) || Infinity;
+        if (precioMin > 0 || precioMax < Infinity) {
+            productosFiltrados = productosFiltrados.filter(product => {
+                const precio = parseFloat(product.precio_igv);
+                return precio >= precioMin && precio <= precioMax;
+            });
+        }
+        
+        setProductos(productosFiltrados);
     };
 
     // Handlers de CRUD de filtros
@@ -429,20 +556,40 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                 setMostrarProductos(true);
 
                 let resultado = productosFiltrados;
+                
+                // Aplicar filtro de marca si existe
                 if (selectedBrand) {
-                    resultado = productosFiltrados.filter(product => 
+                    resultado = resultado.filter(product => 
                         String(product.marca_id) === String(selectedBrand)
+                    );
+                }
+                
+                // Aplicar filtro de país si existe
+                if (paisSeleccionado) {
+                    resultado = resultado.filter(product => 
+                        product.pais === paisSeleccionado
                     );
                 }
                 setProductos(resultado); // Si resultado es [], se muestra vacío
                 setProductosOriginales(productosFiltrados); // Opcional, según tu lógica
             } else {
-                // Si no hay filtros seleccionados, solo filtra por marca si corresponde
+                // Si no hay filtros seleccionados, aplica filtros de marca y/o país si corresponde
+                let productosFiltrados = productosOriginales;
+                
                 if (selectedBrand) {
-                    const productosFiltradosPorMarca = productosOriginales.filter(product => 
+                    productosFiltrados = productosFiltrados.filter(product => 
                         String(product.marca_id) === String(selectedBrand)
                     );
-                    setProductos(productosFiltradosPorMarca);
+                }
+                
+                if (paisSeleccionado) {
+                    productosFiltrados = productosFiltrados.filter(product => 
+                        product.pais === paisSeleccionado
+                    );
+                }
+                
+                if (selectedBrand || paisSeleccionado) {
+                    setProductos(productosFiltrados);
                     setMostrarProductos(true);
                 } else {
                     // No recargues todos los productos aquí, solo muestra vacío si no hay productos
@@ -513,11 +660,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             : 'bg-gradient-to-br from-blue-50 via-white to-indigo-50'
     } transition-all duration-300`;
 
-    const sidebarClasses = `w-1/6 lg:w-1/4 2xl:w-1/5 flex-shrink-0 sticky top-0 h-screen overflow-y-auto p-6 ${
-        isDarkMode 
-            ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-r border-gray-700' 
-            : 'bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200'
-    } shadow-2xl ${isOpen ? 'z-0' : 'z-10'} transition-all duration-300`;
+    const sidebarClasses = `fixed top-0 left-0 z-40 h-screen w-4/5 max-w-sm p-6 overflow-y-auto transition-transform duration-300 ease-in-out ${isFilterSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:sticky lg:top-0 lg:translate-x-0 lg:w-1/4 2xl:w-1/5 lg:flex-shrink-0 ${isDarkMode ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-r border-gray-700' : 'bg-gradient-to-b from-white via-gray-50 to-white border-r border-gray-200'} shadow-2xl lg:shadow-none`;
 
     const titleClasses = `text-2xl lg:text-3xl font-bold mb-2 ${
         isDarkMode ? 'text-white' : 'text-gray-900'
@@ -534,31 +677,37 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
             
+            {isFilterSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+                    onClick={() => setIsFilterSidebarOpen(false)}
+                ></div>
+            )}
+
             <div className={bgClasses}>
                 <div className="flex w-full">
                     {/* Sidebar de filtros */}
                     <div className={sidebarClasses} id="filtros-container">
-                        
-                        
                         <div className="flex justify-between items-center mb-6">
                             <div>
-                                <h2 className={`text-xl font-bold mb-2 ${
-                                    isDarkMode ? 'text-white' : 'text-gray-900'
-                                } transition-colors duration-200`}>
+                                <h2 className={`text-xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'} transition-colors duration-200`}>
                                     Filtros
                                 </h2>
-                                <div className={`h-0.5 w-12 rounded-full ${
-                                    isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
-                                }`}></div>
+                                <div className={`h-0.5 w-12 rounded-full ${isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'}`}></div>
                             </div>
-                            {auth.user && !mostrarFormularioFiltro && (
-                                <button
-                                    onClick={() => setMostrarFormularioFiltro(true)}
-                                    className={`py-1 px-2 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#1e3a8a] hover:bg-blue-700'} text-white rounded transition-colors duration-200 text-sm`}
-                                >
-                                    + Filtro
+                            <div className="flex items-center gap-2">
+                                {auth.user && !mostrarFormularioFiltro && (
+                                    <button
+                                        onClick={() => setMostrarFormularioFiltro(true)}
+                                        className={`py-1 px-2 ${isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-[#1e3a8a] hover:bg-blue-700'} text-white rounded transition-colors duration-200 text-sm`}
+                                    >
+                                        + Filtro
+                                    </button>
+                                )}
+                                <button onClick={() => setIsFilterSidebarOpen(false)} className={`lg:hidden p-1 rounded-full transition-colors ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-100'}`}>
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                                 </button>
-                            )}
+                            </div>
                         </div>
 
                         {/* Filtro de precio */}
@@ -616,6 +765,59 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                 </button>
                             </div>
                         </div>
+
+                        {/* Filtro por país */}
+                        {getPaisesUnicos().length > 0 && (
+                            <div className={`country-filter-container p-4 rounded-xl shadow-lg mb-6 transition-all duration-200 border ${
+                                isDarkMode 
+                                    ? 'bg-gray-700/50 border-gray-600/50' 
+                                    : 'bg-white border-gray-200'
+                            }`}>
+                                <h3 className={`text-lg font-semibold mb-4 ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                } transition-colors duration-200`}>
+                                    Filtrar por País
+                                </h3>
+                                
+                                <div className="mb-4">
+                                    <select
+                                        value={paisSeleccionado}
+                                        onChange={(e) => filtrarPorPais(e.target.value)}
+                                        className={`w-full p-2 rounded-lg text-sm transition-all duration-200 ${
+                                            isDarkMode 
+                                                ? 'bg-gray-600 border-gray-500 text-white' 
+                                                : 'bg-white border-gray-300 text-gray-900'
+                                        } focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                    >
+                                        <option value="">Todos los países</option>
+                                        {getPaisesUnicos().map((pais) => (
+                                            <option key={pais} value={pais}>
+                                                {pais}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {paisSeleccionado && (
+                                    <div className="flex justify-between mt-4">
+                                        <button 
+                                            className={`${isDarkMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-500 hover:bg-gray-600'} text-white py-2 px-4 rounded-md text-sm font-medium transition-colors duration-200`} 
+                                            onClick={limpiarFiltroPais}
+                                        >
+                                            Limpiar Filtro
+                                        </button>
+                                        <span className={`text-xs ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                        } flex items-center`}>
+                                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                                            </svg>
+                                            País: {paisSeleccionado}
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         {/* Contenido de filtros */}
                         {mostrarFormularioFiltro ? (
@@ -771,6 +973,31 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
                     {/* Contenido principal */}
                     <div className="flex-1 p-6 lg:p-8 w-full space-y-2">
+                        {/* Botón para mostrar/ocultar sidebar en móviles */}
+                        <button 
+                            onClick={() => setIsFilterSidebarOpen(!isFilterSidebarOpen)} 
+                            className={`lg:hidden fixed bottom-6 left-4 z-50 px-6 py-3 rounded-full 
+                                ${isDarkMode 
+                                    ? 'bg-gradient-to-r from-blue-600 to-blue-800 text-white' 
+                                    : 'bg-gradient-to-r from-blue-500 to-blue-700 text-white'
+                                } 
+                                shadow-lg flex items-center space-x-2 transition-all duration-300 hover:scale-105 active:scale-95`}
+                        >
+                            <svg 
+                                className={`w-5 h-5 transition-transform duration-300 ${isFilterSidebarOpen ? 'rotate-180' : ''}`}
+                                fill="none" 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth="2" 
+                                viewBox="0 0 24 24" 
+                                stroke="currentColor"
+                            >
+                                <path d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                            <span className="font-medium">
+                                {isFilterSidebarOpen ? 'Cerrar' : 'Filtros'}
+                            </span>
+                        </button>
                         <div className="w-full">
                             {productos && productos.length > 0 ? (
                                 <>
@@ -784,23 +1011,39 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                                         {categoriaNombre} /
                                                     </span>
                                                 </Link> {subcategoriaNombre}
-                                                {selectedBrand && (
+                                                {(selectedBrand || paisSeleccionado) && (
                                                     <span className="text-sm font-normal ml-2 opacity-75">
-                                                        - Filtrado por marca
+                                                        - Filtrado{selectedBrand ? ' por marca' : ''}{(selectedBrand && paisSeleccionado) ? ' y' : ''}{paisSeleccionado ? ` por país (${paisSeleccionado})` : ''}
                                                     </span>
                                                 )}
                                             </h1>
-                                            {selectedBrand && (
-                                                <button
-                                                    onClick={clearBrandFilter}
-                                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                                        isDarkMode 
-                                                            ? 'bg-red-600 hover:bg-red-700 text-white' 
-                                                            : 'bg-red-500 hover:bg-red-600 text-white'
-                                                    }`}
-                                                >
-                                                    Limpiar Filtro de Marca
-                                                </button>
+                                            {(selectedBrand || paisSeleccionado) && (
+                                                <div className="flex gap-2">
+                                                    {selectedBrand && (
+                                                        <button
+                                                            onClick={clearBrandFilter}
+                                                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                                                isDarkMode 
+                                                                    ? 'bg-red-600 hover:bg-red-700 text-white' 
+                                                                    : 'bg-red-500 hover:bg-red-600 text-white'
+                                                            }`}
+                                                        >
+                                                            Limpiar Marca
+                                                        </button>
+                                                    )}
+                                                    {paisSeleccionado && (
+                                                        <button
+                                                            onClick={limpiarFiltroPais}
+                                                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                                                isDarkMode 
+                                                                    ? 'bg-orange-600 hover:bg-orange-700 text-white' 
+                                                                    : 'bg-orange-500 hover:bg-orange-600 text-white'
+                                                            }`}
+                                                        >
+                                                            Limpiar País
+                                                        </button>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
                                         <p className={`text-lg ${
@@ -828,23 +1071,39 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                                         {categoriaNombre} /
                                                     </span>
                                                 </Link> {subcategoriaNombre}
-                                                {selectedBrand && (
+                                                {(selectedBrand || paisSeleccionado) && (
                                                     <span className="text-sm font-normal ml-2 opacity-75">
-                                                        - Filtrado por marca
+                                                        - Filtrado{selectedBrand ? ' por marca' : ''}{(selectedBrand && paisSeleccionado) ? ' y' : ''}{paisSeleccionado ? ` por país (${paisSeleccionado})` : ''}
                                                     </span>
                                                 )}
                                             </h1>
-                                            {selectedBrand && (
-                                                <button
-                                                    onClick={clearBrandFilter}
-                                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                                                        isDarkMode 
-                                                            ? 'bg-red-600 hover:bg-red-700 text-white' 
-                                                            : 'bg-red-500 hover:bg-red-600 text-white'
-                                                    }`}
-                                                >
-                                                    Limpiar Filtro de Marca
-                                                </button>
+                                            {(selectedBrand || paisSeleccionado) && (
+                                                <div className="flex gap-2">
+                                                    {selectedBrand && (
+                                                        <button
+                                                            onClick={clearBrandFilter}
+                                                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                                                isDarkMode 
+                                                                    ? 'bg-red-600 hover:bg-red-700 text-white' 
+                                                                    : 'bg-red-500 hover:bg-red-600 text-white'
+                                                            }`}
+                                                        >
+                                                            Limpiar Marca
+                                                        </button>
+                                                    )}
+                                                    {paisSeleccionado && (
+                                                        <button
+                                                            onClick={limpiarFiltroPais}
+                                                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                                                isDarkMode 
+                                                                    ? 'bg-orange-600 hover:bg-orange-700 text-white' 
+                                                                    : 'bg-orange-500 hover:bg-orange-600 text-white'
+                                                            }`}
+                                                        >
+                                                            Limpiar País
+                                                        </button>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
                                         <p className={`text-lg ${

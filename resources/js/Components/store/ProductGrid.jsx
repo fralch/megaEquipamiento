@@ -431,59 +431,68 @@ const ProductGrid = ({ products: initialProducts }) => {
       
       {/* Paginación */}
       {totalPages > 1 && (
-        <div className="flex flex-col items-center space-y-2 mt-8 mb-8">
-          <div className="flex items-center justify-center space-x-4">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={`px-4 py-2 rounded-lg flex items-center ${
-                currentPage === 1
-                  ? isDarkMode ? 'bg-gray-700 cursor-not-allowed text-gray-400' : 'bg-gray-300 cursor-not-allowed'
-                  : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
-              }`}
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Anterior
-            </button>
-        
-            <div className="flex items-center space-x-2">
+        <div className="flex flex-col items-center space-y-4 mt-8 mb-8">
+          <nav aria-label="Pagination">
+            <ul className="flex flex-wrap justify-center items-center gap-2">
+              <li>
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 h-10 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                    currentPage === 1
+                      ? (isDarkMode ? 'bg-gray-700 cursor-not-allowed text-gray-400' : 'bg-gray-300 cursor-not-allowed text-gray-500')
+                      : (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white')
+                  }`}
+                  aria-label="Previous Page"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  <span className="hidden sm:inline ml-2">Anterior</span>
+                </button>
+              </li>
+
               {getPageNumbers.map((pageNumber, index) => (
-                pageNumber === '...' ? (
-                  <span key={`ellipsis-${index}`} className={`px-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>...</span>
-                ) : (
-                  <button
-                    key={`page-${pageNumber}`}
-                    onClick={() => handlePageChange(pageNumber)}
-                    disabled={loading}
-                    className={`px-4 py-2 rounded-lg ${
-                      currentPage === pageNumber 
-                        ? isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white'
-                        : isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 disabled:bg-gray-800' : 'bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100'
-                    }`}
-                  >
-                    {pageNumber}
-                  </button>
-                )
+                <li key={`page-${index}`}>
+                  {pageNumber === '...' ? (
+                    <span className={`px-3 h-10 flex items-center justify-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>...</span>
+                  ) : (
+                    <button
+                      onClick={() => handlePageChange(pageNumber)}
+                      disabled={loading}
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                        currentPage === pageNumber 
+                          ? (isDarkMode ? 'bg-blue-600 text-white font-bold' : 'bg-blue-600 text-white font-bold')
+                          : (isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 disabled:bg-gray-800' : 'bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100')
+                      }`}
+                      aria-label={`Page ${pageNumber}`}
+                      aria-current={currentPage === pageNumber ? 'page' : undefined}
+                    >
+                      {pageNumber}
+                    </button>
+                  )}
+                </li>
               ))}
-            </div>
-        
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages || loading}
-              className={`px-4 py-2 rounded-lg flex items-center ${
-                currentPage === totalPages || loading
-                  ? isDarkMode ? 'bg-gray-700 cursor-not-allowed text-gray-400' : 'bg-gray-300 cursor-not-allowed'
-                  : isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
-              }`}
-            >
-              Siguiente
-              <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
+
+              <li>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages || loading}
+                  className={`px-3 h-10 rounded-lg flex items-center justify-center transition-colors duration-200 ${
+                    currentPage === totalPages || loading
+                      ? (isDarkMode ? 'bg-gray-700 cursor-not-allowed text-gray-400' : 'bg-gray-300 cursor-not-allowed text-gray-500')
+                      : (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white')
+                  }`}
+                  aria-label="Next Page"
+                >
+                  <span className="hidden sm:inline mr-2">Siguiente</span>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </li>
+            </ul>
+          </nav>
           
           <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             Mostrando {paginationInfo.start}-{paginationInfo.end} de {paginationInfo.total} productos
