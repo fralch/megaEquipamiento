@@ -227,7 +227,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         const precioMax = parseFloat(document.getElementById('max-price')?.value) || Infinity;
         if (precioMin > 0 || precioMax < Infinity) {
             productosFiltrados = productosFiltrados.filter(product => {
-                const precio = parseFloat(product.precio_igv);
+                const precio = parseFloat(product.precio_ganancia);
                 return precio >= precioMin && precio <= precioMax;
             });
         }
@@ -254,7 +254,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         const precioMax = parseFloat(document.getElementById('max-price')?.value) || Infinity;
         if (precioMin > 0 || precioMax < Infinity) {
             productosFiltrados = productosFiltrados.filter(product => {
-                const precio = parseFloat(product.precio_igv);
+                const precio = parseFloat(product.precio_ganancia);
                 return precio >= precioMin && precio <= precioMax;
             });
         }
@@ -268,7 +268,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         
         const productosBase = productosOriginales.length > 0 ? productosOriginales : productos;
         let productosFiltrados = productosBase.filter(producto => {
-            const precio = parseFloat(producto.precio_igv);
+            const precio = parseFloat(producto.precio_ganancia);
             return precio >= precioMin && precio <= precioMax;
         });
         
@@ -337,7 +337,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         const precioMax = parseFloat(document.getElementById('max-price')?.value) || Infinity;
         if (precioMin > 0 || precioMax < Infinity) {
             productosFiltrados = productosFiltrados.filter(product => {
-                const precio = parseFloat(product.precio_igv);
+                const precio = parseFloat(product.precio_ganancia);
                 return precio >= precioMin && precio <= precioMax;
             });
         }
@@ -363,7 +363,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
         const precioMax = parseFloat(document.getElementById('max-price')?.value) || Infinity;
         if (precioMin > 0 || precioMax < Infinity) {
             productosFiltrados = productosFiltrados.filter(product => {
-                const precio = parseFloat(product.precio_igv);
+                const precio = parseFloat(product.precio_ganancia);
                 return precio >= precioMin && precio <= precioMax;
             });
         }
@@ -631,6 +631,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
                 if (productosIniciales && productosIniciales.length > 0) {
                     setProductosOriginales(productosIniciales);
+                     console.log('Productos iniciales:', productosIniciales);
                 }
 
             } catch (error) {
