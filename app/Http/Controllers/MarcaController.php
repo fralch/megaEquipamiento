@@ -41,13 +41,11 @@ class MarcaController extends Controller
             // Set destination path
             $destinationPath = public_path('img/marcas') . '/' . $imagePath;
             
-            // Move the uploaded file using Laravel's move method
-            try {
-                $image->move(public_path('img/marcas'), $imagePath);
+            // Move the uploaded file
+            if (move_uploaded_file($image->getPathname(), $destinationPath)) {
                 // Add the correct image path to the data array
                 $data['imagen'] = '/img/marcas/' . $imagePath;
-            } catch (\Exception $e) {
-                \Log::error('Error moving uploaded file in MarcaController: ' . $e->getMessage());
+            } else {
                 return response()->json(['error' => 'Error al mover el archivo.'], 500);
             }
         }

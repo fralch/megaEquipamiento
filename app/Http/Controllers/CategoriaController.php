@@ -123,14 +123,10 @@ class CategoriaController extends Controller
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $destinationPath = $fullPath . '/' . $fileName;
     
-            try {
-                // Usar el método move() de Laravel en lugar de move_uploaded_file()
-                $file->move($fullPath, $fileName);
+            if (move_uploaded_file($file->getPathname(), $destinationPath)) {
                 // Actualizar la ruta de la imagen principal
                 $categoria->img = '/' . $categoryFolder . '/' . $fileName; // Use the new path structure
                 $categoria->save();
-            } catch (\Exception $e) {
-                \Log::error('Error moving uploaded file for main image: ' . $e->getMessage());
             }
         }
     
@@ -148,9 +144,7 @@ class CategoriaController extends Controller
                 $fileName = time() . '_' . uniqid() . '_' . $count . '.' . $imagen->getClientOriginalExtension();
                 $destinationPath = $fullPath . '/' . $fileName;
                 
-                try {
-                    // Usar el método move() de Laravel en lugar de move_uploaded_file()
-                    $imagen->move($fullPath, $fileName);
+                if (move_uploaded_file($imagen->getPathname(), $destinationPath)) {
                     // Guardar las rutas de las imágenes adicionales
                     $imagenesGuardadas[] = '/' . $categoryFolder . '/' . $fileName; // Use the new path structure
                     
@@ -159,10 +153,6 @@ class CategoriaController extends Controller
                     //     'categoria_id' => $categoria->id,
                     //     'ruta_imagen' => '/' . $categoryFolder . '/' . $fileName
                     // ]);
-                } catch (\Exception $e) {
-                    \Log::error('Error moving uploaded file: ' . $e->getMessage());
-                    // Continuar con la siguiente imagen si hay un error
-                    continue;
                 }
                 
                 $count++;
@@ -247,15 +237,9 @@ class CategoriaController extends Controller
                     $fileName = time() . '_' . uniqid() . '_' . $count . '.' . $imagen->getClientOriginalExtension();
                     $destinationPath = $fullPath . '/' . $fileName;
                     
-                    try {
-                        // Usar el método move() de Laravel en lugar de move_uploaded_file()
-                        $imagen->move($fullPath, $fileName);
+                    if (move_uploaded_file($imagen->getPathname(), $destinationPath)) {
                         // Guardar las rutas de las imágenes adicionales
                         $imagenesGuardadas[] = '/' . $categoryFolder . '/' . $fileName;
-                    } catch (\Exception $e) {
-                        \Log::error('Error moving uploaded file: ' . $e->getMessage());
-                        // Continuar con la siguiente imagen si hay un error
-                        continue;
                     }
                     
                     $count++;

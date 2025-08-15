@@ -58,14 +58,10 @@ class SubcategoriaController extends Controller
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $destinationPath = $fullPath . '/' . $fileName;
             
-            try {
-                // Usar el método move() de Laravel en lugar de move_uploaded_file()
-                $file->move($fullPath, $fileName);
+            if (move_uploaded_file($file->getPathname(), $destinationPath)) {
                 // Actualizar la ruta de la imagen
                 $subcategoria->img = '/' . $subcategoryFolder . '/' . $fileName;
                 $subcategoria->save();
-            } catch (\Exception $e) {
-                \Log::error('Error moving uploaded file in SubcategoriaController: ' . $e->getMessage());
             }
         }
     
