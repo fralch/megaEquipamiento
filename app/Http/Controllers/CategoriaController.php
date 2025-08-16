@@ -353,8 +353,39 @@ class CategoriaController extends Controller
         // Obtener todas las categorías con sus subcategorías incluyendo las imágenes
         $categorias = Categoria::with('subcategorias:id_subcategoria,nombre,id_categoria')->get(['id_categoria', 'nombre', 'img']);
 
+        // Debug: agregar información sobre las imágenes
+        $categorias->each(function($categoria) {
+            $rawImg = $categoria->getAttributes()['img'] ?? null;
+            \Log::info("Categoria {$categoria->nombre}: raw_img = " . ($rawImg ? $rawImg : 'NULL') . ", processed_img = " . json_encode($categoria->img));
+        });
+
         // Devolver las categorías como respuesta JSON
         return response()->json($categorias);
+    }
+
+    /**
+     * Debug endpoint for category images
+     */
+    public function debugCategoryImages()
+    {
+        $categorias = Categoria::all(['id_categoria', 'nombre', 'img']);
+        
+        $debug = [];
+        foreach ($categorias as $categoria) {
+            $rawImg = $categoria->getAttributes()['img'] ?? null;
+            $processedImg = $categoria->img;
+            
+            $debug[] = [
+                'id' => $categoria->id_categoria,
+                'nombre' => $categoria->nombre,
+                'raw_img' => $rawImg,
+                'processed_img' => $processedImg,
+                'is_array' => is_array($processedImg),
+                'count' => is_array($processedImg) ? count($processedImg) : null
+            ];
+        }
+        
+        return response()->json($debug);
     }
 
     /**

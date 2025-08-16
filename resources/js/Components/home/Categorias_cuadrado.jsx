@@ -29,25 +29,34 @@ const CategoryCard = React.memo(({ title, items, categoryId, categoryImages }) =
 
   // Configurar imágenes de la base de datos
   useEffect(() => {
-    if (isVisible && categoryImages) {
-      // Si categoryImages es un array, usarlo directamente
-      if (Array.isArray(categoryImages) && categoryImages.length > 0) {
-        // Convertir rutas relativas a rutas absolutas si es necesario
-        const fullPaths = categoryImages.map(img => {
-          // Si la imagen ya tiene una ruta completa, usarla tal como está
-          if (img.startsWith('http') || img.startsWith('/')) {
-            return img;
-          }
-          // Si es una ruta relativa, agregarle el prefijo /
-          return `/${img}`;
-        });
-        setImagePaths(fullPaths);
+    if (isVisible) {
+      console.log(`[${title}] categoryImages:`, categoryImages);
+      
+      if (categoryImages) {
+        // Si categoryImages es un array, usarlo directamente
+        if (Array.isArray(categoryImages) && categoryImages.length > 0) {
+          // Convertir rutas relativas a rutas absolutas si es necesario
+          const fullPaths = categoryImages.map(img => {
+            // Si la imagen ya tiene una ruta completa, usarla tal como está
+            if (img.startsWith('http') || img.startsWith('/')) {
+              return img;
+            }
+            // Si es una ruta relativa, agregarle el prefijo /
+            return `/${img}`;
+          });
+          console.log(`[${title}] fullPaths:`, fullPaths);
+          setImagePaths(fullPaths);
+        } else {
+          console.log(`[${title}] No images found or not array`);
+          // Si no hay imágenes, usar array vacío
+          setImagePaths([]);
+        }
       } else {
-        // Si no hay imágenes, usar array vacío
+        console.log(`[${title}] categoryImages is null/undefined`);
         setImagePaths([]);
       }
     }
-  }, [isVisible, categoryImages]);
+  }, [isVisible, categoryImages, title]);
 
   // Observer para lazy loading
   useEffect(() => {
