@@ -38,6 +38,11 @@ class Categoria extends Model
         'updated_at',
     ];
 
+    // Definir los campos que deben ser convertidos a arrays
+    protected $casts = [
+        'img' => 'array', // Convertir a array para múltiples imágenes
+    ];
+
     // En el modelo Categoria.php
     public function subcategorias()
     {

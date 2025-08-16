@@ -61,6 +61,7 @@ Route::get('/categorias-con-subcategorias', [CategoriaController::class, 'getCat
 Route::get('/categorias-all', [CategoriaController::class, 'getCategorias'])->name('categorias.all');
 Route::get('/categorias-con-subcategorias-con-id', [CategoriaController::class, 'getCategoriasConSubcategoriasConId'])->name('categorias.with-subcategorias-id');
 Route::get('/categorias-completa', [CategoriaController::class, 'getCategoriasConSubcategoriasIds'])->name('categorias.complete');
+Route::get('/debug-category-images', [CategoriaController::class, 'debugCategoryImages'])->name('debug.category.images');
 Route::get('/categoria/{id}', [CategoriaController::class, 'getCategoriaById'])->name('categoria.show');
 Route::post('/categoria/create', [CategoriaController::class, 'store'])->name('categoria.create');
 Route::put('/categoria/update/{id}', [CategoriaController::class, 'update'])->name('categoria.update');
