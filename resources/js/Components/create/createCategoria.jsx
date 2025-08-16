@@ -16,6 +16,7 @@ const Categorias = ({ onSubmit }) => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [marcas, setMarcas] = useState([]); // Array para las marcas
@@ -316,7 +317,7 @@ const Categorias = ({ onSubmit }) => {
       loadCategorias();
       
       // Si estamos en la última página y no hay más elementos, volver a la página anterior
-      const remainingItems = categorias.length - 1;
+      const remainingItems = filteredCategorias.length - 1;
       const newTotalPages = Math.ceil(remainingItems / itemsPerPage);
       if (currentPage > newTotalPages && currentPage > 1) {
         setCurrentPage(currentPage - 1);
@@ -396,10 +397,13 @@ const Categorias = ({ onSubmit }) => {
   };
 
   // Calcular los índices de los elementos a mostrar
+  const filteredCategorias = categorias.filter(categoria =>
+    categoria.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = [...categorias].reverse().slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(categorias.length / itemsPerPage);
+  const currentItems = [...filteredCategorias].reverse().slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredCategorias.length / itemsPerPage);
 
   // Función para cambiar de página
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -741,6 +745,47 @@ const Categorias = ({ onSubmit }) => {
         <h2 className={`text-lg font-bold mb-4 border-b pb-2 transition-colors duration-300 ${
           isDarkMode ? 'text-gray-200 border-gray-600' : 'text-gray-700 border-gray-200'
         }`}>Categorías Existentes</h2>
+        <div className="mb-6">
+          <div className={`relative flex items-center transition-colors duration-300 ${
+            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+          }`}>
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Buscar categoría por nombre..."
+              className={`w-full pl-10 pr-4 py-3 text-sm rounded-lg border shadow-sm transition-all duration-300 
+                focus:ring-2 focus:ring-opacity-50 focus:outline-none
+                ${isDarkMode 
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 hover:border-gray-500' 
+                  : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-indigo-600 focus:ring-indigo-600 hover:border-gray-400'
+                }
+              `}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+            {searchTerm && (
+              <button
+                className={`absolute inset-y-0 right-0 pr-3 flex items-center ${
+                  isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-800'
+                }`}
+                onClick={() => {
+                  setSearchTerm('');
+                  setCurrentPage(1);
+                }}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
         <div className={`overflow-x-auto rounded-lg border shadow-sm transition-colors duration-300 ${
           isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'
         }`}>
@@ -848,7 +893,7 @@ const Categorias = ({ onSubmit }) => {
                   <td colSpan="5" className={`px-6 py-4 text-center transition-colors duration-300 ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
                   }`}>
-                    No hay categorías disponibles
+                    {searchTerm ? 'No se encontraron resultados' : 'No hay categorías disponibles'}
                   </td>
                 </tr>
               )}
@@ -856,7 +901,7 @@ const Categorias = ({ onSubmit }) => {
           </table>
 
           {/* Paginación */}
-          {totalPages > 1 && (
+          {totalPages > 1 && currentItems.length > 0 && (
             <div className={`px-6 py-3 flex items-center justify-between border-t transition-colors duration-300 ${
               isDarkMode ? 'border-gray-600' : 'border-gray-200'
             }`}>
