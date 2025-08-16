@@ -38,6 +38,31 @@ class Categoria extends Model
         'updated_at',
     ];
 
+    // Definir los campos que deben ser convertidos a arrays
+    protected $casts = [
+        'img' => 'array', // Convertir a array para múltiples imágenes
+    ];
+
+    // Mutator para asegurar que las rutas se guarden sin escape de barras
+    public function setImgAttribute($value)
+    {
+        if (is_array($value)) {
+            // Asegurar que las barras no estén escapadas
+            $this->attributes['img'] = json_encode($value, JSON_UNESCAPED_SLASHES);
+        } else {
+            $this->attributes['img'] = $value;
+        }
+    }
+
+    // Accessor para devolver las rutas como array
+    public function getImgAttribute($value)
+    {
+        if (is_string($value)) {
+            return json_decode($value, true) ?: [];
+        }
+        return $value ?: [];
+    }
+
     // En el modelo Categoria.php
     public function subcategorias()
     {

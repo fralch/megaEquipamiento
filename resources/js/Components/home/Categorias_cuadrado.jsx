@@ -18,58 +18,36 @@ const SubcategoryLink = React.memo(({ item, isDarkMode }) => (
 
 SubcategoryLink.displayName = 'SubcategoryLink';
 
-const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
+const CategoryCard = React.memo(({ title, items, categoryId, categoryImages }) => {
   const { isDarkMode } = useTheme();
   const [imagePaths, setImagePaths] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const cardRef = useRef(null);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [searchedForPaths, setSearchedForPaths] = useState(false);
   const intervalRef = useRef(null);
-  
-  // Función para normalizar nombres de carpetas (reutilizada del componente padre)
-  const normalizeTitle = useCallback((str) => {
-    // Usamos solo la estrategia más robusta que tenías (guiones bajos)
-    // El mapeo se hace en el padre, aquí solo necesitamos una forma de buscar.
-    return str.toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '_')
-      .replace(/\s+/g, '_')
-      .replace(/_+/g, '_')
-      .replace(/^_|_$/g, '');
-  }, []);
 
-  // Cargar rutas de imágenes de forma dinámica solo cuando se necesitan
+  // Configurar imágenes de la base de datos
   useEffect(() => {
-    if (isVisible && imageMap) {
-      // Estrategias de búsqueda en el mapa pre-calculado
-      const strategies = [
-        (t) => t.toLowerCase().replace(/[^a-z0-9\s]/g, '_').replace(/\s+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, ''),
-        (t) => t.toLowerCase().replace(/[^a-z0-9\s]/g, '-').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, ''),
-        (t) => t.toLowerCase().replace(/[^a-z0-9]/g, ''),
-        (t) => t.toLowerCase().replace(/\s+/g, '_'),
-        (t) => t.toLowerCase().replace(/\s+/g, '-'),
-        (t) => t.toLowerCase()
-      ];
-
-      let foundPaths = [];
-      for (const strategy of strategies) {
-        const key = strategy(title);
-        if (imageMap[key] && imageMap[key].length > 0) {
-          foundPaths = imageMap[key];
-          break;
-        }
+    if (isVisible && categoryImages) {
+      // Si categoryImages es un array, usarlo directamente
+      if (Array.isArray(categoryImages) && categoryImages.length > 0) {
+        // Convertir rutas relativas a rutas absolutas si es necesario
+        const fullPaths = categoryImages.map(img => {
+          // Si la imagen ya tiene una ruta completa, usarla tal como está
+          if (img.startsWith('http') || img.startsWith('/')) {
+            return img;
+          }
+          // Si es una ruta relativa, agregarle el prefijo /
+          return `/${img}`;
+        });
+        setImagePaths(fullPaths);
+      } else {
+        // Si no hay imágenes, usar array vacío
+        setImagePaths([]);
       }
-
-      // Fallback si ninguna estrategia de normalización funcionó
-      if (foundPaths.length === 0) {
-        // Podrías añadir una búsqueda parcial aquí si es necesario, pero el mapa debería ser suficiente
-      }
-
-      setImagePaths(foundPaths);
-      setSearchedForPaths(true);
     }
-  }, [isVisible, title, imageMap]);
+  }, [isVisible, categoryImages]);
 
   // Observer para lazy loading
   useEffect(() => {
@@ -115,11 +93,9 @@ const CategoryCard = React.memo(({ title, items, categoryId, imageMap }) => {
     if (imagePaths.length > 0) {
       return imagePaths[activeImageIndex];
     }
-    if (searchedForPaths) {
-      return placeholderImage;
-    }
-    return null;
-  }, [imagePaths, activeImageIndex, searchedForPaths, placeholderImage]);
+    // Si no hay imágenes, usar imagen placeholder
+    return placeholderImage;
+  }, [imagePaths, activeImageIndex, placeholderImage]);
 
   // Memoizar handlers
   const handleImageLoad = useCallback(() => {
@@ -211,8 +187,6 @@ const Categories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // Nuevo estado para el mapa de imágenes
-  const [imageMap, setImageMap] = useState(null);
 
   // Función memoizada para obtener datos del localStorage
   const getStoredCategories = useCallback(() => {
@@ -303,35 +277,6 @@ const Categories = () => {
     initializeCategories();
   }, [getStoredCategories, fetchCategories]);
 
-  // useEffect para construir el mapa de imágenes UNA SOLA VEZ
-  useEffect(() => {
-    const buildImageMap = async () => {
-      try {
-        const imageModules = await import.meta.glob('/public/img/categorias/*/*.{jpg,png,webp,webm}');
-        const newImageMap = {};
-
-        for (const path in imageModules) {
-            // Extraer el nombre de la carpeta (ej: /public/img/categorias/aires_acondicionados/img1.jpg -> aires_acondicionados)
-            const match = path.match(/\/img\/categorias\/(.*?)\//);
-            if (match && match[1]) {
-                const folderName = match[1];
-                const imagePath = path.replace('/public', '');
-
-                if (!newImageMap[folderName]) {
-                    newImageMap[folderName] = [];
-                }
-                newImageMap[folderName].push(imagePath);
-            }
-        }
-        setImageMap(newImageMap);
-      } catch (e) {
-        console.error("Error building image map:", e);
-        setImageMap({}); // Poner un objeto vacío en caso de error para no bloquear el render
-      }
-    };
-
-    buildImageMap();
-  }, []); // El array vacío asegura que se ejecute solo una vez
 
   // Componentes memoizados para loading y error
   const LoadingComponent = useMemo(() => {
@@ -382,7 +327,7 @@ const Categories = () => {
               title={category.nombre} 
               items={category.subcategorias || []} 
               categoryId={category.id_categoria}
-              imageMap={imageMap}
+              categoryImages={category.img}
             />
           ))}
         </div>

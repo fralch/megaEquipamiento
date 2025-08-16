@@ -87,81 +87,54 @@ class CategoriaController extends Controller
         $request->validate([
             'nombre' => 'required|max:200',
             'descripcion' => 'nullable|string',
-            'video' => 'nullable|url|max:500', // Validación para URL de video
-            'imagenes.*' =>  'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048', // Validación para múltiples imágenes
-            'imagenes' => 'max:5', // Máximo 5 imágenes
+            'video' => 'nullable|url|max:500',
+            'imagen' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
+            'imagenes.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
         ]);
     
-        // Preparar datos para la creación
-        $data = [
-            'nombre' => $request->nombre,
-            'descripcion' => $request->descripcion,
-            'img' => null, // Mantenemos el campo principal de imagen
-            'video' => $request->video,
-        ];
-    
-        // Crear la categoría primero
-        $categoria = Categoria::create($data);
+        // Procesar las imágenes si se proporcionan
+        $imagenesArray = [];
 
-        // Sanitize the category name for the folder path
-        $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($request->nombre)); // Replace non-alphanumeric characters with underscores
-        $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized); // Replace multiple underscores with a single one
-    
-        // Crear directorio específico para esta categoría usando el nombre sanitizado
-        $categoryFolder = 'img/categorias/' . $categoryNameSanitized; // Use sanitized name instead of ID
-        $fullPath = public_path($categoryFolder);
-        
-        // Crear el directorio si no existe
-        if (!file_exists($fullPath)) {
-            mkdir($fullPath, 0777, true);
-        }
-    
-        // Procesar imagen principal si existe
-        if ($request->hasFile('img')) {
-            $file = $request->file('img');
-            // Use a unique name for the file, keeping the original extension
-            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $destinationPath = $fullPath . '/' . $fileName;
-    
-            if (move_uploaded_file($file->getPathname(), $destinationPath)) {
-                // Actualizar la ruta de la imagen principal
-                $categoria->img = '/' . $categoryFolder . '/' . $fileName; // Use the new path structure
-                $categoria->save();
-            }
-        }
-    
-        // Procesar imágenes adicionales (hasta 5)
-        $imagenesGuardadas = [];
-        
-        if ($request->hasFile('imagenes')) {
-            $imagenes = $request->file('imagenes');
-            $count = 0;
-            
-            foreach ($imagenes as $imagen) {
-                if ($count >= 5) break; // Limitar a 5 imágenes
-                
-                // Use a unique name for each additional image file
-                $fileName = time() . '_' . uniqid() . '_' . $count . '.' . $imagen->getClientOriginalExtension();
-                $destinationPath = $fullPath . '/' . $fileName;
-                
-                if (move_uploaded_file($imagen->getPathname(), $destinationPath)) {
-                    // Guardar las rutas de las imágenes adicionales
-                    $imagenesGuardadas[] = '/' . $categoryFolder . '/' . $fileName; // Use the new path structure
-                    
-                    // Si tienes una tabla para imágenes relacionadas:
-                    // CategoriaImagen::create([
-                    //     'categoria_id' => $categoria->id,
-                    //     'ruta_imagen' => '/' . $categoryFolder . '/' . $fileName
-                    // ]);
+        if ($request->has('imagenesDelBanco')) {
+            $imagenesDelBanco = json_decode($request->input('imagenesDelBanco'), true);
+            $imagenesArray = array_map(function($imagen) {
+                return $imagen['url'];
+            }, $imagenesDelBanco);
+        } elseif ($request->hasFile('imagenes')) {
+            try {
+                $imagenes = $request->file('imagenes');
+                foreach ($imagenes as $index => $imagen) {
+                    $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
+                    $imagePath = 'categorias/' . $imageName;
+                    $imagen->move(public_path('categorias'), $imageName);
+                    $imagenesArray[] = $imagePath;
                 }
-                
-                $count++;
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Error al subir las imágenes.'], 500);
+            }
+        } elseif ($request->hasFile('imagen')) {
+            // Mantener compatibilidad con imagen única
+            try {
+                $image = $request->file('imagen');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = 'categorias/' . $imageName;
+                $image->move(public_path('categorias'), $imageName);
+                $imagenesArray[] = $imagePath;
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Error al subir la imagen.'], 500);
             }
         }
     
-        // Agregamos las imágenes al resultado para devolverlas
-        // Note: You might want to save $imagenesGuardadas to the database if needed permanently
-        $categoria->imagenes_adicionales = $imagenesGuardadas;
+        // Crear directorio de categorías si no existe
+        $categoriasDir = public_path('categorias');
+        if (!file_exists($categoriasDir)) {
+            mkdir($categoriasDir, 0777, true);
+        }
+        
+        // Crear la categoría
+        $categoria = Categoria::create(array_merge($request->except(['imagen', 'imagenes', 'imagenesDelBanco']), [
+            'img' => $imagenesArray,
+        ]));
         
         // Ejecutar la lógica de la migración para actualizar relaciones marca-categoria
         $this->actualizarRelacionesMarcaCategoria();
@@ -178,9 +151,9 @@ class CategoriaController extends Controller
         $request->validate([
             'nombre' => 'required|max:200',
             'descripcion' => 'nullable|string',
-            'video' => 'nullable|url|max:500', // Validación para URL de video
-            'imagenes.*' =>  'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048', // Validación para múltiples imágenes
-            'imagenes' => 'max:5', // Máximo 5 imágenes
+            'video' => 'nullable|url|max:500',
+            'imagen' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
+            'imagenes.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
         ]);
 
         // Buscar la categoría por ID
@@ -189,140 +162,188 @@ class CategoriaController extends Controller
         if (!$categoria) {
             return response()->json(['error' => 'Categoría no encontrada'], 404);
         }
-
-        // Actualizar campos básicos
-        $categoria->update([
-            'nombre' => $request->nombre,
-            'descripcion' => $request->descripcion,
-            'video' => $request->video,
-        ]);
-
-        // Manejar imágenes si se indica que deben actualizarse
-        if ($request->has('update_images') && $request->input('update_images') === 'true') {
-            // Sanitize the category name for the folder path
-            $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($request->nombre));
-            $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized);
         
-            // Crear directorio específico para esta categoría usando el nombre sanitizado
-            $categoryFolder = 'img/categorias/' . $categoryNameSanitized;
-            $fullPath = public_path($categoryFolder);
-
-            // Solo eliminar archivos físicos de la carpeta de la categoría (no imágenes del banco)
-            // Las imágenes del banco no están en esta carpeta, están en el banco de imágenes
-            if (file_exists($fullPath) && is_dir($fullPath)) {
-                $files = glob($fullPath . '/*');
-                foreach ($files as $file) {
-                    if (is_file($file)) {
-                        unlink($file);
+        // Preparar datos para actualización
+        $dataToUpdate = $request->except(['imagen', 'imagenes', 'imagenesDelBanco']);
+        
+        // Solo procesar imágenes si se envían nuevas imágenes
+        if ($request->hasFile('imagen') || $request->hasFile('imagenes') || $request->has('imagenesDelBanco')) {
+            try {
+                // Crear directorio de categorías si no existe
+                $categoriasDir = public_path('categorias');
+                if (!file_exists($categoriasDir)) {
+                    mkdir($categoriasDir, 0777, true);
+                }
+                // Eliminar las imágenes anteriores si existen
+                if ($categoria->img) {
+                    $imagenesAnteriores = is_array($categoria->img) ? $categoria->img : [$categoria->img];
+                    foreach ($imagenesAnteriores as $imagenAnterior) {
+                        if ($imagenAnterior && file_exists(public_path($imagenAnterior))) {
+                            unlink(public_path($imagenAnterior));
+                        }
                     }
                 }
-            }
-            
-            // Crear el directorio si no existe
-            if (!file_exists($fullPath)) {
-                mkdir($fullPath, 0777, true);
-            }
-
-            // Procesar imágenes adicionales (hasta 5)
-            $imagenesGuardadas = [];
-            
-            if ($request->hasFile('imagenes')) {
-                $imagenes = $request->file('imagenes');
-                $count = 0;
                 
-                foreach ($imagenes as $imagen) {
-                    if ($count >= 5) break; // Limitar a 5 imágenes
-                    
-                    // Use a unique name for each additional image file
-                    $fileName = time() . '_' . uniqid() . '_' . $count . '.' . $imagen->getClientOriginalExtension();
-                    $destinationPath = $fullPath . '/' . $fileName;
-                    
-                    if (move_uploaded_file($imagen->getPathname(), $destinationPath)) {
-                        // Guardar las rutas de las imágenes adicionales
-                        $imagenesGuardadas[] = '/' . $categoryFolder . '/' . $fileName;
+                $imagenesArray = [];
+                
+                // Procesar las imágenes si se proporcionan
+                if ($request->has('imagenesDelBanco')) {
+                    $imagenesDelBanco = json_decode($request->input('imagenesDelBanco'), true);
+                    $imagenesArray = array_map(function($imagen) {
+                        return $imagen['url'];
+                    }, $imagenesDelBanco);
+                } elseif ($request->hasFile('imagenes')) {
+                    $imagenes = $request->file('imagenes');
+                    foreach ($imagenes as $index => $imagen) {
+                        $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
+                        $imagePath = 'categorias/' . $imageName;
+                        $imagen->move(public_path('categorias'), $imageName);
+                        $imagenesArray[] = $imagePath;
                     }
-                    
-                    $count++;
+                } elseif ($request->hasFile('imagen')) {
+                    // Mantener compatibilidad con imagen única
+                    $image = $request->file('imagen');
+                    $imageName = time() . '.' . $image->getClientOriginalExtension();
+                    $imagePath = 'categorias/' . $imageName;
+                    $image->move(public_path('categorias'), $imageName);
+                    $imagenesArray[] = $imagePath;
                 }
+                
+                // Agregar las imágenes a los datos de actualización
+                $dataToUpdate['img'] = $imagenesArray;
+                
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Error al actualizar las imágenes: ' . $e->getMessage()
+                ], 500);
             }
-
-            // Actualizar la imagen principal con la primera imagen nueva (reemplazar la existente)
-            if (!empty($imagenesGuardadas)) {
-                $categoria->img = $imagenesGuardadas[0];
-                $categoria->save();
-            } else {
-                // Si no hay nuevas imágenes, limpiar la imagen principal también
-                $categoria->img = null;
-                $categoria->save();
-            }
-
-            // Agregamos las imágenes al resultado para devolverlas
-            $categoria->imagenes_adicionales = $imagenesGuardadas;
         }
+        
+        // Actualizar la categoría
+        $categoria->update($dataToUpdate);
 
         return response()->json($categoria);
     }
+
+    /**
+     * Actualizar solo la imagen de una categoría
+     */
+    public function updateCategoryImage(Request $request)
+    {
+        $request->validate([
+            'id_categoria' => 'required|exists:categorias,id_categoria',
+            'imagen.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'imagenes.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+        ]);
+        
+        // Buscar la categoría por ID
+        $categoria = Categoria::find($request->id_categoria);
+        
+        try {
+            // Crear directorio de categorías si no existe
+            $categoriasDir = public_path('categorias');
+            if (!file_exists($categoriasDir)) {
+                mkdir($categoriasDir, 0777, true);
+            }
+            
+            // Eliminar las imágenes anteriores si existen
+            if ($categoria->img) {
+                $imagenesAnteriores = is_array($categoria->img) ? $categoria->img : [$categoria->img];
+                foreach ($imagenesAnteriores as $imagenAnterior) {
+                    if ($imagenAnterior && file_exists(public_path($imagenAnterior))) {
+                        unlink(public_path($imagenAnterior));
+                    }
+                }
+            }
+            
+            $imagenesArray = [];
+            
+            // Procesar múltiples imágenes con formato imagen[0], imagen[1], etc.
+            if ($request->has('imagen') && is_array($request->file('imagen'))) {
+                $imagenes = $request->file('imagen');
+                foreach ($imagenes as $index => $imagen) {
+                    if ($imagen && $imagen->isValid()) {
+                        $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
+                        $imagePath = 'categorias/' . $imageName;
+                        $imagen->move(public_path('categorias'), $imageName);
+                        $imagenesArray[] = $imagePath;
+                    }
+                }
+            }
+            // Mantener compatibilidad con el formato anterior 'imagenes'
+            elseif ($request->hasFile('imagenes')) {
+                $imagenes = $request->file('imagenes');
+                foreach ($imagenes as $index => $imagen) {
+                    $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
+                    $imagePath = 'categorias/' . $imageName;
+                    $imagen->move(public_path('categorias'), $imageName);
+                    $imagenesArray[] = $imagePath;
+                }
+            }
+            // Mantener compatibilidad con imagen única
+            elseif ($request->hasFile('imagen') && !is_array($request->file('imagen'))) {
+                $image = $request->file('imagen');
+                $imageName = time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = 'categorias/' . $imageName;
+                $image->move(public_path('categorias'), $imageName);
+                $imagenesArray[] = $imagePath;
+            }
+            
+            // Actualizar el campo de imágenes
+            $categoria->img = $imagenesArray;
+            $categoria->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Imágenes actualizadas correctamente',
+                'img' => $imagenesArray,
+                'categoria' => $categoria->fresh()
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al actualizar las imágenes: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Eliminar una categoría y devolver el id
      */ 
     public function destroy($id)
     {
-        // Primero obtenemos la categoría para acceder a su información
-        $categoria = Categoria::find($id);
-        
-        if (!$categoria) {
-            return response()->json(['error' => 'Categoría no encontrada'], 404);
-        }
-        
-        // Extraemos el nombre de la carpeta del path de la imagen
-        if ($categoria->img) {
-            $imgPath = $categoria->img;
-            $pathParts = explode('/', $imgPath);
-            
-            // La estructura debería ser /img/categorias/nombre_categoria/...
-            if (count($pathParts) >= 4) {
-                $folderName = $pathParts[3]; // Obtenemos el nombre_categoria
-                $categoryFolder = public_path('img/categorias/' . $folderName);
-                
-                // Verificamos si el directorio existe
-                if (file_exists($categoryFolder) && is_dir($categoryFolder)) {
-                    // Eliminamos todos los archivos dentro de la carpeta
-                    $files = glob($categoryFolder . '/*');
-                    foreach ($files as $file) {
-                        if (is_file($file)) {
-                            unlink($file);
-                        }
+        try {
+            // Buscar la categoría
+            $categoria = Categoria::findOrFail($id);
+
+            // Eliminar las imágenes si existen
+            if ($categoria->img) {
+                $imagenes = is_array($categoria->img) ? $categoria->img : [$categoria->img];
+                foreach ($imagenes as $imagen) {
+                    if ($imagen && file_exists(public_path($imagen))) {
+                        unlink(public_path($imagen));
                     }
-                    
-                    // Eliminamos la carpeta
-                    rmdir($categoryFolder);
-                }
-            } else {
-                // Si el path no contiene la estructura esperada, intentamos buscar la carpeta
-                // basándonos en el nombre de la categoría
-                $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($categoria->nombre));
-                $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized);
-                $categoryFolder = public_path('img/categorias/' . $categoryNameSanitized);
-                
-                if (file_exists($categoryFolder) && is_dir($categoryFolder)) {
-                    // Eliminamos todos los archivos dentro de la carpeta
-                    $files = glob($categoryFolder . '/*');
-                    foreach ($files as $file) {
-                        if (is_file($file)) {
-                            unlink($file);
-                        }
-                    }
-                    
-                    // Eliminamos la carpeta
-                    rmdir($categoryFolder);
                 }
             }
+
+            // Eliminar la categoría
+            $categoria->delete();
+
+            return response()->json($id);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Categoría no encontrada'
+            ], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar la categoría: ' . $e->getMessage()
+            ], 500);
         }
-        
-        // Finalmente eliminamos la categoría de la base de datos
-        $categoria->delete();
-        
-        return response()->json($id);
     }
 
 
