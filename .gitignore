@@ -6,7 +6,6 @@
 /public/hot
 /public/storage
 /public/productos
-/public/categorias
 /storage/*.key
 /storage/pail
 /vendor
