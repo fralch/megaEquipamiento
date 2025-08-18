@@ -77,8 +77,8 @@ const ProductCard = ({ product }) => {
         </div>
 
         {/* Botones de acción */}
-        <div className="flex gap-2">
-          <button className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
+        <div className="flex flex-col sm:flex-row gap-2">
+          <button className={`w-full sm:flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
             product.stock > 0
               ? 'bg-blue-600 text-white hover:bg-blue-700'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -88,7 +88,7 @@ const ProductCard = ({ product }) => {
             {product.stock > 0 ? 'Agregar al Carrito' : 'Sin Stock'}
           </button>
           
-          <button className={`py-2 px-4 rounded-lg border transition-colors ${
+          <button className={`w-full sm:w-auto py-2 px-4 rounded-lg border transition-colors ${
             isDarkMode 
               ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
               : 'border-gray-300 text-gray-700 hover:bg-gray-50'

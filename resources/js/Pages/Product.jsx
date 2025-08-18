@@ -1274,10 +1274,10 @@ const ProductPage = ({ producto }) => {
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
             {categoriaCurrent && subcategoriaCurrent && (
-                <div className="flex items-center gap-1 px-6 py-3 ">
+                <div className="flex items-center flex-wrap gap-1 px-4 md:px-6 py-3 ">
                     <Link 
                         href={`/categorias/${categoriaCurrent.id_categoria}`} 
-                        className={`hover:text-blue-600 transition-colors duration-200 text-lg font-medium ${
+                        className={`hover:text-blue-600 transition-colors duration-200 text-base md:text-lg font-medium ${
                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                         }`}
                     >
@@ -1288,7 +1288,7 @@ const ProductPage = ({ producto }) => {
                     }`}>/</span>
                     <Link 
                         href={`/subcategoria/${producto.id_subcategoria}`}
-                        className={`hover:text-blue-600 transition-colors duration-200 text-lg font-medium ${
+                        className={`hover:text-blue-600 transition-colors duration-200 text-base md:text-lg font-medium ${
                             isDarkMode ? 'text-gray-100' : 'text-gray-800'
                         }`}
                     >
@@ -1321,8 +1321,8 @@ const ProductPage = ({ producto }) => {
                 />
             )}
 
-            <main className="p-6" role="main" itemScope itemType="https://schema.org/Product">
-                <section className="grid md:grid-cols-2 gap-8" aria-label="Información del producto">
+            <main className="p-4 md:p-6" role="main" itemScope itemType="https://schema.org/Product">
+                <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8" aria-label="Información del producto">
                     <ImageGallery 
                         images={productData.imagen} 
                         productId={producto.id_producto}
@@ -1336,7 +1336,7 @@ const ProductPage = ({ producto }) => {
                         }}
                     />
 
-                    <div className={`max-w-4xl mx-auto p-6 shadow-lg rounded-lg transition-colors duration-300 ${
+                    <div className={`w-full p-4 sm:p-6 shadow-lg rounded-lg transition-colors duration-300 ${
                         isDarkMode ? 'bg-gray-800' : 'bg-white'
                     }`}>
                         <div className="flex flex-col space-y-4">
@@ -1345,7 +1345,7 @@ const ProductPage = ({ producto }) => {
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="text"
-                                            className={`text-3xl font-bold border rounded px-2 py-1 w-full transition-colors duration-300 ${
+                                            className={`text-2xl md:text-3xl font-bold border rounded px-2 py-1 w-full transition-colors duration-300 ${
                                                 isDarkMode 
                                                     ? 'text-gray-100 bg-gray-700 border-gray-600' 
                                                     : 'text-gray-900 bg-white border-gray-300'
@@ -1369,7 +1369,7 @@ const ProductPage = ({ producto }) => {
                                     </div>
                                 ) : (
                                     <h1
-                                        className={`text-3xl font-bold cursor-pointer transition-colors duration-300 ${
+                                        className={`text-2xl md:text-3xl font-bold cursor-pointer transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-100' : 'text-gray-900'
                                         }`}
                                         onDoubleClick={() => toggleEditMode('nombre')}
@@ -1379,14 +1379,14 @@ const ProductPage = ({ producto }) => {
                                     </h1>
                                 )}
                             </div>
-                            <div className="grid grid-cols-2 gap-8">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                                 <div className="flex text-left space-x-4 flex-col">
                                     <div className="ml-3">
                                         {editMode.precio_ganancia ? (
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     type="number"
-                                                    className={`text-2xl font-semibold text-green-600 border rounded px-2 py-1 transition-colors duration-300 ${
+                                                    className={`text-xl md:text-2xl font-semibold text-green-600 border rounded px-2 py-1 transition-colors duration-300 ${
                                                         isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
                                                     }`}
                                                     value={tempInputs.precio_ganancia || producto.precio_ganancia}
@@ -1408,7 +1408,7 @@ const ProductPage = ({ producto }) => {
                                             </div>
                                         ) : (
                                             <p
-                                                className="text-2xl font-semibold text-green-600 cursor-pointer"
+                                                className="text-xl md:text-2xl font-semibold text-green-600 cursor-pointer"
                                                 onDoubleClick={() => toggleEditMode('precio_ganancia')}
                                                 itemProp="offers" itemScope itemType="https://schema.org/Offer"
                                             >
@@ -1419,7 +1419,7 @@ const ProductPage = ({ producto }) => {
                                                 <meta itemProp="availability" content="https://schema.org/InStock" />
                                             </p>
                                         )}
-                                        <p className={`transition-colors duration-300 ${
+                                        <p className={`text-sm transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                         }`}>
                                             (sin IGV)
@@ -1430,7 +1430,7 @@ const ProductPage = ({ producto }) => {
                                             <div className="flex items-center gap-2">
                                                 <input
                                                     type="number"
-                                                    className={`text-2xl font-semibold border rounded px-2 py-1 transition-colors duration-300 ${
+                                                    className={`text-xl md:text-2xl font-semibold border rounded px-2 py-1 transition-colors duration-300 ${
                                                         isDarkMode 
                                                             ? 'text-gray-100 bg-gray-700 border-gray-600' 
                                                             : 'text-gray-800 bg-white border-gray-300'
@@ -1454,7 +1454,7 @@ const ProductPage = ({ producto }) => {
                                             </div>
                                         ) : (
                                             <p
-                                                className={`text-2xl font-semibold cursor-pointer transition-colors duration-300 ${
+                                                className={`text-xl md:text-2xl font-semibold cursor-pointer transition-colors duration-300 ${
                                                     isDarkMode ? 'text-gray-100' : 'text-gray-800'
                                                 }`}
                                                 onDoubleClick={() => toggleEditMode('precio_igv')}
@@ -1462,14 +1462,14 @@ const ProductPage = ({ producto }) => {
                                                 {formatPrice(productData.precio_igv)}
                                             </p>
                                         )}
-                                        <p className={`transition-colors duration-300 ${
+                                        <p className={`text-sm transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                         }`}>
                                             (con IGV)
                                         </p>
                                     </div>
                                 </div>
-                                <div className={`text-sm transition-colors duration-300 ${
+                                <div className={`text-sm flex flex-col space-y-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                 }`}>
                                     <div>
@@ -1501,27 +1501,27 @@ const ProductPage = ({ producto }) => {
                                             </div>
                                         ) : (
                                             <p
-                                                className={`text-sm cursor-pointer transition-colors duration-300 ${
+                                                className={`cursor-pointer transition-colors duration-300 ${
                                                     isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                 }`}
                                                 onDoubleClick={() => toggleEditMode('sku')}
                                             >
-                                                SKU: <span itemProp="sku">{productData.sku}</span>
+                                                <strong>SKU:</strong> <span itemProp="sku">{productData.sku}</span>
                                             </p>
                                         )}
                                     </div>
                                     <div>
-                                        <p className={`text-sm transition-colors duration-300 ${
+                                        <p className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                         }`}>
-                                            Fabricante: {productData.marca?.nombre?.toUpperCase()}
+                                            <strong>Fabricante:</strong> {productData.marca?.nombre?.toUpperCase()}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className={`text-sm transition-colors duration-300 ${
+                                        <div className={`transition-colors duration-300 ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                         }`}>
-                                            Categoría: 
+                                            <strong>Categoría:</strong> 
                                             {categoriaCurrent && (
                                                 <>
                                                     <Link 
@@ -1547,77 +1547,70 @@ const ProductPage = ({ producto }) => {
                                                     {subcategoriaCurrent.nombre}
                                                 </Link>
                                             )}
-                                        </p>
+                                        </div>
                                     </div>
                                     <p className={`transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-800'
                                     }`}>
-                                        Plazo de entrega: 1-3 días (Salvo fin
-                                        Stock)
+                                        <strong>Plazo de entrega:</strong> 1-3 días (Salvo fin Stock)
                                     </p>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="">
-                          <div className="flex items-center space-x-4 mt-6">
-                          <button 
-                                className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 shadow-md"
-                                onClick={handleAddToCart}
-                            >
-                                Agregar al carrito
-                            </button>
-                            <button 
-                                onClick={() => {
-                                    const productTabsSection = document.getElementById('product-tabs');
-                                    if (productTabsSection) {
-                                        productTabsSection.scrollIntoView({ 
-                                            behavior: 'smooth',
-                                            block: 'start'
-                                        });
-                                    }
-                                }}
-                                className={`px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${
-                                isDarkMode 
-                                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
-                                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                            }`}>
-                                Selecciona tus accesorios
-                            </button>
-                            <button 
-                                onClick={() => {
-                                    const productUrl = window.location.href;
-                                    const message = `Hola, estoy interesado en la compra de este producto: ${productUrl}`;
-                                    const whatsappUrl = `https://wa.me/51939294882?text=${encodeURIComponent(message)}`;
-                                    window.open(whatsappUrl, '_blank');
-                                }}
-                                className={`px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${
-                                isDarkMode 
-                                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
-                                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                            }`}>
-                                Comunícate con un asesor
-                            </button>
-                          </div>
+                        <div className="mt-6">
+                            <div className="flex flex-col md:flex-row items-center gap-3">
+                                <button 
+                                    className="w-full md:w-auto flex-grow bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 shadow-md"
+                                    onClick={handleAddToCart}
+                                >
+                                    Agregar al carrito
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        const productTabsSection = document.getElementById('product-tabs');
+                                        if (productTabsSection) {
+                                            productTabsSection.scrollIntoView({ 
+                                                behavior: 'smooth',
+                                                block: 'start'
+                                            });
+                                        }
+                                    }}
+                                    className={`w-full md:w-auto px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${
+                                    isDarkMode 
+                                        ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                                }`}>
+                                    Selecciona tus accesorios
+                                </button>
+                                <button 
+                                    onClick={() => {
+                                        const productUrl = window.location.href;
+                                        const message = `Hola, estoy interesado en la compra de este producto: ${productUrl}`;
+                                        const whatsappUrl = `https://wa.me/51939294882?text=${encodeURIComponent(message)}`;
+                                        window.open(whatsappUrl, '_blank');
+                                    }}
+                                    className={`w-full md:w-auto px-6 py-3 rounded-md shadow-md transition-colors duration-300 ${
+                                    isDarkMode 
+                                        ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                                }`}>
+                                    Comunícate con un asesor
+                                </button>
+                            </div>
                             {auth.user && (
                                 <button 
                                     onClick={() => {
                                         if (window.confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-                                            // Usar el método delete con una URL y configuración correcta
                                             router.delete(`/product/delete/${producto.id_producto}`, {
-                                                onBefore: () => confirm('¿Estás seguro de que deseas eliminar este producto?'),
                                                 onSuccess: () => {
-                                                    // Navegar a la página anterior o a una ruta específica
-                                                    window.location.href = '/'; // URL específica como fallback
+                                                    window.location.href = '/';
                                                 },
-                                                // Manejar errores
                                                 onError: (errors) => {
                                                     console.error('Error al eliminar:', errors);
                                                     alert('Hubo un error al eliminar el producto');
                                                 },
-                                                // Permitir respuestas no-Inertia
-                                                preserveScroll: true,
-                                                preserveState: true
+                                                preserveState: false 
                                             });
                                         }
                                     }} 

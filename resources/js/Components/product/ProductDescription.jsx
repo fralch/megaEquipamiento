@@ -15,16 +15,16 @@ const ProductDescription = ({ description, editMode, tempInputs, handleInputChan
                                 onChange={(e) => handleInputChange(e.target.value)}
                                 placeholder="Ingrese la descripción del producto"
                             />
-                            <div className="mt-2">
+                            <div className="mt-2 flex flex-col sm:flex-row gap-2">
                                 <button 
                                     onClick={handleSave}
-                                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                    className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                                 >
                                     Guardar
                                 </button>
                                 <button 
                                     onClick={toggleEditMode}
-                                    className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                    className="w-full sm:w-auto px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                                 >
                                     Cancelar
                                 </button>
@@ -71,16 +71,16 @@ const ProductDescription = ({ description, editMode, tempInputs, handleInputChan
                                     }
                                 }}
                             />
-                            <div className="mt-2">
+                            <div className="mt-2 flex flex-col sm:flex-row gap-2">
                                 <button 
                                     onClick={handleSave}
-                                    className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 mr-2"
+                                    className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                                 >
                                     Guardar
                                 </button>
                                 <button 
                                     onClick={toggleEditMode}
-                                    className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                    className="w-full sm:w-auto px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
                                 >
                                     Cancelar
                                 </button>

@@ -82,7 +82,7 @@ const ProductDocuments = ({
             return (
                 <div className="space-y-3">
                     {groupedItems.map((item, index) => (
-                        <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                             {item.icon}
                             <div className="flex-1">
                                 <p className={`font-medium ${item.color}`}>
@@ -96,7 +96,7 @@ const ProductDocuments = ({
                                 href={item.url.startsWith('http') ? item.url : `http://${item.url}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors flex items-center space-x-1"
+                                className="w-full sm:w-auto justify-center px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors flex items-center space-x-1"
                             >
                                 <span>Abrir</span>
                                 <ExternalLink className="w-4 h-4" />
@@ -110,7 +110,7 @@ const ProductDocuments = ({
             if (documents.startsWith('http') || documents.startsWith('www')) {
                 const docInfo = getDocumentInfo('Documento');
                 return (
-                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                         {docInfo.icon}
                         <div className="flex-1">
                             <p className={`font-medium ${docInfo.color}`}>
@@ -124,7 +124,7 @@ const ProductDocuments = ({
                             href={documents.startsWith('http') ? documents : `http://${documents}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            className="px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors flex items-center space-x-1"
+                            className="w-full sm:w-auto justify-center px-4 py-2 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors flex items-center space-x-1"
                         >
                             <span>Abrir</span>
                             <ExternalLink className="w-4 h-4" />
@@ -151,16 +151,16 @@ const ProductDocuments = ({
                                 placeholder="Ingrese los documentos (uno por línea)&#10;Ejemplo:&#10;MANUAL&#10;https://ejemplo.com/manual.pdf&#10;FICHA TÉCNICA&#10;https://ejemplo.com/ficha.pdf&#10;DESCARGAS&#10;https://ejemplo.com/descarga.zip"
                                 rows="8"
                             />
-                            <div className="mt-3 flex space-x-2">
+                            <div className="mt-3 flex flex-col sm:flex-row gap-2">
                                 <button 
                                     onClick={handleSave}
-                                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                                    className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                                 >
                                     Guardar
                                 </button>
                                 <button 
                                     onClick={toggleEditMode}
-                                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                                    className="w-full sm:w-auto px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
                                 >
                                     Cancelar
                                 </button>
@@ -191,16 +191,16 @@ const ProductDocuments = ({
                                 placeholder="Ingrese los documentos (uno por línea)&#10;Ejemplo:&#10;MANUAL&#10;https://ejemplo.com/manual.pdf&#10;FICHA TÉCNICA&#10;https://ejemplo.com/ficha.pdf&#10;DESCARGAS&#10;https://ejemplo.com/descarga.zip"
                                 rows="8"
                             />
-                            <div className="mt-3 flex space-x-2">
+                            <div className="mt-3 flex flex-col sm:flex-row gap-2">
                                 <button 
                                     onClick={handleSave}
-                                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                                    className="w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                                 >
                                     Guardar
                                 </button>
                                 <button 
                                     onClick={toggleEditMode}
-                                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                                    className="w-full sm:w-auto px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
                                 >
                                     Cancelar
                                 </button>
