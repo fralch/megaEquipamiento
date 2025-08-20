@@ -315,10 +315,10 @@ const ProductCategoryEdit = ({
                         </div>
                     </div>
 
-                    <div className="mt-4 flex space-x-2">
+                    <div className="mt-4 flex flex-col sm:flex-row sm:space-y-0 space-y-2">
                         <button
                             onClick={updateProductCategory}
-                            className={`px-4 py-2 rounded transition-colors duration-200 ${
+                            className={`w-full sm:w-auto px-4 py-2 rounded transition-colors duration-200 sm:mr-2 ${
                                 isDarkMode 
                                     ? 'bg-green-600 text-white hover:bg-green-700' 
                                     : 'bg-green-500 text-white hover:bg-green-600'
@@ -328,7 +328,7 @@ const ProductCategoryEdit = ({
                         </button>
                         <button
                             onClick={() => toggleEditMode('categoria')}
-                            className={`px-4 py-2 rounded transition-colors duration-200 ${
+                            className={`w-full sm:w-auto px-4 py-2 rounded transition-colors duration-200 ${
                                 isDarkMode 
                                     ? 'bg-gray-600 text-white hover:bg-gray-700' 
                                     : 'bg-gray-500 text-white hover:bg-gray-600'

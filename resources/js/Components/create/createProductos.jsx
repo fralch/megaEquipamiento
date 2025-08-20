@@ -73,8 +73,8 @@ const FormInput = ({ label, id, name, value, onChange, type = "text", placeholde
   const { isDarkMode } = useTheme();
   
   return (
-    <div className={`mb-4 ${className}`}>
-      <label htmlFor={id} className={`block text-sm font-medium transition-colors duration-300 ${
+    <div className={`mb-3 sm:mb-4 ${className}`}>
+      <label htmlFor={id} className={`block text-xs sm:text-sm font-medium transition-colors duration-300 ${
         isDarkMode ? 'text-gray-300' : 'text-gray-700'
       }`}>{label}</label>
       {name === 'envio' || name === 'soporte_tecnico' ? (
@@ -122,8 +122,8 @@ const FormTextarea = ({ label, id, name, value, onChange, placeholder, rows = 4 
   const { isDarkMode } = useTheme();
   
   return (
-    <div className="mb-4 col-span-2">
-      <label htmlFor={id} className={`block text-sm font-medium transition-colors duration-300 ${
+    <div className="mb-3 sm:mb-4 col-span-1 sm:col-span-2">
+      <label htmlFor={id} className={`block text-xs sm:text-sm font-medium transition-colors duration-300 ${
         isDarkMode ? 'text-gray-300' : 'text-gray-700'
       }`}>{label}</label>
       <textarea
@@ -233,8 +233,8 @@ const VideoInput = ({ value, onChange }) => {
   const { isDarkMode } = useTheme();
   
   return (
-    <div className="mb-4 col-span-2">
-      <label htmlFor="video" className={`block text-sm font-medium transition-colors duration-300 ${
+    <div className="mb-3 sm:mb-4 col-span-1 sm:col-span-2">
+      <label htmlFor="video" className={`block text-xs sm:text-sm font-medium transition-colors duration-300 ${
         isDarkMode ? 'text-gray-300' : 'text-gray-700'
       }`}>Video del Producto</label>
       <div className="mt-1">
@@ -255,7 +255,7 @@ const VideoInput = ({ value, onChange }) => {
       {value && (
         <div className="mt-2 aspect-video w-full">
           <iframe
-            className="w-full h-96 rounded-md shadow-lg"
+            className="w-full h-48 sm:h-64 md:h-80 lg:h-96 rounded-md shadow-lg"
             src={value.replace("youtu.be", "www.youtube.com/embed")}
             title="Vista previa del video"
             allowFullScreen
@@ -309,16 +309,16 @@ const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName
   const { isDarkMode } = useTheme();
 
   return (
-    <div className="w-full lg:w-1/2 lg:pr-6 mb-6 lg:mb-0">
-      <div className="border border-gray-300 rounded-lg p-4 mb-4 h-[300px] md:h-[400px] overflow-y-auto">
+    <div className="w-full lg:w-1/2 lg:pr-4 xl:pr-6 mb-4 sm:mb-6 lg:mb-0">
+      <div className="border border-gray-300 rounded-lg p-2 sm:p-4 mb-4 h-[200px] sm:h-[300px] md:h-[350px] lg:h-[400px] overflow-y-auto">
         {previewImages && previewImages.length > 0 ? (
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
             {previewImages.map((preview, index) => (
               <div key={index} className="border rounded-lg p-2 relative">
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-colors z-10"
+                  className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center text-xs hover:bg-red-600 transition-colors z-10 min-h-[24px] min-w-[24px]"
                   title="Eliminar imagen"
                 >
                   ×
@@ -326,7 +326,7 @@ const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName
                 <img
                   src={preview}
                   alt={`Product Preview ${index + 1}`}
-                  className="w-full h-24 object-contain"
+                  className="w-full h-16 sm:h-20 md:h-24 object-contain"
                 />
                 <p className="text-xs text-gray-500 text-center mt-1">
                   {selectedImages && selectedImages[index] ? selectedImages[index].name : `Imagen ${index + 1}`}
@@ -340,7 +340,7 @@ const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName
               <button
                 type="button"
                 onClick={() => removeImage(0)}
-                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors z-10"
+                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-red-600 transition-colors z-10 min-h-[32px] min-w-[32px]"
                 title="Eliminar imagen"
               >
                 ×
@@ -368,10 +368,10 @@ const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName
           multiple
           className="hidden"
         />
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <label
             htmlFor="imagen"
-            className={`flex-1 border rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 cursor-pointer py-2 px-4 text-sm font-medium text-center transition duration-150 ease-in-out ${
+            className={`flex-1 border rounded-md shadow-sm hover:border-indigo-500 hover:ring-2 hover:ring-indigo-500 cursor-pointer py-3 px-4 text-sm font-medium text-center transition duration-150 ease-in-out min-h-[44px] flex items-center justify-center ${
               isDarkMode 
                 ? 'bg-gray-700 border-gray-600 text-indigo-400 hover:bg-gray-600' 
                 : 'bg-white border-gray-300 text-indigo-600 hover:bg-gray-50'
@@ -382,7 +382,7 @@ const ImageUpload = ({ previewImage, previewImages, handleImageChange, imageName
           <button
             type="button"
             onClick={() => setShowImageBank(true)}
-            className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium transition duration-150 ease-in-out ${
+            className={`px-4 py-3 rounded-md shadow-sm text-sm font-medium transition duration-150 ease-in-out min-h-[44px] flex items-center justify-center whitespace-nowrap ${
               isDarkMode 
                 ? 'bg-green-600 text-white hover:bg-green-700 border border-green-600' 
                 : 'bg-green-500 text-white hover:bg-green-600 border border-green-500'
@@ -819,7 +819,7 @@ const Productos = ({ onSubmit }) => {
 
       case 'tab8': // Otros
         return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <CategorySelect
               categorias={categorias}
               selectedCategory={selectedCategory}
@@ -876,15 +876,15 @@ const Productos = ({ onSubmit }) => {
   };
 
   return (
-    <div className={`container mx-auto px-4 py-6 transition-colors duration-300 ${
+    <div className={`container mx-auto px-2 sm:px-4 py-4 sm:py-6 transition-colors duration-300 ${
       isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
-      <h1 className={`text-2xl font-bold mb-4 text-center lg:text-left transition-colors duration-300 ${
+      <h1 className={`text-xl sm:text-2xl font-bold mb-4 text-center lg:text-left transition-colors duration-300 ${
         isDarkMode ? 'text-white' : 'text-gray-900'
       }`}>Crear Producto</h1>
       
       <form onSubmit={handleSubmit}>
-        <div className={`flex flex-col lg:flex-row shadow-md rounded-lg p-6 mb-8 w-full transition-colors duration-300 ${
+        <div className={`flex flex-col lg:flex-row shadow-md rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 w-full transition-colors duration-300 ${
           isDarkMode ? 'bg-gray-800' : 'bg-white'
         }`}>
           <ImageUpload
@@ -899,7 +899,7 @@ const Productos = ({ onSubmit }) => {
             setShowImageBank={setShowImageBank}
           />
 
-          <div className="w-full lg:w-1/2 lg:pl-6">
+          <div className="w-full lg:w-1/2 lg:pl-4 xl:pl-6">
             <FormInput
               label="Nombre"
               id="nombre"
@@ -910,7 +910,7 @@ const Productos = ({ onSubmit }) => {
               required
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <FormInput
                 label="SKU"
                 id="sku"
@@ -1002,10 +1002,10 @@ const Productos = ({ onSubmit }) => {
           </div>
         </div>
 
-        <div className={`mt-8 shadow-md rounded-lg p-6 transition-colors duration-300 ${
+        <div className={`mt-6 sm:mt-8 shadow-md rounded-lg p-4 sm:p-6 transition-colors duration-300 ${
           isDarkMode ? 'bg-gray-800' : 'bg-white'
         }`}>
-          <div className={`flex overflow-x-auto border-b transition-colors duration-300 ${
+          <div className={`flex overflow-x-auto border-b transition-colors duration-300 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 ${
             isDarkMode ? 'border-gray-700' : 'border-gray-200'
           }`}>
             {tabs.map(tab => (
@@ -1013,7 +1013,7 @@ const Productos = ({ onSubmit }) => {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-3 text-sm font-medium transition-colors duration-150 ease-in-out whitespace-nowrap ${
+                className={`px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium transition-colors duration-150 ease-in-out whitespace-nowrap min-h-[44px] flex items-center ${
                   activeTab === tab.id 
                     ? isDarkMode 
                       ? 'text-blue-400 border-b-2 border-blue-400' 
@@ -1028,15 +1028,15 @@ const Productos = ({ onSubmit }) => {
             ))}
           </div>
           
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             {renderTabContent()}
           </div>
         </div>
 
-        <div className="mt-6 text-right">
+        <div className="mt-6 text-center sm:text-right">
           <button
             type="submit"
-            className={`px-6 py-2 text-white font-bold rounded-lg transition-colors duration-300 ${
+            className={`px-6 py-3 text-white font-bold rounded-lg transition-colors duration-300 min-h-[44px] w-full sm:w-auto ${
               isDarkMode 
                 ? 'bg-blue-600 hover:bg-blue-700' 
                 : 'bg-blue-600 hover:bg-blue-700'

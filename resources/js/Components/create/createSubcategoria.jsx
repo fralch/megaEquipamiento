@@ -295,8 +295,8 @@ const Subcategorias = ({ onSubmit }) => {
   const currentItems = [...subcategorias].reverse().slice(indexOfFirstItem, indexOfLastItem);
 
   return (
-    <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-md rounded-lg p-6 mb-8 w-full mx-auto transition-colors`}>
-      <h1 className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Gestión de Subcategorías</h1>
+    <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-md rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 w-full mx-auto transition-colors`}>
+      <h1 className={`text-xl sm:text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Gestión de Subcategorías</h1>
       
       {/* Mensajes de éxito o error */}
       {successMessage && (
@@ -311,11 +311,11 @@ const Subcategorias = ({ onSubmit }) => {
         </div>
       )}
       
-      <form onSubmit={handleSubmit} encType="multipart/form-data" className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} p-4 rounded-lg transition-colors`}>
-        <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Agregar Nueva Subcategoría</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="mb-4">
-            <label htmlFor="nombre" className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+      <form onSubmit={handleSubmit} encType="multipart/form-data" className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} p-3 sm:p-4 rounded-lg transition-colors`}>
+        <h2 className={`text-base sm:text-lg font-bold mb-3 sm:mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Agregar Nueva Subcategoría</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="mb-3 sm:mb-4">
+            <label htmlFor="nombre" className={`block text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Nombre <span className="text-red-500">*</span>
             </label>
             <input
@@ -332,8 +332,8 @@ const Subcategorias = ({ onSubmit }) => {
               required
             />
           </div>
-          <div className="mb-4">
-            <label htmlFor="id_categoria" className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+          <div className="mb-3 sm:mb-4">
+            <label htmlFor="id_categoria" className={`block text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Categoria Padre <span className="text-red-500">*</span>
             </label>
             <select
@@ -357,8 +357,8 @@ const Subcategorias = ({ onSubmit }) => {
             </select>
           </div>
 
-          <div className="mb-4">
-            <label htmlFor="descripcion" className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+          <div className="mb-3 sm:mb-4">
+            <label htmlFor="descripcion" className={`block text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Descripción
             </label>
             <textarea
@@ -376,11 +376,11 @@ const Subcategorias = ({ onSubmit }) => {
           </div>
 
           {/* Campo para imagen */}
-          <div className="mb-4">
-            <label htmlFor="img" className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+          <div className="mb-3 sm:mb-4">
+            <label htmlFor="img" className={`block text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Imagen
             </label>
-            <div className="mt-1 flex gap-2">
+            <div className="mt-1 flex flex-col sm:flex-row gap-2">
               <input
                 type="file"
                 id="img"
@@ -396,7 +396,7 @@ const Subcategorias = ({ onSubmit }) => {
               <button
                 type="button"
                 onClick={() => setShowImageBank(true)}
-                className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium transition duration-150 ease-in-out ${
+                className={`px-4 py-3 rounded-md shadow-sm text-sm font-medium transition duration-150 ease-in-out min-h-[44px] flex items-center justify-center whitespace-nowrap ${
                   isDarkMode 
                     ? 'bg-green-600 text-white hover:bg-green-700 border border-green-600' 
                     : 'bg-green-500 text-white hover:bg-green-600 border border-green-500'
@@ -417,14 +417,14 @@ const Subcategorias = ({ onSubmit }) => {
                   <img 
                     src={imgPreview} 
                     alt="Vista previa" 
-                    className={`h-24 w-auto object-cover rounded border transition-colors ${
+                    className={`h-20 sm:h-24 w-auto object-cover rounded border transition-colors ${
                       isDarkMode ? 'border-gray-500' : 'border-gray-300'
                     }`}
                   />
                   <button
                     type="button"
                     onClick={removeImage}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 sm:w-5 sm:h-5 flex items-center justify-center text-xs min-h-[20px] min-w-[20px]"
                     title="Eliminar imagen"
                   >
                     &times;
@@ -435,11 +435,11 @@ const Subcategorias = ({ onSubmit }) => {
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-center sm:justify-end">
           <button
             type="submit"
             disabled={loading}
-            className={`px-4 py-2 ${
+            className={`px-6 py-3 min-h-[44px] w-full sm:w-auto ${
               loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
             } text-white font-bold rounded-lg transition-colors`}
           >
@@ -448,27 +448,27 @@ const Subcategorias = ({ onSubmit }) => {
         </div>
       </form>
 
-      <div className="mt-8">
-        <h2 className={`text-lg font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Subcategorías Existentes</h2>
+      <div className="mt-6 sm:mt-8">
+        <h2 className={`text-base sm:text-lg font-bold mb-3 sm:mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Subcategorías Existentes</h2>
         <div className="overflow-x-auto">
           <table className={`min-w-full divide-y transition-colors ${
             isDarkMode ? 'divide-gray-600' : 'divide-gray-200'
           }`}>
             <thead className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} transition-colors`}>
               <tr>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-3 sm:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>ID</th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-3 sm:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>Nombre</th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-3 sm:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>Descripción</th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-3 sm:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>Categoría Padre</th>
-                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                <th className={`px-3 sm:px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-500'
                 }`}>Acciones</th>
               </tr>
@@ -479,36 +479,38 @@ const Subcategorias = ({ onSubmit }) => {
               {currentItems.length > 0 ? (
                 currentItems.map((subcategoria) => (
                   <tr key={subcategoria.id_subcategoria}>
-                    <td className={`px-6 py-4 whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{subcategoria.id_subcategoria}</td>
-                    <td className={`px-6 py-4 whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{subcategoria.nombre}</td>
-                    <td className="px-6 py-4">
-                      <div className={`max-w-xs truncate ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{subcategoria.descripcion || '-'}</div>
+                    <td className={`px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{subcategoria.id_subcategoria}</td>
+                    <td className={`px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{subcategoria.nombre}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <div className={`max-w-xs truncate text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{subcategoria.descripcion || '-'}</div>
                     </td>
-                    <td className={`px-6 py-4 whitespace-nowrap ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
+                    <td className={`px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
                       {categoriasOptions.find(cat => cat.id_categoria === subcategoria.id_categoria)?.nombre || ''}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button 
-                        onClick={() => handleOpenEditModal(subcategoria)}
-                        className="text-indigo-600 hover:text-indigo-900 mr-3"
-                      >
-                        Editar
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteSubcategoria(subcategoria.id_subcategoria, subcategoria.nombre)}
-                        disabled={deleteLoading}
-                        className={`${
-                          deleteLoading ? 'text-red-300' : 'text-red-600 hover:text-red-900'
-                        } transition-colors`}
-                      >
-                        {deleteLoading ? 'Eliminando...' : 'Eliminar'}
-                      </button>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
+                      <div className="flex flex-col sm:flex-row gap-1 sm:gap-3">
+                        <button 
+                          onClick={() => handleOpenEditModal(subcategoria)}
+                          className="text-indigo-600 hover:text-indigo-900 py-1 px-2 rounded min-h-[32px] text-xs sm:text-sm"
+                        >
+                          Editar
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteSubcategoria(subcategoria.id_subcategoria, subcategoria.nombre)}
+                          disabled={deleteLoading}
+                          className={`py-1 px-2 rounded min-h-[32px] text-xs sm:text-sm ${
+                            deleteLoading ? 'text-red-300' : 'text-red-600 hover:text-red-900'
+                          } transition-colors`}
+                        >
+                          {deleteLoading ? 'Eliminando...' : 'Eliminar'}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className={`px-6 py-4 text-center ${
+                  <td colSpan="5" className={`px-3 sm:px-6 py-4 text-center text-xs sm:text-sm ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
                   }`}>
                     No hay subcategorías disponibles
@@ -521,12 +523,12 @@ const Subcategorias = ({ onSubmit }) => {
           {/* Paginación */}
           {totalPages > 1 && (
             <div className="mt-4 flex justify-center">
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px overflow-x-auto">
                 {/* Previous Button */}
                 <button
                   onClick={() => paginate(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border text-sm font-medium transition-colors ${
+                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border text-xs sm:text-sm font-medium transition-colors min-h-[40px] ${
                     isDarkMode 
                       ? `border-gray-600 bg-gray-700 ${
                           currentPage === 1
@@ -546,7 +548,7 @@ const Subcategorias = ({ onSubmit }) => {
                 {/* Page Number Buttons */}
                 {getPageNumbers().map((page, index) => (
                   page === '...' ? (
-                    <span key={`ellipsis-${index}`} className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors ${
+                    <span key={`ellipsis-${index}`} className={`relative inline-flex items-center px-3 sm:px-4 py-2 border text-xs sm:text-sm font-medium transition-colors min-h-[40px] ${
                       isDarkMode 
                         ? 'border-gray-600 bg-gray-700 text-gray-300'
                         : 'border-gray-300 bg-white text-gray-700'
@@ -557,7 +559,7 @@ const Subcategorias = ({ onSubmit }) => {
                     <button
                       key={page}
                       onClick={() => paginate(page)}
-                      className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors ${
+                      className={`relative inline-flex items-center px-3 sm:px-4 py-2 border text-xs sm:text-sm font-medium transition-colors min-h-[40px] ${
                         currentPage === page
                           ? isDarkMode
                             ? 'bg-blue-900 border-blue-400 text-blue-300 z-10'
@@ -576,7 +578,7 @@ const Subcategorias = ({ onSubmit }) => {
                 <button
                   onClick={() => paginate(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border text-sm font-medium transition-colors ${
+                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border text-xs sm:text-sm font-medium transition-colors min-h-[40px] ${
                     isDarkMode 
                       ? `border-gray-600 bg-gray-700 ${
                           currentPage === totalPages

@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Head } from "@inertiajs/react";
 import { Link } from "@inertiajs/react";
 import { useTheme } from '../storage/ThemeContext';
@@ -18,6 +18,10 @@ const CrearProducto = () => {
     const [moverSubcategorias, setMoverSubcategorias] = useState(false);
     const [sidebarVisible, setSidebarVisible] = useState(window.innerWidth >= 768);
     const [activeButton, setActiveButton] = useState('producto');
+    
+    // Ref para el sidebar y el botón del menu
+    const sidebarRef = useRef(null);
+    const menuButtonRef = useRef(null);
 
     const [form, setForm] = useState({
         sku: "",
@@ -29,6 +33,50 @@ const CrearProducto = () => {
         imagen: "",
         descripcion: "",
     });
+
+    // Efecto para manejar clics fuera del sidebar en dispositivos móviles
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // Solo cerrar el sidebar en pantallas móviles (menos de 768px)
+            if (window.innerWidth < 768) {
+                if (
+                    sidebarRef.current && 
+                    !sidebarRef.current.contains(event.target) &&
+                    menuButtonRef.current && 
+                    !menuButtonRef.current.contains(event.target) &&
+                    sidebarVisible
+                ) {
+                    setSidebarVisible(false);
+                }
+            }
+        };
+
+        // Agregar event listener solo si el sidebar está visible
+        if (sidebarVisible) {
+            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener('touchstart', handleClickOutside);
+        }
+
+        // Cleanup
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+        };
+    }, [sidebarVisible]);
+
+    // Efecto para manejar cambios de tamaño de ventana
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 768) {
+                setSidebarVisible(true);
+            } else {
+                setSidebarVisible(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -88,6 +136,7 @@ const CrearProducto = () => {
                 <Head title="Crear" />
                 
                 <button
+                    ref={menuButtonRef}
                     className={`fixed top-4 left-4 z-20 text-white p-2 rounded-md shadow-md md:hidden transition-colors duration-300 ${
                         isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
                     }`}
@@ -117,12 +166,15 @@ const CrearProducto = () => {
                      )}
                  </button>
                 
-                <div className={`${sidebarVisible ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-                transition-all duration-300 fixed md:static w-64 p-4 h-screen z-10 border-r ${
-                    isDarkMode 
-                        ? 'bg-gray-800 border-gray-700' 
-                        : 'bg-blue-50 border-blue-200'
-                }`}>
+                <div 
+                    ref={sidebarRef}
+                    className={`${sidebarVisible ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+                    transition-all duration-300 fixed md:static w-64 p-4 h-screen z-10 border-r ${
+                        isDarkMode 
+                            ? 'bg-gray-800 border-gray-700' 
+                            : 'bg-blue-50 border-blue-200'
+                    }`}
+                >
                     <div className="mb-8">
                         <Link href="/"> 
                             <img
