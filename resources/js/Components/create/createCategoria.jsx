@@ -85,9 +85,9 @@ const Categorias = ({ onSubmit }) => {
     const newPreviews = [];
     let hasError = false;
 
-    // Validar que no se seleccionen más de 5 imágenes
-    if (files.length > 5) {
-      setError('No puedes seleccionar más de 5 imágenes');
+    // Validar que no se excedan las 5 imágenes totales
+    if (imagenes.length + files.length > 5) {
+      setError(`No puedes tener más de 5 imágenes. Actualmente tienes ${imagenes.length} imágenes.`);
       return;
     }
 
@@ -101,9 +101,9 @@ const Categorias = ({ onSubmit }) => {
       }
       
       // Validar tipo de archivo
-      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webm', 'image/webp']; // Añadir 'image/webp'
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webm', 'image/webp'];
       if (!validTypes.includes(file.type)) {
-        setError(`Formato de imagen ${file.name} no válido. Use JPEG, PNG, JPG, GIF, WEBM o WEBP`); // Actualizar mensaje de error
+        setError(`Formato de imagen ${file.name} no válido. Use JPEG, PNG, JPG, GIF, WEBM o WEBP`);
         hasError = true;
         break;
       }
@@ -113,19 +113,24 @@ const Categorias = ({ onSubmit }) => {
       // Crear vista previa para cada imagen
       const reader = new FileReader();
       reader.onloadend = () => {
-        newPreviews.push({ id: file.name, preview: reader.result });
+        newPreviews.push({ id: file.name + Date.now(), preview: reader.result });
         // Si ya tenemos todas las previsualizaciones, actualizamos el estado
         if (newPreviews.length === files.length) {
-          setImagenesPreview([...newPreviews]);
+          // Agregar las nuevas imágenes a las existentes
+          setImagenesPreview(prev => [...prev, ...newPreviews]);
         }
       };
       reader.readAsDataURL(file);
     }
     
     if (!hasError) {
-      setImagenes(newImagenes);
+      // Agregar las nuevas imágenes a las existentes
+      setImagenes(prev => [...prev, ...newImagenes]);
       setError(null);
     }
+    
+    // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
+    e.target.value = '';
   };
 
   // Eliminar una imagen de la lista
@@ -136,6 +141,68 @@ const Categorias = ({ onSubmit }) => {
     
     const newPreviews = [...imagenesPreview];
     newPreviews.splice(index, 1);
+    setImagenesPreview(newPreviews);
+  };
+
+  // Mover imagen hacia arriba en la lista (para creación)
+  const moveImageUp = (index) => {
+    if (index === 0) return; // Ya está en la primera posición
+    
+    const newImagenes = [...imagenes];
+    const newPreviews = [...imagenesPreview];
+    
+    // Intercambiar posiciones
+    [newImagenes[index], newImagenes[index - 1]] = [newImagenes[index - 1], newImagenes[index]];
+    [newPreviews[index], newPreviews[index - 1]] = [newPreviews[index - 1], newPreviews[index]];
+    
+    setImagenes(newImagenes);
+    setImagenesPreview(newPreviews);
+  };
+
+  // Mover imagen hacia abajo en la lista (para creación)
+  const moveImageDown = (index) => {
+    if (index === imagenes.length - 1) return; // Ya está en la última posición
+    
+    const newImagenes = [...imagenes];
+    const newPreviews = [...imagenesPreview];
+    
+    // Intercambiar posiciones
+    [newImagenes[index], newImagenes[index + 1]] = [newImagenes[index + 1], newImagenes[index]];
+    [newPreviews[index], newPreviews[index + 1]] = [newPreviews[index + 1], newPreviews[index]];
+    
+    setImagenes(newImagenes);
+    setImagenesPreview(newPreviews);
+  };
+
+  // Funciones para drag and drop (creación)
+  const handleDragStart = (e, index) => {
+    e.dataTransfer.setData('text/plain', index.toString());
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+    
+    if (dragIndex === dropIndex) return;
+    
+    const newImagenes = [...imagenes];
+    const newPreviews = [...imagenesPreview];
+    
+    // Remover el elemento de la posición original
+    const draggedImage = newImagenes.splice(dragIndex, 1)[0];
+    const draggedPreview = newPreviews.splice(dragIndex, 1)[0];
+    
+    // Insertar en la nueva posición
+    newImagenes.splice(dropIndex, 0, draggedImage);
+    newPreviews.splice(dropIndex, 0, draggedPreview);
+    
+    setImagenes(newImagenes);
     setImagenesPreview(newPreviews);
   };
 
@@ -178,9 +245,9 @@ const Categorias = ({ onSubmit }) => {
     const newPreviews = [];
     let hasError = false;
 
-    // Validar que no se seleccionen más de 5 imágenes
-    if (files.length > 5) {
-      setError('No puedes seleccionar más de 5 imágenes');
+    // Validar que no se excedan las 5 imágenes totales
+    if (editImagenes.length + files.length > 5) {
+      setError(`No puedes tener más de 5 imágenes. Actualmente tienes ${editImagenes.length} imágenes.`);
       return;
     }
 
@@ -206,20 +273,25 @@ const Categorias = ({ onSubmit }) => {
       // Crear vista previa para cada imagen
       const reader = new FileReader();
       reader.onloadend = () => {
-        newPreviews.push({ id: file.name, preview: reader.result });
+        newPreviews.push({ id: file.name + Date.now(), preview: reader.result });
         // Si ya tenemos todas las previsualizaciones, actualizamos el estado
         if (newPreviews.length === files.length) {
-          setEditImagenesPreview([...newPreviews]);
+          // Agregar las nuevas imágenes a las existentes
+          setEditImagenesPreview(prev => [...prev, ...newPreviews]);
         }
       };
       reader.readAsDataURL(file);
     }
     
     if (!hasError) {
-      setEditImagenes(newImagenes);
+      // Agregar las nuevas imágenes a las existentes
+      setEditImagenes(prev => [...prev, ...newImagenes]);
       setError(null);
       setShouldClearImages(true); // Marcar que las imágenes deben ser actualizadas
     }
+    
+    // Limpiar el input para permitir seleccionar el mismo archivo nuevamente
+    e.target.value = '';
   };
 
   // Eliminar una imagen de la lista en edición
@@ -233,6 +305,68 @@ const Categorias = ({ onSubmit }) => {
     setEditImagenesPreview(newPreviews);
   };
 
+  // Mover imagen hacia arriba en la lista
+  const moveEditImageUp = (index) => {
+    if (index === 0) return; // Ya está en la primera posición
+    
+    const newImagenes = [...editImagenes];
+    const newPreviews = [...editImagenesPreview];
+    
+    // Intercambiar posiciones
+    [newImagenes[index], newImagenes[index - 1]] = [newImagenes[index - 1], newImagenes[index]];
+    [newPreviews[index], newPreviews[index - 1]] = [newPreviews[index - 1], newPreviews[index]];
+    
+    setEditImagenes(newImagenes);
+    setEditImagenesPreview(newPreviews);
+  };
+
+  // Mover imagen hacia abajo en la lista
+  const moveEditImageDown = (index) => {
+    if (index === editImagenes.length - 1) return; // Ya está en la última posición
+    
+    const newImagenes = [...editImagenes];
+    const newPreviews = [...editImagenesPreview];
+    
+    // Intercambiar posiciones
+    [newImagenes[index], newImagenes[index + 1]] = [newImagenes[index + 1], newImagenes[index]];
+    [newPreviews[index], newPreviews[index + 1]] = [newPreviews[index + 1], newPreviews[index]];
+    
+    setEditImagenes(newImagenes);
+    setEditImagenesPreview(newPreviews);
+  };
+
+
+  // Funciones para drag and drop (edición)
+  const handleEditDragStart = (e, index) => {
+    e.dataTransfer.setData('text/plain', index.toString());
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleEditDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleEditDrop = (e, dropIndex) => {
+    e.preventDefault();
+    const dragIndex = parseInt(e.dataTransfer.getData('text/plain'));
+    
+    if (dragIndex === dropIndex) return;
+    
+    const newImagenes = [...editImagenes];
+    const newPreviews = [...editImagenesPreview];
+    
+    // Remover el elemento de la posición original
+    const draggedImage = newImagenes.splice(dragIndex, 1)[0];
+    const draggedPreview = newPreviews.splice(dragIndex, 1)[0];
+    
+    // Insertar en la nueva posición
+    newImagenes.splice(dropIndex, 0, draggedImage);
+    newPreviews.splice(dropIndex, 0, draggedPreview);
+    
+    setEditImagenes(newImagenes);
+    setEditImagenesPreview(newPreviews);
+  };
 
   // Función para limpiar todas las imágenes
   const handleClearEditImages = () => {
@@ -662,6 +796,27 @@ const Categorias = ({ onSubmit }) => {
                     />
                   </label>
                   
+                  {/* Botón para limpiar todas las imágenes */}
+                  {imagenesPreview.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImagenes([]);
+                        setImagenesPreview([]);
+                      }}
+                      className={`px-3 py-2 h-24 rounded-lg border-2 transition-all duration-300 hover:scale-[1.02] flex flex-col items-center justify-center ${
+                        isDarkMode 
+                          ? 'border-red-500 bg-red-600 hover:bg-red-500 text-white' 
+                          : 'border-red-400 bg-red-500 hover:bg-red-600 text-white'
+                      }`}
+                      title="Limpiar todas las imágenes"
+                    >
+                      <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      <span className="text-xs font-medium">Limpiar</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -687,14 +842,59 @@ const Categorias = ({ onSubmit }) => {
               </div>
               <div className="flex flex-wrap gap-2">
                 {imagenesPreview.map((img, index) => (
-                  <div key={img.id} className="relative group">
-                    <div className="w-16 h-16 rounded-lg overflow-hidden shadow-sm border-2 border-transparent group-hover:border-indigo-300 transition-all duration-200">
+                  <div 
+                    key={img.id} 
+                    className="relative group cursor-move"
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, index)}
+                  >
+                    <div className="w-16 h-16 rounded-lg overflow-hidden shadow-sm border-2 border-transparent group-hover:border-indigo-300 transition-all duration-200 group-hover:shadow-lg">
                       <img 
                         src={img.preview} 
                         alt={`Preview ${index + 1}`} 
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover pointer-events-none"
                       />
                     </div>
+                    
+                    {/* Indicador de posición */}
+                    <div className="absolute -top-2 -left-2 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-lg">
+                      {index + 1}
+                    </div>
+                    
+                    {/* Icono de drag */}
+                    <div className="absolute top-0 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="bg-gray-700 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs shadow-lg" title="Arrastrar para reordenar">
+                        ⋮⋮
+                      </div>
+                    </div>
+                    
+                    {/* Botones de reordenamiento (mantener como alternativa) */}
+                    <div className="absolute top-0 left-6 flex flex-col opacity-0 group-hover:opacity-100 transition-opacity">
+                      {index > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => moveImageUp(index)}
+                          className="bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs shadow-lg hover:bg-green-600 transition-colors mb-1"
+                          title="Subir"
+                        >
+                          ↑
+                        </button>
+                      )}
+                      {index < imagenesPreview.length - 1 && (
+                        <button
+                          type="button"
+                          onClick={() => moveImageDown(index)}
+                          className="bg-green-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs shadow-lg hover:bg-green-600 transition-colors"
+                          title="Bajar"
+                        >
+                          ↓
+                        </button>
+                      )}
+                    </div>
+                    
+                    {/* Botón eliminar */}
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
@@ -1198,22 +1398,94 @@ const Categorias = ({ onSubmit }) => {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {editImagenesPreview.map((img, index) => (
-                        <div key={img.id} className="relative group">
+                        <div 
+                          key={img.id} 
+                          className="relative group cursor-move"
+                          draggable
+                          onDragStart={(e) => handleEditDragStart(e, index)}
+                          onDragOver={handleEditDragOver}
+                          onDrop={(e) => handleEditDrop(e, index)}
+                        >
                           <div className="w-16 h-16 rounded-lg overflow-hidden shadow-sm border-2 border-transparent group-hover:border-indigo-300 transition-all duration-200">
                             <img 
                               src={img.preview} 
                               alt={`Preview ${index + 1}`} 
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover pointer-events-none"
                             />
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => removeEditImage(index)}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-lg hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
-                            title="Eliminar"
-                          >
-                            ×
-                          </button>
+                          
+                          {/* Indicador de posición */}
+                          <div className="absolute -top-2 -left-2 bg-blue-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-lg">
+                            {index + 1}
+                          </div>
+                          
+                          {/* Icono de drag */}
+                          <div className="absolute top-0 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="bg-gray-700 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs shadow-lg" title="Arrastrar para reordenar">
+                              ⋮⋮
+                            </div>
+                          </div>
+                          
+                          {/* Botones de control */}
+                          <div className="absolute -top-1 -right-1 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {/* Botón eliminar */}
+                            <button
+                              type="button"
+                              onClick={() => removeEditImage(index)}
+                              className="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-lg hover:bg-red-600 transition-colors"
+                              title="Eliminar"
+                            >
+                              ×
+                            </button>
+                          </div>
+                          
+                          {/* Botones de reordenamiento */}
+                          <div className="absolute -bottom-1 -right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {/* Botón mover hacia arriba */}
+                            {index > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => moveEditImageUp(index)}
+                                className={`rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-lg transition-colors ${
+                                  isDarkMode 
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                                }`}
+                                title="Mover hacia arriba"
+                              >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" />
+                                </svg>
+                              </button>
+                            )}
+                            
+                            {/* Botón mover hacia abajo */}
+                            {index < editImagenesPreview.length - 1 && (
+                              <button
+                                type="button"
+                                onClick={() => moveEditImageDown(index)}
+                                className={`rounded-full w-5 h-5 flex items-center justify-center text-xs shadow-lg transition-colors ${
+                                  isDarkMode 
+                                    ? 'bg-green-600 text-white hover:bg-green-700' 
+                                    : 'bg-green-500 text-white hover:bg-green-600'
+                                }`}
+                                title="Mover hacia abajo"
+                              >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                          
+                          {/* Indicador de posición */}
+                          <div className={`absolute -top-1 -left-1 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-lg ${
+                            isDarkMode 
+                              ? 'bg-gray-700 text-gray-200' 
+                              : 'bg-gray-200 text-gray-700'
+                          }`}>
+                            {index + 1}
+                          </div>
                         </div>
                       ))}
                     </div>
