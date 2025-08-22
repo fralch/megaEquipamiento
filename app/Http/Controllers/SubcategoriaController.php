@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Subcategoria;
 use App\Models\Categoria;
+use Illuminate\Support\Facades\DB;
 
 class SubcategoriaController extends Controller
 {
@@ -266,6 +267,34 @@ class SubcategoriaController extends Controller
         Subcategoria::whereIn('id_subcategoria', $request->subcategorias)
             ->update(['id_categoria' => $request->categoria_destino_id]);
 
+        // Actualizar las relaciones marca-categoria después de mover subcategorías
+        $this->actualizarRelacionesMarcaCategoria();
+
         return response()->json(['message' => 'Subcategorías movidas con éxito.']);
+    }
+
+    /**
+     * Actualizar relaciones marca-categoria basándose en productos existentes
+     */
+    private function actualizarRelacionesMarcaCategoria()
+    {
+        // Limpiar relaciones existentes
+        DB::table('marca_categoria')->delete();
+        
+        // Insertar las relaciones marca-categoria basadas en los productos existentes
+        $query = "
+            INSERT INTO marca_categoria (marca_id, categoria_id, created_at, updated_at)
+            SELECT DISTINCT 
+                p.marca_id,
+                s.id_categoria,
+                NOW(),
+                NOW()
+            FROM productos p
+            INNER JOIN subcategorias s ON p.id_subcategoria = s.id_subcategoria
+            WHERE p.marca_id IS NOT NULL 
+            AND s.id_categoria IS NOT NULL
+        ";
+        
+        DB::statement($query);
     }
 }
