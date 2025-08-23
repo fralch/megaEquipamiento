@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use  Inertia\Inertia;
+
 use App\Models\Producto;
 use App\Models\Subcategoria;
 use App\Models\Marca;
@@ -192,25 +193,30 @@ class ProductoController extends Controller
     // obtener todos los productos con paginación
     public function getProductosAll(Request $request)
     {
-        $perPage = $request->input('per_page', 20); // Default to 20 items per page
-        $page = $request->input('page', 1); // Default to page 1
+        $perPage = $request->input('per_page', 20);
+        $page = $request->input('page', 1);
         
-        // Validate per_page parameter
-        $perPage = max(1, min(100, (int)$perPage)); // Limit between 1 and 100
+        $perPage = max(1, min(100, (int)$perPage));
         
         $productos = Producto::with('marca')
-            ->orderByRaw('CASE WHEN created_at IS NULL THEN 0 ELSE 1 END DESC') // Non-null created_at first
-            ->orderBy('created_at', 'desc') // Then by created_at desc
-            ->orderBy('id_producto', 'desc') // Finally by id desc for NULL created_at
+            ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
             
         return response()->json($productos);
     }
+
     // Obtener todos los productos
     public function getProductos(Request $request)
     {
-        $perPage = $request->input('per_page', 50); // Default 50 items per page
-        $productos = Producto::with('marca')->paginate($perPage);
+        $perPage = $request->input('per_page', 20);
+        $page = $request->input('page', 1);
+        
+        $perPage = max(1, min(100, (int)$perPage));
+        
+        $productos = Producto::with('marca')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+            
         return response()->json($productos);
     }
 
