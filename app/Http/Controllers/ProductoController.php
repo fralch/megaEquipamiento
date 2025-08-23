@@ -337,6 +337,78 @@ class ProductoController extends Controller
     }
 
     /**
+     * Eliminar una imagen específica de un producto
+     */
+    public function deleteProductImage(Request $request, $id)
+    {
+        $request->validate([
+            'imagen' => 'required|string'
+        ]);
+
+        // Buscar el producto por ID
+        $producto = Producto::find($id);
+        
+        if (!$producto) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Producto no encontrado'
+            ], 404);
+        }
+
+        try {
+            $imagenAEliminar = $request->input('imagen');
+            $imagenesActuales = $producto->imagen;
+
+            // Si no hay imágenes o está vacío
+            if (!$imagenesActuales) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'El producto no tiene imágenes'
+                ], 400);
+            }
+
+            // Convertir a array si es un string
+            if (!is_array($imagenesActuales)) {
+                $imagenesActuales = [$imagenesActuales];
+            }
+
+            // Verificar si la imagen existe en el producto
+            $indexImagenAEliminar = array_search($imagenAEliminar, $imagenesActuales);
+            if ($indexImagenAEliminar === false) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'La imagen especificada no existe en este producto'
+                ], 400);
+            }
+
+            // Eliminar el archivo físico si existe
+            if (file_exists(public_path($imagenAEliminar))) {
+                unlink(public_path($imagenAEliminar));
+            }
+
+            // Remover la imagen del array
+            array_splice($imagenesActuales, $indexImagenAEliminar, 1);
+
+            // Actualizar el producto - si no quedan imágenes, poner null
+            $producto->imagen = empty($imagenesActuales) ? null : $imagenesActuales;
+            $producto->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Imagen eliminada correctamente',
+                'imagen' => $producto->imagen,
+                'producto' => $producto->fresh('marca')
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al eliminar la imagen: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Add a related product relationship
      * 
      * Example JSON request:

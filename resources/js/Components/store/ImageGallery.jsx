@@ -264,6 +264,53 @@ const ImageGallery = ({ images, productId, productName, onImagesUpdate, canEdit 
         setPreviewImages(newPreviewImages);
     };
 
+    // Función para eliminar una imagen específica del producto
+    const handleDeleteExistingImage = async (imageIndex) => {
+        if (!canEdit || isLoading) return;
+        
+        const imageToDelete = normalizedImages[imageIndex];
+        if (!imageToDelete) return;
+
+        // Confirmar la eliminación
+        if (!window.confirm('¿Estás seguro de que deseas eliminar esta imagen? Esta acción no se puede deshacer.')) {
+            return;
+        }
+
+        setIsLoading(true);
+        setErrors([]);
+
+        try {
+            const response = await axios.delete(`/productos/${productId}/imagen`, {
+                data: {
+                    imagen: imageToDelete
+                },
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.data && response.data.imagen !== undefined) {
+                // Actualizar las imágenes en el componente padre
+                if (onImagesUpdate) {
+                    onImagesUpdate(response.data.imagen);
+                }
+                
+                // Ajustar el índice de la imagen actual si es necesario
+                if (currentImageIndex >= normalizedImages.length - 1) {
+                    setCurrentImageIndex(Math.max(0, normalizedImages.length - 2));
+                } else if (imageIndex <= currentImageIndex) {
+                    setCurrentImageIndex(Math.max(0, currentImageIndex - 1));
+                }
+            }
+        } catch (error) {
+            console.error('Error deleting image:', error);
+            setErrors(['Error al eliminar la imagen. Por favor, inténtalo de nuevo.']);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     // Componente de imagen principal
     const renderMainImage = () => {
         if (normalizedImages.length === 0) {
@@ -575,6 +622,23 @@ const ImageGallery = ({ images, productId, productName, onImagesUpdate, canEdit 
                 </div>
             )}
 
+            {/* Errores de eliminación */}
+            {errors.length > 0 && !isEditing && (
+                <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200">
+                    <div className="flex items-center mb-2">
+                        <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-red-700 font-medium">Error:</span>
+                    </div>
+                    <ul className="text-red-600 text-sm space-y-1">
+                        {errors.map((error, index) => (
+                            <li key={index}>• {error}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
             {/* Imagen principal */}
             {renderMainImage()}
             
@@ -587,28 +651,102 @@ const ImageGallery = ({ images, productId, productName, onImagesUpdate, canEdit 
                         style={{ scrollbarWidth: 'thin' }}
                     >
                         {normalizedImages.map((image, index) => (
-                            <button
-                                key={index}
-                                onClick={() => handleImageChange(index)}
-                                className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                                    index === currentImageIndex
-                                        ? (isDarkMode ? 'border-blue-400 shadow-lg' : 'border-blue-500 shadow-lg')
-                                        : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
-                                }`}
-                                aria-label={`Ver imagen ${index + 1}`}
-                            >
-                                <img
-                                    src={getImageUrl(image)}
-                                    alt={`${productName} - Imagen ${index + 1}`}
-                                    className="w-full h-full object-cover transition-transform duration-200 hover:scale-110"
-                                    loading="lazy"
-                                    onError={(e) => {
-                                        e.target.style.display = 'none';
-                                    }}
-                                />
-                            </button>
+                            <div key={index} className="relative flex-shrink-0 group">
+                                <button
+                                    onClick={() => handleImageChange(index)}
+                                    disabled={isLoading}
+                                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                                        index === currentImageIndex
+                                            ? (isDarkMode ? 'border-blue-400 shadow-lg' : 'border-blue-500 shadow-lg')
+                                            : (isDarkMode ? 'border-gray-600 hover:border-gray-500' : 'border-gray-300 hover:border-gray-400')
+                                    } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    aria-label={`Ver imagen ${index + 1}`}
+                                >
+                                    <img
+                                        src={getImageUrl(image)}
+                                        alt={`${productName} - Imagen ${index + 1}`}
+                                        className="w-full h-full object-cover transition-transform duration-200 hover:scale-110"
+                                        loading="lazy"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                        }}
+                                    />
+                                </button>
+                                
+                                {/* Botón de eliminar */}
+                                {canEdit && !isEditing && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleDeleteExistingImage(index);
+                                        }}
+                                        disabled={isLoading}
+                                        className={`absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs transition-all duration-200 ${
+                                            isLoading 
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : 'bg-red-500 hover:bg-red-600 hover:scale-110'
+                                        } text-white shadow-lg opacity-0 group-hover:opacity-100 z-10`}
+                                        title="Eliminar imagen"
+                                        aria-label={`Eliminar imagen ${index + 1}`}
+                                    >
+                                        {isLoading ? (
+                                            <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                        ) : (
+                                            '×'
+                                        )}
+                                    </button>
+                                )}
+                            </div>
                         ))}
                     </div>
+                </div>
+            )}
+            
+            {/* Mostrar mensaje cuando solo hay una imagen y se puede editar */}
+            {normalizedImages.length === 1 && canEdit && !isEditing && (
+                <div className={`text-center p-4 rounded-lg border-2 border-dashed ${
+                    isDarkMode ? 'border-gray-600 bg-gray-800 text-gray-300' : 'border-gray-300 bg-gray-50 text-gray-600'
+                }`}>
+                    <div className="relative inline-block group">
+                        <button
+                            onClick={(e) => {
+                                e.preventDefault();
+                                handleDeleteExistingImage(0);
+                            }}
+                            disabled={isLoading}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                                isLoading 
+                                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                                    : isDarkMode 
+                                        ? 'bg-red-600 hover:bg-red-700 text-white' 
+                                        : 'bg-red-500 hover:bg-red-600 text-white'
+                            } shadow-md hover:shadow-lg`}
+                        >
+                            {isLoading ? (
+                                <>
+                                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Eliminando...
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Eliminar Imagen
+                                </>
+                            )}
+                        </button>
+                    </div>
+                    <p className="text-xs mt-2 opacity-75">
+                        Puedes eliminar la imagen actual o agregar más imágenes
+                    </p>
                 </div>
             )}
         </div>
