@@ -16,15 +16,51 @@ const ProductsView = () => {
   const [perPage, setPerPage] = useState(20);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [sortOrder, setSortOrder] = useState('desc'); // 'asc' | 'desc'
 
-  // Obtener productos con paginación
+  // Helpers de fecha (tolerante a distintos formatos)
+  const getDateObj = (val) => {
+    if (!val) return null;
+    if (typeof val === 'string' || typeof val === 'number') return new Date(val);
+    if (typeof val === 'object' && val.date) return new Date(val.date);
+    return null;
+    // Si necesitas soportar timestamps en segundos, podrías detectar y multiplicar por 1000.
+  };
+
+  const formatDate = (raw) => {
+    const d = getDateObj(raw);
+    if (!d || isNaN(d.getTime())) return '—';
+    return new Intl.DateTimeFormat('es-PE', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(d);
+  };
+
+  const formatPrice = (price) =>
+    new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(price || 0);
+
+  // Orden por fecha según sortOrder
+  const applySorting = (data, order = sortOrder) => {
+    return [...data].sort((a, b) => {
+      const da = getDateObj(a.created_at || a.fecha_creacion || 0)?.getTime() || 0;
+      const db = getDateObj(b.created_at || b.fecha_creacion || 0)?.getTime() || 0;
+      return order === 'asc' ? da - db : db - da;
+    });
+  };
+
+  // Fetch con paginación
   const fetchProducts = async (page = 1, itemsPerPage = 20) => {
     setLoading(true);
     try {
       const res = await fetch(`${URL_API}/product/all?page=${page}&per_page=${itemsPerPage}`);
       const data = await res.json();
-
+      console.log(data?.data?.[0])
       if (data?.data) {
+        // Respetar el orden que viene del backend (ya ordenado por created_at desc)
+        // Solo aplicar ordenamiento local si el usuario ha cambiado explícitamente el orden
         setProducts(data.data);
         setFilteredProducts(data.data);
         setCurrentPage(data.current_page);
@@ -44,6 +80,24 @@ const ProductsView = () => {
     fetchProducts(currentPage, perPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, perPage]);
+
+  // Reordenar cuando el usuario cambia explícitamente el sortOrder
+  useEffect(() => {
+    if (!products.length) return;
+    const sorted = applySorting(products, sortOrder);
+    setProducts(sorted);
+    // re-aplica filtro vigente
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) setFilteredProducts(sorted);
+    else {
+      const filtered = sorted.filter((p) =>
+        (p.nombre || '').toLowerCase().includes(term) ||
+        (p.sku || '').toLowerCase().includes(term) ||
+        (p.marca?.nombre || '').toLowerCase().includes(term)
+      );
+      setFilteredProducts(filtered);
+    }
+  }, [sortOrder]); // Removido 'products' de las dependencias
 
   // Filtrar productos
   useEffect(() => {
@@ -77,11 +131,11 @@ const ProductsView = () => {
     setDeleteLoading(true);
     try {
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-      const response = await fetch(`${URL_API}/product/delete/${productId}`, {
+      const response = await fetch(`/product/delete/${productId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': csrfToken,
+          'X-CSRF-TOKEN': csrfToken || '',
           'X-Requested-With': 'XMLHttpRequest',
         },
       });
@@ -103,10 +157,6 @@ const ProductsView = () => {
       setDeleteLoading(false);
     }
   };
-
-  // Formatear precio
-  const formatPrice = (price) =>
-    new Intl.NumberFormat('es-PE', { style: 'currency', currency: 'PEN' }).format(price || 0);
 
   // Paginación
   const handlePageChange = (page) => {
@@ -140,13 +190,28 @@ const ProductsView = () => {
       }`}
     >
       {/* Header */}
-      <div className="mb-6">
-        <h1 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-          Gestión de Productos
-        </h1>
-        <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-sm`}>
-          Total de productos: {totalProducts}
-        </p>
+      <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            Gestión de Productos
+          </h1>
+          <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-600'} text-sm`}>
+            Total de productos: {totalProducts}
+          </p>
+        </div>
+
+        {/* Toggle de orden asc/desc */}
+        <button
+          onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+            isDarkMode
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-blue-500 text-white hover:bg-blue-600'
+          }`}
+          title="Cambiar orden por fecha de creación"
+        >
+          {sortOrder === 'asc' ? 'Orden: Antiguos primero ↑' : 'Orden: Recientes primero ↓'}
+        </button>
       </div>
 
       {/* Mensajes */}
@@ -212,7 +277,7 @@ const ProductsView = () => {
         </div>
       )}
 
-      {/* Tabla de productos (sin columna de imágenes) */}
+      {/* Tabla */}
       {!loading && (
         <div className="overflow-x-auto rounded-lg border border-transparent">
           <table
@@ -222,13 +287,7 @@ const ProductsView = () => {
           >
             <thead>
               <tr className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                {[
-                  'SKU',
-                  'Nombre',
-                  'Marca',
-                  'Precio',
-                  'Acciones',
-                ].map((h) => (
+                {['SKU', 'Nombre', 'Marca', 'Precio', 'Fecha de creación', 'Acciones'].map((h) => (
                   <th
                     key={h}
                     className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider border-b sticky top-0 z-10 ${
@@ -250,6 +309,7 @@ const ProductsView = () => {
                       isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
                     }`}
                   >
+                    {/* SKU */}
                     <td
                       className={`px-4 py-4 whitespace-nowrap text-sm font-medium ${
                         isDarkMode ? 'text-gray-300' : 'text-gray-900'
@@ -259,6 +319,7 @@ const ProductsView = () => {
                       {product.sku}
                     </td>
 
+                    {/* Nombre */}
                     <td
                       className={`px-4 py-4 text-sm ${
                         isDarkMode ? 'text-gray-300' : 'text-gray-900'
@@ -268,6 +329,7 @@ const ProductsView = () => {
                       <div className="max-w-xs truncate">{product.nombre}</div>
                     </td>
 
+                    {/* Marca */}
                     <td
                       className={`px-4 py-4 whitespace-nowrap text-sm ${
                         isDarkMode ? 'text-gray-300' : 'text-gray-900'
@@ -287,6 +349,7 @@ const ProductsView = () => {
                       )}
                     </td>
 
+                    {/* Precio */}
                     <td
                       className={`px-4 py-4 whitespace-nowrap text-sm font-semibold ${
                         isDarkMode ? 'text-green-400' : 'text-green-600'
@@ -296,10 +359,21 @@ const ProductsView = () => {
                       {formatPrice(product.precio_igv)}
                     </td>
 
+                    {/* Fecha de creación */}
+                    <td
+                      className={`px-4 py-4 whitespace-nowrap text-sm ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-900'
+                      }`}
+                      title={formatDate(product.created_at || product.fecha_creacion || product.updated_at)}
+                    >
+                      {formatDate(product.created_at || product.fecha_creacion || product.updated_at)}
+                    </td>
+
+                    {/* Acciones */}
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex gap-2">
                         <a
-                          href={`/product/show/${product.id_producto}`}
+                          href={`/producto/${product.id_producto}`}
                           className={`px-3 py-1 rounded-md text-xs transition-colors duration-200 ${
                             isDarkMode
                               ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-400'
@@ -330,7 +404,7 @@ const ProductsView = () => {
               ) : (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className={`px-4 py-10 text-center text-sm ${
                       isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     }`}

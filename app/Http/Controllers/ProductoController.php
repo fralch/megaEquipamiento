@@ -199,7 +199,9 @@ class ProductoController extends Controller
         $perPage = max(1, min(100, (int)$perPage)); // Limit between 1 and 100
         
         $productos = Producto::with('marca')
-            ->orderBy('created_at', 'desc') // Order by newest first
+            ->orderByRaw('CASE WHEN created_at IS NULL THEN 0 ELSE 1 END DESC') // Non-null created_at first
+            ->orderBy('created_at', 'desc') // Then by created_at desc
+            ->orderBy('id_producto', 'desc') // Finally by id desc for NULL created_at
             ->paginate($perPage, ['*'], 'page', $page);
             
         return response()->json($productos);
