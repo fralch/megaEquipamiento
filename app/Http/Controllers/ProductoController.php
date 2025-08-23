@@ -274,47 +274,111 @@ class ProductoController extends Controller
         $producto = Producto::find($request->id_producto);
         
         try {
-            // Eliminar las imágenes anteriores si existen
-            if ($producto->imagen) {
-                $imagenesAnteriores = is_array($producto->imagen) ? $producto->imagen : [$producto->imagen];
-                foreach ($imagenesAnteriores as $imagenAnterior) {
-                    if ($imagenAnterior && file_exists(public_path($imagenAnterior))) {
-                        unlink(public_path($imagenAnterior));
+            $imagenesArray = [];
+
+            // Verificar si se están usando imágenes del banco
+            if ($request->has('imagenesDelBanco')) {
+                $imagenesDelBanco = json_decode($request->input('imagenesDelBanco'), true);
+                if ($imagenesDelBanco && is_array($imagenesDelBanco)) {
+                    // Mantener las imágenes existentes y agregar las del banco
+                    $imagenesExistentes = $producto->imagen;
+                    if ($imagenesExistentes && is_array($imagenesExistentes)) {
+                        $imagenesArray = $imagenesExistentes;
+                    } elseif ($imagenesExistentes) {
+                        $imagenesArray = [$imagenesExistentes];
+                    }
+                    
+                    // Agregar las nuevas imágenes del banco
+                    foreach ($imagenesDelBanco as $imagenBanco) {
+                        if (isset($imagenBanco['url'])) {
+                            $imagenesArray[] = $imagenBanco['url'];
+                        }
                     }
                 }
             }
-            
-            $imagenesArray = [];
-            
-            // Procesar múltiples imágenes con formato imagen[0], imagen[1], etc.
-            if ($request->has('imagen') && is_array($request->file('imagen'))) {
-                $imagenes = $request->file('imagen');
-                foreach ($imagenes as $index => $imagen) {
-                    if ($imagen && $imagen->isValid()) {
+            // Si se suben archivos normales (reemplazar todas las imágenes)
+            else {
+                // Eliminar las imágenes anteriores si existen (solo para archivos nuevos)
+                if ($producto->imagen) {
+                    $imagenesAnteriores = is_array($producto->imagen) ? $producto->imagen : [$producto->imagen];
+                    foreach ($imagenesAnteriores as $imagenAnterior) {
+                        if ($imagenAnterior && !str_starts_with($imagenAnterior, 'http') && file_exists(public_path($imagenAnterior))) {
+                            unlink(public_path($imagenAnterior));
+                        }
+                    }
+                }
+
+                // Procesar múltiples imágenes con formato imagen[0], imagen[1], etc.
+                if ($request->has('imagen') && is_array($request->file('imagen'))) {
+                    $imagenes = $request->file('imagen');
+                    
+                    foreach ($imagenes as $index => $imagen) {
+                        if ($imagen && $imagen->isValid()) {
+                            // Procesar imagen normalmente para el producto
+                            $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
+                            $imagePath = 'productos/' . $imageName;
+                            
+                            // Crear directorio si no existe
+                            $destDir = public_path('productos');
+                            if (!is_dir($destDir)) {
+                                if (!mkdir($destDir, 0755, true)) {
+                                    throw new \Exception("No se pudo crear el directorio: $destDir");
+                                }
+                            }
+                            
+                            // Usar una ruta temporal y copiar manualmente si move() falla
+                            $tempPath = $imagen->getPathname();
+                            $finalPath = $destDir . DIRECTORY_SEPARATOR . $imageName;
+                            
+                            \Log::info("Copiando desde: $tempPath a: $finalPath");
+                            
+                            // Intentar primero move(), luego copy() como fallback
+                            if (!$imagen->move($destDir, $imageName)) {
+                                if (!copy($tempPath, $finalPath)) {
+                                    throw new \Exception("No se pudo copiar el archivo desde $tempPath a $finalPath");
+                                }
+                            }
+                            
+                            $imagenesArray[] = $imagePath;
+                        }
+                    }
+                }
+                // Mantener compatibilidad con el formato anterior 'imagenes'
+                elseif ($request->hasFile('imagenes')) {
+                    $imagenes = $request->file('imagenes');
+                    $destDir = public_path('productos');
+                    if (!file_exists($destDir)) {
+                        mkdir($destDir, 0755, true);
+                    }
+                    
+                    foreach ($imagenes as $index => $imagen) {
                         $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
                         $imagePath = 'productos/' . $imageName;
-                        $imagen->move(public_path('productos'), $imageName);
+                        
+                        if (!$imagen->move($destDir, $imageName)) {
+                            throw new \Exception("No se pudo mover el archivo al directorio de destino: $destDir/$imageName");
+                        }
+                        
                         $imagenesArray[] = $imagePath;
                     }
                 }
-            }
-            // Mantener compatibilidad con el formato anterior 'imagenes'
-            elseif ($request->hasFile('imagenes')) {
-                $imagenes = $request->file('imagenes');
-                foreach ($imagenes as $index => $imagen) {
-                    $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
+                // Mantener compatibilidad con imagen única
+                elseif ($request->hasFile('imagen') && !is_array($request->file('imagen'))) {
+                    $image = $request->file('imagen');
+                    $imageName = time() . '.' . $image->getClientOriginalExtension();
                     $imagePath = 'productos/' . $imageName;
-                    $imagen->move(public_path('productos'), $imageName);
+                    
+                    $destDir = public_path('productos');
+                    if (!file_exists($destDir)) {
+                        mkdir($destDir, 0755, true);
+                    }
+                    
+                    if (!$image->move($destDir, $imageName)) {
+                        throw new \Exception("No se pudo mover el archivo al directorio de destino: $destDir/$imageName");
+                    }
+                    
                     $imagenesArray[] = $imagePath;
                 }
-            }
-            // Mantener compatibilidad con imagen única
-            elseif ($request->hasFile('imagen') && !is_array($request->file('imagen'))) {
-                $image = $request->file('imagen');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = 'productos/' . $imageName;
-                $image->move(public_path('productos'), $imageName);
-                $imagenesArray[] = $imagePath;
             }
             
             // Actualizar el campo de imágenes
@@ -542,5 +606,3 @@ class ProductoController extends Controller
         }
     }
 }
-
-    

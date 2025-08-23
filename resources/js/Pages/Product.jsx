@@ -24,6 +24,7 @@ import ProductTabs from "../Components/product/ProductTabs";
 import ModalRelatedProducts from "../Components/product/ModalRelatedProducts";
 import RelatedProducts from "../Components/product/RelatedProducts";
 import ProductCategoryEdit from "../Components/product/ProductCategoryEdit";
+import BancoImagenesModal from '../Components/store/BancoImagenesModal';
 
 // Currency formatting function moved to CurrencyContext
 // probando github actions
@@ -90,6 +91,38 @@ const ProductPage = ({ producto }) => {
     const [showVideoInput, setShowVideoInput] = useState(false); // Estado para mostrar/ocultar el input de video
     const [videoPreview, setVideoPreview] = useState(''); // Estado para la previsualización del video
     const [showRecentlyViewed, setShowRecentlyViewed] = useState(false); // Estado para mostrar productos vistos recientemente
+    const [isBancoImagenesOpen, setIsBancoImagenesOpen] = useState(false);
+
+    const handleImageSelectFromBank = async (selectedImages) => {
+        if (selectedImages.length === 0) return;
+        
+        try {
+            const formData = new FormData();
+            formData.append('id_producto', producto.id_producto);
+            formData.append('imagenesDelBanco', JSON.stringify(selectedImages));
+
+            const response = await axios.post('/productos/actualizar-imagen', formData, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+
+            if (response.data && response.data.imagen) {
+                setProductData(prevData => ({
+                    ...prevData,
+                    imagen: response.data.imagen
+                }));
+                setIsBancoImagenesOpen(false);
+                
+                // Mostrar mensaje de éxito
+                alert('Imágenes del banco agregadas correctamente');
+            }
+        } catch (error) {
+            console.error('Error adding images from bank:', error);
+            alert('Error al agregar imágenes del banco');
+        }
+    };
 
     // Función para añadir al carrito desde productos vistos recientemente
     const handleAddToCartRecent = useCallback((e, product) => {
@@ -1308,6 +1341,14 @@ const ProductPage = ({ producto }) => {
                 />
             )}
 
+            {isBancoImagenesOpen && (
+                <BancoImagenesModal
+                    isOpen={isBancoImagenesOpen}
+                    onClose={() => setIsBancoImagenesOpen(false)}
+                    onSelectImages={handleImageSelectFromBank}
+                />
+            )}
+
             {/* Modal para productos relacionados */}
             {showRelatedModal && (
                 <ModalRelatedProducts
@@ -1334,6 +1375,7 @@ const ProductPage = ({ producto }) => {
                                 imagen: newImages
                             }));
                         }}
+                        onOpenBanco={() => setIsBancoImagenesOpen(true)}
                     />
 
                     <div className={`w-full p-4 sm:p-6 shadow-lg rounded-lg transition-colors duration-300 ${
