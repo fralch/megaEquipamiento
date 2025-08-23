@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use  Inertia\Inertia;
+
 use App\Models\Producto;
 use App\Models\Subcategoria;
 use App\Models\Marca;
@@ -184,18 +185,38 @@ class ProductoController extends Controller
         return response()->json($producto);
     }
 
+    public function productsAdminView(Request $request)
+    {
+        return Inertia::render('AdminProducts');
+    }
+
     // obtener todos los productos con paginación
     public function getProductosAll(Request $request)
     {
-        $perPage = $request->input('per_page', 50); // Default 50 items per page
-        $productos = Producto::with('marca')->paginate($perPage);
+        $perPage = $request->input('per_page', 20);
+        $page = $request->input('page', 1);
+        
+        $perPage = max(1, min(100, (int)$perPage));
+        
+        $productos = Producto::with('marca')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+            
         return response()->json($productos);
     }
+
     // Obtener todos los productos
     public function getProductos(Request $request)
     {
-        $perPage = $request->input('per_page', 50); // Default 50 items per page
-        $productos = Producto::with('marca')->paginate($perPage);
+        $perPage = $request->input('per_page', 20);
+        $page = $request->input('page', 1);
+        
+        $perPage = max(1, min(100, (int)$perPage));
+        
+        $productos = Producto::with('marca')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+            
         return response()->json($productos);
     }
 
@@ -662,6 +683,14 @@ class ProductoController extends Controller
 
             // Eliminar el producto
             $producto->delete();
+
+            // Verificar si es una petición AJAX
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Producto eliminado correctamente'
+                ], 200);
+            }
 
             return Inertia::location('/');
 
