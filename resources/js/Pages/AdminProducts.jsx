@@ -1,38 +1,17 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Head } from "@inertiajs/react";
 import { Link } from "@inertiajs/react";
 import { useTheme } from '../storage/ThemeContext';
-import Productos from "../Components/create/createProductos";
-import Categorias from "../Components/create/createCategoria";
-import Subcategorias from "../Components/create/createSubcategoria";
-import Marcas from "../Components/create/createMarca";
-import MoveSubcategories from "../Components/create/MoveSubcategories";
+import ProductsView from "../Components/admin/ProductsView";
 
-const CrearProducto = () => {
+const AdminProducts = () => {
     const { isDarkMode, toggleDarkMode } = useTheme();
-    const [crearProducto, setCrearProducto] = useState(true);
-    const [crearCategoria, setCrearCategoria] = useState(false);
-    const [crearSubcategoria, setCrearSubcategoria] = useState(false);
-    const [crearMarca, setCrearMarca] = useState(false);
-    const [moverSubcategorias, setMoverSubcategorias] = useState(false);
     const [sidebarVisible, setSidebarVisible] = useState(window.innerWidth >= 768);
-    const [activeButton, setActiveButton] = useState('producto');
+    const [activeButton, setActiveButton] = useState('productos_todos');
     
     // Ref para el sidebar y el botón del menu
     const sidebarRef = useRef(null);
     const menuButtonRef = useRef(null);
-
-    const [form, setForm] = useState({
-        sku: "",
-        nombre: "",
-        id_subcategoria: "",
-        marca_id: "",
-        pais: "",
-        precio_sin_ganancia: "",
-        imagen: "",
-        descripcion: "",
-    });
 
     // Efecto para manejar clics fuera del sidebar en dispositivos móviles
     useEffect(() => {
@@ -78,62 +57,12 @@ const CrearProducto = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Formulario enviado:", form);
-    };
-
-    const handleCrearProductoClick = () => {
-        setCrearProducto(true);
-        setCrearCategoria(false);
-        setCrearSubcategoria(false);
-        setCrearMarca(false);
-        setMoverSubcategorias(false);
-        setActiveButton('producto');
-    };
-
-    const handleCrearCategoriaClick = () => {
-        setCrearProducto(false);
-        setCrearCategoria(true);
-        setCrearSubcategoria(false);
-        setCrearMarca(false);
-        setMoverSubcategorias(false);
-        setActiveButton('categoria');
-    };
-
-    const handleCrearSubcategoriaClick = () => {
-        setCrearProducto(false);
-        setCrearCategoria(false);
-        setCrearSubcategoria(true);
-        setCrearMarca(false);
-        setMoverSubcategorias(false);
-        setActiveButton('subcategoria');
-    };
-
-    const handleCrearMarcaClick = () => {
-        setCrearProducto(false);
-        setCrearCategoria(false);
-        setCrearSubcategoria(false);
-        setCrearMarca(true);
-        setMoverSubcategorias(false);
-        setActiveButton('marca');
-    };
-
-    const handleMoverSubcategoriasClick = () => {
-        setCrearProducto(false);
-        setCrearCategoria(false);
-        setCrearSubcategoria(false);
-        setCrearMarca(false);
-        setMoverSubcategorias(true);
-        setActiveButton('mover');
-    };
-
     return (
         <div className="w-full relative">
             <div className={`min-h-screen flex flex-col md:flex-row transition-colors duration-300 ${
                 isDarkMode ? 'bg-gray-900' : 'bg-gray-100'
             }`}>
-                <Head title="Crear" />
+                <Head title="Administrar Productos" />
                 
                 <button
                     ref={menuButtonRef}
@@ -186,94 +115,69 @@ const CrearProducto = () => {
                         <h2 className={`text-xl font-bold text-center transition-colors duration-300 ${
                             isDarkMode ? 'text-blue-400' : 'text-blue-600'
                         }`}>
-                            Elige el registro que deseas crear
+                            Panel de Administración
                         </h2>
                     </div>
                     <div className="space-y-4">
-                        <button
-                            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
-                                activeButton === 'producto'
-                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
-                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
+                        <Link
+                            href="/crear"
+                            className={`w-full text-center block py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300'
                             }`}
-                            onClick={handleCrearProductoClick}
                         >
                             Crear Producto
-                        </button>
-                        <button
-                            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
-                                activeButton === 'categoria'
-                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
-                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
+                        </Link>
+                        <Link
+                            href="/crear"
+                            className={`w-full text-center block py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300'
                             }`}
-                            onClick={handleCrearCategoriaClick}
                         >
                             Crear Categoria
-                        </button>
-                        <button
-                            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
-                                activeButton === 'subcategoria'
-                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
-                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
+                        </Link>
+                        <Link
+                            href="/crear"
+                            className={`w-full text-center block py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300'
                             }`}
-                            onClick={handleCrearSubcategoriaClick}
                         >
                             Crear Subcategoria
-                        </button>
-                        <button
-                            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
-                                activeButton === 'marca'
-                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
-                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
+                        </Link>
+                        <Link
+                            href="/crear"
+                            className={`w-full text-center block py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300'
                             }`}
-                            onClick={handleCrearMarcaClick}
                         >
                             Crear Marca
-                        </button>
-                        <button
-                            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
-                                activeButton === 'mover'
-                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
-                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
+                        </Link>
+                        <Link
+                            href="/crear"
+                            className={`w-full text-center block py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                                isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300'
                             }`}
-                            onClick={handleMoverSubcategoriasClick}
                         >
                             Mover Subcategorías
-                        </button>
-                        <Link
-                            href="/admin/products"
-                            className={`w-full text-center py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                        </Link>
+                        <button
+                            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
                                 activeButton === 'productos_todos'
                                     ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
                                     : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
                             }`}
                         >
                             Ver Productos
-                        </Link>
+                        </button>
                     </div>
                 </div>
                 <div className={`w-full p-4 transition-colors duration-300 ${
                     isDarkMode ? 'bg-gray-900' : 'bg-gray-100'
                 }`}>
-                    <div className={crearProducto ? "block" : "hidden"}>
-                        <Productos onSubmit={handleSubmit} />
-                    </div>
-                    <div className={crearCategoria ? "block" : "hidden"}>
-                        <Categorias onSubmit={handleSubmit} />
-                    </div>
-                    <div className={crearSubcategoria ? "block" : "hidden"}>
-                        <Subcategorias onSubmit={handleSubmit} />
-                    </div>
-                    <div className={crearMarca ? "block" : "hidden"}>
-                        <Marcas onSubmit={handleSubmit} />
-                    </div>
-                    <div className={moverSubcategorias ? "block" : "hidden"}>
-                        <MoveSubcategories />
-                    </div>
+                    <ProductsView />
                 </div>
             </div>
         </div>
     );
 };
 
-export default CrearProducto;
+export default AdminProducts;

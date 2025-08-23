@@ -32,6 +32,8 @@ Route::get('/producto/{id}', [ProductoController::class, 'ProductView'])->name('
 Route::get('/marcas/{id}', [ProductoController::class, 'ProductViewByMarca'])->name('marcas.view');
 Route::get('/contacto', function () { return Inertia::render('Contacto'); })->name('contacto.view');
 Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
+Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
+
 
 // Rutas para crear y mostrar productos
 Route::get('/product/todo', [ProductoController::class, 'getProductosAll']);

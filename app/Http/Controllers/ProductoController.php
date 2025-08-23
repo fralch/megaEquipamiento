@@ -184,11 +184,24 @@ class ProductoController extends Controller
         return response()->json($producto);
     }
 
+    public function productsAdminView(Request $request)
+    {
+        return Inertia::render('AdminProducts');
+    }
+
     // obtener todos los productos con paginación
     public function getProductosAll(Request $request)
     {
-        $perPage = $request->input('per_page', 50); // Default 50 items per page
-        $productos = Producto::with('marca')->paginate($perPage);
+        $perPage = $request->input('per_page', 20); // Default to 20 items per page
+        $page = $request->input('page', 1); // Default to page 1
+        
+        // Validate per_page parameter
+        $perPage = max(1, min(100, (int)$perPage)); // Limit between 1 and 100
+        
+        $productos = Producto::with('marca')
+            ->orderBy('created_at', 'desc') // Order by newest first
+            ->paginate($perPage, ['*'], 'page', $page);
+            
         return response()->json($productos);
     }
     // Obtener todos los productos
@@ -662,6 +675,14 @@ class ProductoController extends Controller
 
             // Eliminar el producto
             $producto->delete();
+
+            // Verificar si es una petición AJAX
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Producto eliminado correctamente'
+                ], 200);
+            }
 
             return Inertia::location('/');
 
