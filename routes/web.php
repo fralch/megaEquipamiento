@@ -128,6 +128,7 @@ Route::middleware('auth')->prefix('banco-imagenes')->group(function () {
     Route::delete('/{id}', [BancoImagenesController::class, 'destroy'])->name('banco-imagenes.destroy');
 });
 
+
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
 
