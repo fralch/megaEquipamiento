@@ -242,7 +242,7 @@ const CrearProducto = () => {
                         </button>
                         <Link
                             href="/admin/products"
-                            className={`w-full text-center py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                            className={`w-full text-center py-2 px-4 rounded-md font-medium transition-colors duration-300 block ${
                                 activeButton === 'productos_todos'
                                     ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
                                     : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
