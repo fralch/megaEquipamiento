@@ -234,7 +234,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                 {pendingRelations.length > 0 && (
                     <div className="mb-4">
                         <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`}>Relaciones pendientes por guardar:</h4>
-                        <div className={`divide-y rounded p-2 ${
+                        <div className={`divide-y rounded p-2 max-h-64 overflow-y-auto ${
                             isDarkMode 
                                 ? 'bg-orange-900/20 divide-gray-600' 
                                 : 'bg-orange-50 divide-gray-200'
@@ -262,6 +262,7 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
                         </div>
                     </div>
                 )}
+
 
                 <div className="mb-4">
                     <h4 className="font-semibold mb-2">Productos relacionados guardados:</h4>

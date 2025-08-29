@@ -80,7 +80,7 @@ const BrandCard = ({ brand }) => {
       <h3 className={`mt-4 text-lg font-semibold transition-colors duration-300 ${
         isDarkMode ? 'text-white' : 'text-gray-900'
       }`}>
-        {brand.nombre}
+        {brand.nombre.toUpperCase()}
       </h3>
 
       {/* Description */}
