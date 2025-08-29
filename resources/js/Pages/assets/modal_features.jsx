@@ -184,6 +184,9 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
   const [draggingIndex, setDraggingIndex] = useState(null);
+  const [isJsonMode, setIsJsonMode] = useState(false);
+  const [jsonInput, setJsonInput] = useState('');
+  const [jsonError, setJsonError] = useState('');
 
   useEffect(() => {
     try {
@@ -226,6 +229,52 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
       newData[newKey] = newValue;
       return newData;
     });
+  };
+
+  const handleJsonImport = (replaceAll = false) => {
+    try {
+      setJsonError('');
+      const parsedJson = JSON.parse(jsonInput);
+      
+      // Validar que sea un objeto
+      if (typeof parsedJson !== 'object' || parsedJson === null || Array.isArray(parsedJson)) {
+        setJsonError('El JSON debe ser un objeto con pares clave-valor');
+        return;
+      }
+
+      // Validar que todos los valores sean strings
+      for (const [key, value] of Object.entries(parsedJson)) {
+        if (typeof key !== 'string' || typeof value !== 'string') {
+          setJsonError('Todas las claves y valores deben ser texto');
+          return;
+        }
+      }
+
+      if (replaceAll) {
+        setData(parsedJson);
+      } else {
+        setData(prevData => ({
+          ...prevData,
+          ...parsedJson
+        }));
+      }
+      setJsonInput('');
+      setIsJsonMode(false);
+    } catch (error) {
+      setJsonError('JSON inválido: ' + error.message);
+    }
+  };
+
+  const toggleMode = () => {
+    setIsJsonMode(!isJsonMode);
+    setJsonError('');
+    setJsonInput('');
+  };
+
+  const handleExportToJson = () => {
+    const jsonString = JSON.stringify(data, null, 2);
+    setJsonInput(jsonString);
+    setIsJsonMode(true);
   };
 
   const handleDragStart = (e, key, index) => {
@@ -289,44 +338,133 @@ const Modal_Features = ({ product, type, onSave, onClose, initialData }) => {
       >
         <div className="text-center">
           <h3 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-            Características del Producto
+            {type === 'caracteristicas' ? 'Características del Producto' : 'Datos Técnicos del Producto'}
           </h3>
+
+          {/* Mode Toggle */}
+          <div className="flex justify-center mb-4">
+            <div className={`flex rounded-lg p-1 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+              <button
+                onClick={() => isJsonMode && toggleMode()}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  !isJsonMode
+                    ? 'bg-blue-500 text-white shadow-sm'
+                    : isDarkMode
+                    ? 'text-gray-300 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Manual
+              </button>
+              <button
+                onClick={() => !isJsonMode && toggleMode()}
+                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  isJsonMode
+                    ? 'bg-blue-500 text-white shadow-sm'
+                    : isDarkMode
+                    ? 'text-gray-300 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                JSON
+              </button>
+            </div>
+           
+          </div>
           
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                type="text"
-                className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                  isDarkMode 
-                    ? 'bg-gray-700 text-white border-gray-600 placeholder-gray-400' 
-                    : 'bg-gray-50 text-gray-900 border-gray-300 placeholder-gray-500'
-                }`}
-                placeholder="Característica (Ej: Color)"
-                value={key}
-                onChange={(e) => setKey(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddFeature()}
-              />
-              <input
-                type="text"
-                className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                  isDarkMode 
-                    ? 'bg-gray-700 text-white border-gray-600 placeholder-gray-400' 
-                    : 'bg-gray-50 text-gray-900 border-gray-300 placeholder-gray-500'
-                }`}
-                placeholder="Valor (Ej: Rojo)"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddFeature()}
-              />
-            </div>
-            
-            <button
-              onClick={handleAddFeature}
-              disabled={!key.trim() || !value.trim()}
-              className="w-full px-4 py-2.5 bg-blue-500 text-white font-medium rounded-lg shadow-sm hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-            >
-              Agregar Característica
-            </button>
+            {!isJsonMode ? (
+              // Manual Mode
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                      isDarkMode 
+                        ? 'bg-gray-700 text-white border-gray-600 placeholder-gray-400' 
+                        : 'bg-gray-50 text-gray-900 border-gray-300 placeholder-gray-500'
+                    }`}
+                    placeholder="Característica (Ej: Color)"
+                    value={key}
+                    onChange={(e) => setKey(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddFeature()}
+                  />
+                  <input
+                    type="text"
+                    className={`w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                      isDarkMode 
+                        ? 'bg-gray-700 text-white border-gray-600 placeholder-gray-400' 
+                        : 'bg-gray-50 text-gray-900 border-gray-300 placeholder-gray-500'
+                    }`}
+                    placeholder="Valor (Ej: Rojo)"
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddFeature()}
+                  />
+                </div>
+                
+                <button
+                  onClick={handleAddFeature}
+                  disabled={!key.trim() || !value.trim()}
+                  className="w-full px-4 py-2.5 bg-blue-500 text-white font-medium rounded-lg shadow-sm hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                >
+                  Agregar Característica
+                </button>
+              </>
+            ) : (
+              // JSON Mode
+              <div className="space-y-3">
+                <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-blue-900/20 border border-blue-700' : 'bg-blue-50 border border-blue-200'}`}>
+                  <p className={`text-sm ${isDarkMode ? 'text-blue-300' : 'text-blue-700'}`}>
+                    <strong>Formato JSON esperado:</strong>
+                  </p>
+                  <pre className={`text-xs mt-1 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+{`{
+  "Color": "Rojo",
+  "Material": "Acero inoxidable",
+  "Peso": "2.5 kg"
+}`}
+                  </pre>
+                </div>
+                
+                <textarea
+                  value={jsonInput}
+                  onChange={(e) => setJsonInput(e.target.value)}
+                  className={`w-full h-32 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-mono text-sm ${
+                    isDarkMode 
+                      ? 'bg-gray-700 text-white border-gray-600 placeholder-gray-400' 
+                      : 'bg-gray-50 text-gray-900 border-gray-300 placeholder-gray-500'
+                  } ${jsonError ? 'border-red-500 focus:ring-red-500' : ''}`}
+                  placeholder="Pega aquí tu JSON con las características..."
+                />
+                
+                {jsonError && (
+                  <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm text-red-700 dark:text-red-300">{jsonError}</p>
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => handleJsonImport(false)}
+                    disabled={!jsonInput.trim()}
+                    className="px-4 py-2.5 bg-blue-500 text-white font-medium rounded-lg shadow-sm hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Agregar JSON
+                  </button>
+                  <button
+                    onClick={() => handleJsonImport(true)}
+                    disabled={!jsonInput.trim()}
+                    className="px-4 py-2.5 bg-orange-500 text-white font-medium rounded-lg shadow-sm hover:bg-orange-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Reemplazar Todo
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="mt-6">
