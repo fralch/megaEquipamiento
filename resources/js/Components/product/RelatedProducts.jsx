@@ -688,7 +688,7 @@ const RelatedProducts = ({ productId, currentProductSubcategoryId }) => {
             <div key={type} className="mb-8">
                 <div className="mb-4">
                     <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                        {type === 'accesorio' ? 'Accesorios' : type.charAt(0).toUpperCase() + type.slice(1)}
                     </h2>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
@@ -704,7 +704,7 @@ const RelatedProducts = ({ productId, currentProductSubcategoryId }) => {
                                     : 'bg-green-500 hover:bg-green-600 text-white'
                             }`}
                         >
-                            {isExpanded ? `Ocultar (${products.length - itemsPerRow})` : `Cargar más ${type.charAt(0).toUpperCase() + type.slice(1)} (${products.length})`}
+                            {isExpanded ? `Ocultar (${products.length - itemsPerRow})` : `Cargar más ${type === 'accesorio' ? 'Accesorios' : type.charAt(0).toUpperCase() + type.slice(1)} (${products.length})`}
                         </button>
                     </div>
                 )}
