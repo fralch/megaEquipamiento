@@ -78,9 +78,10 @@ const Header = () => {
         <header className={`transition-colors duration-300 ${
             isDarkMode ? 'bg-gray-900' : 'bg-white'
         }`}>
-            <div className="container mx-auto flex items-center px-8 py-8 md:px-12 max-w-full" id="">
-                {/* Logo - Modified for larger size */}
-                <a href="/" className="mr-auto w-7/12 flex-shrink-0 sm:w-2/12 md:w-1/5 pr-4 ml-10">
+            {/* Desktop Header */}
+            <div className="hidden lg:flex container mx-auto items-center px-8 py-8 md:px-12 max-w-full">
+                {/* Logo */}
+                <a href="/" className="mr-auto w-1/5 flex-shrink-0 pr-4 ml-10">
                     <img
                         className="w-full object-contain"
                         src="/img/logo2.jpg"
@@ -88,8 +89,8 @@ const Header = () => {
                     />
                 </a>
 
-                {/* Input de búsqueda centrado - oculto en móvil */}
-                <div className={`hidden sm:flex mx-auto w-full max-w-lg items-center rounded-md xl:max-w-2xl search-container relative ${
+                {/* Input de búsqueda centrado */}
+                <div className={`flex mx-auto w-full max-w-lg items-center rounded-md xl:max-w-2xl search-container relative ${
                     isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
                 }`}>
                     <input
@@ -298,6 +299,133 @@ const Header = () => {
                 </button>
 
                 <CartIcon />
+            </div>
+
+            {/* Mobile Header */}
+            <div className="lg:hidden">
+                {/* Primera fila: Logo, botones */}
+                <div className="flex items-center justify-between px-4 py-4">
+                    <a href="/" className="flex-shrink-0 w-32">
+                        <img
+                            className="w-full object-contain"
+                            src="/img/logo2.jpg"
+                            alt="EquinLab Logo"
+                        />
+                    </a>
+                    
+                    <div className="flex items-center gap-2">
+                        {/* Botón de toggle modo oscuro */}
+                        <button
+                            onClick={toggleDarkMode}
+                            className={`p-2 rounded-lg transition-colors duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600' 
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                            title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                        >
+                            {isDarkMode ? (
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+                                </svg>
+                            ) : (
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                                </svg>
+                            )}
+                        </button>
+                        
+                        <CartIcon />
+                    </div>
+                </div>
+                
+                {/* Segunda fila: Input de búsqueda */}
+                <div className="px-4 pb-4">
+                    <div className={`flex items-center rounded-md search-container relative ${
+                        isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+                    }`}>
+                        <input
+                            className={`w-full border-l bg-transparent py-2 pl-4 text-sm font-semibold ${
+                                isDarkMode 
+                                    ? 'border-gray-600 text-white placeholder-gray-400' 
+                                    : 'border-gray-300 text-black placeholder-gray-500'
+                            }`}
+                            type="text"
+                            placeholder="Buscar ..."
+                            value={searchTerm}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                if (e.target.value.length >= 2) {
+                                    setShowResults(true);
+                                } else {
+                                    setShowResults(false);
+                                }
+                            }}
+                            onFocus={handleFocus}
+                        />
+                        <svg
+                            className={`ml-auto h-5 px-4 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}
+                            aria-hidden="true"
+                            focusable="false"
+                            data-prefix="far"
+                            data-icon="search"
+                            role="img"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 512 512"
+                        >
+                            <path
+                                fill="currentColor"
+                                d="M508.5 468.9L387.1 347.5c-2.3-2.3-5.3-3.5-8.5-3.5h-13.2c31.5-36.5 50.6-84 50.6-136C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c52 0 99.5-19.1 136-50.6v13.2c0 3.2 1.3 6.2 3.5 8.5l121.4 121.4c4.7 4.7 12.3 4.7 17 0l22.6-22.6c4.7-4.7 4.7-12.3 0-17zM208 368c-88.4 0-160-71.6-160-160S119.6 48 208 48s160 71.6 160 160-71.6 160-160 160z"
+                            ></path>
+                        </svg>
+                        
+                        {/* Resultados de búsqueda móvil */}
+                        {showResults && (searchResults.length > 0 || isLoading) && (
+                            <div className={`absolute top-full left-0 right-0 mt-1 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto ${
+                                isDarkMode ? 'bg-gray-800' : 'bg-white'
+                            }`}>
+                                {isLoading ? (
+                                    <div className={`p-3 text-sm ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>Buscando...</div>
+                                ) : (
+                                    searchResults.map(product => (
+                                        <div
+                                            key={product.id_producto}
+                                            className={`p-3 cursor-pointer border-b ${
+                                                isDarkMode 
+                                                    ? 'hover:bg-gray-700 border-gray-700' 
+                                                    : 'hover:bg-gray-100 border-gray-200'
+                                            }`}
+                                            onClick={() => handleProductClick(product)}
+                                        >
+                                            <div className={`font-medium ${
+                                                isDarkMode ? 'text-white' : 'text-black'
+                                            }`}>{product.nombre}</div>
+                                            <div className={`text-sm ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>
+                                                SKU: {product.sku}
+                                                {product.marca && (
+                                                    <span className="ml-2">
+                                                        | Marca: {product.marca.nombre}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className={`text-sm ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                Precio: S/. {product.precio_igv}
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </header>
     );
