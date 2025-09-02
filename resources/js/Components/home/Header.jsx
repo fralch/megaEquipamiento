@@ -8,6 +8,7 @@ const Header = () => {
     const [searchResults, setSearchResults] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [showResults, setShowResults] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const { isDarkMode, toggleDarkMode } = useTheme();
 
     // Búsqueda de productos
@@ -51,6 +52,7 @@ const Header = () => {
     const handleProductClick = (product) => {
         // Redirigir a la página del producto
         window.location.href = `/producto/${product.id_producto}`;
+        setIsModalOpen(false);
     };
 
     // Manejar foco en el input
@@ -73,6 +75,39 @@ const Header = () => {
             document.removeEventListener('click', handleClickOutside);
         };
     }, []);
+
+    // Cerrar modal con ESC
+    useEffect(() => {
+        const handleEscKey = (event) => {
+            if (event.key === 'Escape') {
+                setIsModalOpen(false);
+            }
+        };
+
+        if (isModalOpen) {
+            document.addEventListener('keydown', handleEscKey);
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscKey);
+        };
+    }, [isModalOpen]);
+
+    // Abrir modal de búsqueda
+    const openSearchModal = () => {
+        setIsModalOpen(true);
+        setSearchTerm('');
+        setSearchResults([]);
+        setShowResults(false);
+    };
+
+    // Cerrar modal de búsqueda
+    const closeSearchModal = () => {
+        setIsModalOpen(false);
+        setSearchTerm('');
+        setSearchResults([]);
+        setShowResults(false);
+    };
 
     return (
         <header className={`transition-colors duration-300 ${
@@ -303,7 +338,7 @@ const Header = () => {
 
             {/* Mobile Header */}
             <div className="lg:hidden">
-                {/* Primera fila: Logo, botones */}
+                {/* Única fila: Logo, botones */}
                 <div className="flex items-center justify-between px-4 py-4">
                     <a href="/" className="flex-shrink-0 w-32">
                         <img
@@ -314,6 +349,33 @@ const Header = () => {
                     </a>
                     
                     <div className="flex items-center gap-2">
+                        {/* Botón de búsqueda para móviles */}
+                        <button
+                            onClick={openSearchModal}
+                            className={`p-2 rounded-lg transition-colors duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                            title="Buscar productos"
+                        >
+                            <svg
+                                className="w-4 h-4"
+                                aria-hidden="true"
+                                focusable="false"
+                                data-prefix="far"
+                                data-icon="search"
+                                role="img"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 512 512"
+                            >
+                                <path
+                                    fill="currentColor"
+                                    d="M508.5 468.9L387.1 347.5c-2.3-2.3-5.3-3.5-8.5-3.5h-13.2c31.5-36.5 50.6-84 50.6-136C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c52 0 99.5-19.1 136-50.6v13.2c0 3.2 1.3 6.2 3.5 8.5l121.4 121.4c4.7 4.7 12.3 4.7 17 0l22.6-22.6c4.7-4.7 4.7-12.3 0-17zM208 368c-88.4 0-160-71.6-160-160S119.6 48 208 48s160 71.6 160 160-71.6 160-160 160z"
+                                ></path>
+                            </svg>
+                        </button>
+
                         {/* Botón de toggle modo oscuro */}
                         <button
                             onClick={toggleDarkMode}
@@ -338,95 +400,248 @@ const Header = () => {
                         <CartIcon />
                     </div>
                 </div>
-                
-                {/* Segunda fila: Input de búsqueda */}
-                <div className="px-4 pb-4">
-                    <div className={`flex items-center rounded-md search-container relative ${
-                        isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
+            </div>
+
+            {/* Modal de búsqueda para móviles */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-start justify-center pt-4 px-3 lg:hidden animate-in fade-in duration-200">
+                    {/* Overlay */}
+                    <div 
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        onClick={closeSearchModal}
+                    ></div>
+                    
+                    {/* Modal content */}
+                    <div className={`relative w-full max-w-lg mx-auto mt-8 rounded-2xl shadow-2xl border animate-in slide-in-from-top-4 duration-300 ${
+                        isDarkMode 
+                            ? 'bg-gray-800 border-gray-700' 
+                            : 'bg-white border-gray-200'
                     }`}>
-                        <input
-                            className={`w-full border-l bg-transparent py-2 pl-4 text-sm font-semibold ${
+                        {/* Header del modal */}
+                        <div className={`flex items-center justify-between p-5 border-b ${
+                            isDarkMode ? 'border-gray-700' : 'border-gray-100'
+                        }`}>
+                            <div className="flex items-center space-x-3">
+                                <div className={`p-2 rounded-full ${
+                                    isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50'
+                                }`}>
+                                    <svg className={`w-5 h-5 ${
+                                        isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                    }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <h3 className={`text-lg font-semibold ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    Buscar productos
+                                </h3>
+                            </div>
+                            <button
+                                onClick={closeSearchModal}
+                                className={`p-2 rounded-full transition-all duration-200 ${
+                                    isDarkMode 
+                                        ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
+                                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                }`}
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Input de búsqueda en el modal */}
+                        <div className="p-5">
+                            <div className={`relative group ${
+                                isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
+                            } rounded-xl border-2 transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500/20 ${
                                 isDarkMode 
-                                    ? 'border-gray-600 text-white placeholder-gray-400' 
-                                    : 'border-gray-300 text-black placeholder-gray-500'
-                            }`}
-                            type="text"
-                            placeholder="Buscar ..."
-                            value={searchTerm}
-                            onChange={(e) => {
-                                setSearchTerm(e.target.value);
-                                if (e.target.value.length >= 2) {
-                                    setShowResults(true);
-                                } else {
-                                    setShowResults(false);
-                                }
-                            }}
-                            onFocus={handleFocus}
-                        />
-                        <svg
-                            className={`ml-auto h-5 px-4 ${
-                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                            }`}
-                            aria-hidden="true"
-                            focusable="false"
-                            data-prefix="far"
-                            data-icon="search"
-                            role="img"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 512 512"
-                        >
-                            <path
-                                fill="currentColor"
-                                d="M508.5 468.9L387.1 347.5c-2.3-2.3-5.3-3.5-8.5-3.5h-13.2c31.5-36.5 50.6-84 50.6-136C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c52 0 99.5-19.1 136-50.6v13.2c0 3.2 1.3 6.2 3.5 8.5l121.4 121.4c4.7 4.7 12.3 4.7 17 0l22.6-22.6c4.7-4.7 4.7-12.3 0-17zM208 368c-88.4 0-160-71.6-160-160S119.6 48 208 48s160 71.6 160 160-71.6 160-160 160z"
-                            ></path>
-                        </svg>
-                        
-                        {/* Resultados de búsqueda móvil */}
-                        {showResults && (searchResults.length > 0 || isLoading) && (
-                            <div className={`absolute top-full left-0 right-0 mt-1 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto ${
-                                isDarkMode ? 'bg-gray-800' : 'bg-white'
+                                    ? 'border-gray-600 focus-within:border-blue-500' 
+                                    : 'border-gray-200 focus-within:border-blue-400'
                             }`}>
-                                {isLoading ? (
-                                    <div className={`p-3 text-sm ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                    }`}>Buscando...</div>
-                                ) : (
-                                    searchResults.map(product => (
-                                        <div
-                                            key={product.id_producto}
-                                            className={`p-3 cursor-pointer border-b ${
-                                                isDarkMode 
-                                                    ? 'hover:bg-gray-700 border-gray-700' 
-                                                    : 'hover:bg-gray-100 border-gray-200'
-                                            }`}
-                                            onClick={() => handleProductClick(product)}
-                                        >
-                                            <div className={`font-medium ${
-                                                isDarkMode ? 'text-white' : 'text-black'
-                                            }`}>{product.nombre}</div>
-                                            <div className={`text-sm ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                            }`}>
-                                                SKU: {product.sku}
-                                                {product.marca && (
-                                                    <span className="ml-2">
-                                                        | Marca: {product.marca.nombre}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className={`text-sm ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`}>
-                                                Precio: S/. {product.precio_igv}
+                                <input
+                                    className={`w-full bg-transparent py-4 pl-5 pr-12 text-base font-medium outline-none ${
+                                        isDarkMode 
+                                            ? 'text-white placeholder-gray-400' 
+                                            : 'text-gray-900 placeholder-gray-500'
+                                    }`}
+                                    type="text"
+                                    placeholder="¿Qué producto estás buscando?"
+                                    value={searchTerm}
+                                    onChange={(e) => {
+                                        setSearchTerm(e.target.value);
+                                        if (e.target.value.length >= 2) {
+                                            setShowResults(true);
+                                        } else {
+                                            setShowResults(false);
+                                        }
+                                    }}
+                                    onFocus={handleFocus}
+                                    autoFocus
+                                />
+                                <div className={`absolute right-4 top-1/2 transform -translate-y-1/2 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                } group-focus-within:text-blue-500 transition-colors duration-200`}>
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            {/* Resultados de búsqueda en el modal */}
+                            {showResults && (searchResults.length > 0 || isLoading) && (
+                                <div className={`mt-4 rounded-xl border max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent ${
+                                    isDarkMode 
+                                        ? 'bg-gray-700/50 border-gray-600' 
+                                        : 'bg-gray-50/80 border-gray-200'
+                                }`}>
+                                    {isLoading ? (
+                                        <div className="flex items-center justify-center py-8">
+                                            <div className="flex items-center space-x-3">
+                                                <div className={`animate-spin rounded-full h-5 w-5 border-2 border-t-transparent ${
+                                                    isDarkMode ? 'border-blue-400' : 'border-blue-500'
+                                                }`}></div>
+                                                <span className={`text-sm font-medium ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}>Buscando productos...</span>
                                             </div>
                                         </div>
-                                    ))
-                                )}
+                                    ) : (
+                                        <div className="divide-y divide-gray-200 dark:divide-gray-600">
+                                            {searchResults.map((product, index) => (
+                                                <div
+                                                    key={product.id_producto}
+                                                    className={`p-4 cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                                                        isDarkMode 
+                                                            ? 'hover:bg-gray-600/50' 
+                                                            : 'hover:bg-white/80 hover:shadow-sm'
+                                                    } ${index === 0 ? 'rounded-t-xl' : ''} ${index === searchResults.length - 1 ? 'rounded-b-xl' : ''}`}
+                                                    onClick={() => handleProductClick(product)}
+                                                >
+                                                    <div className="flex items-start space-x-3">
+                                                        {/* Icono de producto */}
+                                                        <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+                                                            isDarkMode ? 'bg-gray-600' : 'bg-gray-100'
+                                                        }`}>
+                                                            <svg className={`w-5 h-5 ${
+                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                            </svg>
+                                                        </div>
+                                                        
+                                                        {/* Información del producto */}
+                                                        <div className="flex-1 min-w-0">
+                                                            <h4 className={`font-semibold text-sm leading-tight mb-1 line-clamp-2 ${
+                                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                                            }`}>
+                                                                {product.nombre}
+                                                            </h4>
+                                                            
+                                                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                                                                <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
+                                                                    isDarkMode 
+                                                                        ? 'bg-gray-600 text-gray-300' 
+                                                                        : 'bg-gray-100 text-gray-600'
+                                                                }`}>
+                                                                    SKU: {product.sku}
+                                                                </span>
+                                                                {product.marca && (
+                                                                    <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
+                                                                        isDarkMode 
+                                                                            ? 'bg-blue-900/30 text-blue-300' 
+                                                                            : 'bg-blue-50 text-blue-600'
+                                                                    }`}>
+                                                                        {product.marca.nombre}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            
+                                                            <div className="flex items-center justify-between">
+                                                                <span className={`text-lg font-bold ${
+                                                                    isDarkMode ? 'text-green-400' : 'text-green-600'
+                                                                }`}>
+                                                                    S/. {product.precio_igv}
+                                                                </span>
+                                                                <svg className={`w-4 h-4 ${
+                                                                    isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                                                                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Mensaje cuando no hay resultados */}
+                            {showResults && !isLoading && searchResults.length === 0 && searchTerm.length >= 2 && (
+                                <div className={`mt-4 p-6 text-center rounded-xl border-2 border-dashed ${
+                                    isDarkMode 
+                                        ? 'border-gray-600 bg-gray-700/30' 
+                                        : 'border-gray-300 bg-gray-50'
+                                }`}>
+                                    <div className={`w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center ${
+                                        isDarkMode ? 'bg-gray-600' : 'bg-gray-200'
+                                    }`}>
+                                        <svg className={`w-6 h-6 ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
+                                        </svg>
+                                    </div>
+                                    <p className={`text-sm font-medium mb-1 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        No encontramos productos
+                                    </p>
+                                    <p className={`text-xs ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>
+                                        Intenta con otros términos de búsqueda
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Footer del modal con sugerencias */}
+                        {!showResults && searchTerm.length === 0 && (
+                            <div className={`p-5 border-t ${
+                                isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-100 bg-gray-50/50'
+                            } rounded-b-2xl`}>
+                                <p className={`text-xs text-center mb-3 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`}>
+                                    Sugerencias de búsqueda
+                                </p>
+                                <div className="flex flex-wrap gap-2 justify-center">
+                                    {['Agitador de Hélice', 'Viscosímetro', 'Sensor de humedad'].map((suggestion) => (
+                                        <button
+                                            key={suggestion}
+                                            onClick={() => {
+                                                setSearchTerm(suggestion);
+                                                setShowResults(true);
+                                            }}
+                                            className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white' 
+                                                    : 'bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-gray-200'
+                                            }`}
+                                        >
+                                            {suggestion}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
                         )}
                     </div>
                 </div>
-            </div>
+            )}
         </header>
     );
 };
