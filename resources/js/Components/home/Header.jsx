@@ -609,36 +609,7 @@ const Header = () => {
                             )}
                         </div>
                         
-                        {/* Footer del modal con sugerencias */}
-                        {!showResults && searchTerm.length === 0 && (
-                            <div className={`p-5 border-t ${
-                                isDarkMode ? 'border-gray-700 bg-gray-800/50' : 'border-gray-100 bg-gray-50/50'
-                            } rounded-b-2xl`}>
-                                <p className={`text-xs text-center mb-3 ${
-                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                }`}>
-                                    Sugerencias de búsqueda
-                                </p>
-                                <div className="flex flex-wrap gap-2 justify-center">
-                                    {['Agitador de Hélice', 'Viscosímetro', 'Sensor de humedad'].map((suggestion) => (
-                                        <button
-                                            key={suggestion}
-                                            onClick={() => {
-                                                setSearchTerm(suggestion);
-                                                setShowResults(true);
-                                            }}
-                                            className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white' 
-                                                    : 'bg-white text-gray-600 hover:bg-gray-100 hover:text-gray-900 border border-gray-200'
-                                            }`}
-                                        >
-                                            {suggestion}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                       
                     </div>
                 </div>
             )}
