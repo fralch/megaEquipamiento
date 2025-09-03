@@ -321,40 +321,82 @@ const Header = () => {
                   isDarkMode ? "bg-gray-800/95 border-gray-700" : "bg-white/95 border-gray-200"
                 }`}
               >
-                <div className="flex flex-wrap items-center gap-2">
-                  {[
-                    { key: "todos", label: "Todos" },
-                    { key: "productos", label: "Productos", count: searchResults?.productos?.length || 0 },
-                    { key: "marcas", label: "Marcas", count: searchResults?.marcas?.length || 0 },
-                    { key: "categorias", label: "Categorías", count: searchResults?.categorias?.length || 0 },
-                    { key: "subcategorias", label: "Subcategorías", count: searchResults?.subcategorias?.length || 0 },
-                  ].map((tab) => {
-                    const isActive = activeFilter === tab.key;
-                    const disabled = tab.key !== "todos" && (tab.count || 0) === 0;
-                    return (
-                      <button
-                        key={tab.key}
-                        disabled={disabled}
-                        onClick={() => setActiveFilter(tab.key)}
-                        className={[
-                          "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
-                          disabled
-                            ? isDarkMode
-                              ? "text-gray-500 bg-gray-700 cursor-not-allowed"
-                              : "text-gray-400 bg-gray-100 cursor-not-allowed"
-                            : isActive
-                            ? "bg-blue-600 text-white shadow"
-                            : isDarkMode
-                            ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
-                            : "bg-gray-100 text-gray-700 hover:bg-gray-200",
-                        ].join(" ")}
-                      >
-                        {tab.label}
-                        {tab.key !== "todos" && <span className="ml-1 opacity-80">({tab.count})</span>}
-                      </button>
-                    );
-                  })}
-                  <div className="ml-auto text-xs opacity-80">
+                <div className="flex items-center gap-2">
+                  {/* Botón scroll izquierda */}
+                  <button
+                    onClick={() => {
+                      const container = document.getElementById('tabs-container');
+                      container.scrollBy({ left: -200, behavior: 'smooth' });
+                    }}
+                    className={`p-1 rounded-md transition-colors ${
+                      isDarkMode 
+                        ? "hover:bg-gray-700 text-gray-400 hover:text-gray-200" 
+                        : "hover:bg-gray-200 text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  
+                  {/* Container de tabs con scroll */}
+                  <div 
+                    id="tabs-container"
+                    className="flex items-center gap-2 overflow-x-auto scrollbar-hide flex-1"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  >
+                    {[
+                      { key: "todos", label: "Todos" },
+                      { key: "productos", label: "Productos", count: searchResults?.productos?.length || 0 },
+                      { key: "marcas", label: "Marcas", count: searchResults?.marcas?.length || 0 },
+                      { key: "categorias", label: "Categorías", count: searchResults?.categorias?.length || 0 },
+                      { key: "subcategorias", label: "Subcategorías", count: searchResults?.subcategorias?.length || 0 },
+                    ].map((tab) => {
+                      const isActive = activeFilter === tab.key;
+                      const disabled = tab.key !== "todos" && (tab.count || 0) === 0;
+                      return (
+                        <button
+                          key={tab.key}
+                          disabled={disabled}
+                          onClick={() => setActiveFilter(tab.key)}
+                          className={[
+                            "px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex-shrink-0",
+                            disabled
+                              ? isDarkMode
+                                ? "text-gray-500 bg-gray-700 cursor-not-allowed"
+                                : "text-gray-400 bg-gray-100 cursor-not-allowed"
+                              : isActive
+                              ? "bg-blue-600 text-white shadow"
+                              : isDarkMode
+                              ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                              : "bg-gray-100 text-gray-700 hover:bg-gray-200",
+                          ].join(" ")}
+                        >
+                          {tab.label}
+                          {tab.key !== "todos" && <span className="ml-1 opacity-80">({tab.count})</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  
+                  {/* Botón scroll derecha */}
+                  <button
+                    onClick={() => {
+                      const container = document.getElementById('tabs-container');
+                      container.scrollBy({ left: 200, behavior: 'smooth' });
+                    }}
+                    className={`p-1 rounded-md transition-colors ${
+                      isDarkMode 
+                        ? "hover:bg-gray-700 text-gray-400 hover:text-gray-200" 
+                        : "hover:bg-gray-200 text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                  
+                  <div className="text-xs opacity-80 whitespace-nowrap">
                     Presiona <kbd className="px-1 py-0.5 border rounded">↑</kbd>/<kbd className="px-1 py-0.5 border rounded">↓</kbd> y{" "}
                     <kbd className="px-1 py-0.5 border rounded">Enter</kbd>
                   </div>
@@ -572,19 +614,7 @@ const Header = () => {
               {/* Footer CTA */}
               {hasResults() && (
                 <div className={`px-3 py-2 border-t text-right ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}>
-                  <a
-                    href={`/buscar?q=${encodeURIComponent(searchTerm)}`}
-                    className="inline-flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white"
-                  >
-                    Ver todos los resultados para “{searchTerm}”
-                    <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path
-                        fillRule="evenodd"
-                        d="M10.293 3.293a1 1 0 011.414 0L17 8.586a1 1 0 010 1.414l-5.293 5.293a1 1 0 11-1.414-1.414L13.586 11H4a1 1 0 110-2h9.586l-3.293-3.293a1 1 0 010-1.414z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </a>
+                
                 </div>
               )}
             </div>
