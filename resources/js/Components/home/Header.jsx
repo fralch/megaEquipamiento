@@ -62,14 +62,14 @@ const Header = () => {
     // Manejar clic en una marca
     const handleMarcaClick = (marca) => {
         // Redirigir a la página de productos de la marca
-        window.location.href = `/marca/${marca.id_marca}`;
+        window.location.href = `/marcas/${marca.id_marca}`;
         setIsModalOpen(false);
     };
 
     // Manejar clic en una categoría
     const handleCategoriaClick = (categoria) => {
         // Redirigir a la página de la categoría
-        window.location.href = `/categoria/${categoria.id_categoria}`;
+        window.location.href = `/categorias/${categoria.id_categoria}`;
         setIsModalOpen(false);
     };
 
@@ -159,7 +159,7 @@ const Header = () => {
                 </a>
 
                 {/* Input de búsqueda centrado */}
-                <div className={`flex mx-auto w-full max-w-lg items-center rounded-md xl:max-w-2xl search-container relative ${
+                <div className={`flex mx-auto w-full max-w-3xl items-center rounded-md xl:max-w-4xl search-container relative ${
                     isDarkMode ? 'bg-gray-700' : 'bg-gray-100'
                 }`}>
                     <input
