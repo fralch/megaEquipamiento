@@ -264,21 +264,123 @@ class ProductoController extends Controller
      */
     public function buscarPorIniciales(Request $request)
     {
-
         $request->validate([
-            'producto' => 'required|string|min:3'
+            'producto' => 'required|string|min:2'
         ]);
 
-        $producto = $request->input('producto');
+        $termino = $request->input('producto');
         
-
-        $productos = Producto::with('marca')
-            ->where('nombre', 'LIKE', '%' . $producto . '%')
-            ->orWhere('sku', 'LIKE', '%' . $producto . '%')
+        // Buscar productos que coincidan con el término
+        $productos = Producto::with(['marca', 'subcategoria.categoria'])
+            ->where('nombre', 'LIKE', '%' . $termino . '%')
+            ->orWhere('sku', 'LIKE', '%' . $termino . '%')
             ->get();
 
+        // Buscar marcas que coincidan con el término O que tengan productos que coincidan
+        $marcasDirectas = \App\Models\Marca::where('nombre', 'LIKE', '%' . $termino . '%')
+            ->with(['productos' => function($query) {
+                $query->with(['marca', 'subcategoria.categoria'])->limit(5);
+            }])
+            ->get();
+            
+        // Obtener marcas de los productos encontrados
+        $marcasDeProductos = \App\Models\Marca::whereHas('productos', function($query) use ($termino) {
+                $query->where('nombre', 'LIKE', '%' . $termino . '%')
+                      ->orWhere('sku', 'LIKE', '%' . $termino . '%');
+            })
+            ->with(['productos' => function($query) use ($termino) {
+                $query->where('nombre', 'LIKE', '%' . $termino . '%')
+                      ->orWhere('sku', 'LIKE', '%' . $termino . '%')
+                      ->with(['marca', 'subcategoria.categoria'])
+                      ->limit(5);
+            }])
+            ->get();
+            
+        // Combinar ambas colecciones de marcas y eliminar duplicados
+        $marcas = $marcasDirectas->merge($marcasDeProductos)->unique('id_marca');
 
-        return response()->json($productos);
+        // Buscar categorías que coincidan con el término O que tengan productos que coincidan
+        $categoriasDirectas = \App\Models\Categoria::where('nombre', 'LIKE', '%' . $termino . '%')
+            ->with(['subcategorias.productos' => function($query) {
+                $query->with(['marca', 'subcategoria.categoria'])->limit(5);
+            }])
+            ->get();
+            
+        // Obtener categorías de los productos encontrados
+        $categoriasDeProductos = \App\Models\Categoria::whereHas('subcategorias.productos', function($query) use ($termino) {
+                $query->where('nombre', 'LIKE', '%' . $termino . '%')
+                      ->orWhere('sku', 'LIKE', '%' . $termino . '%');
+            })
+            ->with(['subcategorias.productos' => function($query) use ($termino) {
+                $query->where('nombre', 'LIKE', '%' . $termino . '%')
+                      ->orWhere('sku', 'LIKE', '%' . $termino . '%')
+                      ->with(['marca', 'subcategoria.categoria'])
+                      ->limit(5);
+            }])
+            ->get();
+            
+        // Combinar ambas colecciones de categorías y eliminar duplicados
+        $categorias = $categoriasDirectas->merge($categoriasDeProductos)->unique('id_categoria');
+
+        // Buscar subcategorías que coincidan con el término O que tengan productos que coincidan
+        $subcategoriasDirectas = \App\Models\Subcategoria::where('nombre', 'LIKE', '%' . $termino . '%')
+            ->with(['productos' => function($query) {
+                $query->with(['marca', 'subcategoria.categoria'])->limit(5);
+            }, 'categoria'])
+            ->get();
+            
+        // Obtener subcategorías de los productos encontrados
+        $subcategoriasDeProductos = \App\Models\Subcategoria::whereHas('productos', function($query) use ($termino) {
+                $query->where('nombre', 'LIKE', '%' . $termino . '%')
+                      ->orWhere('sku', 'LIKE', '%' . $termino . '%');
+            })
+            ->with(['productos' => function($query) use ($termino) {
+                $query->where('nombre', 'LIKE', '%' . $termino . '%')
+                      ->orWhere('sku', 'LIKE', '%' . $termino . '%')
+                      ->with(['marca', 'subcategoria.categoria'])
+                      ->limit(5);
+            }, 'categoria'])
+            ->get();
+            
+        // Combinar ambas colecciones de subcategorías y eliminar duplicados
+        $subcategorias = $subcategoriasDirectas->merge($subcategoriasDeProductos)->unique('id_subcategoria');
+
+        // Estructurar la respuesta
+        $respuesta = [
+            'productos' => $productos,
+            'marcas' => $marcas->map(function($marca) {
+                 return [
+                     'id_marca' => $marca->id_marca,
+                     'nombre' => $marca->nombre,
+                     'tipo' => 'marca',
+                     'productos_relacionados' => $marca->productos
+                 ];
+             }),
+            'categorias' => $categorias->map(function($categoria) {
+                $productosCategoria = collect();
+                foreach($categoria->subcategorias as $subcategoria) {
+                    $productosCategoria = $productosCategoria->merge($subcategoria->productos);
+                }
+                return [
+                    'id_categoria' => $categoria->id_categoria,
+                    'nombre' => $categoria->nombre,
+                    'tipo' => 'categoria',
+                    'productos_relacionados' => $productosCategoria->take(5)
+                ];
+            }),
+            'subcategorias' => $subcategorias->map(function($subcategoria) {
+                return [
+                    'id_subcategoria' => $subcategoria->id_subcategoria,
+                    'nombre' => $subcategoria->nombre,
+                    'categoria_nombre' => $subcategoria->categoria ? $subcategoria->categoria->nombre : '',
+                    'categoria_id' => $subcategoria->categoria ? $subcategoria->categoria->id_categoria : null,
+                    'tipo' => 'subcategoria',
+                    'productos_relacionados' => $subcategoria->productos
+                ];
+            })
+        ];
+
+        return response()->json($respuesta);
     }
     /**
      * Actualizar solo la imagen de un producto

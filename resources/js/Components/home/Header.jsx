@@ -22,19 +22,23 @@ const Header = () => {
         try {
             const response = await axios.post('/productos/buscar', {
                 producto: term
+            }, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
             });
 
-            // Verifica que la respuesta sea un array
-            if (Array.isArray(response.data)) {
+            // La respuesta ahora es un objeto con productos, marcas, categorías y subcategorías
+            if (response.data && typeof response.data === 'object') {
                 setSearchResults(response.data);
             } else {
-                console.error('La respuesta no es un array:', response.data);
-                setSearchResults([]);
+                console.error('La respuesta no tiene el formato esperado:', response.data);
+                setSearchResults({ productos: [], marcas: [], categorias: [], subcategorias: [] });
             }
 
         } catch (error) {
             console.error('Error en la búsqueda:', error);
-            setSearchResults([]);
+            setSearchResults({ productos: [], marcas: [], categorias: [], subcategorias: [] });
         } finally {
             setIsLoading(false);
         }
@@ -55,11 +59,41 @@ const Header = () => {
         setIsModalOpen(false);
     };
 
+    // Manejar clic en una marca
+    const handleMarcaClick = (marca) => {
+        // Redirigir a la página de productos de la marca
+        window.location.href = `/marca/${marca.id_marca}`;
+        setIsModalOpen(false);
+    };
+
+    // Manejar clic en una categoría
+    const handleCategoriaClick = (categoria) => {
+        // Redirigir a la página de la categoría
+        window.location.href = `/categoria/${categoria.id_categoria}`;
+        setIsModalOpen(false);
+    };
+
+    // Manejar clic en una subcategoría
+    const handleSubcategoriaClick = (subcategoria) => {
+        // Redirigir a la página de la subcategoría
+        window.location.href = `/subcategoria/${subcategoria.id_subcategoria}`;
+        setIsModalOpen(false);
+    };
+
     // Manejar foco en el input
     const handleFocus = () => {
         if (searchTerm.length >= 2) {
             setShowResults(true);
         }
+    };
+
+    // Verificar si hay resultados para mostrar
+    const hasResults = () => {
+        if (!searchResults || typeof searchResults !== 'object') return false;
+        return (searchResults.productos && searchResults.productos.length > 0) ||
+               (searchResults.marcas && searchResults.marcas.length > 0) ||
+               (searchResults.categorias && searchResults.categorias.length > 0) ||
+               (searchResults.subcategorias && searchResults.subcategorias.length > 0);
     };
 
     // Cerrar resultados al hacer clic fuera
@@ -166,8 +200,8 @@ const Header = () => {
                     </svg>
                     
                     {/* Resultados de búsqueda */}
-                    {showResults && (searchResults.length > 0 || isLoading) && (
-                        <div className={`absolute top-full left-0 right-0 mt-1 rounded-md shadow-lg z-50 max-h-60 overflow-y-auto ${
+                    {showResults && (hasResults() || isLoading) && (
+                        <div className={`absolute top-full left-0 right-0 mt-1 rounded-md shadow-lg z-50 max-h-96 overflow-hidden ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
                             {isLoading ? (
@@ -175,36 +209,146 @@ const Header = () => {
                                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                 }`}>Buscando...</div>
                             ) : (
-                                searchResults.map(product => (
-                                    <div
-                                        key={product.id_producto}
-                                        className={`p-3 cursor-pointer border-b ${
-                                            isDarkMode 
-                                                ? 'hover:bg-gray-700 border-gray-700' 
-                                                : 'hover:bg-gray-100 border-gray-200'
-                                        }`}
-                                        onClick={() => handleProductClick(product)}
-                                    >
-                                        <div className={`font-medium ${
-                                            isDarkMode ? 'text-white' : 'text-black'
-                                        }`}>{product.nombre}</div>
-                                        <div className={`text-sm ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                        }`}>
-                                            SKU: {product.sku}
-                                            {product.marca && (
-                                                <span className="ml-2">
-                                                    | Marca: {product.marca.nombre}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className={`text-sm ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            Precio: S/. {product.precio_igv}
-                                        </div>
+                                <div className="flex">
+                                    {/* Columna izquierda - Productos */}
+                                    <div className="flex-1 border-r border-gray-200 dark:border-gray-600">
+                                        {searchResults.productos && searchResults.productos.length > 0 && (
+                                            <div>
+                                                <div className={`px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b ${
+                                                    isDarkMode ? 'text-gray-400 bg-gray-700 border-gray-600' : 'text-gray-500 bg-gray-50 border-gray-200'
+                                                }`}>
+                                                    Productos
+                                                </div>
+                                                <div className="max-h-80 overflow-y-auto">
+                                                    {searchResults.productos.map(product => (
+                                                        <div
+                                                            key={`producto-${product.id_producto}`}
+                                                            className={`p-3 cursor-pointer border-b text-sm ${
+                                                                isDarkMode 
+                                                                    ? 'hover:bg-gray-700 border-gray-700' 
+                                                                    : 'hover:bg-gray-100 border-gray-200'
+                                                            }`}
+                                                            onClick={() => handleProductClick(product)}
+                                                        >
+                                                            <div className={`font-medium text-sm ${
+                                                                isDarkMode ? 'text-white' : 'text-black'
+                                                            }`}>{product.nombre}</div>
+                                                            <div className={`text-xs mt-1 ${
+                                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                            }`}>
+                                                                SKU: {product.sku}
+                                                                {product.marca && (
+                                                                    <span className="ml-2">
+                                                                        | {product.marca.nombre}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                ))
+
+                                    {/* Columna central - Marcas */}
+                                    <div className="w-48 border-r border-gray-200 dark:border-gray-600">
+                                        {searchResults.marcas && searchResults.marcas.length > 0 && (
+                                            <div>
+                                                <div className={`px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b ${
+                                                    isDarkMode ? 'text-gray-400 bg-gray-700 border-gray-600' : 'text-gray-500 bg-gray-50 border-gray-200'
+                                                }`}>
+                                                    Marcas relacionadas
+                                                </div>
+                                                <div className="max-h-80 overflow-y-auto">
+                                                    {searchResults.marcas.map(marca => (
+                                                        <div
+                                                            key={`marca-${marca.id_marca}`}
+                                                            className={`p-2 cursor-pointer border-b text-sm ${
+                                                                isDarkMode 
+                                                                    ? 'hover:bg-gray-700 border-gray-700' 
+                                                                    : 'hover:bg-gray-100 border-gray-200'
+                                                            }`}
+                                                            onClick={() => handleMarcaClick(marca)}
+                                                        >
+                                                            <div className={`font-medium text-sm ${
+                                                                isDarkMode ? 'text-white' : 'text-black'
+                                                            }`}>
+                                                                {marca.nombre}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Columna derecha - Categorías */}
+                                    <div className="w-48">
+                                        {searchResults.categorias && searchResults.categorias.length > 0 && (
+                                            <div>
+                                                <div className={`px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b ${
+                                                    isDarkMode ? 'text-gray-400 bg-gray-700 border-gray-600' : 'text-gray-500 bg-gray-50 border-gray-200'
+                                                }`}>
+                                                    Categorías relacionadas
+                                                </div>
+                                                <div className="max-h-80 overflow-y-auto">
+                                                    {searchResults.categorias.map(categoria => (
+                                                        <div
+                                                            key={`categoria-${categoria.id_categoria}`}
+                                                            className={`p-2 cursor-pointer border-b text-sm ${
+                                                                isDarkMode 
+                                                                    ? 'hover:bg-gray-700 border-gray-700' 
+                                                                    : 'hover:bg-gray-100 border-gray-200'
+                                                            }`}
+                                                            onClick={() => handleCategoriaClick(categoria)}
+                                                        >
+                                                            <div className={`font-medium text-sm ${
+                                                                isDarkMode ? 'text-white' : 'text-black'
+                                                            }`}>
+                                                                {categoria.nombre}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Subcategorías en la misma columna */}
+                                        {searchResults.subcategorias && searchResults.subcategorias.length > 0 && (
+                                            <div className="border-t border-gray-200 dark:border-gray-600">
+                                                <div className={`px-3 py-2 text-xs font-semibold uppercase tracking-wide border-b ${
+                                                    isDarkMode ? 'text-gray-400 bg-gray-700 border-gray-600' : 'text-gray-500 bg-gray-50 border-gray-200'
+                                                }`}>
+                                                    Subcategorías
+                                                </div>
+                                                <div className="max-h-40 overflow-y-auto">
+                                                    {searchResults.subcategorias.map(subcategoria => (
+                                                        <div
+                                                            key={`subcategoria-${subcategoria.id_subcategoria}`}
+                                                            className={`p-2 cursor-pointer border-b text-sm ${
+                                                                isDarkMode 
+                                                                    ? 'hover:bg-gray-700 border-gray-700' 
+                                                                    : 'hover:bg-gray-100 border-gray-200'
+                                                            }`}
+                                                            onClick={() => handleSubcategoriaClick(subcategoria)}
+                                                        >
+                                                            <div className={`font-medium text-sm ${
+                                                                isDarkMode ? 'text-white' : 'text-black'
+                                                            }`}>
+                                                                {subcategoria.nombre}
+                                                            </div>
+                                                            <div className={`text-xs ${
+                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                            }`}>
+                                                                {subcategoria.categoria_nombre}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
                             )}
                         </div>
                     )}
@@ -490,7 +634,7 @@ const Header = () => {
                             </div>
 
                             {/* Resultados de búsqueda en el modal */}
-                            {showResults && (searchResults.length > 0 || isLoading) && (
+                            {showResults && (hasResults() || isLoading) && (
                                 <div className={`mt-4 rounded-xl border max-h-96 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent ${
                                     isDarkMode 
                                         ? 'bg-gray-700/50 border-gray-600' 
@@ -508,79 +652,207 @@ const Header = () => {
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="divide-y divide-gray-200 dark:divide-gray-600">
-                                            {searchResults.map((product, index) => (
-                                                <div
-                                                    key={product.id_producto}
-                                                    className={`p-4 cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
-                                                        isDarkMode 
-                                                            ? 'hover:bg-gray-600/50' 
-                                                            : 'hover:bg-white/80 hover:shadow-sm'
-                                                    } ${index === 0 ? 'rounded-t-xl' : ''} ${index === searchResults.length - 1 ? 'rounded-b-xl' : ''}`}
-                                                    onClick={() => handleProductClick(product)}
-                                                >
-                                                    <div className="flex items-start space-x-3">
-                                                        {/* Icono de producto */}
-                                                        <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                                                            isDarkMode ? 'bg-gray-600' : 'bg-gray-100'
-                                                        }`}>
-                                                            <svg className={`w-5 h-5 ${
-                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                            }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                            </svg>
-                                                        </div>
-                                                        
-                                                        {/* Información del producto */}
-                                                        <div className="flex-1 min-w-0">
-                                                            <h4 className={`font-semibold text-sm leading-tight mb-1 line-clamp-2 ${
-                                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                                            }`}>
-                                                                {product.nombre}
-                                                            </h4>
-                                                            
-                                                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                                                                <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
+                                        <div className="space-y-4">
+                                            {/* Productos */}
+                                            {searchResults.productos && searchResults.productos.length > 0 && (
+                                                <div>
+                                                    <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 px-3 ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                    }`}>
+                                                        Productos ({searchResults.productos.length})
+                                                    </h4>
+                                                    <div className="divide-y divide-gray-200 dark:divide-gray-600">
+                                                        {searchResults.productos.map((product, index) => (
+                                                            <div
+                                                                key={product.id_producto}
+                                                                className={`p-3 cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
                                                                     isDarkMode 
-                                                                        ? 'bg-gray-600 text-gray-300' 
-                                                                        : 'bg-gray-100 text-gray-600'
-                                                                }`}>
-                                                                    SKU: {product.sku}
-                                                                </span>
-                                                                {product.marca && (
-                                                                    <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${
-                                                                        isDarkMode 
-                                                                            ? 'bg-blue-900/30 text-blue-300' 
-                                                                            : 'bg-blue-50 text-blue-600'
+                                                                        ? 'hover:bg-gray-600/50' 
+                                                                        : 'hover:bg-white/80 hover:shadow-sm'
+                                                                }`}
+                                                                onClick={() => handleProductClick(product)}
+                                                            >
+                                                                <div className="flex items-start space-x-3">
+                                                                    <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                                                                        isDarkMode ? 'bg-gray-600' : 'bg-gray-100'
                                                                     }`}>
-                                                                        {product.marca.nombre}
-                                                                    </span>
-                                                                )}
+                                                                        <svg className={`w-4 h-4 ${
+                                                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <h4 className={`font-medium text-sm leading-tight mb-1 ${
+                                                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                        }`}>
+                                                                            {product.nombre}
+                                                                        </h4>
+                                                                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                                                                            <span className={`text-xs ${
+                                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                                            }`}>
+                                                                                SKU: {product.sku}
+                                                                            </span>
+                                                                            {product.marca && (
+                                                                                <span className={`text-xs ${
+                                                                                    isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                                                                }`}>
+                                                                                    {product.marca.nombre}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                        <span className={`text-sm font-bold ${
+                                                                            isDarkMode ? 'text-green-400' : 'text-green-600'
+                                                                        }`}>
+                                                                            S/. {product.precio_igv}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                            
-                                                            <div className="flex items-center justify-between">
-                                                                <span className={`text-lg font-bold ${
-                                                                    isDarkMode ? 'text-green-400' : 'text-green-600'
-                                                                }`}>
-                                                                    S/. {product.precio_igv}
-                                                                </span>
-                                                                <svg className={`w-4 h-4 ${
-                                                                    isDarkMode ? 'text-gray-500' : 'text-gray-400'
-                                                                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                                                </svg>
-                                                            </div>
-                                                        </div>
+                                                        ))}
                                                     </div>
                                                 </div>
-                                            ))}
+                                            )}
+
+                                            {/* Marcas */}
+                                            {searchResults.marcas && searchResults.marcas.length > 0 && (
+                                                <div>
+                                                    <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 px-3 ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                    }`}>
+                                                        Marcas ({searchResults.marcas.length})
+                                                    </h4>
+                                                    <div className="divide-y divide-gray-200 dark:divide-gray-600">
+                                                        {searchResults.marcas.map((marca) => (
+                                                            <div
+                                                                key={marca.id_marca}
+                                                                className={`p-3 cursor-pointer transition-all duration-200 ${
+                                                                    isDarkMode 
+                                                                        ? 'hover:bg-gray-600/50' 
+                                                                        : 'hover:bg-white/80 hover:shadow-sm'
+                                                                }`}
+                                                                onClick={() => handleBrandClick(marca)}
+                                                            >
+                                                                <div className="flex items-center space-x-3">
+                                                                    <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                                                                        isDarkMode ? 'bg-orange-900/30' : 'bg-orange-50'
+                                                                    }`}>
+                                                                        <svg className={`w-4 h-4 ${
+                                                                            isDarkMode ? 'text-orange-400' : 'text-orange-600'
+                                                                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <span className={`font-medium text-sm ${
+                                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                    }`}>
+                                                                        {marca.nombre}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Categorías */}
+                                            {searchResults.categorias && searchResults.categorias.length > 0 && (
+                                                <div>
+                                                    <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 px-3 ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                    }`}>
+                                                        Categorías ({searchResults.categorias.length})
+                                                    </h4>
+                                                    <div className="divide-y divide-gray-200 dark:divide-gray-600">
+                                                        {searchResults.categorias.map((categoria) => (
+                                                            <div
+                                                                key={categoria.id_categoria}
+                                                                className={`p-3 cursor-pointer transition-all duration-200 ${
+                                                                    isDarkMode 
+                                                                        ? 'hover:bg-gray-600/50' 
+                                                                        : 'hover:bg-white/80 hover:shadow-sm'
+                                                                }`}
+                                                                onClick={() => handleCategoryClick(categoria)}
+                                                            >
+                                                                <div className="flex items-center space-x-3">
+                                                                    <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                                                                        isDarkMode ? 'bg-green-900/30' : 'bg-green-50'
+                                                                    }`}>
+                                                                        <svg className={`w-4 h-4 ${
+                                                                            isDarkMode ? 'text-green-400' : 'text-green-600'
+                                                                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <span className={`font-medium text-sm ${
+                                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                    }`}>
+                                                                        {categoria.nombre}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Subcategorías */}
+                                            {searchResults.subcategorias && searchResults.subcategorias.length > 0 && (
+                                                <div>
+                                                    <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 px-3 ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                    }`}>
+                                                        Subcategorías ({searchResults.subcategorias.length})
+                                                    </h4>
+                                                    <div className="divide-y divide-gray-200 dark:divide-gray-600">
+                                                        {searchResults.subcategorias.map((subcategoria) => (
+                                                            <div
+                                                                key={subcategoria.id_subcategoria}
+                                                                className={`p-3 cursor-pointer transition-all duration-200 ${
+                                                                    isDarkMode 
+                                                                        ? 'hover:bg-gray-600/50' 
+                                                                        : 'hover:bg-white/80 hover:shadow-sm'
+                                                                }`}
+                                                                onClick={() => handleSubcategoryClick(subcategoria)}
+                                                            >
+                                                                <div className="flex items-center space-x-3">
+                                                                    <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${
+                                                                        isDarkMode ? 'bg-purple-900/30' : 'bg-purple-50'
+                                                                    }`}>
+                                                                        <svg className={`w-4 h-4 ${
+                                                                            isDarkMode ? 'text-purple-400' : 'text-purple-600'
+                                                                        }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                                                        </svg>
+                                                                    </div>
+                                                                    <div className="flex-1">
+                                                                        <span className={`font-medium text-sm block ${
+                                                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                                                        }`}>
+                                                                            {subcategoria.nombre}
+                                                                        </span>
+                                                                        {subcategoria.categoria && (
+                                                                            <span className={`text-xs ${
+                                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                                            }`}>
+                                                                                en {subcategoria.categoria.nombre}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
                             )}
 
                             {/* Mensaje cuando no hay resultados */}
-                            {showResults && !isLoading && searchResults.length === 0 && searchTerm.length >= 2 && (
+                            {showResults && !isLoading && !hasResults() && searchTerm.length >= 2 && (
                                 <div className={`mt-4 p-6 text-center rounded-xl border-2 border-dashed ${
                                     isDarkMode 
                                         ? 'border-gray-600 bg-gray-700/30' 
