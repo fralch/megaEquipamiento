@@ -33,7 +33,7 @@ const Slider = () => {
             touchAngle={45}
             threshold={10}
             style={{ 
-                width: "100vw", 
+                width: "100%", 
                 height: "85vh",
                 minHeight: "400px",
                 maxHeight: "100vh"
