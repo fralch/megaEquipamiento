@@ -236,11 +236,11 @@ const Header = () => {
     <header className={`transition-colors duration-300 ${isDarkMode ? "bg-gray-900" : "bg-white"}`}>
       {/* Desktop */}
       <div className="hidden lg:flex container mx-auto items-center px-8 py-8 md:px-12 max-w-full">
-        <a href="/" className="mr-auto w-1/5 flex-shrink-0 pr-4 ml-10">
+        <a href="/" className="mr-auto w-1/6 flex-shrink-0 pr-2 ml-4">
           <img className="w-full object-contain" src="/img/logo2.jpg" alt="EquinLab Logo" />
         </a>
 
-        <div className={`flex mx-auto w-full max-w-3xl items-center rounded-md xl:max-w-4xl search-container relative ${isDarkMode ? "bg-gray-700" : "bg-gray-100"}`}>
+        <div className={`flex mx-auto w-full max-w-5xl items-center rounded-md xl:max-w-6xl 2xl:max-w-7xl search-container relative ${isDarkMode ? "bg-gray-700" : "bg-gray-100"}`}>
           <input
             className={`w-full border-l bg-transparent py-2 pl-4 text-sm font-semibold ${
               isDarkMode ? "border-gray-600 text-white placeholder-gray-400" : "border-gray-300 text-black placeholder-gray-500"
@@ -443,12 +443,12 @@ const Header = () => {
         </div>
 
         {/* Contacto + Dark mode + Cart */}
-        <div className="hidden flex-row items-center gap-4 sm:flex md:w-44 xl:w-52 pl-4 mr-20" id="contactos">
+        <div className="hidden flex-row items-center gap-2 sm:flex md:w-32 xl:w-36 pl-2 mr-4" id="contactos">
           {/* ... (redes tal como lo tenías) ... */}
         </div>
         <button
           onClick={toggleDarkMode}
-          className={`p-2 rounded-lg transition-colors duration-200 mr-4 ${isDarkMode ? "bg-gray-700 text-yellow-400 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+          className={`p-2 rounded-lg transition-colors duration-200 mr-2 ${isDarkMode ? "bg-gray-700 text-yellow-400 hover:bg-gray-600" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
           title={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
         >
           {isDarkMode ? <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd"/></svg>
