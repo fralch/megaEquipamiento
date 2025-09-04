@@ -74,7 +74,31 @@ const Header = () => {
     });
     return flat;
   };
+
+  // Construye una lista plana para móvil (muestra todos los resultados sin filtros)
+  const buildFlatItemsMobile = () => {
+    if (!searchResults || typeof searchResults !== "object") return [];
+    const groups = [
+      { key: "productos", label: "Productos", kind: "producto" },
+      { key: "marcas", label: "Marcas", kind: "marca" },
+      { key: "categorias", label: "Categorías", kind: "categoria" },
+      { key: "subcategorias", label: "Subcategorías", kind: "subcategoria" },
+    ];
+
+    const flat = [];
+    groups.forEach((g) => {
+      const list = searchResults[g.key] || [];
+      if (!list.length) return;
+
+      flat.push({ type: "header", groupKey: g.key, label: g.label });
+      list.forEach((item) =>
+        flat.push({ type: "item", groupKey: g.key, kind: g.kind, data: item })
+      );
+    });
+    return flat;
+  };
   const flatItems = buildFlatItems();
+  const flatItemsMobile = buildFlatItemsMobile();
 
   const selectItem = (entry) => {
     if (!entry) return;
@@ -511,42 +535,9 @@ const Header = () => {
               </div>
             </div>
 
-            {/* Tabs con scroll (móvil) */}
-            <div className={`px-5 pb-2 sticky top-[64px] z-10 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
-              <div id="tabs-container-mobile" className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-                {[
-                  { key: "todos", label: "Todos" },
-                  { key: "productos", label: "Productos", count: searchResults?.productos?.length || 0 },
-                  { key: "marcas", label: "Marcas", count: searchResults?.marcas?.length || 0 },
-                  { key: "categorias", label: "Categorías", count: searchResults?.categorias?.length || 0 },
-                  { key: "subcategorias", label: "Subcategorías", count: searchResults?.subcategorias?.length || 0 },
-                ].map((tab) => {
-                  const isActive = activeFilter === tab.key;
-                  const disabled = tab.key !== "todos" && (tab.count || 0) === 0;
-                  return (
-                    <button
-                      key={`m-${tab.key}`}
-                      disabled={disabled}
-                      onClick={() => setActiveFilter(tab.key)}
-                      className={[
-                        "px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap flex-shrink-0",
-                        disabled
-                          ? isDarkMode ? "text-gray-500 bg-gray-700" : "text-gray-400 bg-gray-100"
-                          : isActive
-                          ? "bg-blue-600 text-white"
-                          : isDarkMode
-                          ? "bg-gray-700 text-gray-200"
-                          : "bg-gray-100 text-gray-700",
-                      ].join(" ")}
-                    >
-                      {tab.label}{tab.key !== "todos" && <span className="ml-1 opacity-80">({tab.count})</span>}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
 
-            {/* Resultados con scroll (móvil) – reutiliza flatItems + “Ver todas” */}
+
+            {/* Resultados con scroll (móvil) – muestra todos los resultados */}
             {showResults && (hasResults() || isLoading) && (
               <div className={`px-5 pb-5 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
                 <div className={`rounded-xl border ${isDarkMode ? "bg-gray-700/40 border-gray-600" : "bg-gray-50/80 border-gray-200"} max-h-[65vh] overflow-y-auto`}>
@@ -561,7 +552,7 @@ const Header = () => {
                     <div className="py-10 text-center text-sm">No encontramos coincidencias.</div>
                   ) : (
                     <div className="py-2">
-                      {flatItems.map((entry, idx) => {
+                      {flatItemsMobile.map((entry, idx) => {
                         if (entry.type === "header") {
                           return (
                             <div key={`mh-${entry.groupKey}-${idx}`} className={`px-4 py-2 text-[11px] font-bold uppercase tracking-wider sticky top-0 ${isDarkMode ? "text-gray-300 bg-gray-700/80" : "text-gray-600 bg-gray-50/90"}`}>
@@ -569,13 +560,9 @@ const Header = () => {
                             </div>
                           );
                         }
+                        // No mostramos botones "Ver más" en móvil ya que mostramos todos los resultados
                         if (entry.type === "more") {
-                          return (
-                            <button key={`mmore-${entry.groupKey}-${idx}`} onClick={() => selectItem(entry)}
-                                    className={`w-full text-left px-4 py-3 text-sm font-medium ${isDarkMode ? "text-blue-300 hover:bg-gray-600/50" : "text-blue-700 hover:bg-white/80"}`}>
-                              {entry.label}
-                            </button>
-                          );
+                          return null;
                         }
 
                         const { kind, data } = entry;
