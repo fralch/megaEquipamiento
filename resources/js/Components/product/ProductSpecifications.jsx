@@ -75,7 +75,7 @@ const ProductSpecifications = ({
                                 <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                                     {row.map((cell, cellIndex) => (
                                         <td key={cellIndex} className="border border-gray-300 px-4 py-2">
-                                            {cell}
+                                            {typeof cell === 'object' && cell !== null ? JSON.stringify(cell) : cell}
                                         </td>
                                     ))}
                                 </tr>
@@ -110,7 +110,10 @@ const ProductSpecifications = ({
                                         <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                                             {row.map((cell, cellIndex) => (
                                                 <td key={cellIndex} className="border border-gray-300 px-4 py-2">
-                                                    {cell?.replace?.(/\\r$/, '') || cell}
+                                                    {typeof cell === 'object' && cell !== null 
+                                                        ? JSON.stringify(cell) 
+                                                        : (cell?.replace?.(/\\r$/, '') || cell)
+                                                    }
                                                 </td>
                                             ))}
                                         </tr>
