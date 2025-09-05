@@ -194,3 +194,25 @@ Route::get('/test-pedido-email', function () {
     return 'Email de pedido enviado!';
 });
 
+// Rutas para SEO y Sitemap
+use App\Http\Controllers\SitemapController;
+
+Route::get('/sitemap.xml', [SitemapController::class, 'show'])->name('sitemap.show');
+Route::get('/sitemap/generate', [SitemapController::class, 'generate'])->name('sitemap.generate');
+Route::get('/sitemap/dynamic', [SitemapController::class, 'dynamic'])->name('sitemap.dynamic');
+
+// Ruta para robots.txt dinámico
+Route::get('/robots.txt', function () {
+    $content = "User-agent: *\n";
+    $content .= "Allow: /\n";
+    $content .= "Disallow: /admin/\n";
+    $content .= "Disallow: /crear\n";
+    $content .= "Disallow: /api/\n";
+    $content .= "\n";
+    $content .= "Sitemap: " . url('/sitemap.xml') . "\n";
+    
+    return response($content, 200, [
+        'Content-Type' => 'text/plain'
+    ]);
+})->name('robots.txt');
+
