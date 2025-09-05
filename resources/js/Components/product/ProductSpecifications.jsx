@@ -11,6 +11,30 @@ const ProductSpecifications = ({
 }) => {
     const { auth } = usePage().props;
 
+    const renderCellContent = (cell) => {
+        if (cell === null || cell === undefined) {
+            return '';
+        }
+        
+        if (typeof cell === 'object') {
+            try {
+                if (Array.isArray(cell)) {
+                    return cell.join(', ');
+                }
+                return JSON.stringify(cell);
+            } catch (error) {
+                console.error('Error rendering cell content:', error);
+                return '[Error rendering content]';
+            }
+        }
+        
+        if (typeof cell === 'string') {
+            return cell.replace(/\\r$/, '') || cell;
+        }
+        
+        return String(cell);
+    };
+
     if (!specifications || (!specifications.secciones && !specifications.length)) {
         return (
             <div className="p-4">
@@ -75,7 +99,7 @@ const ProductSpecifications = ({
                                 <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                                     {row.map((cell, cellIndex) => (
                                         <td key={cellIndex} className="border border-gray-300 px-4 py-2">
-                                            {typeof cell === 'object' && cell !== null ? JSON.stringify(cell) : cell}
+                                            {renderCellContent(cell)}
                                         </td>
                                     ))}
                                 </tr>
@@ -110,10 +134,7 @@ const ProductSpecifications = ({
                                         <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                                             {row.map((cell, cellIndex) => (
                                                 <td key={cellIndex} className="border border-gray-300 px-4 py-2">
-                                                    {typeof cell === 'object' && cell !== null 
-                                                        ? JSON.stringify(cell) 
-                                                        : (cell?.replace?.(/\\r$/, '') || cell)
-                                                    }
+                                                    {renderCellContent(cell)}
                                                 </td>
                                             ))}
                                         </tr>

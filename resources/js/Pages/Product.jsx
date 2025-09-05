@@ -679,13 +679,37 @@ const ProductPage = ({ producto }) => {
         }
     };
 
+    const renderCellContent = (cell) => {
+        if (cell === null || cell === undefined) {
+            return '';
+        }
+        
+        if (typeof cell === 'object') {
+            try {
+                if (Array.isArray(cell)) {
+                    return cell.join(', ');
+                }
+                return JSON.stringify(cell);
+            } catch (error) {
+                console.error('Error rendering cell content:', error);
+                return '[Error rendering content]';
+            }
+        }
+        
+        if (typeof cell === 'string') {
+            return cell.replace(/\\r$/, '') || cell;
+        }
+        
+        return String(cell);
+    };
+
     const renderTabla = (seccion) => (
         <table style={{ width: '100%' }} className="border-collapse border border-gray-300">
             <thead>
                 <tr>
                     {seccion.datos[0].map((celda, idx) => (
                         <th key={idx} style={{ padding: '8px', backgroundColor: '#f3f4f6' }} className="bg-gray-100">
-                            {celda}
+                            {renderCellContent(celda)}
                         </th>
                     ))}
                 </tr>
@@ -695,7 +719,7 @@ const ProductPage = ({ producto }) => {
                     <tr key={rowIdx} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                         {fila.map((celda, cellIdx) => (
                             <td key={cellIdx} style={{ padding: '8px' }} className="border border-gray-300">
-                                {celda}
+                                {renderCellContent(celda)}
                             </td>
                         ))}
                     </tr>
