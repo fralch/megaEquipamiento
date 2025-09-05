@@ -34,7 +34,9 @@ class GenerateSitemap extends Command
     {
         $this->info('Generando sitemap...');
         
-        $sitemap = Sitemap::create();
+        // Configurar la URL base para producción
+        $baseUrl = 'https://megaequipamiento.pe';
+        $sitemap = Sitemap::create($baseUrl);
         
         // Página principal
         $sitemap->add(
@@ -72,7 +74,7 @@ class GenerateSitemap extends Command
         $this->info('Agregando categorías al sitemap...');
         Categoria::chunk(50, function ($categorias) use ($sitemap) {
             foreach ($categorias as $categoria) {
-                $url = Url::create('/categoria/' . $categoria->id_categoria)
+                $url = Url::create('/categorias/' . $categoria->id_categoria)
                     ->setChangeFrequency(Url::CHANGE_FREQUENCY_WEEKLY)
                     ->setPriority(0.8);
                 

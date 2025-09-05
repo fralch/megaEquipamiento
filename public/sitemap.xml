@@ -1,3344 +1,3344 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
     <url>
-    <loc>http://127.0.0.1:8000</loc>
-    <lastmod>2025-09-05T10:14:38-05:00</lastmod>
+    <loc>https://megaequipamiento.pe</loc>
+    <lastmod>2025-09-05T10:51:09-05:00</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/contacto</loc>
-    <lastmod>2025-09-05T10:14:38-05:00</lastmod>
+    <loc>https://megaequipamiento.pe/contacto</loc>
+    <lastmod>2025-09-05T10:51:09-05:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/producto</loc>
+    <loc>https://megaequipamiento.pe/producto</loc>
     <lastmod>2025-07-25T09:12:23-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/1</loc>
+    <loc>https://megaequipamiento.pe/categorias/1</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/2</loc>
+    <loc>https://megaequipamiento.pe/categorias/2</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/3</loc>
+    <loc>https://megaequipamiento.pe/categorias/3</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/4</loc>
+    <loc>https://megaequipamiento.pe/categorias/4</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/5</loc>
+    <loc>https://megaequipamiento.pe/categorias/5</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/6</loc>
+    <loc>https://megaequipamiento.pe/categorias/6</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/7</loc>
+    <loc>https://megaequipamiento.pe/categorias/7</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/8</loc>
+    <loc>https://megaequipamiento.pe/categorias/8</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/9</loc>
+    <loc>https://megaequipamiento.pe/categorias/9</loc>
     <lastmod>2025-08-11T04:57:01-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/10</loc>
+    <loc>https://megaequipamiento.pe/categorias/10</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/11</loc>
+    <loc>https://megaequipamiento.pe/categorias/11</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/12</loc>
+    <loc>https://megaequipamiento.pe/categorias/12</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/13</loc>
+    <loc>https://megaequipamiento.pe/categorias/13</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/14</loc>
+    <loc>https://megaequipamiento.pe/categorias/14</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/15</loc>
+    <loc>https://megaequipamiento.pe/categorias/15</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/16</loc>
+    <loc>https://megaequipamiento.pe/categorias/16</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/17</loc>
+    <loc>https://megaequipamiento.pe/categorias/17</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/18</loc>
+    <loc>https://megaequipamiento.pe/categorias/18</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/19</loc>
+    <loc>https://megaequipamiento.pe/categorias/19</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/20</loc>
+    <loc>https://megaequipamiento.pe/categorias/20</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/21</loc>
+    <loc>https://megaequipamiento.pe/categorias/21</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/22</loc>
+    <loc>https://megaequipamiento.pe/categorias/22</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/23</loc>
+    <loc>https://megaequipamiento.pe/categorias/23</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/24</loc>
+    <loc>https://megaequipamiento.pe/categorias/24</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/25</loc>
+    <loc>https://megaequipamiento.pe/categorias/25</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/26</loc>
+    <loc>https://megaequipamiento.pe/categorias/26</loc>
     <lastmod>2025-08-16T10:09:54-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/27</loc>
+    <loc>https://megaequipamiento.pe/categorias/27</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/28</loc>
+    <loc>https://megaequipamiento.pe/categorias/28</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/29</loc>
+    <loc>https://megaequipamiento.pe/categorias/29</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/30</loc>
+    <loc>https://megaequipamiento.pe/categorias/30</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/31</loc>
+    <loc>https://megaequipamiento.pe/categorias/31</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/32</loc>
+    <loc>https://megaequipamiento.pe/categorias/32</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/33</loc>
+    <loc>https://megaequipamiento.pe/categorias/33</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/34</loc>
+    <loc>https://megaequipamiento.pe/categorias/34</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/35</loc>
+    <loc>https://megaequipamiento.pe/categorias/35</loc>
     <lastmod>2025-08-16T11:06:06-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/36</loc>
+    <loc>https://megaequipamiento.pe/categorias/36</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/37</loc>
+    <loc>https://megaequipamiento.pe/categorias/37</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/38</loc>
+    <loc>https://megaequipamiento.pe/categorias/38</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/39</loc>
+    <loc>https://megaequipamiento.pe/categorias/39</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/40</loc>
+    <loc>https://megaequipamiento.pe/categorias/40</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/41</loc>
+    <loc>https://megaequipamiento.pe/categorias/41</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/42</loc>
+    <loc>https://megaequipamiento.pe/categorias/42</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/43</loc>
+    <loc>https://megaequipamiento.pe/categorias/43</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/45</loc>
+    <loc>https://megaequipamiento.pe/categorias/45</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/47</loc>
+    <loc>https://megaequipamiento.pe/categorias/47</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/48</loc>
+    <loc>https://megaequipamiento.pe/categorias/48</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/49</loc>
+    <loc>https://megaequipamiento.pe/categorias/49</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/50</loc>
+    <loc>https://megaequipamiento.pe/categorias/50</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/51</loc>
+    <loc>https://megaequipamiento.pe/categorias/51</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/52</loc>
+    <loc>https://megaequipamiento.pe/categorias/52</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/53</loc>
+    <loc>https://megaequipamiento.pe/categorias/53</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/55</loc>
+    <loc>https://megaequipamiento.pe/categorias/55</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/56</loc>
+    <loc>https://megaequipamiento.pe/categorias/56</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/57</loc>
+    <loc>https://megaequipamiento.pe/categorias/57</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/58</loc>
+    <loc>https://megaequipamiento.pe/categorias/58</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/59</loc>
+    <loc>https://megaequipamiento.pe/categorias/59</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/60</loc>
+    <loc>https://megaequipamiento.pe/categorias/60</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/61</loc>
+    <loc>https://megaequipamiento.pe/categorias/61</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/62</loc>
+    <loc>https://megaequipamiento.pe/categorias/62</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/63</loc>
+    <loc>https://megaequipamiento.pe/categorias/63</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/64</loc>
+    <loc>https://megaequipamiento.pe/categorias/64</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/65</loc>
+    <loc>https://megaequipamiento.pe/categorias/65</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/66</loc>
+    <loc>https://megaequipamiento.pe/categorias/66</loc>
     <lastmod>2025-08-16T11:09:58-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/67</loc>
+    <loc>https://megaequipamiento.pe/categorias/67</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/68</loc>
+    <loc>https://megaequipamiento.pe/categorias/68</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/70</loc>
+    <loc>https://megaequipamiento.pe/categorias/70</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/72</loc>
+    <loc>https://megaequipamiento.pe/categorias/72</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/73</loc>
+    <loc>https://megaequipamiento.pe/categorias/73</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/74</loc>
+    <loc>https://megaequipamiento.pe/categorias/74</loc>
     <lastmod>2025-08-19T22:05:47-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/76</loc>
+    <loc>https://megaequipamiento.pe/categorias/76</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/categoria/83</loc>
+    <loc>https://megaequipamiento.pe/categorias/83</loc>
     <lastmod>2025-08-16T10:09:55-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/1</loc>
+    <loc>https://megaequipamiento.pe/marcas/1</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/2</loc>
+    <loc>https://megaequipamiento.pe/marcas/2</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/3</loc>
+    <loc>https://megaequipamiento.pe/marcas/3</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/4</loc>
+    <loc>https://megaequipamiento.pe/marcas/4</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/5</loc>
+    <loc>https://megaequipamiento.pe/marcas/5</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/6</loc>
+    <loc>https://megaequipamiento.pe/marcas/6</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/7</loc>
+    <loc>https://megaequipamiento.pe/marcas/7</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/8</loc>
+    <loc>https://megaequipamiento.pe/marcas/8</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/9</loc>
+    <loc>https://megaequipamiento.pe/marcas/9</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/10</loc>
+    <loc>https://megaequipamiento.pe/marcas/10</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/11</loc>
+    <loc>https://megaequipamiento.pe/marcas/11</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/12</loc>
+    <loc>https://megaequipamiento.pe/marcas/12</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/13</loc>
+    <loc>https://megaequipamiento.pe/marcas/13</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/14</loc>
+    <loc>https://megaequipamiento.pe/marcas/14</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/15</loc>
+    <loc>https://megaequipamiento.pe/marcas/15</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/16</loc>
+    <loc>https://megaequipamiento.pe/marcas/16</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/17</loc>
+    <loc>https://megaequipamiento.pe/marcas/17</loc>
     <lastmod>2025-08-06T18:32:12-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/18</loc>
+    <loc>https://megaequipamiento.pe/marcas/18</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/19</loc>
+    <loc>https://megaequipamiento.pe/marcas/19</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/20</loc>
+    <loc>https://megaequipamiento.pe/marcas/20</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/21</loc>
+    <loc>https://megaequipamiento.pe/marcas/21</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/22</loc>
+    <loc>https://megaequipamiento.pe/marcas/22</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/23</loc>
+    <loc>https://megaequipamiento.pe/marcas/23</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/24</loc>
+    <loc>https://megaequipamiento.pe/marcas/24</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/25</loc>
+    <loc>https://megaequipamiento.pe/marcas/25</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/26</loc>
+    <loc>https://megaequipamiento.pe/marcas/26</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/27</loc>
+    <loc>https://megaequipamiento.pe/marcas/27</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/28</loc>
+    <loc>https://megaequipamiento.pe/marcas/28</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/29</loc>
+    <loc>https://megaequipamiento.pe/marcas/29</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/30</loc>
+    <loc>https://megaequipamiento.pe/marcas/30</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/31</loc>
+    <loc>https://megaequipamiento.pe/marcas/31</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/32</loc>
+    <loc>https://megaequipamiento.pe/marcas/32</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/33</loc>
+    <loc>https://megaequipamiento.pe/marcas/33</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/34</loc>
+    <loc>https://megaequipamiento.pe/marcas/34</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/35</loc>
+    <loc>https://megaequipamiento.pe/marcas/35</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/36</loc>
+    <loc>https://megaequipamiento.pe/marcas/36</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/37</loc>
+    <loc>https://megaequipamiento.pe/marcas/37</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/38</loc>
+    <loc>https://megaequipamiento.pe/marcas/38</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/39</loc>
+    <loc>https://megaequipamiento.pe/marcas/39</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/40</loc>
+    <loc>https://megaequipamiento.pe/marcas/40</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/41</loc>
+    <loc>https://megaequipamiento.pe/marcas/41</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/42</loc>
+    <loc>https://megaequipamiento.pe/marcas/42</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/43</loc>
+    <loc>https://megaequipamiento.pe/marcas/43</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/marcas/58</loc>
+    <loc>https://megaequipamiento.pe/marcas/58</loc>
     <lastmod>2025-08-06T07:54:58-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/1</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/1</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/2</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/2</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/3</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/3</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/4</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/4</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/5</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/5</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/6</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/6</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/7</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/7</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/8</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/8</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/9</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/9</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/10</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/10</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/11</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/11</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/12</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/12</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/13</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/13</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/14</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/14</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/15</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/15</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/16</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/16</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/17</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/17</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/18</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/18</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/19</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/19</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/20</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/20</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/21</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/21</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/22</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/22</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/23</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/23</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/24</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/24</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/25</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/25</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/26</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/26</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/27</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/27</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/28</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/28</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/29</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/29</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/30</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/30</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/31</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/31</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/32</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/32</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/33</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/33</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/34</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/34</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/35</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/35</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/36</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/36</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/37</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/37</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/38</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/38</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/39</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/39</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/40</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/40</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/41</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/41</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/42</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/42</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/43</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/43</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/44</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/44</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/45</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/45</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/46</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/46</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/47</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/47</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/48</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/48</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/49</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/49</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/50</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/50</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/51</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/51</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/52</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/52</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/53</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/53</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/54</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/54</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/55</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/55</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/56</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/56</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/57</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/57</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/58</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/58</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/59</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/59</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/60</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/60</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/61</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/61</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/62</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/62</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/63</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/63</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/64</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/64</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/65</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/65</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/66</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/66</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/67</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/67</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/68</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/68</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/69</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/69</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/70</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/70</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/71</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/71</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/72</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/72</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/73</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/73</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/74</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/74</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/75</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/75</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/76</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/76</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/77</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/77</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/78</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/78</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/79</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/79</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/80</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/80</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/81</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/81</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/82</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/82</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/83</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/83</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/84</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/84</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/85</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/85</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/86</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/86</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/87</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/87</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/88</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/88</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/89</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/89</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/90</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/90</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/91</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/91</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/92</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/92</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/93</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/93</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/94</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/94</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/95</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/95</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/96</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/96</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/97</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/97</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/98</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/98</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/99</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/99</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/100</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/100</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/101</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/101</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/102</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/102</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/103</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/103</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/104</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/104</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/105</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/105</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/106</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/106</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/107</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/107</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/108</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/108</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/109</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/109</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/110</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/110</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/111</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/111</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/112</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/112</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/113</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/113</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/114</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/114</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/115</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/115</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/116</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/116</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/117</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/117</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/118</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/118</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/119</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/119</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/120</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/120</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/121</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/121</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/122</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/122</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/123</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/123</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/124</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/124</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/125</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/125</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/126</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/126</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/127</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/127</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/128</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/128</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/129</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/129</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/130</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/130</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/131</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/131</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/132</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/132</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/133</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/133</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/134</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/134</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/135</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/135</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/136</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/136</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/137</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/137</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/138</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/138</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/139</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/139</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/140</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/140</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/141</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/141</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/142</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/142</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/143</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/143</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/144</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/144</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/145</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/145</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/146</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/146</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/147</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/147</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/148</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/148</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/149</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/149</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/150</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/150</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/151</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/151</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/152</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/152</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/153</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/153</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/154</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/154</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/155</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/155</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/156</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/156</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/157</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/157</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/158</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/158</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/159</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/159</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/160</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/160</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/161</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/161</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/162</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/162</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/163</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/163</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/164</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/164</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/165</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/165</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/166</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/166</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/167</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/167</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/168</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/168</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/169</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/169</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/170</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/170</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/171</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/171</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/172</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/172</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/173</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/173</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/174</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/174</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/175</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/175</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/176</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/176</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/177</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/177</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/178</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/178</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/179</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/179</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/180</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/180</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/181</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/181</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/182</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/182</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/183</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/183</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/184</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/184</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/185</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/185</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/186</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/186</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/187</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/187</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/188</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/188</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/189</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/189</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/190</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/190</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/191</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/191</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/192</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/192</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/193</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/193</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/194</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/194</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/195</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/195</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/196</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/196</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/197</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/197</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/198</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/198</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/199</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/199</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/200</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/200</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/201</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/201</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/202</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/202</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/203</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/203</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/204</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/204</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/205</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/205</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/206</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/206</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/207</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/207</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/208</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/208</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/209</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/209</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/210</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/210</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/211</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/211</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/212</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/212</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/213</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/213</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/214</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/214</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/215</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/215</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/216</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/216</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/217</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/217</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/218</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/218</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/219</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/219</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/220</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/220</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/221</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/221</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/222</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/222</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/223</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/223</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/224</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/224</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/225</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/225</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/226</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/226</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/227</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/227</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/228</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/228</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/229</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/229</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/230</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/230</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/231</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/231</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/232</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/232</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/233</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/233</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/234</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/234</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/235</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/235</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/236</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/236</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/237</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/237</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/238</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/238</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/239</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/239</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/240</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/240</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/241</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/241</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/242</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/242</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/243</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/243</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/244</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/244</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/245</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/245</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/246</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/246</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/247</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/247</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/248</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/248</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/249</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/249</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/250</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/250</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/251</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/251</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/252</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/252</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/253</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/253</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/254</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/254</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/255</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/255</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/256</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/256</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/257</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/257</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/258</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/258</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/259</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/259</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/260</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/260</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/261</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/261</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/262</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/262</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/263</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/263</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/264</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/264</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/265</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/265</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/266</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/266</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/267</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/267</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/268</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/268</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/269</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/269</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/270</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/270</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/271</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/271</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/272</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/272</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/273</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/273</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/274</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/274</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/275</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/275</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/276</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/276</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/277</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/277</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/278</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/278</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/279</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/279</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/280</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/280</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/281</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/281</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/282</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/282</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/283</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/283</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/284</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/284</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/285</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/285</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/286</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/286</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/287</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/287</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/288</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/288</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/289</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/289</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/290</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/290</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/291</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/291</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/292</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/292</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/293</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/293</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/294</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/294</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/295</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/295</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/296</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/296</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/297</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/297</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/298</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/298</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/299</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/299</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/300</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/300</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/301</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/301</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/302</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/302</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/303</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/303</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/304</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/304</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/305</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/305</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/306</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/306</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/307</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/307</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/308</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/308</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/309</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/309</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/310</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/310</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/311</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/311</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/312</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/312</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/313</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/313</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/314</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/314</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/315</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/315</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/316</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/316</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/317</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/317</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/318</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/318</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/319</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/319</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/320</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/320</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/321</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/321</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/322</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/322</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/323</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/323</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/324</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/324</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/325</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/325</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/326</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/326</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/327</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/327</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/328</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/328</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/329</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/329</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/330</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/330</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/331</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/331</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/332</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/332</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/333</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/333</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/334</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/334</loc>
     <lastmod>2025-08-12T02:41:04-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/335</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/335</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/336</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/336</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/337</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/337</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/338</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/338</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/339</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/339</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/340</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/340</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/341</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/341</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/342</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/342</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/343</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/343</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/344</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/344</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/345</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/345</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/346</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/346</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/347</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/347</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/348</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/348</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/349</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/349</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/350</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/350</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/351</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/351</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/352</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/352</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/353</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/353</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/354</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/354</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/355</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/355</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/356</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/356</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/357</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/357</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/358</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/358</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/359</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/359</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/360</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/360</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/361</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/361</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/362</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/362</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/363</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/363</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/364</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/364</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/365</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/365</loc>
     <lastmod>2025-08-11T05:02:09-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/366</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/366</loc>
     <lastmod>2025-08-11T05:02:09-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/367</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/367</loc>
     <lastmod>2025-08-11T05:02:09-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/368</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/368</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/369</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/369</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/370</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/370</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/371</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/371</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/372</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/372</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/373</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/373</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/374</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/374</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/375</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/375</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/376</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/376</loc>
     <lastmod>2025-08-11T05:02:29-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/377</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/377</loc>
     <lastmod>2025-08-11T05:02:29-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/378</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/378</loc>
     <lastmod>2025-08-11T05:02:29-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/379</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/379</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/380</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/380</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/381</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/381</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/382</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/382</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/383</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/383</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/384</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/384</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/385</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/385</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/386</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/386</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/387</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/387</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/388</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/388</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/389</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/389</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/390</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/390</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/391</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/391</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/392</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/392</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/393</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/393</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/394</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/394</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/395</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/395</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/396</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/396</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/397</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/397</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/398</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/398</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/399</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/399</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/400</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/400</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/401</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/401</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/402</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/402</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/403</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/403</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/404</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/404</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/405</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/405</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/406</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/406</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/407</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/407</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/408</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/408</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/409</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/409</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/410</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/410</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/411</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/411</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/412</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/412</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/413</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/413</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/414</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/414</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/415</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/415</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/416</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/416</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/417</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/417</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/418</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/418</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/419</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/419</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/420</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/420</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/421</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/421</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/422</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/422</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/423</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/423</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/424</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/424</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/425</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/425</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/426</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/426</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/427</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/427</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/429</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/429</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/430</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/430</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/431</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/431</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/432</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/432</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/433</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/433</loc>
     <lastmod>2025-08-11T04:33:15-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/434</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/434</loc>
     <lastmod>2025-08-11T04:33:15-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/435</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/435</loc>
     <lastmod>2025-08-11T04:33:15-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/436</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/436</loc>
     <lastmod>2025-08-11T04:33:15-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/437</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/437</loc>
     <lastmod>2025-08-11T04:33:15-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/438</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/438</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/439</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/439</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/440</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/440</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/441</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/441</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/442</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/442</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/443</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/443</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/444</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/444</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/445</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/445</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/446</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/446</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/447</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/447</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/448</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/448</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/449</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/449</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/450</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/450</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/451</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/451</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/452</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/452</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/453</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/453</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/454</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/454</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/455</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/455</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/456</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/456</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/457</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/457</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/458</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/458</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/459</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/459</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/460</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/460</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/461</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/461</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/462</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/462</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/463</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/463</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/464</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/464</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/465</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/465</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/466</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/466</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/467</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/467</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/468</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/468</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/469</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/469</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/470</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/470</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/471</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/471</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/472</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/472</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/473</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/473</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/474</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/474</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/475</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/475</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/476</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/476</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/477</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/477</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/478</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/478</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/479</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/479</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/480</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/480</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/481</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/481</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/482</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/482</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/483</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/483</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/484</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/484</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/485</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/485</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/486</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/486</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/487</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/487</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/488</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/488</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/489</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/489</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/490</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/490</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/491</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/491</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/492</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/492</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/493</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/493</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/494</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/494</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/495</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/495</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/496</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/496</loc>
     <lastmod>2025-08-11T04:50:15-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/497</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/497</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/498</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/498</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/499</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/499</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/500</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/500</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/501</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/501</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/502</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/502</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/503</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/503</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/504</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/504</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/505</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/505</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/506</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/506</loc>
     <lastmod>2025-08-04T12:20:00-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/507</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/507</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/508</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/508</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/509</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/509</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/510</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/510</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/511</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/511</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/512</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/512</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/513</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/513</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/514</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/514</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/515</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/515</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/516</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/516</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/517</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/517</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/518</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/518</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/519</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/519</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/520</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/520</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/521</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/521</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/522</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/522</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/523</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/523</loc>
     <lastmod>2025-08-11T04:15:40-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/524</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/524</loc>
     <lastmod>2025-08-11T04:15:40-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/525</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/525</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/526</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/526</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/527</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/527</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/528</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/528</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/529</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/529</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/530</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/530</loc>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/538</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/538</loc>
     <lastmod>2025-06-29T03:48:12-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/539</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/539</loc>
     <lastmod>2025-07-30T18:49:11-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
             </url>
     <url>
-    <loc>http://127.0.0.1:8000/subcategoria/540</loc>
+    <loc>https://megaequipamiento.pe/subcategoria/540</loc>
     <lastmod>2025-08-06T19:54:59-05:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
