@@ -43,6 +43,9 @@
         <meta name="robots" content="index, follow">
         <meta name="googlebot" content="index, follow">
         
+        <!-- Google Site Verification -->
+        <meta name="google-site-verification" content="HQUWgHksZ__OtAxWHg5vQ_URrg9g1Ub5lSQIakNWb00" />
+        
         <!-- Language and Region -->
         <meta name="language" content="Spanish">
         <meta name="geo.region" content="PE">
