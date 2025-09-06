@@ -14,8 +14,8 @@ class CategoriaController extends Controller
    
     public function CategoriasWiew($id_categoria = null)
     {
-        // Obtener todas las categorías para la navegación
-        $todasCategorias = Categoria::all();
+        // Obtener todas las categorías para la navegación con subcategorías cargadas
+        $todasCategorias = Categoria::with('subcategorias')->get();
 
         if ($id_categoria === null) {
             // Si no se proporciona id_categoria, devolver un array vacío
@@ -32,18 +32,16 @@ class CategoriaController extends Controller
             ]);
         }
 
-        // Obtener la categoría por su ID
-        $categoria = Categoria::find($id_categoria);
+        // Obtener la categoría por su ID con subcategorías y marcas precargadas
+        $categoria = Categoria::with(['subcategorias', 'marcas'])->find($id_categoria);
 
         if (!$categoria) {
             // Manejar el caso en que la categoría no se encuentre
             return response()->json(['error' => 'Categoría no encontrada'], 404);
         }
 
-        // Obtener las subcategorías asociadas a la categoría
+        // Las subcategorías y marcas ya están cargadas por el eager loading
         $subcategorias = $categoria->subcategorias;
-
-        // Obtener las marcas relacionadas a la categoría
         $marcas = $categoria->marcas;
 
         // Verificar los IDs de las subcategorías
