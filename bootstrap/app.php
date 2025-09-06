@@ -20,11 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
-        // Regenerar sitemap diariamente a las 2:00 AM
-        $schedule->command('sitemap:generate')
-                 ->daily()
-                 ->at('02:00')
-                 ->description('Regenerar sitemap automáticamente');
+        //
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
