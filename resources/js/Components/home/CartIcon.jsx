@@ -1,10 +1,10 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useCallback, memo } from "react";
 import { useTheme } from "../../storage/ThemeContext";
 import { useCurrency } from "../../storage/CurrencyContext";
 import { CartContext } from "../../storage/CartContext";
 import { router } from "@inertiajs/react";
 
-const CartIcon = () => {
+const CartIcon = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const { cart, dispatch } = useContext(CartContext);
   const { isDarkMode } = useTheme();
@@ -719,6 +719,7 @@ const CartIcon = () => {
       </div>
     </>
   );
-};
+});
 
+CartIcon.displayName = 'CartIcon';
 export default CartIcon;

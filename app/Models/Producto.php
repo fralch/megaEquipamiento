@@ -50,6 +50,9 @@ class Producto extends Model implements HasMedia
         'updated_at' => 'datetime:Y-m-d\TH:i:sP',
     ];
 
+    // Eager loading por defecto para optimizar consultas
+    protected $with = ['marca', 'subcategoria'];
+
     // Relaciones
     public function subcategoria()
     {

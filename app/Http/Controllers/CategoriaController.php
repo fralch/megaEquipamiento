@@ -8,14 +8,17 @@ use App\Models\Categoria;
 use App\Models\Subcategoria;
 use App\Models\Producto;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class CategoriaController extends Controller
 {
    
     public function CategoriasWiew($id_categoria = null)
     {
-        // Obtener todas las categorías para la navegación con subcategorías cargadas
-        $todasCategorias = Categoria::with('subcategorias')->get();
+        // Cache para todas las categorías por 1 hora
+        $todasCategorias = Cache::remember('todas_categorias', 3600, function () {
+            return Categoria::with('subcategorias')->get();
+        });
 
         if ($id_categoria === null) {
             // Si no se proporciona id_categoria, devolver un array vacío

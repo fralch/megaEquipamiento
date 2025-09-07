@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback, memo } from "react";
 import axios from "axios";
 import CartIcon from "./CartIcon";
 import { useTheme } from "../../storage/ThemeContext";
 
-const Header = () => {
+const Header = memo(() => {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState({
     productos: [],
@@ -639,6 +639,7 @@ const Header = () => {
       )}
     </header>
   );
-};
+});
 
+Header.displayName = 'Header';
 export default Header;

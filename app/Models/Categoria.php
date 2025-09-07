@@ -43,6 +43,13 @@ class Categoria extends Model
         'img' => 'array', // Convertir a array para múltiples imágenes
     ];
 
+    // Eager loading por defecto para optimizar consultas
+    protected $with = ['subcategorias'];
+
+    // Configurar incrementing timestamps
+    const UPDATED_AT = 'updated_at';
+    const CREATED_AT = 'created_at';
+
     // En el modelo Categoria.php
     public function subcategorias()
     {

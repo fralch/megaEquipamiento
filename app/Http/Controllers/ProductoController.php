@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use  Inertia\Inertia;
+use Illuminate\Support\Facades\Cache;
 
 use App\Models\Producto;
 use App\Models\Subcategoria;
@@ -14,8 +15,10 @@ class ProductoController extends Controller
      /* Vista de productos */
      public function ProductView(Request $request, $producto_id)
      {
-        // Obtener el producto desde la solicitud
-        $producto = Producto::with('marca')->find($producto_id);
+        // Cache por 30 minutos para cada producto
+        $producto = Cache::remember("producto_{$producto_id}", 1800, function () use ($producto_id) {
+            return Producto::with(['marca', 'subcategoria', 'productosRelacionados'])->find($producto_id);
+        });
     
         // Renderizar la vista con Inertia y pasar el producto
         return Inertia::render('Product', compact('producto'));
