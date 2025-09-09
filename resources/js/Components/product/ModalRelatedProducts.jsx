@@ -40,18 +40,14 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
 
         setIsLoading(true);
         try {
-            const response = await axios.post('/productos/buscar', {
+            const response = await axios.post('/productos/buscar-relacionados', {
                 producto: term
             });
 
-            // Verifica que la respuesta sea un array
-            if (Array.isArray(response.data)) {
-                const filteredResults = response.data.filter(p => p.id_producto !== productId);
-                setSearchResults(filteredResults);
-            } else {
-                console.error('La respuesta no es un array:', response.data);
-                setSearchResults([]);
-            }
+            // Respuesta esperada: array de productos
+            const productos = Array.isArray(response.data) ? response.data : [];
+            const filteredResults = productos.filter(p => p.id_producto !== productId);
+            setSearchResults(filteredResults);
 
         } catch (error) {
             console.error('Error en la búsqueda:', error);

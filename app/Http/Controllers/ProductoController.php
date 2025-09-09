@@ -393,6 +393,32 @@ class ProductoController extends Controller
 
         return response()->json($respuesta);
     }
+
+    /**
+     * Buscar solo productos para relaciones (respuesta simple)
+     *
+     * Espera en el body: { "producto": "texto" }
+     * Devuelve: Array de productos con relación 'marca'
+     */
+    public function buscarSoloProductos(Request $request)
+    {
+        $request->validate([
+            'producto' => 'required|string|min:2'
+        ]);
+
+        $termino = $request->input('producto');
+
+        $productos = Producto::with('marca')
+            ->where(function ($q) use ($termino) {
+                $q->where('nombre', 'LIKE', '%' . $termino . '%')
+                  ->orWhere('sku', 'LIKE', '%' . $termino . '%');
+            })
+            ->orderBy('nombre')
+            ->limit(25)
+            ->get();
+
+        return response()->json($productos);
+    }
     /**
      * Actualizar solo la imagen de un producto
      */
