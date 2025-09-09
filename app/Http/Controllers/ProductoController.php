@@ -157,6 +157,10 @@ class ProductoController extends Controller
 
         ]));
     
+        // Invalidar cache relacionado
+        Cache::forget('todas_categorias');
+        Cache::forget("producto_{$producto->id_producto}");
+    
         return response()->json($producto);
     }
     
@@ -181,6 +185,10 @@ class ProductoController extends Controller
         
         // Actualizar el producto con el campo proporcionado
         $producto->update($dataToUpdate);
+        
+        // Invalidar cache del producto específico
+        Cache::forget("producto_{$producto->id_producto}");
+        Cache::forget('todas_categorias');
         
         // Recargar el producto con la relación marca
         $producto = $producto->fresh('marca');
@@ -511,6 +519,9 @@ class ProductoController extends Controller
             $producto->imagen = $imagenesArray;
             $producto->save();
             
+            // Invalidar cache del producto específico
+            Cache::forget("producto_{$producto->id_producto}");
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Imágenes actualizadas correctamente',
@@ -582,6 +593,9 @@ class ProductoController extends Controller
             // Actualizar el producto - si no quedan imágenes, poner null
             $producto->imagen = empty($imagenesActuales) ? null : $imagenesActuales;
             $producto->save();
+
+            // Invalidar cache del producto específico
+            Cache::forget("producto_{$producto->id_producto}");
 
             return response()->json([
                 'success' => true,
@@ -745,6 +759,9 @@ class ProductoController extends Controller
             // Actualizar solo los campos proporcionados
             if (!empty($dataToUpdate)) {
                 $producto->update($dataToUpdate);
+                // Invalidar cache del producto específico
+                Cache::forget("producto_{$producto->id_producto}");
+                Cache::forget('todas_categorias');
             }
             
             
@@ -788,6 +805,10 @@ class ProductoController extends Controller
 
             // Eliminar el producto
             $producto->delete();
+
+            // Invalidar cache del producto específico
+            Cache::forget("producto_{$id_producto}");
+            Cache::forget('todas_categorias');
 
             // Verificar si es una petición AJAX
             if ($request->expectsJson() || $request->ajax()) {

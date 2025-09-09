@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Subcategoria;
 use App\Models\Categoria;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class SubcategoriaController extends Controller
 {
@@ -66,6 +67,9 @@ class SubcategoriaController extends Controller
             }
         }
     
+        // Invalidar cache de categorías
+        Cache::forget('todas_categorias');
+
         return response()->json([
             'success' => true,
             'message' => 'Subcategoría creada exitosamente.',
@@ -134,6 +138,9 @@ class SubcategoriaController extends Controller
 
         $subcategoria->save();
 
+        // Invalidar cache de categorías
+        Cache::forget('todas_categorias');
+
         return response()->json([
             'success' => true,
             'message' => 'Subcategoría actualizada exitosamente.',
@@ -170,6 +177,10 @@ class SubcategoriaController extends Controller
         }
         
         $subcategoria->delete();
+        
+        // Invalidar cache de categorías
+        Cache::forget('todas_categorias');
+        
         return response()->json($id);
     }
 

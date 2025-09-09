@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Marca;
+use Illuminate\Support\Facades\Cache;
 
 class MarcaController extends Controller
 {
@@ -52,6 +53,9 @@ class MarcaController extends Controller
 
         $creado = Marca::create($data);
 
+        // Invalidar cache de categorías ya que las marcas afectan la vista de categorías
+        Cache::forget('todas_categorias');
+
         return response()->json($creado);
     }
 
@@ -76,6 +80,10 @@ class MarcaController extends Controller
         }
         // Eliminar la marca
         $marca->delete();
+        
+        // Invalidar cache de categorías
+        Cache::forget('todas_categorias');
+        
         return response()->json(['message' => 'Marca eliminada correctamente']);
     }
    
@@ -100,6 +108,9 @@ class MarcaController extends Controller
         }
 
         $marca->update($request->all());
+
+        // Invalidar cache de categorías
+        Cache::forget('todas_categorias');
 
         // Check if it's an AJAX request (for API usage)
         if ($request->expectsJson() || $request->ajax()) {

@@ -140,6 +140,9 @@ class CategoriaController extends Controller
         // Ejecutar la lógica de la migración para actualizar relaciones marca-categoria
         $this->actualizarRelacionesMarcaCategoria();
     
+        // Invalidar cache de categorías
+        Cache::forget('todas_categorias');
+    
         return response()->json($categoria);
     }
 
@@ -224,6 +227,9 @@ class CategoriaController extends Controller
         // Actualizar la categoría
         $categoria->update($dataToUpdate);
 
+        // Invalidar cache de categorías
+        Cache::forget('todas_categorias');
+
         return response()->json($categoria);
     }
 
@@ -295,6 +301,9 @@ class CategoriaController extends Controller
             $categoria->img = $imagenesArray;
             $categoria->save();
             
+            // Invalidar cache de categorías
+            Cache::forget('todas_categorias');
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Imágenes actualizadas correctamente',
@@ -331,6 +340,9 @@ class CategoriaController extends Controller
 
             // Eliminar la categoría
             $categoria->delete();
+
+            // Invalidar cache de categorías
+            Cache::forget('todas_categorias');
 
             return response()->json($id);
 
