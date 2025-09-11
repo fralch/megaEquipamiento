@@ -114,6 +114,7 @@ class ProductoController extends Controller
 
             "especificaciones_tecnicas" => 'nullable|string|json', 
             'archivos_adicionales' => 'nullable|string',
+            'tag_ids' => 'nullable|json',
         ]);
     
         // Procesar las imágenes si se proporcionan
@@ -153,15 +154,26 @@ class ProductoController extends Controller
         $caracteristicas = is_string($request->caracteristicas) ? json_decode($request->caracteristicas, true) : $request->caracteristicas;
     
         // Crear el producto
-        $producto = Producto::create(array_merge($request->except(['imagen', 'imagenes', 'imagenesDelBanco']), [
+        $producto = Producto::create(array_merge($request->except(['imagen', 'imagenes', 'imagenesDelBanco', 'tag_ids']), [
             'imagen' => $imagenesArray,
             'caracteristicas' => $caracteristicas,
 
         ]));
+
+        // Asociar tags si se proporcionaron
+        if ($request->has('tag_ids') && $request->tag_ids) {
+            $tagIds = json_decode($request->tag_ids, true);
+            if (is_array($tagIds) && !empty($tagIds)) {
+                $producto->tags()->sync($tagIds);
+            }
+        }
     
         // Invalidar cache relacionado
         Cache::forget('todas_categorias');
         Cache::forget("producto_{$producto->id_producto}");
+
+        // Cargar tags para la respuesta
+        $producto->load('tags.tagParent');
     
         return response()->json($producto);
     }

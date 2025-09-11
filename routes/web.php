@@ -14,6 +14,7 @@ use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\BancoImagenesController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\TagParentController;
+use App\Http\Controllers\ProductoTagController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -146,6 +147,24 @@ Route::middleware('auth')->prefix('admin/tag-parents')->group(function () {
     Route::post('/', [TagParentController::class, 'store'])->name('admin.tagparents.store');
     Route::put('/{id}', [TagParentController::class, 'update'])->name('admin.tagparents.update');
     Route::delete('/{id}', [TagParentController::class, 'destroy'])->name('admin.tagparents.destroy');
+});
+
+// Rutas para gestión de relaciones Producto-Tag
+Route::middleware('auth')->prefix('admin/producto-tags')->group(function () {
+    Route::get('/', [ProductoTagController::class, 'index'])->name('admin.producto-tags.index');
+    Route::get('/stats', [ProductoTagController::class, 'getTagStats'])->name('admin.producto-tags.stats');
+    Route::post('/bulk-assign', [ProductoTagController::class, 'bulkAssignTags'])->name('admin.producto-tags.bulk-assign');
+});
+
+// Rutas públicas para relaciones Producto-Tag
+Route::get('/productos/{id}/tags', [ProductoTagController::class, 'getProductTags'])->name('productos.tags');
+Route::get('/tags/{id}/productos', [ProductoTagController::class, 'getProductsByTag'])->name('tags.productos');
+
+// Rutas protegidas para modificar relaciones Producto-Tag
+Route::middleware('auth')->group(function () {
+    Route::post('/productos/{id}/tags/sync', [ProductoTagController::class, 'syncTags'])->name('productos.tags.sync');
+    Route::post('/productos/{id}/tags/attach', [ProductoTagController::class, 'attachTag'])->name('productos.tags.attach');
+    Route::delete('/productos/{id}/tags/detach', [ProductoTagController::class, 'detachTag'])->name('productos.tags.detach');
 });
 
 // Rutas para banco de imágenes

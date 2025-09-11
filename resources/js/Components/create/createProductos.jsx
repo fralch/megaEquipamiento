@@ -4,6 +4,7 @@ import Modal_Features from './assets/modal_features';
 import EspecificacionesTecnicas from './assets/especificacionesTecnicas';
 import { countryOptions } from '../countrys';
 import ImageBankModal from './ImageBankModal';
+import TagInput from '../TagInput';
 
 const URL_API = import.meta.env.VITE_API_URL;
 
@@ -24,6 +25,7 @@ const initialForm = {
   caracteristicas: {},
   especificaciones_tecnicas: "",
   archivos_adicionales: "",
+  tags: [],
 };
 
 const priceFields = [
@@ -419,6 +421,7 @@ const Productos = ({ onSubmit }) => {
   const [showImageBank, setShowImageBank] = useState(false);
   const especificacionesRef = useRef(null);
 
+
   // Función para manejar la selección de imágenes del banco
   const handleImageBankSelect = (bankImages) => {
     if (bankImages.length > 0) {
@@ -644,7 +647,11 @@ const Productos = ({ onSubmit }) => {
         formData.append(key, value);
       } else if (key === 'caracteristicas' && value) {
         formData.append(key, JSON.stringify(value));
-      } else if (value !== null && value !== undefined && key !== 'imagen' && key !== 'imagenes' && key !== 'imagenesDelBanco') {
+      } else if (key === 'tags' && value && Array.isArray(value)) {
+        // Agregar los IDs de tags seleccionados
+        const tagIds = value.map(tag => tag.id_tag);
+        formData.append('tag_ids', JSON.stringify(tagIds));
+      } else if (value !== null && value !== undefined && key !== 'imagen' && key !== 'imagenes' && key !== 'imagenesDelBanco' && key !== 'tags') {
         formData.append(key, value);
       }
     });
@@ -714,6 +721,25 @@ const Productos = ({ onSubmit }) => {
               onChange={handleChange}
               placeholder="Descripción detallada del producto"
             />
+            
+            <div>
+              <label className={`block text-sm font-medium mb-2 transition-colors duration-300 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                Tags del Producto
+              </label>
+              <TagInput
+                selectedTags={form.tags}
+                onChange={(selectedTags) => setForm(prev => ({ ...prev, tags: selectedTags }))}
+                placeholder="Buscar y seleccionar tags..."
+                className="w-full"
+              />
+              <p className={`text-xs mt-1 transition-colors duration-300 ${
+                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              }`}>
+                Los tags ayudan a categorizar y filtrar productos. Puedes seleccionar múltiples tags.
+              </p>
+            </div>
           </div>
         );
 

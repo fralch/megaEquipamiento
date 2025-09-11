@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { useTheme } from '../../storage/ThemeContext';
 
-const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
+const TagParents = ({ initialTagParents = [] }) => {
   const { isDarkMode } = useTheme();
-  const [tags, setTags] = useState(initialTags);
-  const [parentTags, setParentTags] = useState(initialTagParents);
+  const [tagParents, setTagParents] = useState(initialTagParents);
   const [currentPage, setCurrentPage] = useState(1);
-  const [editingTag, setEditingTag] = useState(null);
+  const [editingTagParent, setEditingTagParent] = useState(null);
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(null);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -15,8 +14,9 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
 
   const [form, setForm] = useState({
     nombre: "",
+    descripcion: "",
     color: "#3B82F6",
-    id_tag_parent: ""
+    imagen: ""
   });
 
   const colors = [
@@ -42,85 +42,85 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
     setTimeout(() => setMessage({ type: '', text: '' }), 3000);
   };
 
-  const fetchTags = async () => {
+  const fetchTagParents = async () => {
     try {
-      const response = await axios.get('/admin/tags');
-      setTags(response.data.tags || []);
-      setParentTags(response.data.tagParents || []);
+      const response = await axios.get('/admin/tag-parents');
+      setTagParents(response.data.tagParents || []);
     } catch (error) {
-      console.error('Error al obtener tags:', error);
-      showMessage('error', 'Error al cargar los tags');
+      console.error('Error al obtener sectores:', error);
+      showMessage('error', 'Error al cargar los sectores');
     }
   };
 
   useEffect(() => {
-    if (initialTags.length === 0 && initialTagParents.length === 0) {
-      fetchTags();
+    if (initialTagParents.length === 0) {
+      fetchTagParents();
     }
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.nombre.trim()) {
-      showMessage('error', 'El nombre del tag es obligatorio');
+      showMessage('error', 'El nombre del sector es obligatorio');
       return;
     }
 
     setLoading(true);
     try {
-      if (editingTag) {
-        await axios.put(`/admin/tags/${editingTag.id_tag}`, form);
-        showMessage('success', 'Tag actualizado exitosamente');
+      if (editingTagParent) {
+        await axios.put(`/admin/tag-parents/${editingTagParent.id_tag_parent}`, form);
+        showMessage('success', 'Sector actualizado exitosamente');
       } else {
-        await axios.post('/admin/tags', form);
-        showMessage('success', 'Tag creado exitosamente');
+        await axios.post('/admin/tag-parents', form);
+        showMessage('success', 'Sector creado exitosamente');
       }
       
-      setForm({ nombre: "", color: "#3B82F6", id_tag_parent: "" });
-      setEditingTag(null);
-      fetchTags();
+      setForm({ nombre: "", descripcion: "", color: "#3B82F6", imagen: "" });
+      setEditingTagParent(null);
+      fetchTagParents();
     } catch (error) {
       console.error('Error:', error);
-      showMessage('error', error.response?.data?.message || 'Error al procesar el tag');
+      showMessage('error', error.response?.data?.message || 'Error al procesar el sector');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (tag) => {
-    setEditingTag(tag);
+  const handleEdit = (tagParent) => {
+    setEditingTagParent(tagParent);
     setForm({
-      nombre: tag.nombre,
-      color: tag.color || "#3B82F6",
-      id_tag_parent: tag.id_tag_parent || ""
+      nombre: tagParent.nombre,
+      descripcion: tagParent.descripcion || "",
+      color: tagParent.color || "#3B82F6",
+      imagen: tagParent.imagen || ""
     });
   };
 
   const handleCancelEdit = () => {
-    setEditingTag(null);
-    setForm({ nombre: "", color: "#3B82F6", id_tag_parent: "" });
+    setEditingTagParent(null);
+    setForm({ nombre: "", descripcion: "", color: "#3B82F6", imagen: "" });
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('¿Estás seguro de eliminar este tag?')) return;
+    if (!confirm('¿Estás seguro de eliminar este sector? Esto también eliminará todos los tags asociados.')) return;
     
     setDeleteLoading(id);
     try {
-      await axios.delete(`/admin/tags/${id}`);
-      showMessage('success', 'Tag eliminado exitosamente');
-      fetchTags();
+      await axios.delete(`/admin/tag-parents/${id}`);
+      showMessage('success', 'Sector eliminado exitosamente');
+      fetchTagParents();
     } catch (error) {
       console.error('Error:', error);
-      showMessage('error', 'Error al eliminar el tag');
+      showMessage('error', 'Error al eliminar el sector');
     } finally {
       setDeleteLoading(null);
     }
   };
 
-  const totalPages = Math.ceil(tags.length / itemsPerPage);
+  const totalPages = Math.ceil(tagParents.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentTags = tags.slice(startIndex, endIndex);
+  const currentTagParents = tagParents.slice(startIndex, endIndex);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -131,21 +131,9 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
       isDarkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'
     }`}>
       <div className="mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">
-            {editingTag ? 'Editar Tag' : 'Crear Tag'}
-          </h1>
-          <a
-            href="/admin/tag-parents"
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              isDarkMode
-                ? 'bg-purple-600 hover:bg-purple-700'
-                : 'bg-purple-500 hover:bg-purple-600'
-            } text-white`}
-          >
-            Gestionar Sectores
-          </a>
-        </div>
+        <h1 className="text-3xl font-bold mb-4">
+          {editingTagParent ? 'Editar Sector' : 'Crear Sector'}
+        </h1>
         
         {message.text && (
           <div className={`p-4 rounded-lg mb-4 ${
@@ -160,14 +148,14 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">
-              Nombre del Tag *
+              Nombre del Sector *
             </label>
             <input
               type="text"
               name="nombre"
               value={form.nombre}
               onChange={handleChange}
-              placeholder="Ej: Destacado, Oferta, etc."
+              placeholder="Ej: Laboratorio, Instrumentación, etc."
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 isDarkMode 
                   ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
@@ -179,30 +167,43 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Sector (Opcional)
+              Descripción (Opcional)
             </label>
-            <select
-              name="id_tag_parent"
-              value={form.id_tag_parent}
+            <textarea
+              name="descripcion"
+              value={form.descripcion}
               onChange={handleChange}
+              placeholder="Descripción del sector"
+              rows="3"
               className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 isDarkMode 
-                  ? 'bg-gray-700 border-gray-600 text-white' 
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                   : 'bg-white border-gray-300 text-gray-900'
               }`}
-            >
-              <option value="">Sin sector (tag independiente)</option>
-              {parentTags.map((parent) => (
-                <option key={parent.id_tag_parent} value={parent.id_tag_parent}>
-                  {parent.nombre}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">
-              Color del Tag
+              URL de Imagen (Opcional)
+            </label>
+            <input
+              type="url"
+              name="imagen"
+              value={form.imagen}
+              onChange={handleChange}
+              placeholder="https://ejemplo.com/imagen.jpg"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                isDarkMode 
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Color del Sector
             </label>
             <div className="flex flex-wrap gap-2 mb-2">
               {colors.map((colorOption) => (
@@ -239,10 +240,10 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
                   : 'bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300'
               } text-white disabled:cursor-not-allowed`}
             >
-              {loading ? 'Procesando...' : (editingTag ? 'Actualizar Tag' : 'Crear Tag')}
+              {loading ? 'Procesando...' : (editingTagParent ? 'Actualizar Sector' : 'Crear Sector')}
             </button>
             
-            {editingTag && (
+            {editingTagParent && (
               <button
                 type="button"
                 onClick={handleCancelEdit}
@@ -259,11 +260,11 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
         </form>
       </div>
 
-      {/* Tabla de Tags */}
+      {/* Tabla de Sectores */}
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Tags Existentes ({tags.length})</h2>
+        <h2 className="text-2xl font-bold mb-4">Sectores Existentes ({tagParents.length})</h2>
         
-        {currentTags.length > 0 ? (
+        {currentTagParents.length > 0 ? (
           <>
             <div className={`overflow-x-auto rounded-lg border ${
               isDarkMode ? 'border-gray-700' : 'border-gray-200'
@@ -275,10 +276,10 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
                       Nombre
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                      Sector
+                      Descripción
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                      Slug
+                      Tags Asociados
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                       Color
@@ -292,41 +293,35 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
-                  {currentTags.map((tag) => (
-                    <tr key={tag.id_tag} className={isDarkMode ? 'bg-gray-800' : 'bg-white'}>
+                  {currentTagParents.map((tagParent) => (
+                    <tr key={tagParent.id_tag_parent} className={isDarkMode ? 'bg-gray-800' : 'bg-white'}>
                       <td className="px-6 py-4 whitespace-nowrap font-medium">
-                        {tag.id_tag_parent && <span className="mr-2 text-gray-400">└</span>}
-                        {tag.nombre}
+                        {tagParent.nombre}
+                      </td>
+                      <td className="px-6 py-4 text-sm max-w-xs">
+                        <div className="truncate" title={tagParent.descripcion}>
+                          {tagParent.descripcion || 'Sin descripción'}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {tag.tag_parent ? (
-                          <span 
-                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
-                            style={{ backgroundColor: tag.tag_parent.color || '#3B82F6' }}
-                          >
-                            {tag.tag_parent.nombre}
-                          </span>
-                        ) : (
-                          <span className="text-gray-400">Tag independiente</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm opacity-75">
-                        {tag.slug}
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {tagParent.tags_count || tagParent.tags?.length || 0} tags
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {tag.color || 'Sin color'}
+                        {tagParent.color || 'Sin color'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span 
                           className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
-                          style={{ backgroundColor: tag.color || '#3B82F6' }}
+                          style={{ backgroundColor: tagParent.color || '#3B82F6' }}
                         >
-                          {tag.nombre}
+                          {tagParent.nombre}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                         <button
-                          onClick={() => handleEdit(tag)}
+                          onClick={() => handleEdit(tagParent)}
                           className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                             isDarkMode
                               ? 'bg-yellow-600 hover:bg-yellow-700'
@@ -336,15 +331,15 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
                           Editar
                         </button>
                         <button
-                          onClick={() => handleDelete(tag.id_tag)}
-                          disabled={deleteLoading === tag.id_tag}
+                          onClick={() => handleDelete(tagParent.id_tag_parent)}
+                          disabled={deleteLoading === tagParent.id_tag_parent}
                           className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
                             isDarkMode
                               ? 'bg-red-600 hover:bg-red-700 disabled:bg-red-800'
                               : 'bg-red-500 hover:bg-red-600 disabled:bg-red-300'
                           } text-white disabled:cursor-not-allowed`}
                         >
-                          {deleteLoading === tag.id_tag ? 'Eliminando...' : 'Eliminar'}
+                          {deleteLoading === tagParent.id_tag_parent ? 'Eliminando...' : 'Eliminar'}
                         </button>
                       </td>
                     </tr>
@@ -376,7 +371,7 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
           <div className={`text-center py-8 rounded-lg ${
             isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
           }`}>
-            <p className="text-gray-500">No hay tags creados aún</p>
+            <p className="text-gray-500">No hay sectores creados aún</p>
           </div>
         )}
       </div>
@@ -384,4 +379,4 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
   );
 };
 
-export default Tags;
+export default TagParents;

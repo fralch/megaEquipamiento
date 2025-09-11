@@ -10,7 +10,7 @@ use Inertia\Inertia;
 
 class TagController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $tags = Tag::with('tagParent')
                    ->orderBy('id_tag_parent', 'asc')
@@ -18,6 +18,13 @@ class TagController extends Controller
                    ->get();
         
         $tagParents = TagParent::orderBy('nombre')->get();
+        
+        if ($request->expectsJson()) {
+            return response()->json([
+                'tags' => $tags,
+                'tagParents' => $tagParents,
+            ]);
+        }
         
         return Inertia::render('AdminTags', [
             'tags' => $tags,
@@ -35,7 +42,7 @@ class TagController extends Controller
 
         $slug = Str::slug($validated['nombre']);
 
-        Tag::firstOrCreate(
+        $tag = Tag::firstOrCreate(
             ['slug' => $slug],
             [
                 'nombre' => $validated['nombre'],
@@ -43,6 +50,13 @@ class TagController extends Controller
                 'id_tag_parent' => $validated['id_tag_parent'] ?? null,
             ]
         );
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Tag creado exitosamente',
+                'tag' => $tag->load('tagParent')
+            ], 201);
+        }
 
         return redirect()->back()->with('success', 'Tag creado');
     }
@@ -63,13 +77,27 @@ class TagController extends Controller
         $tag->id_tag_parent = $validated['id_tag_parent'] ?? null;
         $tag->save();
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Tag actualizado exitosamente',
+                'tag' => $tag->load('tagParent')
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Tag actualizado');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $tag = Tag::findOrFail($id);
         $tag->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Tag eliminado exitosamente'
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Tag eliminado');
     }
 }

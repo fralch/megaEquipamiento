@@ -9,9 +9,15 @@ use Inertia\Inertia;
 
 class TagParentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $tagParents = TagParent::with('tags')->orderBy('nombre')->get();
+        
+        if ($request->expectsJson()) {
+            return response()->json([
+                'tagParents' => $tagParents,
+            ]);
+        }
         
         return Inertia::render('AdminTagParents', [
             'tagParents' => $tagParents,
@@ -29,7 +35,7 @@ class TagParentController extends Controller
 
         $slug = Str::slug($validated['nombre']);
 
-        TagParent::firstOrCreate(
+        $tagParent = TagParent::firstOrCreate(
             ['slug' => $slug],
             [
                 'nombre' => $validated['nombre'],
@@ -38,6 +44,13 @@ class TagParentController extends Controller
                 'imagen' => $validated['imagen'] ?? null,
             ]
         );
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Sector creado exitosamente',
+                'tagParent' => $tagParent->load('tags')
+            ], 201);
+        }
 
         return redirect()->back()->with('success', 'Sector creado');
     }
@@ -59,13 +72,27 @@ class TagParentController extends Controller
         $tagParent->imagen = $validated['imagen'] ?? null;
         $tagParent->save();
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Sector actualizado exitosamente',
+                'tagParent' => $tagParent->load('tags')
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Sector actualizado');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $tagParent = TagParent::findOrFail($id);
         $tagParent->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Sector eliminado exitosamente'
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Sector eliminado');
     }
 }

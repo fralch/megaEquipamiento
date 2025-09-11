@@ -277,6 +277,16 @@ const CrearProducto = () => {
                         >
                             Ver Productos
                         </Link>
+                        <Link
+                            href="/admin/producto-tags"
+                            className={`w-full text-center py-2 px-4 rounded-md font-medium transition-colors duration-300 block ${
+                                activeButton === 'producto_tags'
+                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
+                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
+                            }`}
+                        >
+                            Asignar Tags a Productos
+                        </Link>
                     </div>
                 </div>
                 <div className={`w-full p-4 transition-colors duration-300 ${
