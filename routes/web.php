@@ -12,6 +12,8 @@ use App\Http\Controllers\MarcaCategoriaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\BancoImagenesController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\TagParentController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -57,6 +59,15 @@ Route::post('/product/agregar-relacion', [ProductoController::class, 'agregarRel
 Route::get('/product/relacion/{id}', [ProductoController::class, 'obtenerRelacionados'])->name('product.obtener-relacionados');
 Route::get('/product/con-relacion/{id}', [ProductoController::class, 'obtenerProductosQueRelacionan'])->name('product.obtener-productos-que-relacionan');
 Route::post('/product/eliminar-relacion', [ProductoController::class, 'eliminarRelacion'])->name('product.eliminar-relacion');
+
+// Rutas de tags (web)
+Route::get('/productos/{id}/tags', [ProductoController::class, 'getProductoTags'])->name('productos.tags');
+Route::middleware('auth')->group(function () {
+    Route::post('/productos/{id}/tags/sync', [ProductoController::class, 'syncProductoTags'])->name('productos.tags.sync');
+    Route::post('/productos/{id}/tags/attach', [ProductoController::class, 'attachProductoTag'])->name('productos.tags.attach');
+    Route::delete('/productos/{id}/tags/detach', [ProductoController::class, 'detachProductoTag'])->name('productos.tags.detach');
+});
+Route::get('/tags/{tag}/productos', [ProductoController::class, 'getProductosByTag'])->name('tags.productos');
 
 // Rutas para usuarios
 Route::apiResource('usuarios', UsuarioController::class);
@@ -120,6 +131,22 @@ Route::post('/marca-categoria/create', [MarcaCategoriaController::class, 'store'
 // Rutas para pedidos
 Route::post('/pedido/confirmar', [PedidoController::class, 'confirmarPedido'])->name('pedido.confirmar');
 Route::get('/orders/{orderNumber}', [PedidoController::class, 'verPedido'])->name('pedido.ver');
+
+// Admin de Tags (protegido)
+Route::middleware('auth')->prefix('admin/tags')->group(function () {
+    Route::get('/', [TagController::class, 'index'])->name('admin.tags.index');
+    Route::post('/', [TagController::class, 'store'])->name('admin.tags.store');
+    Route::put('/{id}', [TagController::class, 'update'])->name('admin.tags.update');
+    Route::delete('/{id}', [TagController::class, 'destroy'])->name('admin.tags.destroy');
+});
+
+// Admin de Tag Parents (Sectores) - protegido
+Route::middleware('auth')->prefix('admin/tag-parents')->group(function () {
+    Route::get('/', [TagParentController::class, 'index'])->name('admin.tagparents.index');
+    Route::post('/', [TagParentController::class, 'store'])->name('admin.tagparents.store');
+    Route::put('/{id}', [TagParentController::class, 'update'])->name('admin.tagparents.update');
+    Route::delete('/{id}', [TagParentController::class, 'destroy'])->name('admin.tagparents.destroy');
+});
 
 // Rutas para banco de imágenes
 Route::middleware('auth')->prefix('banco-imagenes')->group(function () {

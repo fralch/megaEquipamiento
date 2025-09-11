@@ -78,6 +78,11 @@ class Producto extends Model implements HasMedia
             ->withTimestamps();
     }
 
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'producto_tag', 'id_producto', 'id_tag')->withTimestamps();
+    }
+
     // Helpers de imágenes
     public function getPrimeraImagenAttribute()
     {

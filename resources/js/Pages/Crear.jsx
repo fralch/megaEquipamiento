@@ -7,6 +7,7 @@ import Productos from "../Components/create/createProductos";
 import Categorias from "../Components/create/createCategoria";
 import Subcategorias from "../Components/create/createSubcategoria";
 import Marcas from "../Components/create/createMarca";
+import Tags from "../Components/create/createTags";
 import MoveSubcategories from "../Components/create/MoveSubcategories";
 
 const CrearProducto = () => {
@@ -15,6 +16,7 @@ const CrearProducto = () => {
     const [crearCategoria, setCrearCategoria] = useState(false);
     const [crearSubcategoria, setCrearSubcategoria] = useState(false);
     const [crearMarca, setCrearMarca] = useState(false);
+    const [crearTags, setCrearTags] = useState(false);
     const [moverSubcategorias, setMoverSubcategorias] = useState(false);
     const [sidebarVisible, setSidebarVisible] = useState(window.innerWidth >= 768);
     const [activeButton, setActiveButton] = useState('producto');
@@ -88,6 +90,7 @@ const CrearProducto = () => {
         setCrearCategoria(false);
         setCrearSubcategoria(false);
         setCrearMarca(false);
+        setCrearTags(false);
         setMoverSubcategorias(false);
         setActiveButton('producto');
     };
@@ -97,6 +100,7 @@ const CrearProducto = () => {
         setCrearCategoria(true);
         setCrearSubcategoria(false);
         setCrearMarca(false);
+        setCrearTags(false);
         setMoverSubcategorias(false);
         setActiveButton('categoria');
     };
@@ -106,6 +110,7 @@ const CrearProducto = () => {
         setCrearCategoria(false);
         setCrearSubcategoria(true);
         setCrearMarca(false);
+        setCrearTags(false);
         setMoverSubcategorias(false);
         setActiveButton('subcategoria');
     };
@@ -115,8 +120,19 @@ const CrearProducto = () => {
         setCrearCategoria(false);
         setCrearSubcategoria(false);
         setCrearMarca(true);
+        setCrearTags(false);
         setMoverSubcategorias(false);
         setActiveButton('marca');
+    };
+
+    const handleCrearTagsClick = () => {
+        setCrearProducto(false);
+        setCrearCategoria(false);
+        setCrearSubcategoria(false);
+        setCrearMarca(false);
+        setCrearTags(true);
+        setMoverSubcategorias(false);
+        setActiveButton('tags');
     };
 
     const handleMoverSubcategoriasClick = () => {
@@ -124,6 +140,7 @@ const CrearProducto = () => {
         setCrearCategoria(false);
         setCrearSubcategoria(false);
         setCrearMarca(false);
+        setCrearTags(false);
         setMoverSubcategorias(true);
         setActiveButton('mover');
     };
@@ -232,6 +249,16 @@ const CrearProducto = () => {
                         </button>
                         <button
                             className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                                activeButton === 'tags'
+                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
+                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
+                            }`}
+                            onClick={handleCrearTagsClick}
+                        >
+                            Gestionar Tags
+                        </button>
+                        <button
+                            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
                                 activeButton === 'mover'
                                     ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
                                     : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
@@ -266,6 +293,9 @@ const CrearProducto = () => {
                     </div>
                     <div className={crearMarca ? "block" : "hidden"}>
                         <Marcas onSubmit={handleSubmit} />
+                    </div>
+                    <div className={crearTags ? "block" : "hidden"}>
+                        <Tags onSubmit={handleSubmit} />
                     </div>
                     <div className={moverSubcategorias ? "block" : "hidden"}>
                         <MoveSubcategories />

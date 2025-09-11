@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Producto;
 use App\Models\Subcategoria;
 use App\Models\Marca;
+use App\Models\Tag;
+use Illuminate\Support\Str;
 
 class ProductoController extends Controller
 {
@@ -726,6 +728,189 @@ class ProductoController extends Controller
         }
 
         return response()->json(['message' => 'Relación eliminada correctamente']);
+    }
+
+    /**
+     * Obtener tags de un producto
+     */
+    public function getProductoTags($id)
+    {
+        $producto = Producto::with('tags')->findOrFail($id);
+        return response()->json($producto->tags);
+    }
+
+    /**
+     * Sincronizar tags de un producto.
+     * Acepta `tag_ids` (array de IDs) o `tags` (array de nombres).
+     */
+    public function syncProductoTags(Request $request, $id)
+    {
+        $request->validate([
+            'tag_ids' => 'sometimes|array',
+            'tag_ids.*' => 'integer|exists:tags,id_tag',
+            'tags' => 'sometimes|array',
+            'tags.*' => 'string|min:1',
+        ]);
+
+        $producto = Producto::findOrFail($id);
+
+        $tagIds = [];
+
+        if ($request->filled('tag_ids')) {
+            $tagIds = array_map('intval', $request->input('tag_ids', []));
+        } elseif ($request->filled('tags')) {
+            $nombres = $request->input('tags', []);
+            foreach ($nombres as $nombre) {
+                $slug = Str::slug($nombre);
+                $tag = Tag::firstOrCreate(
+                    ['slug' => $slug],
+                    ['nombre' => $nombre]
+                );
+                $tagIds[] = $tag->id_tag;
+            }
+        }
+
+        $producto->tags()->sync($tagIds);
+
+        // invalidar cache del producto
+        Cache::forget("producto_{$producto->id_producto}");
+
+        return response()->json([
+            'success' => true,
+            'producto' => $producto->load('tags')
+        ]);
+    }
+
+    /**
+     * Adjuntar un tag a un producto (sin duplicar).
+     */
+    public function attachProductoTag(Request $request, $id)
+    {
+        $request->validate([
+            'tag_id' => 'required|integer|exists:tags,id_tag',
+        ]);
+
+        $producto = Producto::findOrFail($id);
+        $producto->tags()->syncWithoutDetaching([$request->tag_id]);
+
+        Cache::forget("producto_{$producto->id_producto}");
+
+        return response()->json([
+            'success' => true,
+            'producto' => $producto->load('tags')
+        ]);
+    }
+
+    /**
+     * Quitar un tag de un producto.
+     */
+    public function detachProductoTag(Request $request, $id)
+    {
+        $request->validate([
+            'tag_id' => 'required|integer|exists:tags,id_tag',
+        ]);
+
+        $producto = Producto::findOrFail($id);
+        $producto->tags()->detach($request->tag_id);
+
+        Cache::forget("producto_{$producto->id_producto}");
+
+        return response()->json([
+            'success' => true,
+            'producto' => $producto->load('tags')
+        ]);
+    }
+
+    /**
+     * Listar productos por tag (slug o ID)
+     */
+    public function getProductosByTag(Request $request, $tag)
+    {
+        $perPage = (int) $request->input('per_page', 24);
+
+        $tagModel = is_numeric($tag)
+            ? Tag::findOrFail((int)$tag)
+            : Tag::where('slug', $tag)->firstOrFail();
+
+        $query = $tagModel->productos()->with('marca');
+
+        // Filtros
+        if ($request->filled('q')) {
+            $q = $request->input('q');
+            $query->where(function ($sub) use ($q) {
+                $sub->where('nombre', 'like', "%{$q}%")
+                    ->orWhere('sku', 'like', "%{$q}%");
+            });
+        }
+        if ($request->filled('marca_id')) {
+            $query->where('marca_id', (int) $request->input('marca_id'));
+        }
+        if ($request->filled('min_price')) {
+            $query->where('precio_igv', '>=', (float) $request->input('min_price'));
+        }
+        if ($request->filled('max_price')) {
+            $query->where('precio_igv', '<=', (float) $request->input('max_price'));
+        }
+
+        // Orden
+        $sort = $request->input('sort', 'recientes');
+        switch ($sort) {
+            case 'precio_asc':
+                $query->orderBy('precio_igv', 'asc');
+                break;
+            case 'precio_desc':
+                $query->orderBy('precio_igv', 'desc');
+                break;
+            case 'nombre_asc':
+                $query->orderBy('nombre', 'asc');
+                break;
+            default: // recientes
+                $query->orderBy('created_at', 'desc');
+        }
+
+        $productos = $query->paginate($perPage)->appends($request->query());
+
+        // Marcas disponibles para este tag (para filtros)
+        $marcaIds = $tagModel->productos()->select('marca_id')->whereNotNull('marca_id')->distinct()->pluck('marca_id');
+        $marcas = \App\Models\Marca::whereIn('id_marca', $marcaIds)->orderBy('nombre')->get(['id_marca','nombre']);
+
+        if ($request->wantsJson() || $request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'tag' => $tagModel,
+                'productos' => $productos,
+                'marcas' => $marcas,
+                'filters' => [
+                    'q' => $request->input('q'),
+                    'marca_id' => $request->input('marca_id'),
+                    'min_price' => $request->input('min_price'),
+                    'max_price' => $request->input('max_price'),
+                    'sort' => $sort,
+                ],
+            ]);
+        }
+
+        $seo = [
+            'title' => 'Productos para ' . ($tagModel->nombre ?? $tagModel->slug) . ' | ' . config('app.name'),
+            'description' => 'Explora productos etiquetados con ' . ($tagModel->nombre ?? $tagModel->slug) . '.',
+            'keywords' => ($tagModel->nombre ?? $tagModel->slug) . ', productos, megaequipamiento',
+            'type' => 'website',
+            'url' => url()->current(),
+            'image' => asset('img/logo2.png'),
+        ];
+
+        return Inertia::render('TagProducts', [
+            'tag' => $tagModel,
+            'productos' => $productos,
+            'marcas' => $marcas,
+            'filters' => [
+                'q' => $request->input('q'),
+                'marca_id' => $request->input('marca_id'),
+                'min_price' => $request->input('min_price'),
+                'max_price' => $request->input('max_price'),
+                'sort' => $sort,
+            ],
+            'seo' => $seo,
+        ]);
     }
 
     /* 
