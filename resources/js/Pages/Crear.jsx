@@ -8,6 +8,7 @@ import Categorias from "../Components/create/createCategoria";
 import Subcategorias from "../Components/create/createSubcategoria";
 import Marcas from "../Components/create/createMarca";
 import Tags from "../Components/create/createTags";
+import TagParents from "../Components/create/createTagParents";
 import MoveSubcategories from "../Components/create/MoveSubcategories";
 
 const CrearProducto = () => {
@@ -17,6 +18,7 @@ const CrearProducto = () => {
     const [crearSubcategoria, setCrearSubcategoria] = useState(false);
     const [crearMarca, setCrearMarca] = useState(false);
     const [crearTags, setCrearTags] = useState(false);
+    const [crearTagParents, setCrearTagParents] = useState(false);
     const [moverSubcategorias, setMoverSubcategorias] = useState(false);
     const [sidebarVisible, setSidebarVisible] = useState(window.innerWidth >= 768);
     const [activeButton, setActiveButton] = useState('producto');
@@ -91,6 +93,7 @@ const CrearProducto = () => {
         setCrearSubcategoria(false);
         setCrearMarca(false);
         setCrearTags(false);
+        setCrearTagParents(false);
         setMoverSubcategorias(false);
         setActiveButton('producto');
     };
@@ -101,6 +104,7 @@ const CrearProducto = () => {
         setCrearSubcategoria(false);
         setCrearMarca(false);
         setCrearTags(false);
+        setCrearTagParents(false);
         setMoverSubcategorias(false);
         setActiveButton('categoria');
     };
@@ -111,6 +115,7 @@ const CrearProducto = () => {
         setCrearSubcategoria(true);
         setCrearMarca(false);
         setCrearTags(false);
+        setCrearTagParents(false);
         setMoverSubcategorias(false);
         setActiveButton('subcategoria');
     };
@@ -121,6 +126,7 @@ const CrearProducto = () => {
         setCrearSubcategoria(false);
         setCrearMarca(true);
         setCrearTags(false);
+        setCrearTagParents(false);
         setMoverSubcategorias(false);
         setActiveButton('marca');
     };
@@ -131,8 +137,20 @@ const CrearProducto = () => {
         setCrearSubcategoria(false);
         setCrearMarca(false);
         setCrearTags(true);
+        setCrearTagParents(false);
         setMoverSubcategorias(false);
         setActiveButton('tags');
+    };
+
+    const handleCrearTagParentsClick = () => {
+        setCrearProducto(false);
+        setCrearCategoria(false);
+        setCrearSubcategoria(false);
+        setCrearMarca(false);
+        setCrearTags(false);
+        setCrearTagParents(true);
+        setMoverSubcategorias(false);
+        setActiveButton('tagparents');
     };
 
     const handleMoverSubcategoriasClick = () => {
@@ -141,6 +159,7 @@ const CrearProducto = () => {
         setCrearSubcategoria(false);
         setCrearMarca(false);
         setCrearTags(false);
+        setCrearTagParents(false);
         setMoverSubcategorias(true);
         setActiveButton('mover');
     };
@@ -207,6 +226,13 @@ const CrearProducto = () => {
                         </h2>
                     </div>
                     <div className="space-y-4">
+                        {/* Sección: Creación de Contenido */}
+                        <div className={`text-xs font-semibold uppercase tracking-wider pb-2 border-b ${
+                            isDarkMode ? 'text-blue-400 border-gray-600' : 'text-blue-600 border-blue-200'
+                        }`}>
+                            📝 Crear Contenido
+                        </div>
+                        
                         <button
                             className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
                                 activeButton === 'producto'
@@ -247,6 +273,14 @@ const CrearProducto = () => {
                         >
                             Crear Marca
                         </button>
+                        
+                        {/* Sección: Gestión de Tags */}
+                        <div className={`text-xs font-semibold uppercase tracking-wider pb-2 border-b mt-6 ${
+                            isDarkMode ? 'text-green-400 border-gray-600' : 'text-green-600 border-green-200'
+                        }`}>
+                            🏷️ Sistema de Tags
+                        </div>
+                        
                         <button
                             className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
                                 activeButton === 'tags'
@@ -259,6 +293,34 @@ const CrearProducto = () => {
                         </button>
                         <button
                             className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                                activeButton === 'tagparents'
+                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
+                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
+                            }`}
+                            onClick={handleCrearTagParentsClick}
+                        >
+                            Gestionar Sectores
+                        </button>
+                        <Link
+                            href="/admin/producto-tags"
+                            className={`w-full text-center py-2 px-4 rounded-md font-medium transition-colors duration-300 block ${
+                                activeButton === 'producto_tags_management'
+                                    ? (isDarkMode ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-green-500 hover:bg-green-600 text-white')
+                                    : (isDarkMode ? 'bg-gray-700 text-green-400 hover:bg-gray-600' : 'bg-blue-200 text-green-600 hover:bg-blue-300')
+                            }`}
+                        >
+                            🏷️ Asignar Tags a Productos
+                        </Link>
+                        
+                        {/* Sección: Herramientas Administrativas */}
+                        <div className={`text-xs font-semibold uppercase tracking-wider pb-2 border-b mt-6 ${
+                            isDarkMode ? 'text-yellow-400 border-gray-600' : 'text-yellow-600 border-yellow-200'
+                        }`}>
+                            🔧 Herramientas Admin
+                        </div>
+                        
+                        <button
+                            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
                                 activeButton === 'mover'
                                     ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
                                     : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
@@ -267,6 +329,14 @@ const CrearProducto = () => {
                         >
                             Mover Subcategorías
                         </button>
+                        
+                        {/* Sección: Visualización */}
+                        <div className={`text-xs font-semibold uppercase tracking-wider pb-2 border-b mt-6 ${
+                            isDarkMode ? 'text-purple-400 border-gray-600' : 'text-purple-600 border-purple-200'
+                        }`}>
+                            👁️ Visualizar
+                        </div>
+                        
                         <Link
                             href="/admin/products"
                             className={`w-full text-center py-2 px-4 rounded-md font-medium transition-colors duration-300 block ${
@@ -276,16 +346,6 @@ const CrearProducto = () => {
                             }`}
                         >
                             Ver Productos
-                        </Link>
-                        <Link
-                            href="/admin/producto-tags"
-                            className={`w-full text-center py-2 px-4 rounded-md font-medium transition-colors duration-300 block ${
-                                activeButton === 'producto_tags'
-                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
-                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
-                            }`}
-                        >
-                            Asignar Tags a Productos
                         </Link>
                     </div>
                 </div>
@@ -305,7 +365,13 @@ const CrearProducto = () => {
                         <Marcas onSubmit={handleSubmit} />
                     </div>
                     <div className={crearTags ? "block" : "hidden"}>
-                        <Tags onSubmit={handleSubmit} />
+                        <Tags 
+                            onSubmit={handleSubmit} 
+                            onNavigateToSectors={handleCrearTagParentsClick}
+                        />
+                    </div>
+                    <div className={crearTagParents ? "block" : "hidden"}>
+                        <TagParents onSubmit={handleSubmit} />
                     </div>
                     <div className={moverSubcategorias ? "block" : "hidden"}>
                         <MoveSubcategories />

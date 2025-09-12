@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { useTheme } from '../../storage/ThemeContext';
 
-const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
+const Tags = ({ onSubmit, onNavigateToSectors, initialTags = [], initialTagParents = [] }) => {
   const { isDarkMode } = useTheme();
   const [tags, setTags] = useState(initialTags);
   const [parentTags, setParentTags] = useState(initialTagParents);
@@ -135,16 +135,30 @@ const Tags = ({ onSubmit, initialTags = [], initialTagParents = [] }) => {
           <h1 className="text-3xl font-bold">
             {editingTag ? 'Editar Tag' : 'Crear Tag'}
           </h1>
-          <a
-            href="/admin/tag-parents"
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              isDarkMode
-                ? 'bg-purple-600 hover:bg-purple-700'
-                : 'bg-purple-500 hover:bg-purple-600'
-            } text-white`}
-          >
-            Gestionar Sectores
-          </a>
+          {onNavigateToSectors ? (
+            <button
+              type="button"
+              onClick={onNavigateToSectors}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                isDarkMode
+                  ? 'bg-purple-600 hover:bg-purple-700'
+                  : 'bg-purple-500 hover:bg-purple-600'
+              } text-white`}
+            >
+              Gestionar Sectores
+            </button>
+          ) : (
+            <a
+              href="/admin/tag-parents"
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                isDarkMode
+                  ? 'bg-purple-600 hover:bg-purple-700'
+                  : 'bg-purple-500 hover:bg-purple-600'
+              } text-white`}
+            >
+              Gestionar Sectores
+            </a>
+          )}
         </div>
         
         {message.text && (
