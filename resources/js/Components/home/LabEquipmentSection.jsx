@@ -76,7 +76,7 @@ const LabEquipmentSection = () => {
                     <span className="hidden xl:inline"> Cada equipo tiene su propia utilidad y está diseñado para manipular muestras y realizar
                     mediciones con precisión. Estos instrumentos son esenciales para la investigación científica,
                     el desarrollo de productos, el control de calidad y el análisis en una amplia gama de campos,
-                    como la biología, la química, la física, la medicina, la ingeniería y las ciencias ambientales.</span>
+                    como la biología, la química, la física, la medicina, la ingeniería y las ciencias ambientales</span>
                 </p>
 
                 {/* Navigation Buttons - Bottom right position */}
