@@ -161,7 +161,7 @@ Route::middleware('auth')->prefix('admin/producto-tags')->group(function () {
 
 // Rutas públicas para relaciones Producto-Tag
 Route::get('/productos/{id}/tags', [ProductoTagController::class, 'getProductTags'])->name('productos.tags');
-Route::get('/tags/{id}/productos', [ProductoTagController::class, 'getProductsByTag'])->name('tags.productos');
+Route::get('/tags/{id}/productos', [ProductoTagController::class, 'getProductsByTag'])->name('tag.productos');
 
 // Rutas públicas para sectores
 Route::get('/api/tag-parents', [TagParentController::class, 'getPublicTagParents'])->name('api.tag-parents');
