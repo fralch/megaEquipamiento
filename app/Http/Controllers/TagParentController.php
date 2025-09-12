@@ -95,4 +95,18 @@ class TagParentController extends Controller
 
         return redirect()->back()->with('success', 'Sector eliminado');
     }
+
+    /**
+     * Get all tag parents with their tags for public consumption
+     */
+    public function getPublicTagParents()
+    {
+        $tagParents = TagParent::with(['tags' => function($query) {
+                                    $query->orderBy('nombre');
+                                }])
+                                ->orderBy('nombre')
+                                ->get();
+
+        return response()->json($tagParents);
+    }
 }

@@ -15,6 +15,7 @@ use App\Http\Controllers\BancoImagenesController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\TagParentController;
 use App\Http\Controllers\ProductoTagController;
+use App\Http\Controllers\SectorController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -33,6 +34,8 @@ Route::get('/categorias/{id_categoria?}', [CategoriaController::class, 'Categori
 Route::get('/subcategoria/{id}/{marca_id?}', [ProductoController::class, 'subCategoriaView'])->name('subcategoria.view');
 Route::get('/producto/{id}', [ProductoController::class, 'ProductView'])->name('producto.view');
 Route::get('/marcas/{id}', [ProductoController::class, 'ProductViewByMarca'])->name('marcas.view');
+Route::get('/sector/{id_tag_parent}', [SectorController::class, 'show'])->name('sector.view');
+Route::get('/sectores', [SectorController::class, 'index'])->name('sectores.index');
 Route::get('/contacto', function () { return Inertia::render('Contacto'); })->name('contacto.view');
 Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
@@ -159,6 +162,12 @@ Route::middleware('auth')->prefix('admin/producto-tags')->group(function () {
 // Rutas públicas para relaciones Producto-Tag
 Route::get('/productos/{id}/tags', [ProductoTagController::class, 'getProductTags'])->name('productos.tags');
 Route::get('/tags/{id}/productos', [ProductoTagController::class, 'getProductsByTag'])->name('tags.productos');
+
+// Rutas públicas para sectores
+Route::get('/api/tag-parents', [TagParentController::class, 'getPublicTagParents'])->name('api.tag-parents');
+Route::get('/sector/{id_tag_parent}/products/{id_tag}', [SectorController::class, 'getProductsByTag'])->name('sector.products-by-tag');
+Route::get('/sector/{id_tag_parent}/search', [SectorController::class, 'searchProducts'])->name('sector.search');
+Route::get('/sector/{id_tag_parent}/stats', [SectorController::class, 'getStats'])->name('sector.stats');
 
 // Rutas protegidas para modificar relaciones Producto-Tag
 Route::middleware('auth')->group(function () {
