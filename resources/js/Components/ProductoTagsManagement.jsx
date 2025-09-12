@@ -24,21 +24,22 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
         const newFilters = { ...filters, [key]: value };
         setFilters(newFilters);
         
-        // Aquí podrías hacer una llamada al servidor para filtrar
-        // Por ahora filtraremos localmente
-        filterProductos(newFilters);
+        // Realizar búsqueda en el servidor si hay término de búsqueda
+        if (key === 'search' && value && value.trim().length >= 2) {
+            buscarProductosEnServidor(value.trim());
+        } else if (key === 'search' && (!value || value.trim().length < 2)) {
+            // Si no hay búsqueda o es muy corta, mostrar productos iniciales
+            setProductos(initialProductos?.data || []);
+        } else {
+            // Para otros filtros, filtrar localmente
+            filterProductos(newFilters);
+        }
     };
 
     const filterProductos = (currentFilters) => {
         let filtered = initialProductos?.data || [];
 
-        if (currentFilters.search) {
-            filtered = filtered.filter(producto => 
-                producto.nombre.toLowerCase().includes(currentFilters.search.toLowerCase()) ||
-                producto.sku.toLowerCase().includes(currentFilters.search.toLowerCase())
-            );
-        }
-
+        // Solo filtrar por tags localmente, la búsqueda por texto se hace en servidor
         if (currentFilters.tag_id) {
             filtered = filtered.filter(producto => 
                 producto.tags?.some(tag => tag.id_tag == currentFilters.tag_id)
@@ -46,6 +47,30 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
         }
 
         setProductos(filtered);
+    };
+
+    const buscarProductosEnServidor = async (termino) => {
+        setLoading(true);
+        try {
+            const response = await axios.post('/productos/buscar-relacionados', {
+                producto: termino
+            });
+            
+            // Si hay filtro de tag activo, aplicarlo a los resultados del servidor
+            let resultados = response.data;
+            if (filters.tag_id) {
+                resultados = resultados.filter(producto => 
+                    producto.tags?.some(tag => tag.id_tag == filters.tag_id)
+                );
+            }
+            
+            setProductos(resultados);
+        } catch (error) {
+            console.error('Error en búsqueda:', error);
+            showMessage('error', 'Error al buscar productos');
+        } finally {
+            setLoading(false);
+        }
     };
 
 
@@ -157,6 +182,12 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
             }`}>
                 <div className="mb-4">
                     <h2 className="text-2xl font-bold">Productos ({productos.length})</h2>
+                    {loading && (
+                        <div className="flex items-center mt-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+                            <span className="text-sm text-gray-600">Buscando productos...</span>
+                        </div>
+                    )}
                 </div>
                 
                 <div className={`overflow-x-auto rounded-lg border ${

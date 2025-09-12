@@ -422,7 +422,7 @@ class ProductoController extends Controller
 
         $termino = $request->input('producto');
 
-        $productos = Producto::with('marca')
+        $productos = Producto::with(['tags.tagParent', 'subcategoria.categoria', 'marca'])
             ->where(function ($q) use ($termino) {
                 $q->where('nombre', 'LIKE', '%' . $termino . '%')
                   ->orWhere('sku', 'LIKE', '%' . $termino . '%');
