@@ -9,10 +9,7 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
     const [tags, setTags] = useState(initialTags || []);
     const [tagParents, setTagParents] = useState(initialTagParents || []);
     const [filters, setFilters] = useState(initialFilters || {});
-    const [selectedProducts, setSelectedProducts] = useState([]);
     const [selectedProductForTags, setSelectedProductForTags] = useState(null);
-    const [bulkAction, setBulkAction] = useState('attach');
-    const [bulkTags, setBulkTags] = useState([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
     const [showStats, setShowStats] = useState(false);
@@ -51,47 +48,7 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
         setProductos(filtered);
     };
 
-    const handleProductSelection = (productId) => {
-        setSelectedProducts(prev => 
-            prev.includes(productId) 
-                ? prev.filter(id => id !== productId)
-                : [...prev, productId]
-        );
-    };
 
-    const handleSelectAll = () => {
-        if (selectedProducts.length === productos.length) {
-            setSelectedProducts([]);
-        } else {
-            setSelectedProducts(productos.map(p => p.id_producto));
-        }
-    };
-
-    const handleBulkTagUpdate = async () => {
-        if (selectedProducts.length === 0 || bulkTags.length === 0) {
-            showMessage('error', 'Selecciona productos y tags para continuar');
-            return;
-        }
-
-        setLoading(true);
-        try {
-            await axios.post('/admin/producto-tags/bulk-assign', {
-                producto_ids: selectedProducts,
-                tag_ids: bulkTags,
-                action: bulkAction
-            });
-
-            showMessage('success', `Tags ${bulkAction === 'attach' ? 'agregados' : bulkAction === 'detach' ? 'removidos' : 'sincronizados'} exitosamente`);
-            
-            // Refresh data
-            window.location.reload();
-        } catch (error) {
-            console.error('Error:', error);
-            showMessage('error', 'Error al actualizar tags');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const loadStats = async () => {
         try {
@@ -192,99 +149,14 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
                 </div>
             </div>
 
-            {/* Bulk Actions */}
-            <div className={`p-6 rounded-lg shadow-lg ${
-                isDarkMode ? 'bg-gray-800' : 'bg-white'
-            }`}>
-                <h2 className="text-2xl font-bold mb-4">Acciones Masivas</h2>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium mb-2">
-                            Acción
-                        </label>
-                        <select
-                            value={bulkAction}
-                            onChange={(e) => setBulkAction(e.target.value)}
-                            className={`w-full px-3 py-2 border rounded-lg ${
-                                isDarkMode 
-                                    ? 'bg-gray-700 border-gray-600 text-white' 
-                                    : 'bg-white border-gray-300'
-                            }`}
-                        >
-                            <option value="attach">Agregar Tags</option>
-                            <option value="detach">Remover Tags</option>
-                            <option value="sync">Reemplazar Tags</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-2">
-                            Seleccionar Tags
-                        </label>
-                        <select
-                            multiple
-                            value={bulkTags}
-                            onChange={(e) => setBulkTags(Array.from(e.target.selectedOptions, option => option.value))}
-                            className={`w-full px-3 py-2 border rounded-lg ${
-                                isDarkMode 
-                                    ? 'bg-gray-700 border-gray-600 text-white' 
-                                    : 'bg-white border-gray-300'
-                            }`}
-                        >
-                            {tagParents.map(parent => (
-                                <optgroup key={parent.id_tag_parent} label={parent.nombre}>
-                                    {parent.tags?.map(tag => (
-                                        <option key={tag.id_tag} value={tag.id_tag}>
-                                            {tag.nombre}
-                                        </option>
-                                    ))}
-                                </optgroup>
-                            ))}
-                            <optgroup label="Tags Independientes">
-                                {tags.filter(tag => !tag.id_tag_parent).map(tag => (
-                                    <option key={tag.id_tag} value={tag.id_tag}>
-                                        {tag.nombre}
-                                    </option>
-                                ))}
-                            </optgroup>
-                        </select>
-                    </div>
-                    <div className="flex items-end">
-                        <button
-                            onClick={handleBulkTagUpdate}
-                            disabled={loading || selectedProducts.length === 0}
-                            className={`px-4 py-2 rounded-lg font-medium ${
-                                isDarkMode
-                                    ? 'bg-green-600 hover:bg-green-700 disabled:bg-green-800'
-                                    : 'bg-green-500 hover:bg-green-600 disabled:bg-green-300'
-                            } text-white disabled:cursor-not-allowed`}
-                        >
-                            {loading ? 'Procesando...' : 'Aplicar'}
-                        </button>
-                    </div>
-                    <div className="flex items-end">
-                        <span className="text-sm">
-                            {selectedProducts.length} productos seleccionados
-                        </span>
-                    </div>
-                </div>
-            </div>
+
 
             {/* Products List */}
             <div className={`p-6 rounded-lg shadow-lg ${
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
-                <div className="flex justify-between items-center mb-4">
+                <div className="mb-4">
                     <h2 className="text-2xl font-bold">Productos ({productos.length})</h2>
-                    <button
-                        onClick={handleSelectAll}
-                        className={`px-4 py-2 rounded-lg font-medium ${
-                            isDarkMode
-                                ? 'bg-gray-600 hover:bg-gray-700'
-                                : 'bg-gray-500 hover:bg-gray-600'
-                        } text-white`}
-                    >
-                        {selectedProducts.length === productos.length ? 'Deseleccionar Todo' : 'Seleccionar Todo'}
-                    </button>
                 </div>
                 
                 <div className={`overflow-x-auto rounded-lg border ${
@@ -293,14 +165,6 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
                     <table className="w-full">
                         <thead className={isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}>
                             <tr>
-                                <th className="px-4 py-3 text-left">
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedProducts.length === productos.length && productos.length > 0}
-                                        onChange={handleSelectAll}
-                                        className="rounded"
-                                    />
-                                </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                     Producto
                                 </th>
@@ -318,14 +182,6 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
                         <tbody className={`divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
                             {productos.map((producto) => (
                                 <tr key={producto.id_producto} className={isDarkMode ? 'bg-gray-800' : 'bg-white'}>
-                                    <td className="px-4 py-4">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedProducts.includes(producto.id_producto)}
-                                            onChange={() => handleProductSelection(producto.id_producto)}
-                                            className="rounded"
-                                        />
-                                    </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center">
                                             {producto.imagen?.[0] && (
