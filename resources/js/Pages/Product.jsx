@@ -608,8 +608,46 @@ const ProductPage = ({ producto }) => {
             datos: [contenidoTabla.textoActual.trim()]
         };
 
-        updateContent([...contenidoTabla.secciones, nuevaSeccion], "");
-        handleSave('especificaciones_tecnicas');
+        const nuevasSecciones = [...contenidoTabla.secciones, nuevaSeccion];
+        const nuevoContenido = { secciones: nuevasSecciones, textoActual: "" };
+        
+        // Actualizar el estado local inmediatamente
+        setContenidoTabla(nuevoContenido);
+        
+        // Preparar y enviar datos al servidor
+        const dataToSend = {
+            id_producto: producto.id_producto,
+            especificaciones_tecnicas: JSON.stringify(nuevoContenido)
+        };
+        
+        // Enviar al servidor
+        sendToServer(dataToSend, nuevoContenido);
+    };
+    
+    const sendToServer = async (dataToSend, nuevoContenido) => {
+        try {
+            console.log('Enviando al servidor:', dataToSend);
+            const response = await axios.post('/product/update', dataToSend, {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            console.log('Respuesta del servidor:', response);
+
+            if (response.status === 200) {
+                // Actualizar productData con el nuevo contenido
+                setProductData(prev => ({
+                    ...prev,
+                    especificaciones_tecnicas: JSON.stringify(nuevoContenido)
+                }));
+                console.log("Guardado exitoso para especificaciones técnicas");
+            }
+        } catch (error) {
+            console.error("Error al guardar:", error);
+            alert('Error al guardar los cambios.');
+        }
     };
 
     const updateContent = async (secciones, textoActual) => {
