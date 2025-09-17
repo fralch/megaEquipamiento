@@ -44,7 +44,7 @@ class Categoria extends Model
     ];
 
     // Eager loading por defecto para optimizar consultas
-    protected $with = ['subcategorias'];
+    // protected $with = ['subcategorias']; // Removed for debugging
 
     // Configurar incrementing timestamps
     const UPDATED_AT = 'updated_at';

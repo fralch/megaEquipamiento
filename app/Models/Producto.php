@@ -51,7 +51,7 @@ class Producto extends Model implements HasMedia
     ];
 
     // Eager loading por defecto para optimizar consultas
-    protected $with = ['marca', 'subcategoria'];
+    // protected $with = ['marca', 'subcategoria']; // Removed for debugging
 
     // Relaciones
     public function subcategoria()

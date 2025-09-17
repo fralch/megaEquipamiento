@@ -31,6 +31,23 @@ import BancoImagenesModal from '../Components/store/BancoImagenesModal';
 
 const ProductPage = ({ producto }) => {
     console.log("producto", producto);
+
+    // Validación temprana para evitar errores
+    if (!producto || !producto.id_producto) {
+        console.error('Producto no válido:', producto);
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
+                    <p className="text-gray-600">Producto no encontrado o datos inválidos.</p>
+                    <Link href="/" className="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        Volver al inicio
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
     const { isDarkMode } = useTheme();
     const { formatPrice } = useCurrency();
     const { addRecentlyViewed, getRecentlyViewed } = useRecentlyViewed();
@@ -175,16 +192,28 @@ const ProductPage = ({ producto }) => {
         }
     }, [addToCompare, isInCompare, canAddMore]);
 
-    const [productData, setProductData] = useState({
-        ...producto,
-        caracteristicas: typeof producto.caracteristicas === 'string' ? JSON.parse(producto.caracteristicas) : producto.caracteristicas || {},
+    const [productData, setProductData] = useState(() => {
+        // Función helper para parsear JSON de forma segura
+        const safeJsonParse = (str, fallback = {}) => {
+            if (typeof str !== 'string') return str || fallback;
+            try {
+                return JSON.parse(str);
+            } catch (error) {
+                console.warn('Error parsing JSON:', error, 'String:', str);
+                return fallback;
+            }
+        };
 
-        descripcion: producto.descripcion || '',
-        archivos_adicionales: producto.archivos_adicionales || '',
-        envio: producto.envio || '',
-        soporte_tecnico: producto.soporte_tecnico || '',
-        especificaciones_tecnicas: producto.especificaciones_tecnicas || '',
-        relatedProducts: producto.relatedProducts || [] // Se asume que vienen desde el servidor o se inicializa con un array vacío
+        return {
+            ...producto,
+            caracteristicas: safeJsonParse(producto.caracteristicas, {}),
+            descripcion: producto.descripcion || '',
+            archivos_adicionales: producto.archivos_adicionales || '',
+            envio: producto.envio || '',
+            soporte_tecnico: producto.soporte_tecnico || '',
+            especificaciones_tecnicas: producto.especificaciones_tecnicas || '',
+            relatedProducts: producto.relatedProducts || [] // Se asume que vienen desde el servidor o se inicializa con un array vacío
+        };
     });
 
     // Función para añadir al carrito
