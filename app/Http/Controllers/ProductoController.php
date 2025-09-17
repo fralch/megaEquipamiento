@@ -18,93 +18,13 @@ class ProductoController extends Controller
      /* Vista de productos */
      public function ProductView(Request $request, $producto_id)
      {
-        // Cache por 30 minutos para cada producto
-        $producto = Producto::with(['marca', 'subcategoria', 'productosRelacionados'])->find($producto_id);
-
-        // Verificar si el producto existe
-        if (!$producto) {
-            abort(404, 'Producto no encontrado');
-        }
-
-        // Asegurar que el producto siempre tenga la estructura correcta
-        $productoData = $producto->toArray();
-
-        // Normalizar todos los campos para evitar problemas de serialización
-        $productoData['video'] = $productoData['video'] ?? '';
-        $productoData['archivos_adicionales'] = $productoData['archivos_adicionales'] ?? '';
-        $productoData['envio'] = $productoData['envio'] ?? '';
-        $productoData['soporte_tecnico'] = $productoData['soporte_tecnico'] ?? '';
-        $productoData['especificaciones_tecnicas'] = $productoData['especificaciones_tecnicas'] ?? '';
-        $productoData['datos_tecnicos'] = $productoData['datos_tecnicos'] ?? '';
-
-        // Asegurar que las características sean válidas
-        if (isset($productoData['caracteristicas'])) {
-            if (is_string($productoData['caracteristicas'])) {
-                try {
-                    $productoData['caracteristicas'] = json_decode($productoData['caracteristicas'], true);
-                } catch (Exception $e) {
-                    $productoData['caracteristicas'] = [];
-                }
-            }
-        } else {
-            $productoData['caracteristicas'] = [];
-        }
-
-        // Si no hay productos relacionados, asegurar que sea un array vacío
-        if (!isset($productoData['productos_relacionados'])) {
-            $productoData['productos_relacionados'] = [];
-        }
-
-        // Asegurar que las imágenes sean siempre un array
-        if (isset($productoData['imagen'])) {
-            if (!is_array($productoData['imagen'])) {
-                $productoData['imagen'] = $productoData['imagen'] ? [$productoData['imagen']] : [];
-            }
-        } else {
-            $productoData['imagen'] = [];
-        }
-
-        // Validar que el JSON sea serializable correctamente
-        $jsonTest = json_encode($productoData);
-        if ($jsonTest === false) {
-            Log::error("Error de serialización JSON para producto {$producto_id}");
-            abort(500, 'Error interno del servidor');
-        }
-
-        // Verificar que se pueda decodificar correctamente
-        $decodedTest = json_decode($jsonTest, true);
-        if ($decodedTest === null && json_last_error() !== JSON_ERROR_NONE) {
-            Log::error("Error de JSON para producto {$producto_id}: " . json_last_error_msg());
-            abort(500, 'Error interno del servidor');
-        }
-
-        Log::info("Datos del producto para ID {$producto_id}:", ['producto' => $productoData]);
-
-        // Verificar el tamaño de la respuesta
-        $jsonSize = strlen(json_encode(['producto' => $productoData]));
-        Log::info("Tamaño de JSON para producto {$producto_id}: {$jsonSize} bytes");
-
-        // Solución temporal: Si el JSON es muy grande, reducir el contenido
-        if ($jsonSize > 50000) { // Si es mayor a 50KB
-            Log::warning("Producto {$producto_id} tiene JSON muy grande ({$jsonSize} bytes), reduciendo contenido");
-
-            // Reducir la descripción si es muy larga
-            if (strlen($productoData['descripcion']) > 500) {
-                $productoData['descripcion'] = substr($productoData['descripcion'], 0, 500) . '...';
-            }
-
-            // Simplificar productos relacionados si hay muchos
-            if (count($productoData['productos_relacionados']) > 5) {
-                $productoData['productos_relacionados'] = array_slice($productoData['productos_relacionados'], 0, 5);
-            }
-
-            $newJsonSize = strlen(json_encode(['producto' => $productoData]));
-            Log::info("Nuevo tamaño reducido: {$newJsonSize} bytes");
-        }
-
+        // Obtener el producto desde la solicitud
+        $producto = Producto::with('marca')->find($producto_id);
+    
         // Renderizar la vista con Inertia y pasar el producto
-        return Inertia::render('Product', ['producto' => $productoData]);
+        return Inertia::render('Product', compact('producto'));
      }
+
 
      /* vista de subcategoria */
      public function subCategoriaView(Request $request, $subcategoria_id, $marca_id = null)
