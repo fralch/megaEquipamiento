@@ -39,6 +39,7 @@ Route::get('/sectores', [SectorController::class, 'index'])->name('sectores.inde
 Route::get('/contacto', function () { return Inertia::render('Contacto'); })->name('contacto.view');
 Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
+Route::get('/crm/dashboard', function () { return Inertia::render('CRM/Dashboard'); })->middleware('auth')->name('crm.dashboard');
 
 
 // Rutas para crear y mostrar productos
