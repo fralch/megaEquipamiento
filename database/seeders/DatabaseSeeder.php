@@ -16,11 +16,15 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'nombre_usuario' => 'admin',
+            'correo' => 'admin@example.com',
+            'nombre' => 'Administrador',
+            'apellido' => 'Sistema',
+            'id_rol' => 1, // Asumiendo que el rol admin tendrá id_rol = 1
         ]);
 
         $this->call([
+            RoleSeeder::class,
             TagSeeder::class,
         ]);
     }
