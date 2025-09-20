@@ -41,6 +41,36 @@ Route::get('/crear', function () { return Inertia::render('Crear');})->name('cre
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
 Route::get('/crm/dashboard', function () { return Inertia::render('CRM/Dashboard'); })->middleware('auth')->name('crm.dashboard');
 
+// Rutas CRM - Usuarios y Roles
+Route::get('/crm/usuarios-roles/empleados-clientes-particulares', function () { return Inertia::render('CRM/UsuariosRoles/EmpleadosClientesParticulares'); })->middleware('auth')->name('crm.usuarios-roles.empleados-clientes-particulares');
+Route::get('/crm/usuarios-roles/empresas-clientes', function () { return Inertia::render('CRM/UsuariosRoles/EmpresasClientes'); })->middleware('auth')->name('crm.usuarios-roles.empresas-clientes');
+Route::get('/crm/usuarios-roles/areas-clientes', function () { return Inertia::render('CRM/UsuariosRoles/AreasClientes'); })->middleware('auth')->name('crm.usuarios-roles.areas-clientes');
+
+// Rutas CRM - Nuestras Empresas
+Route::get('/crm/empresas/ver-empresas', function () { return Inertia::render('CRM/Empresas/VerEmpresas'); })->middleware('auth')->name('crm.empresas.ver-empresas');
+Route::get('/crm/empresas/agregar-empresa', function () { return Inertia::render('CRM/Empresas/AgregarEmpresa'); })->middleware('auth')->name('crm.empresas.agregar-empresa');
+Route::get('/crm/empresas/configuracion-empresas', function () { return Inertia::render('CRM/Empresas/ConfiguracionEmpresas'); })->middleware('auth')->name('crm.empresas.configuracion-empresas');
+
+// Rutas CRM - Clientes
+Route::get('/crm/clientes/empleados-clientes-particulares', function () { return Inertia::render('CRM/Clientes/EmpleadosClientesParticulares'); })->middleware('auth')->name('crm.clientes.empleados-clientes-particulares');
+Route::get('/crm/clientes/empresas-clientes', function () { return Inertia::render('CRM/Clientes/EmpresasClientes'); })->middleware('auth')->name('crm.clientes.empresas-clientes');
+Route::get('/crm/clientes/areas-clientes', function () { return Inertia::render('CRM/Clientes/AreasClientes'); })->middleware('auth')->name('crm.clientes.areas-clientes');
+
+// Rutas CRM - Productos y Servicios
+Route::get('/crm/productos-servicios/productos', function () { return Inertia::render('CRM/ProductosServicios/Productos'); })->middleware('auth')->name('crm.productos-servicios.productos');
+Route::get('/crm/productos-servicios/servicios', function () { return Inertia::render('CRM/ProductosServicios/Servicios'); })->middleware('auth')->name('crm.productos-servicios.servicios');
+Route::get('/crm/productos-servicios/taxonomias', function () { return Inertia::render('CRM/ProductosServicios/Taxonomias'); })->middleware('auth')->name('crm.productos-servicios.taxonomias');
+Route::get('/crm/productos-servicios/marcas', function () { return Inertia::render('CRM/ProductosServicios/Marcas'); })->middleware('auth')->name('crm.productos-servicios.marcas');
+Route::get('/crm/productos-servicios/procedencias', function () { return Inertia::render('CRM/ProductosServicios/Procedencias'); })->middleware('auth')->name('crm.productos-servicios.procedencias');
+Route::get('/crm/productos-servicios/categorias', function () { return Inertia::render('CRM/ProductosServicios/Categorias'); })->middleware('auth')->name('crm.productos-servicios.categorias');
+Route::get('/crm/productos-servicios/monedas', function () { return Inertia::render('CRM/ProductosServicios/Monedas'); })->middleware('auth')->name('crm.productos-servicios.monedas');
+
+// Rutas CRM - Cotizaciones
+Route::get('/crm/cotizaciones/cotizaciones', function () { return Inertia::render('CRM/Cotizaciones/Cotizaciones'); })->middleware('auth')->name('crm.cotizaciones.cotizaciones');
+
+// Rutas CRM - APIs
+Route::get('/crm/apis/conexiones-api', function () { return Inertia::render('CRM/Apis/ConexionesApi'); })->middleware('auth')->name('crm.apis.conexiones-api');
+
 
 // Rutas para crear y mostrar productos
 Route::get('/product/todo', [ProductoController::class, 'getProductosAll']);
