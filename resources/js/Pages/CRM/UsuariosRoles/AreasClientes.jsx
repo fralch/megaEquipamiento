@@ -1,6 +1,7 @@
 import { Head } from "@inertiajs/react";
 import { FiMapPin, FiEdit, FiTrash, FiPlus } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
+import CRMLayout from '../../../Components/CRM/CRMLayout';
 
 export default function AreasClientes() {
     const { isDarkMode } = useTheme();

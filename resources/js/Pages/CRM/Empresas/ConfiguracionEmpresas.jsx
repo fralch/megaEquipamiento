@@ -2,6 +2,7 @@ import { Head } from "@inertiajs/react";
 import { FiSettings, FiSave } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import { useState } from 'react';
+import CRMLayout from '../../../Components/CRM/CRMLayout';
 
 export default function ConfiguracionEmpresas() {
     const { isDarkMode } = useTheme();
