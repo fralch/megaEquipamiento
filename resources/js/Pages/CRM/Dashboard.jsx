@@ -129,28 +129,25 @@ export default function CrmDashboard() {
 
     return (
         <>
-            <Head title="CRM Dashboard" />
+            <Head title="CRM Dashboard" description="Panel de Control CRM" />
             <div className={`min-h-screen transition-colors duration-300 ${
                 isDarkMode ? 'bg-gray-950' : 'bg-gray-50'
             }`}>
                 {/* Sidebar Mejorado */}
-                <aside className={`w-72 fixed inset-y-0 left-0 shadow-xl transition-colors duration-300 ${
+                <aside className={`w-72 fixed inset-y-0 left-0 shadow-xl transition-colors duration-300 flex flex-col ${
                     isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
                 } border-r z-40`}>
                     
                     {/* Logo/Brand Section */}
                     <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-100'}`}>
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                                <span className="text-white text-xl font-bold">C</span>
-                            </div>
                             <div>
-                                <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                    CRM Pro
-                                </h2>
-                                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    Panel de Control
-                                </p>
+                                <img 
+                                    src="https://megaequipamiento.pe/img/logo2.jpg" 
+                                    alt="CRM Pro Logo"
+                                    className="h-16 w-auto"
+                                />
+                                
                             </div>
                         </div>
                     </div>
