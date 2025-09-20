@@ -6,6 +6,7 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
+import VideoPlayer from "../Components/VideoPlayer";
 const URL_API = import.meta.env.VITE_API_URL;
 
 export default function Categoria({ productos, categoria, subcategorias, marcas, todasCategorias }) {
@@ -16,33 +17,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [mostrarProductos, setMostrarProductos] = useState(false);
 
-    // Función para convertir URLs de YouTube al formato embed
-    const convertToEmbedUrl = (url) => {
-        if (!url) return url;
-        
-        // Si ya es una URL embed, devolverla tal como está
-        if (url.includes('youtube.com/embed/')) {
-            return url;
-        }
-        
-        // Convertir URLs de youtu.be
-        if (url.includes('youtu.be/')) {
-            const videoId = url.split('youtu.be/')[1].split('?')[0];
-            return `https://www.youtube.com/embed/${videoId}?mute=1&autoplay=1&loop=1&playlist=${videoId}&vq=hd1080`;
-        }
-        
-        // Convertir URLs de youtube.com/watch
-        if (url.includes('youtube.com/watch')) {
-            const urlParams = new URLSearchParams(url.split('?')[1]);
-            const videoId = urlParams.get('v');
-            if (videoId) {
-                return `https://www.youtube.com/embed/${videoId}?mute=1&autoplay=1&loop=1&playlist=${videoId}&vq=hd1080`;
-            }
-        }
-        
-        // Si no es una URL de YouTube, devolver la URL original
-        return url;
-    };
+
 
     useEffect(() => {
         const storedData = localStorage.getItem('categoriasCompleta');
@@ -413,15 +388,14 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                             }`}>
                                 Categoría: {categoria.nombre}
                             </h2>
-                            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                                <iframe
-                                    src={convertToEmbedUrl(categoria.video)}
-                                    className="absolute top-0 left-0 w-full h-full rounded-lg"
-                                    frameBorder="0"
-                                    allowFullScreen
-                                    title={`Video de ${categoria.nombre}`}
-                                ></iframe>
-                            </div>
+                            <VideoPlayer
+                                videoUrl={categoria.video}
+                                title={`Video de ${categoria.nombre}`}
+                                autoplay={true}
+                                mute={true}
+                                loop={true}
+                                showControls={false}
+                            />
                         </div>
                     )}
                     

@@ -6,70 +6,11 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
+import VideoPlayer from "../Components/VideoPlayer";
 
 const URL_API = import.meta.env.VITE_API_URL;
 
-// Función para convertir URLs de video al formato embed
-const getEmbedUrl = (url) => {
-    if (!url) {
-        console.log('getEmbedUrl: URL vacía o null');
-        return null;
-    }
-    
-    console.log('getEmbedUrl: Procesando URL:', url);
-    
-    try {
-        // Si ya es una URL embed, verificar si es YouTube y agregar autoplay
-        if (url.includes('/embed/') || url.includes('player.vimeo.com') || url.includes('player.')) {
-            console.log('getEmbedUrl: URL ya en formato embed');
-            
-            // Si es YouTube embed, agregar autoplay si no lo tiene
-            if (url.includes('youtube.com/embed/')) {
-                const hasAutoplay = url.includes('autoplay=');
-                if (!hasAutoplay) {
-                    const separator = url.includes('?') ? '&' : '?';
-                    return `${url}${separator}autoplay=1&mute=1`;
-                }
-            }
-            return url;
-        }
-        
-        // YouTube URLs normales
-        if (url.includes('youtube.com/watch')) {
-            const videoId = url.split('v=')[1]?.split('&')[0];
-            const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1` : null;
-            console.log('getEmbedUrl: Convertido YouTube watch a embed:', embedUrl);
-            return embedUrl;
-        }
-        
-        if (url.includes('youtu.be/')) {
-            const videoId = url.split('youtu.be/')[1]?.split('?')[0];
-            const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1` : null;
-            console.log('getEmbedUrl: Convertido YouTube short a embed:', embedUrl);
-            return embedUrl;
-        }
-        
-        // Vimeo URLs normales (Vimeo también soporta autoplay)
-        if (url.includes('vimeo.com/') && !url.includes('player.vimeo.com')) {
-            const videoId = url.split('vimeo.com/')[1]?.split('?')[0];
-            const embedUrl = videoId ? `https://player.vimeo.com/video/${videoId}?autoplay=1&muted=1` : null;
-            console.log('getEmbedUrl: Convertido Vimeo a embed:', embedUrl);
-            return embedUrl;
-        }
-        
-        // Para otras URLs válidas, intentar usarlas directamente
-        if (url.startsWith('http://') || url.startsWith('https://')) {
-            console.log('getEmbedUrl: URL HTTP válida, devolviendo tal como está');
-            return url;
-        }
-        
-        console.log('getEmbedUrl: URL no reconocida:', url);
-        return null;
-    } catch (error) {
-        console.error('getEmbedUrl: Error procesando URL de video:', error, 'URL:', url);
-        return null;
-    }
-};
+
 
 
 export default function Marcas({ marca, productos }) {
@@ -213,7 +154,7 @@ export default function Marcas({ marca, productos }) {
     useEffect(() => {
         if (marca && marca.video_url) {
             setEditVideoForm({ video_url: marca.video_url });
-            setVideoPreview(getEmbedUrl(marca.video_url));
+            setVideoPreview(marca.video_url);
         }
     }, [marca]);
 
@@ -221,7 +162,7 @@ export default function Marcas({ marca, productos }) {
     const handleEditVideoChange = (e) => {
         const value = e.target.value;
         setEditVideoForm({ video_url: value });
-        setVideoPreview(getEmbedUrl(value));
+        setVideoPreview(value);
     };
 
     // Handle video update submission
@@ -327,7 +268,7 @@ export default function Marcas({ marca, productos }) {
                                     
                                     {/* Video de la marca */}
                                     {marca && (marca.video_url || auth?.user) && (() => {
-                                        const embedUrl = marca.video_url ? getEmbedUrl(marca.video_url) : null;
+
                                         
                                         return (
                                             <div className="mb-8">
@@ -361,16 +302,15 @@ export default function Marcas({ marca, productos }) {
                                                     )}
 
                                                     {/* Video Content */}
-                                                    {embedUrl ? (
-                                                        <div className="aspect-video w-full">
-                                                            <iframe
-                                                                src={embedUrl}
-                                                                className="w-full h-full"
-                                                                frameBorder="0"
-                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                                allowFullScreen
+                                                    {marca.video_url ? (
+                                                        <div className="p-4">
+                                                            <VideoPlayer
+                                                                videoUrl={marca.video_url}
                                                                 title={`Video de ${marca.nombre}`}
-                                                            ></iframe>
+                                                                autoplay={true}
+                                                                mute={true}
+                                                                showControls={auth?.user ? true : false}
+                                                            />
                                                         </div>
                                                     ) : (
                                                         <div className={`p-8 text-center ${
@@ -573,7 +513,7 @@ export default function Marcas({ marca, productos }) {
                                     onClick={() => {
                                         setIsEditingVideo(false);
                                         setEditVideoForm({ video_url: marca.video_url || '' });
-                                        setVideoPreview(marca.video_url ? getEmbedUrl(marca.video_url) : null);
+                                        setVideoPreview(marca.video_url || null);
                                         setUpdateMessage({ type: '', text: '' });
                                     }}
                                     className={`p-2 rounded-md transition-colors duration-200 ${
@@ -635,15 +575,14 @@ export default function Marcas({ marca, productos }) {
                                         }`}>
                                             Vista Previa
                                         </label>
-                                        <div className="aspect-video w-full max-w-2xl">
-                                            <iframe
-                                                src={videoPreview}
-                                                className="w-full h-full rounded-md"
-                                                frameBorder="0"
-                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                                allowFullScreen
+                                        <div className="max-w-2xl">
+                                            <VideoPlayer
+                                                videoUrl={videoPreview}
                                                 title="Video Preview"
-                                            ></iframe>
+                                                autoplay={false}
+                                                mute={false}
+                                                showControls={true}
+                                            />
                                         </div>
                                     </div>
                                 )}
@@ -657,7 +596,7 @@ export default function Marcas({ marca, productos }) {
                                     onClick={() => {
                                         setIsEditingVideo(false);
                                         setEditVideoForm({ video_url: marca.video_url || '' });
-                                        setVideoPreview(marca.video_url ? getEmbedUrl(marca.video_url) : null);
+                                        setVideoPreview(marca.video_url || null);
                                         setUpdateMessage({ type: '', text: '' });
                                     }}
                                     disabled={isUpdating}
