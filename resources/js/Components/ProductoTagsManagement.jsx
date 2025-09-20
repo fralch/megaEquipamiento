@@ -14,6 +14,20 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
     const [message, setMessage] = useState({ type: '', text: '' });
     const [showStats, setShowStats] = useState(false);
     const [stats, setStats] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pagination, setPagination] = useState(null);
+
+    // Efecto para manejar filtros iniciales
+    useEffect(() => {
+        if (initialFilters?.tag_id || (initialFilters?.search && initialFilters.search.trim().length >= 2)) {
+            setFilters(initialFilters);
+            if (initialFilters.tag_id) {
+                filtrarProductosPorTag(initialFilters.tag_id, 1);
+            } else if (initialFilters.search && initialFilters.search.trim().length >= 2) {
+                buscarProductosEnServidor(initialFilters.search.trim(), 1);
+            }
+        }
+    }, []);
 
     const showMessage = (type, text) => {
         setMessage({ type, text });
@@ -23,13 +37,36 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
     const handleFilterChange = (key, value) => {
         const newFilters = { ...filters, [key]: value };
         setFilters(newFilters);
-        
+
+        // Resetear página cuando cambian los filtros
+        setCurrentPage(1);
+
         // Realizar búsqueda en el servidor si hay término de búsqueda
         if (key === 'search' && value && value.trim().length >= 2) {
-            buscarProductosEnServidor(value.trim());
+            buscarProductosEnServidor(value.trim(), 1);
         } else if (key === 'search' && (!value || value.trim().length < 2)) {
-            // Si no hay búsqueda o es muy corta, mostrar productos iniciales
-            setProductos(initialProductos?.data || []);
+            // Si no hay búsqueda o es muy corta, considerar filtro de tag
+            if (newFilters.tag_id) {
+                filtrarProductosPorTag(newFilters.tag_id, 1);
+            } else {
+                setProductos(initialProductos?.data || []);
+                setPagination(null);
+                setCurrentPage(1);
+            }
+        } else if (key === 'tag_id') {
+            // Para filtro de tag, hacer consulta al servidor
+            if (value) {
+                filtrarProductosPorTag(value, 1);
+            } else {
+                // Si se quita el filtro de tag, verificar si hay búsqueda
+                if (newFilters.search && newFilters.search.trim().length >= 2) {
+                    buscarProductosEnServidor(newFilters.search.trim(), 1);
+                } else {
+                    setProductos(initialProductos?.data || []);
+                    setPagination(null);
+                    setCurrentPage(1);
+                }
+            }
         } else {
             // Para otros filtros, filtrar localmente
             filterProductos(newFilters);
@@ -39,35 +76,78 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
     const filterProductos = (currentFilters) => {
         let filtered = initialProductos?.data || [];
 
-        // Solo filtrar por tags localmente, la búsqueda por texto se hace en servidor
-        if (currentFilters.tag_id) {
-            filtered = filtered.filter(producto => 
-                producto.tags?.some(tag => tag.id_tag == currentFilters.tag_id)
-            );
-        }
+        // Nota: El filtro por tags ahora se hace desde el servidor
+        // Solo aplicar otros filtros locales si es necesario
 
         setProductos(filtered);
     };
 
-    const buscarProductosEnServidor = async (termino) => {
+    const buscarProductosEnServidor = async (termino, page = 1) => {
         setLoading(true);
         try {
-            const response = await axios.post('/productos/buscar-relacionados', {
-                producto: termino
-            });
-            
-            // Si hay filtro de tag activo, aplicarlo a los resultados del servidor
-            let resultados = response.data;
+            const requestData = {
+                producto: termino,
+                page: page
+            };
+
+            // Si hay filtro de tag activo, incluirlo en la búsqueda
             if (filters.tag_id) {
-                resultados = resultados.filter(producto => 
-                    producto.tags?.some(tag => tag.id_tag == filters.tag_id)
-                );
+                requestData.tag_id = filters.tag_id;
             }
-            
-            setProductos(resultados);
+
+            const response = await axios.post('/productos/buscar-relacionados', requestData);
+            setProductos(response.data.data || response.data);
+            setPagination(response.data);
+            setCurrentPage(page);
         } catch (error) {
             console.error('Error en búsqueda:', error);
             showMessage('error', 'Error al buscar productos');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filtrarProductosPorTag = async (tagId, page = 1) => {
+        setLoading(true);
+        try {
+            if (tagId) {
+                // Si hay un tag seleccionado, buscar todos los productos con ese tag
+                const requestData = {
+                    tag_id: tagId,
+                    page: page
+                };
+
+                // Si también hay búsqueda activa, incluir el término de búsqueda
+                if (filters.search && filters.search.trim().length >= 2) {
+                    requestData.producto = filters.search.trim();
+                } else {
+                    // Si no hay búsqueda, usar "*" para obtener todos los productos con el tag
+                    requestData.producto = "*";
+                }
+
+                const response = await axios.post('/productos/buscar-relacionados', requestData);
+                setProductos(response.data.data || response.data);
+                setPagination(response.data);
+            } else {
+                // Si no hay tag seleccionado
+                if (filters.search && filters.search.trim().length >= 2) {
+                    // Si hay búsqueda activa, buscar sin tag
+                    const response = await axios.post('/productos/buscar-relacionados', {
+                        producto: filters.search.trim(),
+                        page: page
+                    });
+                    setProductos(response.data.data || response.data);
+                    setPagination(response.data);
+                } else {
+                    // Si no hay búsqueda ni tag, mostrar productos iniciales
+                    setProductos(initialProductos?.data || []);
+                    setPagination(null);
+                }
+            }
+            setCurrentPage(page);
+        } catch (error) {
+            console.error('Error al filtrar por tag:', error);
+            showMessage('error', 'Error al filtrar productos por tag');
         } finally {
             setLoading(false);
         }
@@ -91,6 +171,21 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
             return tag.tag_parent.color;
         }
         return tag.color || '#3B82F6';
+    };
+
+    const handlePageChange = (page) => {
+        if (filters.tag_id) {
+            filtrarProductosPorTag(filters.tag_id, page);
+        } else if (filters.search && filters.search.trim().length >= 2) {
+            buscarProductosEnServidor(filters.search.trim(), page);
+        }
+    };
+
+    const clearFilters = () => {
+        setFilters({});
+        setProductos(initialProductos?.data || []);
+        setPagination(null);
+        setCurrentPage(1);
     };
 
     return (
@@ -159,18 +254,31 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
                             </optgroup>
                         </select>
                     </div>
-                    <div className="flex items-end">
-                        <button
-                            onClick={loadStats}
-                            className={`px-4 py-2 rounded-lg font-medium ${
-                                isDarkMode
-                                    ? 'bg-blue-600 hover:bg-blue-700'
-                                    : 'bg-blue-500 hover:bg-blue-600'
-                            } text-white`}
-                        >
-                            Ver Estadísticas
-                        </button>
-                    </div>
+                     <div className="flex items-end space-x-2">
+                         <button
+                             onClick={clearFilters}
+                             disabled={!filters.tag_id && !filters.search}
+                             className={`px-4 py-2 rounded-lg font-medium ${
+                                 !filters.tag_id && !filters.search
+                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed dark:bg-gray-600 dark:text-gray-400'
+                                     : isDarkMode
+                                         ? 'bg-red-600 hover:bg-red-700 text-white'
+                                         : 'bg-red-500 hover:bg-red-600 text-white'
+                             }`}
+                         >
+                             Limpiar Filtros
+                         </button>
+                         <button
+                             onClick={loadStats}
+                             className={`px-4 py-2 rounded-lg font-medium ${
+                                 isDarkMode
+                                     ? 'bg-blue-600 hover:bg-blue-700'
+                                     : 'bg-blue-500 hover:bg-blue-600'
+                             } text-white`}
+                         >
+                             Ver Estadísticas
+                         </button>
+                     </div>
                 </div>
             </div>
 
@@ -181,11 +289,23 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
                 isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 <div className="mb-4">
-                    <h2 className="text-2xl font-bold">Productos ({productos.length})</h2>
+                    <h2 className="text-2xl font-bold">
+                        Productos ({pagination ? pagination.total : productos.length})
+                        {filters.tag_id && (
+                            <span className="text-sm font-normal text-gray-600 dark:text-gray-400 ml-2">
+                                filtrados por tag
+                            </span>
+                        )}
+                        {filters.search && (
+                            <span className="text-sm font-normal text-gray-600 dark:text-gray-400 ml-2">
+                                búsqueda: "{filters.search}"
+                            </span>
+                        )}
+                    </h2>
                     {loading && (
                         <div className="flex items-center mt-2">
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
-                            <span className="text-sm text-gray-600">Buscando productos...</span>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">Cargando productos...</span>
                         </div>
                     )}
                 </div>
@@ -264,6 +384,73 @@ const ProductoTagsManagement = ({ initialProductos, initialTags, initialTagParen
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {pagination && pagination.last_page > 1 && (
+                    <div className="mt-6 flex items-center justify-between">
+                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                            Mostrando {pagination.from || 0} a {pagination.to || 0} de {pagination.total || 0} productos
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            {/* Previous Button */}
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1 || loading}
+                                className={`px-3 py-2 text-sm font-medium rounded-md ${
+                                    currentPage === 1 || loading
+                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700'
+                                }`}
+                            >
+                                Anterior
+                            </button>
+
+                            {/* Page Numbers */}
+                            <div className="flex items-center space-x-1">
+                                {Array.from({ length: Math.min(5, pagination.last_page) }, (_, i) => {
+                                    let pageNum;
+                                    if (pagination.last_page <= 5) {
+                                        pageNum = i + 1;
+                                    } else if (currentPage <= 3) {
+                                        pageNum = i + 1;
+                                    } else if (currentPage >= pagination.last_page - 2) {
+                                        pageNum = pagination.last_page - 4 + i;
+                                    } else {
+                                        pageNum = currentPage - 2 + i;
+                                    }
+
+                                    return (
+                                        <button
+                                            key={pageNum}
+                                            onClick={() => handlePageChange(pageNum)}
+                                            disabled={loading}
+                                            className={`px-3 py-2 text-sm font-medium rounded-md ${
+                                                currentPage === pageNum
+                                                    ? 'bg-blue-600 text-white dark:bg-blue-500'
+                                                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700'
+                                            } ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
+                                        >
+                                            {pageNum}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Next Button */}
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === pagination.last_page || loading}
+                                className={`px-3 py-2 text-sm font-medium rounded-md ${
+                                    currentPage === pagination.last_page || loading
+                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500'
+                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700'
+                                }`}
+                            >
+                                Siguiente
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Stats Modal */}
