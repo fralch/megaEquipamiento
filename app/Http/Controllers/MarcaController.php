@@ -124,10 +124,10 @@ class MarcaController extends Controller
                          ->with('success', 'Marca actualizada exitosamente.');
     }
 
-    // obtener todos los marcas en json 
+    // obtener todos los marcas en json ordenadas alfabéticamente de A a Z
     public function getMarcas ()
     {
-        $marcas = Marca::all();
+        $marcas = Marca::orderBy('nombre', 'asc')->get();
         return response()->json($marcas);
     }
 

@@ -144,12 +144,21 @@ const BrandSection = () => {
       try {
         const response = await axios.get('/marca/all');
         const brandsData = response.data;
-        
+
+        // Ordenar marcas alfabéticamente de A a Z
+        const sortedBrands = Array.isArray(brandsData)
+          ? brandsData.sort((a, b) => {
+              const nameA = a.nombre?.toLowerCase() || '';
+              const nameB = b.nombre?.toLowerCase() || '';
+              return nameA.localeCompare(nameB);
+            })
+          : brandsData;
+
         // Guardar en localStorage con timestamp para caché
-        localStorage.setItem('brandsData', JSON.stringify(brandsData));
+        localStorage.setItem('brandsData', JSON.stringify(sortedBrands));
         localStorage.setItem('brandsDataTimestamp', Date.now().toString());
-        
-        setBrands(brandsData);
+
+        setBrands(sortedBrands);
         setLoading(false);
       } catch (error) {
         console.error('Error loading brands from API:', error);
@@ -164,7 +173,18 @@ const BrandSection = () => {
     
     if (cachedBrands && cachedTimestamp && (Date.now() - parseInt(cachedTimestamp)) < oneHour) {
       // Usar datos en caché si son recientes (1 hora)
-      setBrands(JSON.parse(cachedBrands));
+      const cachedBrandsData = JSON.parse(cachedBrands);
+
+      // Ordenar marcas del caché alfabéticamente de A a Z
+      const sortedCachedBrands = Array.isArray(cachedBrandsData)
+        ? cachedBrandsData.sort((a, b) => {
+            const nameA = a.nombre?.toLowerCase() || '';
+            const nameB = b.nombre?.toLowerCase() || '';
+            return nameA.localeCompare(nameB);
+          })
+        : cachedBrandsData;
+
+      setBrands(sortedCachedBrands);
       setLoading(false);
     } else {
       // Configurar observer para cargar marcas solo cuando la sección es visible
