@@ -2,12 +2,31 @@ import { Head } from "@inertiajs/react";
 import { 
     FiHome, FiUsers, FiDollarSign, FiActivity, FiChevronDown, 
     FiSettings, FiShoppingBag, FiBarChart, FiBell, FiSearch,
-    FiTrendingUp, FiCalendar, FiMail, FiPhone
+    FiTrendingUp, FiCalendar, FiMail, FiPhone, FiPackage
 } from "react-icons/fi";
 import { useTheme } from '../../storage/ThemeContext';
+import { useState } from 'react';
 
 export default function CrmDashboard() {
     const { isDarkMode } = useTheme();
+    
+    // Estado para manejar qué secciones del menú están expandidas
+    const [expandedMenus, setExpandedMenus] = useState({
+        'usuarios-roles': true, // Por defecto expandido
+        'empresas': false,
+        'clientes': false,
+        'productos': false,
+        'cotizaciones': false,
+        'apis': false
+    });
+
+    // Función para alternar la expansión de un menú
+    const toggleMenu = (menuKey) => {
+        setExpandedMenus(prev => ({
+            ...prev,
+            [menuKey]: !prev[menuKey]
+        }));
+    };
 
     // Datos de ejemplo para las métricas
     const stats = [
@@ -49,38 +68,62 @@ export default function CrmDashboard() {
         {
             title: "USUARIOS Y ROLES",
             icon: FiUsers,
-            active: true,
-            items: ["Gestionar Usuarios", "Roles y Permisos", "Configuración"]
+            key: "usuarios-roles",
+            items: [
+                "Empleados y clientes particulares",
+                "Empresas de clientes", 
+                "Areas de clientes"
+            ]
         },
         {
             title: "NUESTRAS EMPRESAS",
-            icon: FiShoppingBag,
-            active: false,
-            items: ["Ver Empresas", "Agregar Empresa", "Configuración"]
+            icon: FiHome,
+            key: "empresas",
+            items: [
+                "Ver Empresas",
+                "Agregar Empresa", 
+                "Configuración de Empresas"
+            ]
         },
         {
             title: "CLIENTES",
             icon: FiUsers,
-            active: false,
-            items: ["Lista de Clientes", "Agregar Cliente", "Segmentación"]
+            key: "clientes",
+            items: [
+                "Empleados y clientes particulares",
+                "Empresas de clientes", 
+                "Areas de clientes"
+            ]
         },
         {
             title: "PRODUCTOS Y SERVICIOS",
-            icon: FiDollarSign,
-            active: false,
-            items: ["Catálogo", "Precios", "Inventario"]
+            icon: FiPackage,
+            key: "productos",
+            items: [
+                "PRODUCTOS",
+                "SERVICIOS",
+                "TAXONOMIAS",
+                "MARCAS",
+                "PROCEDENCIAS",
+                "CATEGORIAS",
+                "MONEDAS"
+            ]
         },
         {
             title: "COTIZACIONES",
             icon: FiBarChart,
-            active: false,
-            items: ["Crear Cotización", "Historial", "Plantillas"]
+            key: "cotizaciones",
+            items: [
+                "COTIZACIONES"
+            ]
         },
         {
             title: "CONEXIONES APIS",
             icon: FiSettings,
-            active: false,
-            items: ["Configurar APIs", "Logs", "Webhooks"]
+            key: "apis",
+            items: [
+                "CONEXIONES API"
+            ]
         }
     ];
 
@@ -141,20 +184,23 @@ export default function CrmDashboard() {
                         <div className="space-y-2">
                             {menuItems.map((item, index) => (
                                 <div key={index} className="mb-2">
-                                    <div className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer group ${
-                                        item.active 
-                                            ? (isDarkMode ? 'bg-blue-600 text-white shadow-lg' : 'bg-blue-50 text-blue-700 shadow-sm')
-                                            : (isDarkMode ? 'text-gray-300 hover:bg-gray-800 hover:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900')
-                                    }`}>
+                                    <div 
+                                        onClick={() => toggleMenu(item.key)}
+                                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer group ${
+                                            expandedMenus[item.key] 
+                                                ? (isDarkMode ? 'bg-blue-600 text-white shadow-lg' : 'bg-blue-50 text-blue-700 shadow-sm')
+                                                : (isDarkMode ? 'text-gray-300 hover:bg-gray-800 hover:text-white' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900')
+                                        }`}
+                                    >
                                         <item.icon className="w-5 h-5 flex-shrink-0" />
                                         <span className="font-medium text-sm flex-1">{item.title}</span>
                                         <FiChevronDown className={`w-4 h-4 transition-transform duration-200 ${
-                                            item.active ? 'rotate-180' : 'group-hover:rotate-180'
+                                            expandedMenus[item.key] ? 'rotate-180' : ''
                                         }`} />
                                     </div>
                                     
                                     {/* Submenu desplegable */}
-                                    {item.active && (
+                                    {expandedMenus[item.key] && (
                                         <div className="ml-8 mt-2 space-y-1">
                                             {item.items.map((subItem, subIndex) => (
                                                 <div key={subIndex} className={`px-4 py-2 text-sm rounded-lg cursor-pointer transition-colors duration-200 ${
