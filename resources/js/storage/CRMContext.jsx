@@ -13,12 +13,27 @@ export function CRMProvider({ children }) {
         'apis': false
     });
 
-    // Función para alternar la expansión de un menú
+    // Función para alternar la expansión de un menú (comportamiento acordeón)
     const toggleMenu = (menuKey) => {
-        setExpandedMenus(prev => ({
-            ...prev,
-            [menuKey]: !prev[menuKey]
-        }));
+        setExpandedMenus(prev => {
+            const isCurrentlyExpanded = prev[menuKey];
+
+            // Si el menú actual está expandido, lo cerramos
+            if (isCurrentlyExpanded) {
+                return {
+                    ...prev,
+                    [menuKey]: false
+                };
+            }
+
+            // Si el menú actual está cerrado, cerramos todos los demás y abrimos este
+            const newState = {};
+            Object.keys(prev).forEach(key => {
+                newState[key] = key === menuKey;
+            });
+
+            return newState;
+        });
     };
 
     return (
