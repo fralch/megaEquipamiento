@@ -9,6 +9,7 @@ import { CompareProvider } from './storage/CompareContext';
 import { ThemeProvider } from './storage/ThemeContext';
 import { CurrencyProvider } from './storage/CurrencyContext';
 import { RecentlyViewedProvider } from './storage/RecentlyViewedContext';
+import { CRMProvider } from './storage/CRMContext';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -28,7 +29,9 @@ createInertiaApp({
                     <CartProvider>
                         <CompareProvider>
                             <RecentlyViewedProvider>
-                                <App {...props} />
+                                <CRMProvider>
+                                    <App {...props} />
+                                </CRMProvider>
                             </RecentlyViewedProvider>
                         </CompareProvider>
                     </CartProvider>

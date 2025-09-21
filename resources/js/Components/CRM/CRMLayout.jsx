@@ -5,28 +5,11 @@ import {
     FiTrendingUp, FiCalendar, FiMail, FiPhone, FiPackage
 } from "react-icons/fi";
 import { useTheme } from '../../storage/ThemeContext';
-import { useState } from 'react';
+import { useCRM } from '../../storage/CRMContext';
 
 export default function CRMLayout({ children, title }) {
     const { isDarkMode } = useTheme();
-
-    // Estado para manejar qué secciones del menú están expandidas
-    const [expandedMenus, setExpandedMenus] = useState({
-        'usuarios-roles': true, // Expandido por defecto
-        'empresas': false,
-        'clientes': false,
-        'productos': false,
-        'cotizaciones': false,
-        'apis': false
-    });
-
-    // Función para alternar la expansión de un menú
-    const toggleMenu = (menuKey) => {
-        setExpandedMenus(prev => ({
-            ...prev,
-            [menuKey]: !prev[menuKey]
-        }));
-    };
+    const { expandedMenus, toggleMenu } = useCRM();
 
     const menuItems = [
         {

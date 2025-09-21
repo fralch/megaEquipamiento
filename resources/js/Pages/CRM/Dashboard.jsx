@@ -5,29 +5,10 @@ import {
     FiTrendingUp, FiCalendar, FiMail, FiPhone, FiPackage
 } from "react-icons/fi";
 import { useTheme } from '../../storage/ThemeContext';
-import { useState } from 'react';
 import CRMLayout from '../../Components/CRM/CRMLayout';
 
 export default function CrmDashboard() {
     const { isDarkMode } = useTheme();
-    
-    // Estado para manejar qué secciones del menú están expandidas
-    const [expandedMenus, setExpandedMenus] = useState({
-        'usuarios-roles': true, // Por defecto expandido
-        'empresas': false,
-        'clientes': false,
-        'productos': false,
-        'cotizaciones': false,
-        'apis': false
-    });
-
-    // Función para alternar la expansión de un menú
-    const toggleMenu = (menuKey) => {
-        setExpandedMenus(prev => ({
-            ...prev,
-            [menuKey]: !prev[menuKey]
-        }));
-    };
 
     // Datos de ejemplo para las métricas
     const stats = [
@@ -65,101 +46,6 @@ export default function CrmDashboard() {
         }
     ];
 
-    const menuItems = [
-        {
-            title: "USUARIOS Y ROLES",
-            icon: FiUsers,
-            key: "usuarios-roles",
-            items: [
-                "Empleados y clientes particulares",
-                "Empresas de clientes", 
-                "Areas de clientes"
-            ]
-        },
-        {
-            title: "NUESTRAS EMPRESAS",
-            icon: FiHome,
-            key: "empresas",
-            items: [
-                "Ver Empresas",
-                "Agregar Empresa", 
-                "Configuración de Empresas"
-            ]
-        },
-        {
-            title: "CLIENTES",
-            icon: FiUsers,
-            key: "clientes",
-            items: [
-                "Empleados y clientes particulares",
-                "Empresas de clientes", 
-                "Areas de clientes"
-            ]
-        },
-        {
-            title: "PRODUCTOS Y SERVICIOS",
-            icon: FiPackage,
-            key: "productos",
-            items: [
-                "PRODUCTOS",
-                "SERVICIOS",
-                "TAXONOMIAS",
-                "MARCAS",
-                "PROCEDENCIAS",
-                "CATEGORIAS",
-                "MONEDAS"
-            ]
-        },
-        {
-            title: "COTIZACIONES",
-            icon: FiBarChart,
-            key: "cotizaciones",
-            items: [
-                "COTIZACIONES"
-            ]
-        },
-        {
-            title: "CONEXIONES APIS",
-            icon: FiSettings,
-            key: "apis",
-            items: [
-                "CONEXIONES API"
-            ]
-        }
-    ];
-
-    // Mapeo de rutas para navegación
-    const routeMap = {
-        // Usuarios y Roles
-        "Empleados y clientes particulares": "/crm/usuarios-roles/empleados-clientes-particulares",
-        "Empresas de clientes": "/crm/usuarios-roles/empresas-clientes",
-        "Areas de clientes": "/crm/usuarios-roles/areas-clientes",
-
-        // Nuestras Empresas
-        "Ver Empresas": "/crm/empresas/ver-empresas",
-        "Agregar Empresa": "/crm/empresas/agregar-empresa",
-        "Configuración de Empresas": "/crm/empresas/configuracion-empresas",
-
-        // Clientes
-        "Empleados y clientes particulares": "/crm/clientes/empleados-clientes-particulares",
-        "Empresas de clientes": "/crm/clientes/empresas-clientes",
-        "Areas de clientes": "/crm/clientes/areas-clientes",
-
-        // Productos y Servicios
-        "PRODUCTOS": "/crm/productos-servicios/productos",
-        "SERVICIOS": "/crm/productos-servicios/servicios",
-        "TAXONOMIAS": "/crm/productos-servicios/taxonomias",
-        "MARCAS": "/crm/productos-servicios/marcas",
-        "PROCEDENCIAS": "/crm/productos-servicios/procedencias",
-        "CATEGORIAS": "/crm/productos-servicios/categorias",
-        "MONEDAS": "/crm/productos-servicios/monedas",
-
-        // Cotizaciones
-        "COTIZACIONES": "/crm/cotizaciones/cotizaciones",
-
-        // Conexiones APIs
-        "CONEXIONES API": "/crm/apis/conexiones-api"
-    };
 
     return (
         <>
