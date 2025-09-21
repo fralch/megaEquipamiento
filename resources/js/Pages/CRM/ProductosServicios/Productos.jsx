@@ -92,7 +92,6 @@ export default function Productos() {
                                 </tbody>
                             </table>
                         </div>
-                    </div>
                 </div>
             </CRMLayout>
         </>

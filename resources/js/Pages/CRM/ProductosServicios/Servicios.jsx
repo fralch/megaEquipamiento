@@ -7,127 +7,102 @@ export default function Servicios() {
     const { isDarkMode } = useTheme();
 
     const servicios = [
-        { id: 1, nombre: "Mantenimiento Industrial", categoria: "Mantenimiento", precio: "S/ 2,500", duracion: "4 horas", estado: "Disponible" },
-        { id: 2, nombre: "Instalación de Equipos", categoria: "Instalación", precio: "S/ 5,000", duracion: "8 horas", estado: "Disponible" },
-        { id: 3, nombre: "Capacitación Técnica", categoria: "Capacitación", precio: "S/ 1,800", duracion: "2 días", estado: "Disponible" },
-        { id: 4, nombre: "Reparación de Motores", categoria: "Reparación", precio: "S/ 3,200", duracion: "6 horas", estado: "No Disponible" },
-        { id: 5, nombre: "Consultoría Energética", categoria: "Consultoría", precio: "S/ 8,000", duracion: "1 semana", estado: "Disponible" }
+        { id: 1, nombre: "Mantenimiento Preventivo", descripcion: "Servicio de mantenimiento programado", categoria: "Mantenimiento", precio: "S/ 350.00", duracion: "2 horas", estado: "Activo" },
+        { id: 2, nombre: "Reparación de Motores", descripcion: "Reparación especializada de motores", categoria: "Reparación", precio: "S/ 850.00", duracion: "4 horas", estado: "Activo" },
+        { id: 3, nombre: "Instalación de Equipos", descripcion: "Instalación profesional de maquinaria", categoria: "Instalación", precio: "S/ 450.00", duracion: "3 horas", estado: "Activo" },
+        { id: 4, nombre: "Consultoría Técnica", descripcion: "Asesoramiento técnico especializado", categoria: "Consultoría", precio: "S/ 200.00", duracion: "1 hora", estado: "Activo" },
+        { id: 5, nombre: "Calibración de Instrumentos", descripcion: "Calibración de equipos de medición", categoria: "Calibración", precio: "S/ 180.00", duracion: "1.5 horas", estado: "Inactivo" }
     ];
 
     return (
         <>
             <Head title="Servicios" />
-            <div className={`min-h-screen transition-colors duration-300 ${
-                isDarkMode ? 'bg-gray-950' : 'bg-gray-50'
-            }`}>
-                <aside className={`w-72 fixed inset-y-0 left-0 shadow-xl transition-colors duration-300 ${
-                    isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
-                } border-r z-40`}>
-                    <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-100'}`}>
-                        <img src="https://megaequipamiento.pe/img/logo2.jpg" alt="Logo" className="h-16 w-auto" />
-                    </div>
-                    <nav className="p-4">
-                        <div className="space-y-2">
-                            <div className={`flex items-center gap-3 px-4 py-3 rounded-xl ${
-                                isDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-50'
-                            }`}>
-                                <FiSettings className="w-5 h-5" />
-                                <span className="font-medium text-sm">Servicios</span>
-                            </div>
+            <CRMLayout title="Servicios">
+                <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                Gestión de Servicios
+                            </h2>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Administra los servicios ofrecidos por la empresa
+                            </p>
                         </div>
-                    </nav>
-                </aside>
+                        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <FiPlus className="w-4 h-4" />
+                            Agregar Servicio
+                        </button>
+                    </div>
 
-                <main className="ml-72 transition-all duration-300">
-                    <header className={`sticky top-0 z-30 shadow-sm border-b transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-900/95 border-gray-800' : 'bg-white/95 border-gray-200'
+                    <div className={`rounded-xl shadow-sm border overflow-hidden ${
+                        isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
                     }`}>
-                        <div className="px-6 py-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        Servicios
-                                    </h1>
-                                </div>
-                                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                    <FiPlus className="w-4 h-4" />
-                                    Agregar Servicio
-                                </button>
-                            </div>
-                        </div>
-                    </header>
-
-                    <div className="p-6">
-                        <div className={`rounded-xl shadow-sm border overflow-hidden ${
-                            isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-                        }`}>
-                            <table className="w-full">
-                                <thead className={`border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
-                                    <tr>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>Nombre</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>Categoría</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>Precio</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>Duración</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>Estado</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>Acciones</th>
+                        <table className="w-full">
+                            <thead className={`border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
+                                <tr>
+                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>Nombre</th>
+                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>Categoría</th>
+                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>Precio</th>
+                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>Duración</th>
+                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>Estado</th>
+                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
+                                {servicios.map((servicio) => (
+                                    <tr key={servicio.id} className={`${
+                                        isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
+                                    }`}>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
+                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                        }`}>{servicio.nombre}</td>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                                        }`}>{servicio.categoria}</td>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                                        }`}>{servicio.precio}</td>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                                        }`}>{servicio.duracion}</td>
+                                        <td className={`px-6 py-4 whitespace-nowrap`}>
+                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                                servicio.estado === 'Activo'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'
+                                            }`}>
+                                                {servicio.estado}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <div className="flex gap-2">
+                                                <button className="text-blue-600 hover:text-blue-900">
+                                                    <FiEdit className="w-4 h-4" />
+                                                </button>
+                                                <button className="text-red-600 hover:text-red-900">
+                                                    <FiTrash className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
-                                    {servicios.map((servicio) => (
-                                        <tr key={servicio.id} className={`${
-                                            isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
-                                        }`}>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
-                                                isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>{servicio.nombre}</td>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                            }`}>{servicio.categoria}</td>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                            }`}>{servicio.precio}</td>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${
-                                                isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                            }`}>{servicio.duracion}</td>
-                                            <td className={`px-6 py-4 whitespace-nowrap`}>
-                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                                    servicio.estado === 'Disponible' 
-                                                        ? 'bg-green-100 text-green-800' 
-                                                        : 'bg-red-100 text-red-800'
-                                                }`}>
-                                                    {servicio.estado}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div className="flex gap-2">
-                                                    <button className="text-blue-600 hover:text-blue-900">
-                                                        <FiEdit className="w-4 h-4" />
-                                                    </button>
-                                                    <button className="text-red-600 hover:text-red-900">
-                                                        <FiTrash className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
-                </main>
-            </div>
+                </div>
+            </CRMLayout>
         </>
     );
 }

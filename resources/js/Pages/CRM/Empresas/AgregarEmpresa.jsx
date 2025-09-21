@@ -9,71 +9,46 @@ export default function AgregarEmpresa() {
     const [formData, setFormData] = useState({
         nombre: '',
         ruc: '',
+        direccion: '',
+        telefono: '',
+        email: '',
         sector: '',
+        contacto: '',
         empleados: '',
         descripcion: ''
     });
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [name]: value
         });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Aquí iría la lógica para guardar
-        console.log('Guardando empresa:', formData);
+        console.log('Datos de la empresa:', formData);
     };
 
     return (
         <>
             <Head title="Agregar Empresa" />
-            <div className={`min-h-screen transition-colors duration-300 ${
-                isDarkMode ? 'bg-gray-950' : 'bg-gray-50'
-            }`}>
-                <aside className={`w-72 fixed inset-y-0 left-0 shadow-xl transition-colors duration-300 ${
-                    isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
-                } border-r z-40`}>
-                    <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-100'}`}>
-                        <img src="https://megaequipamiento.pe/img/logo2.jpg" alt="Logo" className="h-16 w-auto" />
+            <CRMLayout title="Agregar Empresa">
+                <div className="p-6">
+                    <div className="mb-6">
+                        <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            Agregar Nueva Empresa
+                        </h2>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Complete los datos para registrar una nueva empresa
+                        </p>
                     </div>
-                    <nav className="p-4">
-                        <div className="space-y-2">
-                            <div className={`flex items-center gap-3 px-4 py-3 rounded-xl ${
-                                isDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-50'
-                            }`}>
-                                <FiHome className="w-5 h-5" />
-                                <span className="font-medium text-sm">Agregar Empresa</span>
-                            </div>
-                        </div>
-                    </nav>
-                </aside>
 
-                <main className="ml-72 transition-all duration-300">
-                    <header className={`sticky top-0 z-30 shadow-sm border-b transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-900/95 border-gray-800' : 'bg-white/95 border-gray-200'
+                    <div className={`max-w-2xl mx-auto rounded-xl shadow-sm border p-6 ${
+                        isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
                     }`}>
-                        <div className="px-6 py-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        Agregar Nueva Empresa
-                                    </h1>
-                                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Complete el formulario para registrar una nueva empresa
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </header>
-
-                    <div className="p-6">
-                        <div className={`max-w-2xl mx-auto rounded-xl shadow-sm border p-6 ${
-                            isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-                        }`}>
-                            <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-6">
                                 <div>
                                     <label className={`block text-sm font-medium mb-2 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -202,11 +177,10 @@ export default function AgregarEmpresa() {
                                         Cancelar
                                     </button>
                                 </div>
-                            </form>
-                        </div>
+                        </form>
                     </div>
-                </main>
-            </div>
+                </div>
+            </CRMLayout>
         </>
     );
 }

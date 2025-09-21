@@ -17,50 +17,26 @@ export default function Monedas() {
     return (
         <>
             <Head title="Monedas" />
-            <div className={`min-h-screen transition-colors duration-300 ${
-                isDarkMode ? 'bg-gray-950' : 'bg-gray-50'
-            }`}>
-                <aside className={`w-72 fixed inset-y-0 left-0 shadow-xl transition-colors duration-300 ${
-                    isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-100'
-                } border-r z-40`}>
-                    <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-100'}`}>
-                        <img src="https://megaequipamiento.pe/img/logo2.jpg" alt="Logo" className="h-16 w-auto" />
+            <CRMLayout title="Monedas">
+                <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                Gestión de Monedas
+                            </h2>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Administra las monedas y tipos de cambio
+                            </p>
+                        </div>
+                        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <FiPlus className="w-4 h-4" />
+                            Agregar Moneda
+                        </button>
                     </div>
-                    <nav className="p-4">
-                        <div className="space-y-2">
-                            <div className={`flex items-center gap-3 px-4 py-3 rounded-xl ${
-                                isDarkMode ? 'text-gray-300 hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-50'
-                            }`}>
-                                <FiDollarSign className="w-5 h-5" />
-                                <span className="font-medium text-sm">Monedas</span>
-                            </div>
-                        </div>
-                    </nav>
-                </aside>
 
-                <main className="ml-72 transition-all duration-300">
-                    <header className={`sticky top-0 z-30 shadow-sm border-b transition-colors duration-300 ${
-                        isDarkMode ? 'bg-gray-900/95 border-gray-800' : 'bg-white/95 border-gray-200'
+                    <div className={`rounded-xl shadow-sm border overflow-hidden ${
+                        isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
                     }`}>
-                        <div className="px-6 py-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        Monedas
-                                    </h1>
-                                </div>
-                                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                    <FiPlus className="w-4 h-4" />
-                                    Agregar Moneda
-                                </button>
-                            </div>
-                        </div>
-                    </header>
-
-                    <div className="p-6">
-                        <div className={`rounded-xl shadow-sm border overflow-hidden ${
-                            isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
-                        }`}>
                             <table className="w-full">
                                 <thead className={`border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
                                     <tr>
@@ -126,8 +102,7 @@ export default function Monedas() {
                             </table>
                         </div>
                     </div>
-                </main>
-            </div>
-        </>
-    );
-}
+                </CRMLayout>
+            </>
+        );
+    }
