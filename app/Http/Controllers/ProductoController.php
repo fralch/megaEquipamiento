@@ -1013,6 +1013,39 @@ class ProductoController extends Controller
 
         return response()->json($productos);
     }
+    public function buscarSoloProductosRelacionados(Request $request)
+    {
+        $request->validate([
+            'producto' => 'required|string|min:1',
+            'tag_id' => 'nullable|exists:tags,id_tag',
+            'page' => 'nullable|integer|min:1'
+        ]);
+
+        $termino = $request->input('producto');
+        $tagId = $request->input('tag_id');
+        $page = $request->input('page', 1);
+
+        $query = Producto::with(['tags.tagParent', 'subcategoria.categoria', 'marca']);
+
+        // Si el término es "*", obtener todos los productos (sin filtro de búsqueda)
+        if ($termino !== '*') {
+            $query->where(function($q) use ($termino) {
+                $q->where('nombre', 'like', "%{$termino}%")
+                  ->orWhere('sku', 'like', "%{$termino}%");
+            });
+        }
+
+        // Si se especifica un tag_id, filtrar por ese tag
+        if ($tagId) {
+            $query->whereHas('tags', function($q) use ($tagId) {
+                $q->where('tags.id_tag', $tagId);
+            });
+        }
+
+        $productos = $query->orderBy('nombre')->paginate(20);
+
+        return response()->json($productos);
+    }
 
     /* Crear una funcion que elimine un producto */
     public function deleteProduct(Request $request, $id_producto)

@@ -40,12 +40,12 @@ const ModalRelatedProducts = ({ productId, initialRelated = [], onSave, onClose 
 
         setIsLoading(true);
         try {
-            const response = await axios.post('/productos/buscar-relacionados', {
+            const response = await axios.post('/productos/buscarproductosrelacionados', {
                 producto: term
             });
 
-            // Respuesta esperada: array de productos
-            const productos = Array.isArray(response.data) ? response.data : [];
+            // Respuesta paginada de Laravel: response.data.data contiene los productos
+            const productos = response.data.data || [];
             const filteredResults = productos.filter(p => p.id_producto !== productId);
             setSearchResults(filteredResults);
 

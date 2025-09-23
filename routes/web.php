@@ -53,7 +53,8 @@ Route::get('/product/image/{id}', [ProductoController::class, 'getImagenProducto
 Route::get('/product/subcategoria/{id}', [ProductoController::class, 'getProductosSubcategoria'])->name('product.by-subcategoria');
 Route::post('/productos/buscar', [ProductoController::class, 'buscarPorIniciales'])->name('productos.buscar-iniciales');
 // Búsqueda simple de productos para modal de relacionados
-Route::post('/productos/buscar-relacionados', [ProductoController::class, 'buscarSoloProductos'])->name('productos.buscar-relacionados');
+Route::post('/productos/buscar-relacionados', [ProductoController::class, 'buscarSoloProductos']);
+Route::post('/productos/buscarproductosrelacionados', [ProductoController::class, 'buscarSoloProductosRelacionados'])->name('productos.buscar-relacionados');
 Route::post('/productos/actualizar-imagen', [ProductoController::class, 'updateProductImage']);
 Route::delete('/productos/{id}/imagen', [ProductoController::class, 'deleteProductImage'])->name('productos.eliminar-imagen');
 Route::post('/productos/actualizar-categoria', [ProductoController::class, 'updateProductCategory'])->name('productos.actualizar-categoria');
