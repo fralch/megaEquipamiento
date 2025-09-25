@@ -42,8 +42,8 @@ Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])-
 Route::get('/crm/dashboard', function () { return Inertia::render('CRM/Dashboard'); })->middleware('auth')->name('crm.dashboard');
 
 // Rutas CRM - Usuarios y Roles
-Route::get('/crm/usuarios-roles/empleados-clientes-particulares', function () { return Inertia::render('CRM/UsuariosRoles/EmpleadosClientesParticulares'); })->middleware('auth')->name('crm.usuarios-roles.empleados-clientes-particulares');
-Route::get('/crm/usuarios-roles/areas-clientes', function () { return Inertia::render('CRM/UsuariosRoles/AreasClientes'); })->middleware('auth')->name('crm.usuarios-roles.areas-clientes');
+Route::get('/crm/usuarios-roles/usuarios', function () { return Inertia::render('CRM/UsuariosRoles/Usuarios'); })->middleware('auth')->name('crm.usuarios-roles.usuarios');
+Route::get('/crm/usuarios-roles/roles', function () { return Inertia::render('CRM/UsuariosRoles/Roles'); })->middleware('auth')->name('crm.usuarios-roles.roles');
 
 // Rutas CRM - Nuestras Empresas
 Route::get('/crm/empresas/ver-empresas', function () { return Inertia::render('CRM/Empresas/VerEmpresas'); })->middleware('auth')->name('crm.empresas.ver-empresas');

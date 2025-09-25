@@ -17,8 +17,8 @@ export default function CRMLayout({ children, title }) {
             icon: FiUsers,
             key: "usuarios-roles",
             items: [
-                "Empleados y clientes particulares (Usuarios)",
-                "Areas de clientes (Usuarios)"
+                "Usuarios",
+                "Roles"
             ]
         },
         {
@@ -76,8 +76,8 @@ export default function CRMLayout({ children, title }) {
     // Mapeo de rutas para navegación
     const routeMap = {
         // Usuarios y Roles
-        "Empleados y clientes particulares (Usuarios)": "/crm/usuarios-roles/empleados-clientes-particulares",
-        "Areas de clientes (Usuarios)": "/crm/usuarios-roles/areas-clientes",
+        "Usuarios": "/crm/usuarios-roles/usuarios",
+        "Roles": "/crm/usuarios-roles/roles",
 
         // Nuestras Empresas
         "Ver Empresas": "/crm/empresas/ver-empresas",
