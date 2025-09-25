@@ -18,7 +18,6 @@ export default function CRMLayout({ children, title }) {
             key: "usuarios-roles",
             items: [
                 "Empleados y clientes particulares (Usuarios)",
-                "Empresas de clientes (Usuarios)",
                 "Areas de clientes (Usuarios)"
             ]
         },
@@ -78,7 +77,6 @@ export default function CRMLayout({ children, title }) {
     const routeMap = {
         // Usuarios y Roles
         "Empleados y clientes particulares (Usuarios)": "/crm/usuarios-roles/empleados-clientes-particulares",
-        "Empresas de clientes (Usuarios)": "/crm/usuarios-roles/empresas-clientes",
         "Areas de clientes (Usuarios)": "/crm/usuarios-roles/areas-clientes",
 
         // Nuestras Empresas

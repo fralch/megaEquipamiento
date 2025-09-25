@@ -43,7 +43,6 @@ Route::get('/crm/dashboard', function () { return Inertia::render('CRM/Dashboard
 
 // Rutas CRM - Usuarios y Roles
 Route::get('/crm/usuarios-roles/empleados-clientes-particulares', function () { return Inertia::render('CRM/UsuariosRoles/EmpleadosClientesParticulares'); })->middleware('auth')->name('crm.usuarios-roles.empleados-clientes-particulares');
-Route::get('/crm/usuarios-roles/empresas-clientes', function () { return Inertia::render('CRM/UsuariosRoles/EmpresasClientes'); })->middleware('auth')->name('crm.usuarios-roles.empresas-clientes');
 Route::get('/crm/usuarios-roles/areas-clientes', function () { return Inertia::render('CRM/UsuariosRoles/AreasClientes'); })->middleware('auth')->name('crm.usuarios-roles.areas-clientes');
 
 // Rutas CRM - Nuestras Empresas
