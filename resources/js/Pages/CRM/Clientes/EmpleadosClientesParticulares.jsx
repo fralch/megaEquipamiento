@@ -161,13 +161,17 @@ export default function EmpleadosClientesParticulares() {
                                 isDarkMode ? 'divide-gray-700' : 'divide-gray-200'
                             }`}>
                                 {filteredEmployees.map((employee) => (
-                                    <tr key={employee.id} className="hover:bg-gray-700 transition-colors">
+                                    <tr key={employee.id} className={`transition-colors ${
+                                        isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-50'
+                                    }`}>
                                         <td className="px-6 py-4">
                                             <input
                                                 type="checkbox"
                                                 checked={selectedEmployees.includes(employee.id)}
                                                 onChange={() => handleSelectEmployee(employee.id)}
-                                                className="rounded border-gray-600 bg-gray-700 text-blue-600 focus:ring-blue-500"
+                                                className={`rounded text-blue-600 focus:ring-blue-500 ${
+                                                    isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'
+                                                }`}
                                             />
                                         </td>
                                         <td className="px-6 py-4">
@@ -176,20 +180,32 @@ export default function EmpleadosClientesParticulares() {
                                                     {employee.name.charAt(0)}
                                                 </div>
                                                 <div className="ml-4">
-                                                    <div className="text-sm font-medium text-white">{employee.name}</div>
-                                                    <div className="text-sm text-gray-400">ID: {employee.id}</div>
+                                                    <div className={`text-sm font-medium ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>{employee.name}</div>
+                                                    <div className={`text-sm ${
+                                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                    }`}>ID: {employee.id}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-sm text-white">{employee.email}</div>
-                                            <div className="text-sm text-gray-400">{employee.phone}</div>
+                                            <div className={`text-sm ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>{employee.email}</div>
+                                            <div className={`text-sm ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>{employee.phone}</div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-sm text-white">{employee.position}</div>
+                                            <div className={`text-sm ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>{employee.position}</div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-sm text-white">{employee.department}</div>
+                                            <div className={`text-sm ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>{employee.department}</div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -202,10 +218,14 @@ export default function EmpleadosClientesParticulares() {
                                         </td>
                                         <td className="px-6 py-4 text-sm font-medium">
                                             <div className="flex space-x-2">
-                                                <button className="text-blue-400 hover:text-blue-300">
+                                                <button className={`${
+                                                    isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'
+                                                }`}>
                                                     Editar
                                                 </button>
-                                                <button className="text-red-400 hover:text-red-300">
+                                                <button className={`${
+                                                    isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                                                }`}>
                                                     Eliminar
                                                 </button>
                                             </div>
@@ -218,8 +238,12 @@ export default function EmpleadosClientesParticulares() {
 
                     {filteredEmployees.length === 0 && (
                         <div className="p-8 text-center">
-                            <div className="text-gray-400 mb-2">No se encontraron empleados</div>
-                            <div className="text-sm text-gray-500">
+                            <div className={`mb-2 ${
+                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                            }`}>No se encontraron empleados</div>
+                            <div className={`text-sm ${
+                                isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                            }`}>
                                 {searchTerm ? 'Intenta con otros términos de búsqueda' : 'Agrega el primer empleado'}
                             </div>
                         </div>

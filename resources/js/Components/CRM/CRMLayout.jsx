@@ -2,13 +2,13 @@ import { router } from "@inertiajs/react";
 import {
     FiHome, FiUsers, FiDollarSign, FiActivity, FiChevronDown,
     FiSettings, FiShoppingBag, FiBarChart, FiBell, FiSearch,
-    FiTrendingUp, FiCalendar, FiMail, FiPhone, FiPackage
+    FiTrendingUp, FiCalendar, FiMail, FiPhone, FiPackage, FiSun, FiMoon
 } from "react-icons/fi";
 import { useTheme } from '../../storage/ThemeContext';
 import { useCRM } from '../../storage/CRMContext';
 
 export default function CRMLayout({ children, title }) {
-    const { isDarkMode } = useTheme();
+    const { isDarkMode, toggleTheme } = useTheme();
     const { expandedMenus, toggleMenu } = useCRM();
 
     const menuItems = [
@@ -213,6 +213,19 @@ export default function CRMLayout({ children, title }) {
                                 </p>
                             </div>
                             <div className="flex items-center gap-4">
+                                {/* Theme Toggle Button */}
+                                <button
+                                    onClick={toggleTheme}
+                                    className={`p-2 rounded-lg transition-all duration-200 ${
+                                        isDarkMode 
+                                            ? 'hover:bg-gray-800 text-yellow-400 hover:text-yellow-300' 
+                                            : 'hover:bg-gray-100 text-gray-600 hover:text-gray-800'
+                                    }`}
+                                    title={isDarkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                                >
+                                    {isDarkMode ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
+                                </button>
+
                                 {/* Search Bar */}
                                 <div className="relative">
                                     <FiSearch className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
