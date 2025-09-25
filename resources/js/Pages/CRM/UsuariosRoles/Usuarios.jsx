@@ -4,7 +4,7 @@ import { useTheme } from '../../../storage/ThemeContext';
 import { useState } from 'react';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
 
-export default function EmpleadosClientesParticulares() {
+export default function UsuariosEmpleados() {
     const { isDarkMode } = useTheme();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState('all');
@@ -13,94 +13,94 @@ export default function EmpleadosClientesParticulares() {
     const usuarios = [
         {
             id: 1,
-            nombre: "Ana García",
-            email: "ana.garcia@email.com",
-            telefono: "+51 987 654 321",
-            rol: "cliente",
-            empresa: "Laboratorio San Marcos",
-            fechaRegistro: "2024-01-15",
-            ultimaActividad: "2024-01-20",
-            estado: "activo",
-            avatar: "AG",
-            pedidosTotal: 15,
-            montoTotal: "S/ 45,320"
-        },
-        {
-            id: 2,
             nombre: "Carlos Mendoza",
             email: "carlos.mendoza@megaequip.pe",
             telefono: "+51 998 765 432",
             rol: "empleado",
-            empresa: "MegaEquipamiento",
+            departamento: "Ventas",
             fechaRegistro: "2023-06-10",
             ultimaActividad: "2024-01-21",
             estado: "activo",
             avatar: "CM",
-            pedidosTotal: 0,
-            montoTotal: "S/ 0"
+            tareasCompletadas: 45,
+            proyectosActivos: 3
         },
         {
-            id: 3,
-            nombre: "María López",
-            email: "maria.lopez@unmsm.edu.pe",
-            telefono: "+51 976 543 210",
-            rol: "cliente",
-            empresa: "Universidad San Marcos",
-            fechaRegistro: "2024-02-20",
-            ultimaActividad: "2024-01-18",
-            estado: "inactivo",
-            avatar: "ML",
-            pedidosTotal: 8,
-            montoTotal: "S/ 22,150"
-        },
-        {
-            id: 4,
+            id: 2,
             nombre: "José Ruiz",
             email: "jose.ruiz@megaequip.pe",
             telefono: "+51 965 432 109",
             rol: "empleado",
-            empresa: "MegaEquipamiento",
+            departamento: "Técnico",
             fechaRegistro: "2023-11-05",
             ultimaActividad: "2024-01-21",
             estado: "activo",
             avatar: "JR",
-            pedidosTotal: 0,
-            montoTotal: "S/ 0"
+            tareasCompletadas: 67,
+            proyectosActivos: 2
+        },
+        {
+            id: 3,
+            nombre: "Ana Torres",
+            email: "ana.torres@megaequip.pe",
+            telefono: "+51 987 654 321",
+            rol: "gerente",
+            departamento: "Administración",
+            fechaRegistro: "2023-01-15",
+            ultimaActividad: "2024-01-20",
+            estado: "activo",
+            avatar: "AT",
+            tareasCompletadas: 89,
+            proyectosActivos: 5
+        },
+        {
+            id: 4,
+            nombre: "Miguel Sánchez",
+            email: "miguel.sanchez@megaequip.pe",
+            telefono: "+51 976 543 210",
+            rol: "empleado",
+            departamento: "Logística",
+            fechaRegistro: "2023-08-20",
+            ultimaActividad: "2024-01-19",
+            estado: "activo",
+            avatar: "MS",
+            tareasCompletadas: 34,
+            proyectosActivos: 1
         },
         {
             id: 5,
-            nombre: "Laura Fernández",
-            email: "laura.fernandez@biolab.com",
+            nombre: "Lucía Ramírez",
+            email: "lucia.ramirez@megaequip.pe",
             telefono: "+51 954 321 098",
-            rol: "cliente",
-            empresa: "BioLab Perú",
-            fechaRegistro: "2024-03-10",
-            ultimaActividad: "2024-01-19",
-            estado: "activo",
-            avatar: "LF",
-            pedidosTotal: 12,
-            montoTotal: "S/ 38,750"
+            rol: "empleado",
+            departamento: "Marketing",
+            fechaRegistro: "2023-12-10",
+            ultimaActividad: "2024-01-18",
+            estado: "inactivo",
+            avatar: "LR",
+            tareasCompletadas: 23,
+            proyectosActivos: 0
         },
         {
             id: 6,
-            nombre: "Diego Vargas",
-            email: "diego.vargas@cientifica.com",
+            nombre: "Roberto Díaz",
+            email: "roberto.diaz@megaequip.pe",
             telefono: "+51 943 210 987",
-            rol: "cliente",
-            empresa: "Científica Lab",
-            fechaRegistro: "2023-12-15",
-            ultimaActividad: "2024-01-15",
+            rol: "supervisor",
+            departamento: "Calidad",
+            fechaRegistro: "2023-05-15",
+            ultimaActividad: "2024-01-17",
             estado: "activo",
-            avatar: "DV",
-            pedidosTotal: 25,
-            montoTotal: "S/ 67,890"
+            avatar: "RD",
+            tareasCompletadas: 78,
+            proyectosActivos: 4
         }
     ];
 
     const estadisticas = [
         { titulo: "Total Usuarios", valor: "127", color: "blue", cambio: "+12%" },
         { titulo: "Empleados", valor: "23", color: "green", cambio: "+3%" },
-        { titulo: "Clientes", valor: "104", color: "purple", cambio: "+9%" },
+        { titulo: "Gerentes/Supervisores", valor: "12", color: "purple", cambio: "+5%" },
         { titulo: "Activos Hoy", valor: "45", color: "orange", cambio: "+15%" }
     ];
 
@@ -114,8 +114,8 @@ export default function EmpleadosClientesParticulares() {
 
     return (
         <>
-            <Head title="Empleados y Clientes Particulares" />
-            <CRMLayout title="Empleados y Clientes Particulares">
+            <Head title="Usuarios y Empleados" />
+            <CRMLayout title="Usuarios y Empleados">
                 <div className="p-6">
 
                     {/* Estadísticas */}
@@ -166,7 +166,7 @@ export default function EmpleadosClientesParticulares() {
                                     }`} />
                                     <input
                                         type="text"
-                                        placeholder="Buscar usuarios..."
+                                        placeholder="Buscar empleados..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         className={`pl-10 pr-4 py-2 w-64 rounded-lg border ${
@@ -178,24 +178,25 @@ export default function EmpleadosClientesParticulares() {
                                 </div>
 
                                 {/* Filtro por rol */}
-                                <select
-                                    value={filterRole}
-                                    onChange={(e) => setFilterRole(e.target.value)}
-                                    className={`px-4 py-2 rounded-lg border ${
-                                        isDarkMode
-                                            ? 'bg-gray-800 border-gray-700 text-white'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                    } focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500`}
-                                >
-                                    <option value="all">Todos los roles</option>
-                                    <option value="empleado">Empleados</option>
-                                    <option value="cliente">Clientes</option>
-                                </select>
+                                 <select
+                                     value={filterRole}
+                                     onChange={(e) => setFilterRole(e.target.value)}
+                                     className={`px-4 py-2 rounded-lg border ${
+                                         isDarkMode
+                                             ? 'bg-gray-800 border-gray-700 text-white'
+                                             : 'bg-white border-gray-300 text-gray-900'
+                                     } focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500`}
+                                 >
+                                     <option value="all">Todos los roles</option>
+                                     <option value="empleado">Empleados</option>
+                                     <option value="gerente">Gerentes</option>
+                                     <option value="supervisor">Supervisores</option>
+                                 </select>
                             </div>
 
                             <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
                                 <FiPlus className="w-4 h-4" />
-                                Agregar Usuario
+                                Agregar Empleado
                             </button>
                         </div>
                     </div>
@@ -228,11 +229,11 @@ export default function EmpleadosClientesParticulares() {
                                         }`}>
                                             Estado
                                         </th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            Estadísticas
-                                        </th>
+                                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                         }`}>
+                                             Rendimiento
+                                         </th>
                                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                         }`}>
@@ -248,14 +249,14 @@ export default function EmpleadosClientesParticulares() {
                                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
                                                         {usuario.avatar}
                                                     </div>
-                                                    <div className="ml-4">
-                                                        <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            {usuario.nombre}
-                                                        </div>
-                                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            {usuario.empresa}
-                                                        </div>
-                                                    </div>
+                                                     <div className="ml-4">
+                                                         <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                             {usuario.nombre}
+                                                         </div>
+                                                         <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                             {usuario.departamento}
+                                                         </div>
+                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -274,15 +275,18 @@ export default function EmpleadosClientesParticulares() {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                                    usuario.rol === 'empleado'
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-blue-100 text-blue-800'
-                                                }`}>
-                                                    {usuario.rol === 'empleado' ? 'Empleado' : 'Cliente'}
-                                                </span>
-                                            </td>
+                                             <td className="px-6 py-4 whitespace-nowrap">
+                                                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                                     usuario.rol === 'empleado'
+                                                         ? 'bg-green-100 text-green-800'
+                                                         : usuario.rol === 'gerente'
+                                                         ? 'bg-blue-100 text-blue-800'
+                                                         : 'bg-purple-100 text-purple-800'
+                                                 }`}>
+                                                     {usuario.rol === 'empleado' ? 'Empleado' :
+                                                      usuario.rol === 'gerente' ? 'Gerente' : 'Supervisor'}
+                                                 </span>
+                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex flex-col">
                                                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mb-1 ${
@@ -297,22 +301,16 @@ export default function EmpleadosClientesParticulares() {
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                {usuario.rol === 'cliente' ? (
-                                                    <div className="text-sm">
-                                                        <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            {usuario.pedidosTotal} pedidos
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            {usuario.montoTotal}
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                        N/A
-                                                    </span>
-                                                )}
-                                            </td>
+                                             <td className="px-6 py-4 whitespace-nowrap">
+                                                 <div className="text-sm">
+                                                     <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                         {usuario.tareasCompletadas} tareas
+                                                     </div>
+                                                     <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                         {usuario.proyectosActivos} proyectos activos
+                                                     </div>
+                                                 </div>
+                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                 <div className="flex items-center gap-2">
                                                     <button className="p-1 rounded hover:bg-blue-100 text-blue-600 transition-colors duration-200" title="Ver detalles">
