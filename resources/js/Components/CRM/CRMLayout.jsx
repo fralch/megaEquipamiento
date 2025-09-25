@@ -8,7 +8,7 @@ import { useTheme } from '../../storage/ThemeContext';
 import { useCRM } from '../../storage/CRMContext';
 
 export default function CRMLayout({ children, title }) {
-    const { isDarkMode, toggleTheme } = useTheme();
+    const { isDarkMode, toggleDarkMode } = useTheme();
     const { expandedMenus, toggleMenu } = useCRM();
 
     const menuItems = [
@@ -17,9 +17,9 @@ export default function CRMLayout({ children, title }) {
             icon: FiUsers,
             key: "usuarios-roles",
             items: [
-                "Empleados y clientes particulares",
-                "Empresas de clientes",
-                "Areas de clientes"
+                "Empleados y clientes particulares (Usuarios)",
+                "Empresas de clientes (Usuarios)",
+                "Areas de clientes (Usuarios)"
             ]
         },
         {
@@ -37,9 +37,9 @@ export default function CRMLayout({ children, title }) {
             icon: FiUsers,
             key: "clientes",
             items: [
-                "Empleados y clientes particulares",
-                "Empresas de clientes",
-                "Areas de clientes"
+                "Empleados y clientes particulares (Clientes)",
+                "Empresas de clientes (Clientes)",
+                "Areas de clientes (Clientes)"
             ]
         },
         {
@@ -77,9 +77,9 @@ export default function CRMLayout({ children, title }) {
     // Mapeo de rutas para navegación
     const routeMap = {
         // Usuarios y Roles
-        "Empleados y clientes particulares": "/crm/usuarios-roles/empleados-clientes-particulares",
-        "Empresas de clientes": "/crm/usuarios-roles/empresas-clientes",
-        "Areas de clientes": "/crm/usuarios-roles/areas-clientes",
+        "Empleados y clientes particulares (Usuarios)": "/crm/usuarios-roles/empleados-clientes-particulares",
+        "Empresas de clientes (Usuarios)": "/crm/usuarios-roles/empresas-clientes",
+        "Areas de clientes (Usuarios)": "/crm/usuarios-roles/areas-clientes",
 
         // Nuestras Empresas
         "Ver Empresas": "/crm/empresas/ver-empresas",
@@ -87,9 +87,9 @@ export default function CRMLayout({ children, title }) {
         "Configuración de Empresas": "/crm/empresas/configuracion-empresas",
 
         // Clientes
-        "Empleados y clientes particulares": "/crm/clientes/empleados-clientes-particulares",
-        "Empresas de clientes": "/crm/clientes/empresas-clientes",
-        "Areas de clientes": "/crm/clientes/areas-clientes",
+        "Empleados y clientes particulares (Clientes)": "/crm/clientes/empleados-clientes-particulares",
+        "Empresas de clientes (Clientes)": "/crm/clientes/empresas-clientes",
+        "Areas de clientes (Clientes)": "/crm/clientes/areas-clientes",
 
         // Productos y Servicios
         "PRODUCTOS": "/crm/productos-servicios/productos",
@@ -215,7 +215,7 @@ export default function CRMLayout({ children, title }) {
                             <div className="flex items-center gap-4">
                                 {/* Theme Toggle Button */}
                                 <button
-                                    onClick={toggleTheme}
+                                    onClick={toggleDarkMode}
                                     className={`p-2 rounded-lg transition-all duration-200 ${
                                         isDarkMode 
                                             ? 'hover:bg-gray-800 text-yellow-400 hover:text-yellow-300' 
