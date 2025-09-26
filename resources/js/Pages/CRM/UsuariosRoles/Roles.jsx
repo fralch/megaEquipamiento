@@ -3,16 +3,8 @@ import { FiMapPin, FiEdit, FiTrash, FiPlus } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
 
-export default function AreasClientes() {
+export default function RolesUsuarios({ roles }) {
     const { isDarkMode } = useTheme();
-
-    const areas = [
-        { id: 1, nombre: "Ventas", descripcion: "Área encargada de las ventas", responsable: "Juan Pérez", empleados: 8, estado: "Activo" },
-        { id: 2, nombre: "Marketing", descripcion: "Área de marketing y publicidad", responsable: "María García", empleados: 5, estado: "Activo" },
-        { id: 3, nombre: "Soporte Técnico", descripcion: "Área de soporte y mantenimiento", responsable: "Carlos López", empleados: 12, estado: "Activo" },
-        { id: 4, nombre: "Administración", descripcion: "Área administrativa y contable", responsable: "Ana Rodríguez", empleados: 6, estado: "Activo" },
-        { id: 5, nombre: "Logística", descripcion: "Área de logística y distribución", responsable: "Pedro Martín", empleados: 10, estado: "Inactivo" }
-    ];
 
     return (
         <>
@@ -30,7 +22,7 @@ export default function AreasClientes() {
                         </div>
                         <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                             <FiPlus className="w-4 h-4" />
-                            Agregar Área
+                            Agregar Rol
                         </button>
                     </div>
 
@@ -48,7 +40,7 @@ export default function AreasClientes() {
                                     }`}>Descripción</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                    }`}>Empleados</th>
+                                    }`}>Usuarios</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                     }`}>Estado</th>
@@ -58,26 +50,35 @@ export default function AreasClientes() {
                                 </tr>
                             </thead>
                             <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
-                                {areas.map((area) => (
-                                    <tr key={area.id} className={`${
+                                {roles?.map((role) => (
+                                    <tr key={role.id_rol} className={`${
                                         isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                     }`}>
                                         <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>{area.nombre}</td>
+                                        }`}>
+                                            <div className="flex items-center">
+                                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mr-2 ${
+                                                    role.nombre_rol === 'admin' ? 'bg-purple-100 text-purple-800' :
+                                                    role.nombre_rol === 'editor' ? 'bg-blue-100 text-blue-800' :
+                                                    'bg-green-100 text-green-800'
+                                                }`}>
+                                                    {role.nombre_rol}
+                                                </span>
+                                                {role.nombre_rol.charAt(0).toUpperCase() + role.nombre_rol.slice(1)}
+                                            </div>
+                                        </td>
                                         <td className={`px-6 py-4 text-sm ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                        }`}>{area.descripcion}</td>
+                                        }`}>{role.descripcion || 'Sin descripción'}</td>
                                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                        }`}>{area.empleados}</td>
+                                        }`}>
+                                            <span className="font-semibold">{role.usuarios_count || 0}</span> usuarios
+                                        </td>
                                         <td className={`px-6 py-4 whitespace-nowrap`}>
-                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                                area.estado === 'Activo' 
-                                                    ? 'bg-green-100 text-green-800' 
-                                                    : 'bg-red-100 text-red-800'
-                                            }`}>
-                                                {area.estado}
+                                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                Activo
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -91,7 +92,15 @@ export default function AreasClientes() {
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
+                                )) || (
+                                    <tr>
+                                        <td colSpan="5" className={`px-6 py-4 text-center text-sm ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                        }`}>
+                                            No hay roles disponibles
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>

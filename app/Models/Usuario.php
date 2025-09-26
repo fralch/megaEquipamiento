@@ -19,6 +19,7 @@ class Usuario extends Authenticatable
         'nombre',
         'direccion',
         'telefono',
+        'id_rol',
     ];
 
     protected $hidden = [
@@ -33,5 +34,10 @@ class Usuario extends Authenticatable
     public function getAuthPassword()
     {
         return $this->contraseña;
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class, 'id_rol', 'id_rol');
     }
 }

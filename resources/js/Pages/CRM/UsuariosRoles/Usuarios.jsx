@@ -4,128 +4,50 @@ import { useTheme } from "../../../storage/ThemeContext";
 import { useState } from "react";
 import CRMLayout from "../../../Components/CRM/CRMLayout";
 
-export default function UsuariosEmpleados() {
+export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filters }) {
   const { isDarkMode } = useTheme();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterRole, setFilterRole] = useState("all"); // admin | usuario | editor
+  const [searchTerm, setSearchTerm] = useState(filters?.search || "");
+  const [filterRole, setFilterRole] = useState(filters?.role || "all");
 
   // Helpers para label y color por rol
-  const roleLabel = (rol) =>
-    rol === "admin" ? "Admin" : rol === "editor" ? "Editor" : "Usuario";
+  const roleLabel = (nombreRol) => {
+    switch(nombreRol) {
+      case 'admin': return 'Admin';
+      case 'editor': return 'Editor';
+      case 'usuario': return 'Usuario';
+      default: return nombreRol;
+    }
+  };
 
-  const rolePillClasses = (rol) =>
-    rol === "admin"
-      ? "bg-purple-100 text-purple-800"
-      : rol === "editor"
-      ? "bg-blue-100 text-blue-800"
-      : "bg-green-100 text-green-800";
+  const rolePillClasses = (nombreRol) => {
+    switch(nombreRol) {
+      case 'admin': return "bg-purple-100 text-purple-800";
+      case 'editor': return "bg-blue-100 text-blue-800";
+      case 'usuario': return "bg-green-100 text-green-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
+  };
 
-  // Datos demo usando admin/usuario/editor
-  const usuarios = [
-    {
-      id: 1,
-      nombre: "Carlos Mendoza",
-      email: "carlos.mendoza@megaequip.pe",
-      telefono: "+51 998 765 432",
-      rol: "usuario",
-      departamento: "Ventas",
-      fechaRegistro: "2023-06-10",
-      ultimaActividad: "2024-01-21",
-      estado: "activo",
-      avatar: "CM",
-      tareasCompletadas: 45,
-      proyectosActivos: 3,
-    },
-    {
-      id: 2,
-      nombre: "José Ruiz",
-      email: "jose.ruiz@megaequip.pe",
-      telefono: "+51 965 432 109",
-      rol: "usuario",
-      departamento: "Técnico",
-      fechaRegistro: "2023-11-05",
-      ultimaActividad: "2024-01-21",
-      estado: "activo",
-      avatar: "JR",
-      tareasCompletadas: 67,
-      proyectosActivos: 2,
-    },
-    {
-      id: 3,
-      nombre: "Ana Torres",
-      email: "ana.torres@megaequip.pe",
-      telefono: "+51 987 654 321",
-      rol: "admin",
-      departamento: "Administración",
-      fechaRegistro: "2023-01-15",
-      ultimaActividad: "2024-01-20",
-      estado: "activo",
-      avatar: "AT",
-      tareasCompletadas: 89,
-      proyectosActivos: 5,
-    },
-    {
-      id: 4,
-      nombre: "Miguel Sánchez",
-      email: "miguel.sanchez@megaequip.pe",
-      telefono: "+51 976 543 210",
-      rol: "usuario",
-      departamento: "Logística",
-      fechaRegistro: "2023-08-20",
-      ultimaActividad: "2024-01-19",
-      estado: "activo",
-      avatar: "MS",
-      tareasCompletadas: 34,
-      proyectosActivos: 1,
-    },
-    {
-      id: 5,
-      nombre: "Lucía Ramírez",
-      email: "lucia.ramirez@megaequip.pe",
-      telefono: "+51 954 321 098",
-      rol: "editor",
-      departamento: "Marketing",
-      fechaRegistro: "2023-12-10",
-      ultimaActividad: "2024-01-18",
-      estado: "inactivo",
-      avatar: "LR",
-      tareasCompletadas: 23,
-      proyectosActivos: 0,
-    },
-    {
-      id: 6,
-      nombre: "Roberto Díaz",
-      email: "roberto.diaz@megaequip.pe",
-      telefono: "+51 943 210 987",
-      rol: "editor",
-      departamento: "Calidad",
-      fechaRegistro: "2023-05-15",
-      ultimaActividad: "2024-01-17",
-      estado: "activo",
-      avatar: "RD",
-      tareasCompletadas: 78,
-      proyectosActivos: 4,
-    },
-  ];
+  // Generar avatar con iniciales
+  const generateAvatar = (nombre) => {
+    const words = nombre.split(' ');
+    if (words.length >= 2) {
+      return words[0][0] + words[1][0];
+    }
+    return nombre.substring(0, 2);
+  };
 
-  const estadisticas = [
-    { titulo: "Total Usuarios", valor: "127", color: "blue", cambio: "+12%" },
-    { titulo: "Empleados", valor: "23", color: "green", cambio: "+3%" },
-    { titulo: "Administradores", valor: "12", color: "purple", cambio: "+5%" },
-    { titulo: "Activos Hoy", valor: "45", color: "orange", cambio: "+15%" },
-  ];
-
-  const filteredUsuarios = usuarios.filter((u) => {
+  const filteredUsuarios = usuarios.data ? usuarios.data.filter((u) => {
     const q = searchTerm.toLowerCase().trim();
     const matchesSearch =
       !q ||
       u.nombre.toLowerCase().includes(q) ||
-      u.email.toLowerCase().includes(q) ||
+      u.correo.toLowerCase().includes(q) ||
       (u.telefono || "").toLowerCase().includes(q) ||
-      (u.departamento || "").toLowerCase().includes(q);
-    const matchesRole = filterRole === "all" || u.rol === filterRole;
+      u.nombre_usuario.toLowerCase().includes(q);
+    const matchesRole = filterRole === "all" || (u.role && u.role.nombre_rol === filterRole);
     return matchesSearch && matchesRole;
-  });
+  }) : [];
 
   return (
     <>
@@ -216,9 +138,11 @@ export default function UsuariosEmpleados() {
                   } focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500`}
                 >
                   <option value="all">Todos los roles</option>
-                  <option value="usuario">Usuarios</option>
-                  <option value="editor">Editores</option>
-                  <option value="admin">Administradores</option>
+                  {roles?.map((role) => (
+                    <option key={role.id_rol} value={role.nombre_rol}>
+                      {roleLabel(role.nombre_rol)}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -258,13 +182,13 @@ export default function UsuariosEmpleados() {
                 >
                   {filteredUsuarios.map((u) => (
                     <tr
-                      key={u.id}
+                      key={u.id_usuario}
                       className={`hover:${isDarkMode ? "bg-gray-800" : "bg-gray-50"} transition-colors duration-200`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-                            {u.avatar}
+                            {generateAvatar(u.nombre).toUpperCase()}
                           </div>
                           <div className="ml-4">
                             <div
@@ -279,7 +203,7 @@ export default function UsuariosEmpleados() {
                                 isDarkMode ? "text-gray-400" : "text-gray-500"
                               }`}
                             >
-                              {u.departamento}
+                              @{u.nombre_usuario}
                             </div>
                           </div>
                         </div>
@@ -294,18 +218,20 @@ export default function UsuariosEmpleados() {
                                 isDarkMode ? "text-white" : "text-gray-900"
                               }`}
                             >
-                              {u.email}
+                              {u.correo}
                             </div>
-                            <div className="flex items-center gap-1">
-                              <FiPhone className="w-3 h-3 text-gray-400" />
-                              <div
-                                className={`text-xs ${
-                                  isDarkMode ? "text-gray-400" : "text-gray-500"
-                                }`}
-                              >
-                                {u.telefono}
+                            {u.telefono && (
+                              <div className="flex items-center gap-1">
+                                <FiPhone className="w-3 h-3 text-gray-400" />
+                                <div
+                                  className={`text-xs ${
+                                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                                  }`}
+                                >
+                                  {u.telefono}
+                                </div>
                               </div>
-                            </div>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -313,30 +239,24 @@ export default function UsuariosEmpleados() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${rolePillClasses(
-                            u.rol
+                            u.role?.nombre_rol || 'usuario'
                           )}`}
                         >
-                          {roleLabel(u.rol)}
+                          {roleLabel(u.role?.nombre_rol || 'usuario')}
                         </span>
                       </td>
 
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span
-                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mb-1 ${
-                              u.estado === "activo"
-                                ? "bg-green-100 text-green-800"
-                                : "bg-red-100 text-red-800"
-                            }`}
-                          >
-                            {u.estado === "activo" ? "Activo" : "Inactivo"}
+                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full mb-1 bg-green-100 text-green-800">
+                            Activo
                           </span>
                           <span
                             className={`text-xs ${
                               isDarkMode ? "text-gray-400" : "text-gray-500"
                             }`}
                           >
-                            Último: {u.ultimaActividad}
+                            Registrado: {new Date(u.created_at).toLocaleDateString()}
                           </span>
                         </div>
                       </td>
@@ -348,14 +268,14 @@ export default function UsuariosEmpleados() {
                               isDarkMode ? "text-white" : "text-gray-900"
                             }`}
                           >
-                            {u.tareasCompletadas} tareas
+                            {u.direccion || 'Sin dirección'}
                           </div>
                           <div
                             className={`text-xs ${
                               isDarkMode ? "text-gray-400" : "text-gray-500"
                             }`}
                           >
-                            {u.proyectosActivos} proyectos activos
+                            ID: {u.id_usuario}
                           </div>
                         </div>
                       </td>
@@ -396,9 +316,9 @@ export default function UsuariosEmpleados() {
             >
               <div className="flex items-center justify-between">
                 <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-700"}`}>
-                  Mostrando <span className="font-medium">1</span> a{" "}
-                  <span className="font-medium">{filteredUsuarios.length}</span> de{" "}
-                  <span className="font-medium">{usuarios.length}</span> resultados
+                  Mostrando <span className="font-medium">{usuarios.from || 0}</span> a{" "}
+                  <span className="font-medium">{usuarios.to || 0}</span> de{" "}
+                  <span className="font-medium">{usuarios.total || 0}</span> resultados
                 </div>
                 <div className="flex gap-2">
                   <button

@@ -16,6 +16,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\TagParentController;
 use App\Http\Controllers\ProductoTagController;
 use App\Http\Controllers\SectorController;
+use App\Http\Controllers\CRM\UserRoleController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -41,9 +42,30 @@ Route::get('/crear', function () { return Inertia::render('Crear');})->name('cre
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
 Route::get('/crm/dashboard', function () { return Inertia::render('CRM/Dashboard'); })->middleware('auth')->name('crm.dashboard');
 
+// Test route for debugging
+Route::get('/crm/test', function () {
+    return response()->json(['message' => 'CRM routes working', 'user' => auth()->user()]);
+})->middleware('auth')->name('crm.test');
+
 // Rutas CRM - Usuarios y Roles
-Route::get('/crm/usuarios-roles/usuarios', function () { return Inertia::render('CRM/UsuariosRoles/Usuarios'); })->middleware('auth')->name('crm.usuarios-roles.usuarios');
-Route::get('/crm/usuarios-roles/roles', function () { return Inertia::render('CRM/UsuariosRoles/Roles'); })->middleware('auth')->name('crm.usuarios-roles.roles');
+Route::middleware('auth')->prefix('crm')->group(function () {
+    // Rutas para usuarios
+    Route::get('/usuarios', [UserRoleController::class, 'usuarios'])->name('crm.usuarios');
+    Route::get('/usuarios/crear', [UserRoleController::class, 'createUser'])->name('crm.usuarios.crear');
+    Route::post('/usuarios', [UserRoleController::class, 'storeUser'])->name('crm.usuarios.store');
+    Route::get('/usuarios/{usuario}', [UserRoleController::class, 'showUser'])->name('crm.usuarios.show');
+    Route::get('/usuarios/{usuario}/editar', [UserRoleController::class, 'editUser'])->name('crm.usuarios.editar');
+    Route::put('/usuarios/{usuario}', [UserRoleController::class, 'updateUser'])->name('crm.usuarios.update');
+    Route::delete('/usuarios/{usuario}', [UserRoleController::class, 'destroyUser'])->name('crm.usuarios.destroy');
+
+    // Rutas para roles
+    Route::get('/roles', [UserRoleController::class, 'roles'])->name('crm.roles');
+    Route::get('/roles/crear', [UserRoleController::class, 'createRole'])->name('crm.roles.crear');
+    Route::post('/roles', [UserRoleController::class, 'storeRole'])->name('crm.roles.store');
+    Route::get('/roles/{role}/editar', [UserRoleController::class, 'editRole'])->name('crm.roles.editar');
+    Route::put('/roles/{role}', [UserRoleController::class, 'updateRole'])->name('crm.roles.update');
+    Route::delete('/roles/{role}', [UserRoleController::class, 'destroyRole'])->name('crm.roles.destroy');
+});
 
 // Rutas CRM - Nuestras Empresas
 Route::get('/crm/empresas/ver-empresas', function () { return Inertia::render('CRM/Empresas/VerEmpresas'); })->middleware('auth')->name('crm.empresas.ver-empresas');

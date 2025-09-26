@@ -23,7 +23,7 @@ class RoleSeeder extends Seeder
             ],
             [
                 'nombre_rol' => 'editor',
-                'descripcion' => 'Editor del sistema'
+                'descripcion' => 'Editor de contenido con permisos limitados'
             ],
         ];
 

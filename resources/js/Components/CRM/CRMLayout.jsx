@@ -76,8 +76,8 @@ export default function CRMLayout({ children, title }) {
     // Mapeo de rutas para navegación
     const routeMap = {
         // Usuarios y Roles
-        "Usuarios": "/crm/usuarios-roles/usuarios",
-        "Roles": "/crm/usuarios-roles/roles",
+        "Usuarios": "/crm/usuarios",
+        "Roles": "/crm/roles",
 
         // Nuestras Empresas
         "Ver Empresas": "/crm/empresas/ver-empresas",
