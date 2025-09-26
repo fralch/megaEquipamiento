@@ -22,8 +22,8 @@ class RoleSeeder extends Seeder
                 'descripcion' => 'Usuario regular del sistema'
             ],
             [
-                'nombre_rol' => 'moderador',
-                'descripcion' => 'Moderador con permisos limitados de administración'
+                'nombre_rol' => 'editor',
+                'descripcion' => 'Editor del sistema'
             ],
         ];
 
