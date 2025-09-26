@@ -16,16 +16,16 @@ export default function AreasClientes() {
 
     return (
         <>
-            <Head title="Áreas de Clientes" />
-            <CRMLayout title="Áreas de Clientes">
+            <Head title="Roles de Usuarios" />
+            <CRMLayout title="Roles de Usuarios">
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                Gestión de Áreas de Clientes
+                                Roles de Usuarios
                             </h2>
                             <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                Administra las diferentes áreas de atención al cliente
+                                Administra los diferentes roles de usuarios en el sistema
                             </p>
                         </div>
                         <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
