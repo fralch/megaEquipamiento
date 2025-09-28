@@ -5,6 +5,7 @@ import { useState } from "react";
 import CRMLayout from "../../../Components/CRM/CRMLayout";
 import EditUserModal from "./componentes/EditUserModal";
 import ShowUserModal from "./componentes/ShowUserModal";
+import CreateUserModal from "./componentes/CreateUserModal";
 
 export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filters }) {
   const { isDarkMode } = useTheme();
@@ -12,6 +13,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
   const [filterRole, setFilterRole] = useState(filters?.role || "all");
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   // Helpers para label y color por rol
@@ -65,15 +67,109 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
     setShowViewModal(true);
   };
 
+  const handleCreateUser = () => {
+    setShowCreateModal(true);
+  };
+
   const handleSaveUser = async (userId, userData) => {
-    // Aquí implementarías la lógica para guardar el usuario
-    console.log("Guardando usuario:", userId, userData);
-    // Por ejemplo, hacer una petición PUT/PATCH al backend
+    try {
+      const response = await fetch(`/crm/usuarios/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        // Recargar la página para mostrar los cambios
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        console.error('Error al actualizar usuario:', errorData);
+        
+        // Mostrar errores de validación específicos si están disponibles
+        if (errorData.errors) {
+          const errorMessages = Object.values(errorData.errors).flat().join('\n');
+          alert(`Error al actualizar el usuario:\n${errorMessages}`);
+        } else {
+          alert('Error al actualizar el usuario. Por favor, intenta de nuevo.');
+        }
+      }
+    } catch (error) {
+      console.error('Error de red:', error);
+      alert('Error de conexión. Por favor, intenta de nuevo.');
+    }
+  };
+
+  const handleCreateNewUser = async (userData) => {
+    try {
+      const response = await fetch('/crm/usuarios', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        // Recargar la página para mostrar el nuevo usuario
+        window.location.reload();
+      } else {
+        const errorData = await response.json();
+        console.error('Error al crear usuario:', errorData);
+        
+        // Mostrar errores de validación específicos si están disponibles
+        if (errorData.errors) {
+          const errorMessages = Object.values(errorData.errors).flat().join('\n');
+          alert(`Error al crear el usuario:\n${errorMessages}`);
+        } else {
+          alert('Error al crear el usuario. Por favor, verifica los datos e intenta de nuevo.');
+        }
+      }
+    } catch (error) {
+      console.error('Error de red:', error);
+      alert('Error de conexión. Por favor, intenta de nuevo.');
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (confirm('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')) {
+      try {
+        const response = await fetch(`/crm/usuarios/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          },
+        });
+
+        if (response.ok) {
+          // Recargar la página para mostrar los cambios
+          window.location.reload();
+        } else {
+          const errorData = await response.json();
+          console.error('Error al eliminar usuario:', errorData);
+          
+          // Mostrar mensaje de error específico si está disponible
+          if (errorData.message) {
+            alert(`Error al eliminar el usuario: ${errorData.message}`);
+          } else {
+            alert('Error al eliminar el usuario. Por favor, intenta de nuevo.');
+          }
+        }
+      } catch (error) {
+        console.error('Error de red:', error);
+        alert('Error de conexión. Por favor, intenta de nuevo.');
+      }
+    }
   };
 
   const closeModals = () => {
     setShowEditModal(false);
     setShowViewModal(false);
+    setShowCreateModal(false);
     setSelectedUser(null);
   };
 
@@ -174,9 +270,12 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                 </select>
               </div>
 
-              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+              <button 
+                onClick={handleCreateUser}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              >
                 <FiPlus className="w-4 h-4" />
-                Agregar Empleado
+                Agregar Colaborador
               </button>
             </div>
           </div>
@@ -306,6 +405,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                             <FiEdit className="w-4 h-4" />
                           </button>
                           <button
+                            onClick={() => handleDeleteUser(u.id_usuario)}
                             className="p-1 rounded hover:bg-red-100 text-red-600 transition-colors duration-200"
                             title="Eliminar"
                           >
@@ -365,6 +465,13 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
           isOpen={showViewModal}
           onClose={closeModals}
           user={selectedUser}
+        />
+
+        <CreateUserModal
+          isOpen={showCreateModal}
+          onClose={closeModals}
+          roles={roles}
+          onSave={handleCreateNewUser}
         />
       </CRMLayout>
     </>

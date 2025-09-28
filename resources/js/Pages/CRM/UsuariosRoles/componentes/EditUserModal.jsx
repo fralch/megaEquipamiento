@@ -40,7 +40,22 @@ export default function EditUserModal({ isOpen, onClose, user, roles, onSave }) 
     setIsLoading(true);
     
     try {
-      await onSave(user.id_usuario, formData);
+      // Preparar los datos para enviar al backend
+      const dataToSend = {
+        nombre: formData.nombre,
+        correo: formData.correo,
+        telefono: formData.telefono,
+        direccion: formData.direccion,
+        nombre_usuario: formData.nombre_usuario,
+        id_rol: formData.id_rol
+      };
+
+      // Solo incluir contraseña si se proporcionó una nueva
+      if (formData.contraseña && formData.contraseña.trim()) {
+        dataToSend.contraseña = formData.contraseña;
+      }
+
+      await onSave(user.id_usuario, dataToSend);
       onClose();
     } catch (error) {
       console.error("Error al guardar usuario:", error);
