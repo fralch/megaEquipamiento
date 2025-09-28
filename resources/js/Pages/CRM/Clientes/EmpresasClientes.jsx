@@ -1,17 +1,20 @@
-import { Head } from "@inertiajs/react";
-import { FiHome, FiEdit, FiTrash, FiPlus } from "react-icons/fi";
+import { Head, Link, router } from "@inertiajs/react";
+import { FiHome, FiEdit, FiTrash, FiPlus, FiEye, FiToggleLeft, FiToggleRight } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
 
-export default function EmpresasClientes() {
+export default function EmpresasClientes({ empresas = [] }) {
     const { isDarkMode } = useTheme();
 
-    const empresas = [
-        { id: 1, nombre: "TechCorp S.A.", ruc: "20123456789", sector: "Tecnología", contacto: "Juan Pérez", estado: "Activo" },
-        { id: 2, nombre: "Industria Moderna Ltda.", ruc: "20987654321", sector: "Manufactura", contacto: "María García", estado: "Activo" },
-        { id: 3, nombre: "Comercial Solutions Corp.", ruc: "20456789012", sector: "Comercio", contacto: "Carlos López", estado: "Inactivo" },
-        { id: 4, nombre: "Servicios Integrales S.R.L.", ruc: "20789012345", sector: "Servicios", contacto: "Ana Rodríguez", estado: "Activo" }
-    ];
+    const handleDelete = (empresaId) => {
+        if (confirm('¿Estás seguro de que deseas eliminar esta empresa cliente?')) {
+            router.delete(route('empresas-clientes.destroy', empresaId));
+        }
+    };
+
+    const handleToggleStatus = (empresaId) => {
+        router.patch(route('empresas-clientes.toggle-status', empresaId));
+    };
 
     return (
         <>
@@ -27,10 +30,13 @@ export default function EmpresasClientes() {
                                 Administra las empresas que son clientes de la organización
                             </p>
                         </div>
-                        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <Link
+                            href={route('empresas-clientes.create')}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
                             <FiPlus className="w-4 h-4" />
                             Agregar Empresa Cliente
-                        </button>
+                        </Link>
                     </div>
 
                     <div className={`rounded-xl shadow-sm border overflow-hidden ${
@@ -41,7 +47,7 @@ export default function EmpresasClientes() {
                                 <tr>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                    }`}>Nombre</th>
+                                    }`}>Razón Social</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                     }`}>RUC</th>
@@ -53,6 +59,9 @@ export default function EmpresasClientes() {
                                     }`}>Contacto Principal</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>Email</th>
+                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                     }`}>Estado</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
@@ -60,47 +69,84 @@ export default function EmpresasClientes() {
                                 </tr>
                             </thead>
                             <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
-                                {empresas.map((emp) => (
-                                    <tr key={emp.id} className={`${
+                                {empresas.length > 0 ? empresas.map((empresa) => (
+                                    <tr key={empresa.id} className={`${
                                         isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                     }`}>
                                         <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>{emp.nombre}</td>
+                                        }`}>{empresa.razon_social}</td>
                                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                        }`}>{emp.ruc}</td>
+                                        }`}>{empresa.ruc}</td>
                                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                        }`}>{emp.sector}</td>
+                                        }`}>{empresa.sector}</td>
                                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                        }`}>{emp.contacto}</td>
+                                        }`}>{empresa.contacto_principal}</td>
+                                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                                        }`}>{empresa.email}</td>
                                         <td className={`px-6 py-4 whitespace-nowrap`}>
                                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                                emp.estado === 'Activo' 
-                                                    ? 'bg-green-100 text-green-800' 
+                                                empresa.activo
+                                                    ? 'bg-green-100 text-green-800'
                                                     : 'bg-red-100 text-red-800'
                                             }`}>
-                                                {emp.estado}
+                                                {empresa.activo ? 'Activo' : 'Inactivo'}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div className="flex gap-2">
-                                                <button className={`${
-                                                    isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'
-                                                }`}>
+                                                <Link
+                                                    href={route('empresas-clientes.show', empresa.id)}
+                                                    className={`${
+                                                        isDarkMode ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-900'
+                                                    }`}
+                                                    title="Ver detalles"
+                                                >
+                                                    <FiEye className="w-4 h-4" />
+                                                </Link>
+                                                <Link
+                                                    href={route('empresas-clientes.edit', empresa.id)}
+                                                    className={`${
+                                                        isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'
+                                                    }`}
+                                                    title="Editar"
+                                                >
                                                     <FiEdit className="w-4 h-4" />
+                                                </Link>
+                                                <button
+                                                    onClick={() => handleToggleStatus(empresa.id)}
+                                                    className={`${
+                                                        isDarkMode ? 'text-yellow-400 hover:text-yellow-300' : 'text-yellow-600 hover:text-yellow-900'
+                                                    }`}
+                                                    title={empresa.activo ? 'Desactivar' : 'Activar'}
+                                                >
+                                                    {empresa.activo ? <FiToggleRight className="w-4 h-4" /> : <FiToggleLeft className="w-4 h-4" />}
                                                 </button>
-                                                <button className={`${
-                                                    isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
-                                                }`}>
+                                                <button
+                                                    onClick={() => handleDelete(empresa.id)}
+                                                    className={`${
+                                                        isDarkMode ? 'text-red-400 hover:text-red-300' : 'text-red-600 hover:text-red-900'
+                                                    }`}
+                                                    title="Eliminar"
+                                                >
                                                     <FiTrash className="w-4 h-4" />
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
+                                )) : (
+                                    <tr>
+                                        <td colSpan="7" className={`px-6 py-8 text-center text-sm ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                        }`}>
+                                            No hay empresas clientes registradas.
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
