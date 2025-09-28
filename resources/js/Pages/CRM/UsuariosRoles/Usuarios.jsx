@@ -142,10 +142,14 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
     if (confirm('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')) {
       try {
         const response = await fetch(`/crm/usuarios/${userId}`, {
-          method: 'DELETE',
+          method: 'POST',
           headers: {
+            'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
           },
+          body: JSON.stringify({
+            _method: 'DELETE'
+          }),
         });
 
         if (response.ok) {
