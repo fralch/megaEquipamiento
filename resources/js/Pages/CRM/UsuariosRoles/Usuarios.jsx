@@ -74,12 +74,15 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
   const handleSaveUser = async (userId, userData) => {
     try {
       const response = await fetch(`/crm/usuarios/${userId}`, {
-        method: 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
         },
-        body: JSON.stringify(userData),
+        body: JSON.stringify({
+          ...userData,
+          _method: 'PUT'
+        }),
       });
 
       if (response.ok) {
