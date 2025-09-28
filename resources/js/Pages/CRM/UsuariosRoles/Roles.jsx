@@ -1,10 +1,69 @@
 import { Head } from "@inertiajs/react";
-import { FiMapPin, FiEdit, FiTrash, FiPlus } from "react-icons/fi";
+import { FiMapPin, FiEdit, FiTrash, FiPlus, FiEye } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
+import { useState } from 'react';
+import CreateRoleModal from './componentes/CreateRoleModal';
+import EditRoleModal from './componentes/EditRoleModal';
+import ShowRoleModal from './componentes/ShowRoleModal';
 
 export default function RolesUsuarios({ roles }) {
     const { isDarkMode } = useTheme();
+    
+    // Modal states
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isShowModalOpen, setIsShowModalOpen] = useState(false);
+    const [selectedRole, setSelectedRole] = useState(null);
+
+    // Handle modal actions
+    const handleCreateRole = () => {
+        setIsCreateModalOpen(true);
+    };
+
+    const handleEditRole = (role) => {
+        setSelectedRole(role);
+        setIsEditModalOpen(true);
+    };
+
+    const handleShowRole = (role) => {
+        setSelectedRole(role);
+        setIsShowModalOpen(true);
+    };
+
+    const handleDeleteRole = async (role) => {
+        if (confirm(`¿Estás seguro de que deseas eliminar el rol "${role.nombre_rol}"?`)) {
+            try {
+                const response = await fetch(`/crm/roles/${role.id_rol}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({
+                        _method: 'DELETE'
+                    })
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error al eliminar el rol: ${errorData.message || 'Error desconocido'}`);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al eliminar el rol. Por favor, inténtalo de nuevo.');
+            }
+        }
+    };
+
+    const closeModals = () => {
+        setIsCreateModalOpen(false);
+        setIsEditModalOpen(false);
+        setIsShowModalOpen(false);
+        setSelectedRole(null);
+    };
 
     return (
         <>
@@ -20,7 +79,10 @@ export default function RolesUsuarios({ roles }) {
                                 Administra los diferentes roles de usuarios en el sistema
                             </p>
                         </div>
-                        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <button 
+                            onClick={handleCreateRole}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
                             <FiPlus className="w-4 h-4" />
                             Agregar Rol
                         </button>
@@ -83,10 +145,25 @@ export default function RolesUsuarios({ roles }) {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div className="flex gap-2">
-                                                <button className="text-blue-600 hover:text-blue-900">
+                                                <button 
+                                                    onClick={() => handleShowRole(role)}
+                                                    className="text-gray-600 hover:text-gray-900"
+                                                    title="Ver detalles"
+                                                >
+                                                    <FiEye className="w-4 h-4" />
+                                                </button>
+                                                <button 
+                                                    onClick={() => handleEditRole(role)}
+                                                    className="text-blue-600 hover:text-blue-900"
+                                                    title="Editar rol"
+                                                >
                                                     <FiEdit className="w-4 h-4" />
                                                 </button>
-                                                <button className="text-red-600 hover:text-red-900">
+                                                <button 
+                                                    onClick={() => handleDeleteRole(role)}
+                                                    className="text-red-600 hover:text-red-900"
+                                                    title="Eliminar rol"
+                                                >
                                                     <FiTrash className="w-4 h-4" />
                                                 </button>
                                             </div>
@@ -105,6 +182,24 @@ export default function RolesUsuarios({ roles }) {
                         </table>
                     </div>
                 </div>
+
+                {/* Modals */}
+                <CreateRoleModal 
+                    isOpen={isCreateModalOpen} 
+                    onClose={closeModals} 
+                />
+                
+                <EditRoleModal 
+                    isOpen={isEditModalOpen} 
+                    onClose={closeModals} 
+                    role={selectedRole}
+                />
+                
+                <ShowRoleModal 
+                    isOpen={isShowModalOpen} 
+                    onClose={closeModals} 
+                    role={selectedRole}
+                />
             </CRMLayout>
         </>
     );
