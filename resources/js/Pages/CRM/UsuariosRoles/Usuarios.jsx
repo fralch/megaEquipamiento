@@ -3,11 +3,16 @@ import { FiUsers, FiEdit, FiTrash2, FiPlus, FiSearch, FiEye, FiMail, FiPhone } f
 import { useTheme } from "../../../storage/ThemeContext";
 import { useState } from "react";
 import CRMLayout from "../../../Components/CRM/CRMLayout";
+import EditUserModal from "./componentes/EditUserModal";
+import ShowUserModal from "./componentes/ShowUserModal";
 
 export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filters }) {
   const { isDarkMode } = useTheme();
   const [searchTerm, setSearchTerm] = useState(filters?.search || "");
   const [filterRole, setFilterRole] = useState(filters?.role || "all");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   // Helpers para label y color por rol
   const roleLabel = (nombreRol) => {
@@ -48,6 +53,29 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
     const matchesRole = filterRole === "all" || (u.role && u.role.nombre_rol === filterRole);
     return matchesSearch && matchesRole;
   }) : [];
+
+  // Modal handlers
+  const handleEditUser = (user) => {
+    setSelectedUser(user);
+    setShowEditModal(true);
+  };
+
+  const handleViewUser = (user) => {
+    setSelectedUser(user);
+    setShowViewModal(true);
+  };
+
+  const handleSaveUser = async (userId, userData) => {
+    // Aquí implementarías la lógica para guardar el usuario
+    console.log("Guardando usuario:", userId, userData);
+    // Por ejemplo, hacer una petición PUT/PATCH al backend
+  };
+
+  const closeModals = () => {
+    setShowEditModal(false);
+    setShowViewModal(false);
+    setSelectedUser(null);
+  };
 
   return (
     <>
@@ -163,7 +191,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
               <table className="w-full">
                 <thead className={`${isDarkMode ? "bg-gray-800" : "bg-gray-50"}`}>
                   <tr>
-                    {["Usuario", "Contacto", "Rol", "Estado", "Rendimiento", "Acciones"].map(
+                    {["Usuario", "Contacto", "Rol", "Estado", "Acciones"].map(
                       (h) => (
                         <th
                           key={h}
@@ -261,34 +289,17 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                         </div>
                       </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm">
-                          <div
-                            className={`font-medium ${
-                              isDarkMode ? "text-white" : "text-gray-900"
-                            }`}
-                          >
-                            {u.direccion || 'Sin dirección'}
-                          </div>
-                          <div
-                            className={`text-xs ${
-                              isDarkMode ? "text-gray-400" : "text-gray-500"
-                            }`}
-                          >
-                            ID: {u.id_usuario}
-                          </div>
-                        </div>
-                      </td>
-
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex items-center gap-2">
                           <button
+                            onClick={() => handleViewUser(u)}
                             className="p-1 rounded hover:bg-blue-100 text-blue-600 transition-colors duration-200"
                             title="Ver detalles"
                           >
                             <FiEye className="w-4 h-4" />
                           </button>
                           <button
+                            onClick={() => handleEditUser(u)}
                             className="p-1 rounded hover:bg-yellow-100 text-yellow-600 transition-colors duration-200"
                             title="Editar"
                           >
@@ -340,6 +351,21 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
             </div>
           </div>
         </div>
+
+        {/* Modals */}
+        <EditUserModal
+          isOpen={showEditModal}
+          onClose={closeModals}
+          user={selectedUser}
+          roles={roles}
+          onSave={handleSaveUser}
+        />
+        
+        <ShowUserModal
+          isOpen={showViewModal}
+          onClose={closeModals}
+          user={selectedUser}
+        />
       </CRMLayout>
     </>
   );
