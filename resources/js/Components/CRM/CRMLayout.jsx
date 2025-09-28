@@ -85,9 +85,9 @@ export default function CRMLayout({ children, title }) {
         "Configuración de Empresas": "/crm/empresas/configuracion-empresas",
 
         // Clientes
-        "Empleados y clientes particulares (Clientes)": "/crm/clientes/empleados-clientes-particulares",
-        "Empresas de clientes (Clientes)": "/crm/clientes/empresas-clientes",
-        "Areas de clientes (Clientes)": "/crm/clientes/areas-clientes",
+        "Empleados y clientes particulares": "/crm/clientes/empleados-clientes-particulares",
+        "Empresas de clientes": "/crm/clientes/empresas-clientes",
+        "Areas de clientes": "/crm/clientes/areas-clientes",
 
         // Productos y Servicios
         "PRODUCTOS": "/crm/productos-servicios/productos",
