@@ -83,10 +83,13 @@ export default function CrmDashboard() {
                                         </div>
                                     </div>
                                     <div className={`p-3 rounded-full ${
-                                        stat.color === 'blue' ? 'bg-blue-100 text-blue-600' :
-                                        stat.color === 'green' ? 'bg-green-100 text-green-600' :
-                                        stat.color === 'purple' ? 'bg-purple-100 text-purple-600' :
-                                        'bg-orange-100 text-orange-600'
+                                        stat.color === 'blue' 
+                                            ? (isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-600')
+                                            : stat.color === 'green' 
+                                            ? (isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-100 text-green-600')
+                                            : stat.color === 'purple' 
+                                            ? (isDarkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-100 text-purple-600')
+                                            : (isDarkMode ? 'bg-orange-900/50 text-orange-300' : 'bg-orange-100 text-orange-600')
                                     }`}>
                                         <stat.icon className="w-6 h-6" />
                                     </div>
@@ -105,21 +108,33 @@ export default function CrmDashboard() {
                             Acciones Rápidas
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <button className="flex items-center gap-3 p-4 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 transition-colors duration-200">
+                            <button className={`flex items-center gap-3 p-4 rounded-lg transition-colors duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-blue-900/30 hover:bg-blue-900/50 text-blue-300 border border-blue-800/50' 
+                                    : 'bg-blue-50 hover:bg-blue-100 text-blue-700'
+                            }`}>
                                 <FiUsers className="w-5 h-5" />
                                 <div className="text-left">
                                     <div className="font-medium">Agregar Cliente</div>
                                     <div className="text-sm opacity-70">Registrar nuevo cliente</div>
                                 </div>
                             </button>
-                            <button className="flex items-center gap-3 p-4 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 transition-colors duration-200">
+                            <button className={`flex items-center gap-3 p-4 rounded-lg transition-colors duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-green-900/30 hover:bg-green-900/50 text-green-300 border border-green-800/50' 
+                                    : 'bg-green-50 hover:bg-green-100 text-green-700'
+                            }`}>
                                 <FiBarChart className="w-5 h-5" />
                                 <div className="text-left">
                                     <div className="font-medium">Nueva Cotización</div>
                                     <div className="text-sm opacity-70">Crear cotización</div>
                                 </div>
                             </button>
-                            <button className="flex items-center gap-3 p-4 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 transition-colors duration-200">
+                            <button className={`flex items-center gap-3 p-4 rounded-lg transition-colors duration-200 ${
+                                isDarkMode 
+                                    ? 'bg-purple-900/30 hover:bg-purple-900/50 text-purple-300 border border-purple-800/50' 
+                                    : 'bg-purple-50 hover:bg-purple-100 text-purple-700'
+                            }`}>
                                 <FiDollarSign className="w-5 h-5" />
                                 <div className="text-left">
                                     <div className="font-medium">Agregar Producto</div>
@@ -147,7 +162,9 @@ export default function CrmDashboard() {
                                     { action: "Producto agregado", client: "Servicio Premium", time: "Ayer", icon: FiDollarSign }
                                 ].map((activity, index) => (
                                     <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
-                                        <div className="p-2 rounded-full bg-blue-100 text-blue-600">
+                                        <div className={`p-2 rounded-full ${
+                                            isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-600'
+                                        }`}>
                                             <activity.icon className="w-4 h-4" />
                                         </div>
                                         <div className="flex-1">
