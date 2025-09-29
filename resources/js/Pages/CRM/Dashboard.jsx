@@ -1,4 +1,4 @@
-import { Head, router } from "@inertiajs/react";
+import { Head, router, usePage } from "@inertiajs/react";
 import {
     FiHome, FiUsers, FiDollarSign, FiActivity, FiChevronDown,
     FiSettings, FiShoppingBag, FiBarChart, FiBell, FiSearch,
@@ -9,6 +9,7 @@ import CRMLayout from '../../Components/CRM/CRMLayout';
 
 export default function CrmDashboard() {
     const { isDarkMode } = useTheme();
+    const { auth } = usePage().props;
 
     // Datos de ejemplo para las métricas
     const stats = [
@@ -50,7 +51,7 @@ export default function CrmDashboard() {
     return (
         <>
             <Head title="CRM Dashboard" description="Panel de Control CRM" />
-            <CRMLayout title="Bienvenido de nuevo, Ezra">
+            <CRMLayout title={`Bienvenido, ${auth.user?.nombre || auth.user?.name || 'Usuario'}`}>
                 {/* Dashboard Content */}
                 <div className="p-6 space-y-6">
                     <p className={`text-sm mb-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
