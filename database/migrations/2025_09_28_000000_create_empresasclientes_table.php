@@ -20,7 +20,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('telefono');
             $table->text('direccion');
-            $table->foreignId('usuario_id')->constrained('usuarios')->onDelete('cascade');
+            $table->unsignedBigInteger('usuario_id');
+            $table->foreign('usuario_id')->references('id_usuario')->on('usuarios')->onDelete('cascade');
             $table->boolean('activo')->default(true);
             $table->timestamps();
 

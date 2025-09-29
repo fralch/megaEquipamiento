@@ -82,6 +82,9 @@ Route::middleware('auth')->prefix('crm')->group(function () {
     Route::resource('empresas-clientes', EmpresaClienteController::class);
     Route::patch('/empresas-clientes/{empresaCliente}/toggle-status', [EmpresaClienteController::class, 'toggleStatus'])->name('empresas-clientes.toggle-status');
     Route::get('/api/empresas-clientes/sector', [EmpresaClienteController::class, 'getBySector'])->name('empresas-clientes.by-sector');
+
+    // Ruta específica para el menú CRM que accede por /crm/clientes/empresas-clientes
+    Route::get('/clientes/empresas-clientes', [EmpresaClienteController::class, 'index'])->name('crm.clientes.empresas-clientes');
 });
 
 // Rutas CRM - Productos y Servicios
