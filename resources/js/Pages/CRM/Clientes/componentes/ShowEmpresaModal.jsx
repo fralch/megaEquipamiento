@@ -1,4 +1,4 @@
-import { FiX, FiBuilding, FiMail, FiPhone, FiMapPin, FiUser, FiHash, FiCalendar, FiCheckCircle, FiXCircle } from "react-icons/fi";
+import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiUser, FiHash, FiCalendar, FiCheckCircle, FiXCircle } from "react-icons/fi";
 import { useTheme } from "../../../../storage/ThemeContext";
 
 export default function ShowEmpresaModal({ isOpen, onClose, empresa }) {
@@ -57,7 +57,7 @@ export default function ShowEmpresaModal({ isOpen, onClose, empresa }) {
         }`}>
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg mr-3">
-              <FiBuilding className="w-6 h-6 text-blue-600" />
+              <FiHome className="w-6 h-6 text-blue-600" />
             </div>
             <div>
               <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -133,7 +133,7 @@ export default function ShowEmpresaModal({ isOpen, onClose, empresa }) {
 
               <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
                 <div className="flex items-center mb-2">
-                  <FiBuilding className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                  <FiHome className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
                   <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     Sector
                   </span>

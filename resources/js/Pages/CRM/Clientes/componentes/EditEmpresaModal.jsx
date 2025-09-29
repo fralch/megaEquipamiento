@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FiX, FiBuilding, FiMail, FiPhone, FiMapPin, FiSave, FiUser, FiHash } from "react-icons/fi";
+import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiSave, FiUser, FiHash } from "react-icons/fi";
 import { useTheme } from "../../../../storage/ThemeContext";
 import { router } from "@inertiajs/react";
 
@@ -141,7 +141,7 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
         }`}>
           <div className="flex items-center">
             <div className="p-2 bg-yellow-100 rounded-lg mr-3">
-              <FiBuilding className="w-6 h-6 text-yellow-600" />
+              <FiHome className="w-6 h-6 text-yellow-600" />
             </div>
             <div>
               <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
@@ -174,7 +174,7 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
                 <label className={`block text-sm font-medium mb-2 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-700'
                 }`}>
-                  <FiBuilding className="inline w-4 h-4 mr-1" />
+                  <FiHome className="inline w-4 h-4 mr-1" />
                   Razón Social *
                 </label>
                 <input
