@@ -396,6 +396,17 @@ const CrearProducto = () => {
                         >
                             Ver Productos
                         </Link>
+
+                        <Link
+                            href="/crm/dashboard"
+                            className={`w-full text-center py-2 px-4 rounded-md font-medium transition-colors duration-300 block ${
+                                activeButton === 'crm'
+                                    ? (isDarkMode ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-purple-500 hover:bg-purple-600 text-white')
+                                    : (isDarkMode ? 'bg-gray-700 text-purple-400 hover:bg-gray-600' : 'bg-purple-200 text-purple-700 hover:bg-purple-300')
+                            }`}
+                        >
+                            CRM
+                        </Link>
                     </div>
                 </div>
                 <div className={`w-full p-4 transition-colors duration-300 ${
