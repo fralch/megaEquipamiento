@@ -1,10 +1,18 @@
 import { Head, Link, router } from "@inertiajs/react";
 import { FiHome, FiEdit, FiTrash, FiPlus, FiEye, FiToggleLeft, FiToggleRight } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
+import { useState } from 'react';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
+import CreateEmpresaModal from './componentes/CreateEmpresaModal';
+import EditEmpresaModal from './componentes/EditEmpresaModal';
+import ShowEmpresaModal from './componentes/ShowEmpresaModal';
 
-export default function EmpresasClientes({ empresas = [] }) {
+export default function EmpresasClientes({ empresas = [], usuarios = [] }) {
     const { isDarkMode } = useTheme();
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [selectedEmpresa, setSelectedEmpresa] = useState(null);
 
     const handleDelete = (empresaId) => {
         if (confirm('¿Estás seguro de que deseas eliminar esta empresa cliente?')) {
@@ -14,6 +22,20 @@ export default function EmpresasClientes({ empresas = [] }) {
 
     const handleToggleStatus = (empresaId) => {
         router.patch(route('empresas-clientes.toggle-status', empresaId));
+    };
+
+    const handleCreate = () => {
+        setShowCreateModal(true);
+    };
+
+    const handleEdit = (empresa) => {
+        setSelectedEmpresa(empresa);
+        setShowEditModal(true);
+    };
+
+    const handleView = (empresa) => {
+        setSelectedEmpresa(empresa);
+        setShowViewModal(true);
     };
 
     return (
@@ -30,13 +52,13 @@ export default function EmpresasClientes({ empresas = [] }) {
                                 Administra las empresas que son clientes de la organización
                             </p>
                         </div>
-                        <Link
-                            href={route('empresas-clientes.create')}
+                        <button
+                            onClick={handleCreate}
                             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                         >
                             <FiPlus className="w-4 h-4" />
                             Agregar Empresa Cliente
-                        </Link>
+                        </button>
                     </div>
 
                     <div className={`rounded-xl shadow-sm border overflow-hidden ${
@@ -99,24 +121,24 @@ export default function EmpresasClientes({ empresas = [] }) {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                             <div className="flex gap-2">
-                                                <Link
-                                                    href={route('empresas-clientes.show', empresa.id)}
+                                                <button
+                                                    onClick={() => handleView(empresa)}
                                                     className={`${
                                                         isDarkMode ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-900'
                                                     }`}
                                                     title="Ver detalles"
                                                 >
                                                     <FiEye className="w-4 h-4" />
-                                                </Link>
-                                                <Link
-                                                    href={route('empresas-clientes.edit', empresa.id)}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleEdit(empresa)}
                                                     className={`${
                                                         isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'
                                                     }`}
                                                     title="Editar"
                                                 >
                                                     <FiEdit className="w-4 h-4" />
-                                                </Link>
+                                                </button>
                                                 <button
                                                     onClick={() => handleToggleStatus(empresa.id)}
                                                     className={`${
@@ -152,6 +174,32 @@ export default function EmpresasClientes({ empresas = [] }) {
                     </div>
                 </div>
             </CRMLayout>
+
+            {/* Modals */}
+            {showCreateModal && (
+                <CreateEmpresaModal
+                    isOpen={showCreateModal}
+                    onClose={() => setShowCreateModal(false)}
+                    usuarios={usuarios}
+                />
+            )}
+
+            {showEditModal && selectedEmpresa && (
+                <EditEmpresaModal
+                    isOpen={showEditModal}
+                    onClose={() => setShowEditModal(false)}
+                    empresa={selectedEmpresa}
+                    usuarios={usuarios}
+                />
+            )}
+
+            {showViewModal && selectedEmpresa && (
+                <ShowEmpresaModal
+                    isOpen={showViewModal}
+                    onClose={() => setShowViewModal(false)}
+                    empresa={selectedEmpresa}
+                />
+            )}
         </>
     );
 }
