@@ -18,6 +18,7 @@ use App\Http\Controllers\ProductoTagController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\CRM\UserRoleController;
 use App\Http\Controllers\EmpresaClienteController;
+use App\Http\Controllers\ClienteController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -74,7 +75,7 @@ Route::get('/crm/empresas/agregar-empresa', function () { return Inertia::render
 Route::get('/crm/empresas/configuracion-empresas', function () { return Inertia::render('CRM/Empresas/ConfiguracionEmpresas'); })->middleware('auth')->name('crm.empresas.configuracion-empresas');
 
 // Rutas CRM - Clientes
-Route::get('/crm/clientes/empleados-clientes-particulares', function () { return Inertia::render('CRM/Clientes/EmpleadosClientesParticulares'); })->middleware('auth')->name('crm.clientes.empleados-clientes-particulares');
+Route::get('/crm/clientes/empleados-clientes-particulares', [ClienteController::class, 'index'])->middleware('auth')->name('crm.clientes.empleados-clientes-particulares');
 Route::get('/crm/clientes/areas-clientes', function () { return Inertia::render('CRM/Clientes/AreasClientes'); })->middleware('auth')->name('crm.clientes.areas-clientes');
 
 // Rutas CRM - Empresas Clientes (CRUD completo)
@@ -85,6 +86,15 @@ Route::middleware('auth')->prefix('crm')->group(function () {
 
     // Ruta específica para el menú CRM que accede por /crm/clientes/empresas-clientes
     Route::get('/clientes/empresas-clientes', [EmpresaClienteController::class, 'index'])->name('crm.clientes.empresas-clientes');
+
+    // Rutas para gestión de Clientes (empleados y particulares)
+    Route::resource('clientes', ClienteController::class);
+
+    // Rutas API específicas para clientes
+    Route::get('/api/clientes/empleados', [ClienteController::class, 'empleados'])->name('clientes.empleados');
+    Route::get('/api/clientes/particulares', [ClienteController::class, 'particulares'])->name('clientes.particulares');
+    Route::get('/api/clientes/empresa/{empresaId}', [ClienteController::class, 'getByEmpresa'])->name('clientes.by-empresa');
+    Route::get('/api/clientes/vendedor/{vendedorId}', [ClienteController::class, 'getByVendedor'])->name('clientes.by-vendedor');
 });
 
 // Rutas CRM - Productos y Servicios

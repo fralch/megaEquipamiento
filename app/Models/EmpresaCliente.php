@@ -38,6 +38,14 @@ class EmpresaCliente extends Model
     }
 
     /**
+     * Relación con clientes (empleados de esta empresa)
+     */
+    public function clientes()
+    {
+        return $this->hasMany(Cliente::class, 'empresa_id');
+    }
+
+    /**
      * Scope para empresas activas
      */
     public function scopeActivas($query)

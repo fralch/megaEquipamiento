@@ -45,4 +45,9 @@ class Usuario extends Authenticatable
     {
         return $this->hasMany(EmpresaCliente::class, 'usuario_id', 'id_usuario');
     }
+
+    public function clientes()
+    {
+        return $this->hasMany(Cliente::class, 'usuario_id', 'id_usuario');
+    }
 }
