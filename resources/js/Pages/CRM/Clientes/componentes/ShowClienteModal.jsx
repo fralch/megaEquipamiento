@@ -112,7 +112,7 @@ export default function ShowClienteModal({ isOpen, onClose, cliente }) {
                                                         Área
                                                     </label>
                                                     <p className={`mt-1 text-sm ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                        {cliente.area || 'No especificado'}
+                                                        {cliente.area_relacion ? cliente.area_relacion.nombre : (cliente.area || 'No especificado')}
                                                     </p>
                                                 </div>
                                             </div>

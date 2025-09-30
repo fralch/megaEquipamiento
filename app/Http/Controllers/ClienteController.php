@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cliente;
 use App\Models\EmpresaCliente;
 use App\Models\Usuario;
+use App\Models\Area;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Validation\Rule;
@@ -16,7 +17,7 @@ class ClienteController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Cliente::with(['empresa', 'vendedor']);
+        $query = Cliente::with(['empresa', 'vendedor', 'areaRelacion']);
 
         // Filtrar por tipo de cliente si se especifica
         if ($request->has('tipo')) {
@@ -44,12 +45,17 @@ class ClienteController extends Controller
             ->select('id', 'razon_social', 'ruc')
             ->orderBy('razon_social')
             ->get();
+        $areas = Area::where('estado', 'Activo')
+            ->select('id', 'nombre', 'descripcion')
+            ->orderBy('nombre')
+            ->get();
 
         return Inertia::render('CRM/Clientes/EmpleadosClientesParticulares', [
             'clientes' => $clientes,
             'filters' => $request->only(['tipo', 'search', 'vendedor_id']),
             'usuarios' => $usuarios,
-            'empresas' => $empresas
+            'empresas' => $empresas,
+            'areas' => $areas
         ]);
     }
 
@@ -119,8 +125,8 @@ class ClienteController extends Controller
             'nombrecompleto' => 'required|string|max:255',
             'ruc' => 'required|string|max:20',
             'empresa_id' => 'nullable|exists:empresasclientes,id',
+            'area_id' => 'nullable|exists:areas,id',
             'sucursal' => 'nullable|string|max:255',
-            'area' => 'nullable|string|max:255',
             'cargo' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'telefono' => 'nullable|string|max:20',
@@ -176,6 +182,7 @@ class ClienteController extends Controller
             'nombrecompleto' => 'required|string|max:255',
             'ruc' => 'required|string|max:20',
             'empresa_id' => 'nullable|exists:empresasclientes,id',
+            'area_id' => 'nullable|exists:areas,id',
             'sucursal' => 'nullable|string|max:255',
             'area' => 'nullable|string|max:255',
             'cargo' => 'nullable|string|max:255',

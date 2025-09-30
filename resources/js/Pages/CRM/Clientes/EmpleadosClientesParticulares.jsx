@@ -6,7 +6,7 @@ import CreateClienteModal from './componentes/CreateClienteModal';
 import EditClienteModal from './componentes/EditClienteModal';
 import ShowClienteModal from './componentes/ShowClienteModal';
 
-export default function EmpleadosClientesParticulares({ clientes = [], filters = {}, usuarios = [], empresas = [] }) {
+export default function EmpleadosClientesParticulares({ clientes = [], filters = {}, usuarios = [], empresas = [], areas = [] }) {
     const { isDarkMode } = useTheme();
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [selectedClientes, setSelectedClientes] = useState([]);
@@ -238,7 +238,7 @@ export default function EmpleadosClientesParticulares({ clientes = [], filters =
                                             }`}>{cliente.cargo || 'N/A'}</div>
                                             <div className={`text-sm ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`}>{cliente.area || 'N/A'}</div>
+                                            }`}>{cliente.area_relacion ? cliente.area_relacion.nombre : (cliente.area || 'N/A')}</div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={`text-sm ${
@@ -310,6 +310,7 @@ export default function EmpleadosClientesParticulares({ clientes = [], filters =
                     onClose={() => setShowCreateModal(false)}
                     empresas={empresas}
                     usuarios={usuarios}
+                    areas={areas}
                 />
             )}
 
@@ -320,6 +321,7 @@ export default function EmpleadosClientesParticulares({ clientes = [], filters =
                     cliente={selectedCliente}
                     empresas={empresas}
                     usuarios={usuarios}
+                    areas={areas}
                 />
             )}
 

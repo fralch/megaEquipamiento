@@ -15,6 +15,7 @@ class Cliente extends Model
         'nombrecompleto',
         'ruc',
         'empresa_id',
+        'area_id',
         'sucursal',
         'area',
         'cargo',
@@ -44,6 +45,14 @@ class Cliente extends Model
     public function vendedor()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id', 'id_usuario');
+    }
+
+    /**
+     * Relación con el modelo Area
+     */
+    public function areaRelacion()
+    {
+        return $this->belongsTo(Area::class, 'area_id');
     }
 
     /**

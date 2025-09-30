@@ -2,13 +2,14 @@ import { useForm } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { useTheme } from '../../../../storage/ThemeContext';
 
-export default function EditClienteModal({ isOpen, onClose, cliente, empresas = [], usuarios = [] }) {
+export default function EditClienteModal({ isOpen, onClose, cliente, empresas = [], usuarios = [], areas = [] }) {
     const { isDarkMode } = useTheme();
 
     const { data, setData, put, processing, errors, reset } = useForm({
         nombrecompleto: '',
         ruc: '',
         empresa_id: '',
+        area_id: '',
         sucursal: '',
         area: '',
         cargo: '',
@@ -24,6 +25,7 @@ export default function EditClienteModal({ isOpen, onClose, cliente, empresas = 
                 nombrecompleto: cliente.nombrecompleto || '',
                 ruc: cliente.ruc || '',
                 empresa_id: cliente.empresa_id || '',
+                area_id: cliente.area_id || '',
                 sucursal: cliente.sucursal || '',
                 area: cliente.area || '',
                 cargo: cliente.cargo || '',
@@ -157,17 +159,23 @@ export default function EditClienteModal({ isOpen, onClose, cliente, empresas = 
                                                     <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                         Área
                                                     </label>
-                                                    <input
-                                                        type="text"
-                                                        value={data.area}
-                                                        onChange={(e) => setData('area', e.target.value)}
+                                                    <select
+                                                        value={data.area_id}
+                                                        onChange={(e) => setData('area_id', e.target.value)}
                                                         className={`mt-1 block w-full rounded-md shadow-sm ${
                                                             isDarkMode
                                                                 ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500 focus:ring-blue-500'
                                                                 : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'
                                                         }`}
-                                                    />
-                                                    {errors.area && <p className="mt-1 text-sm text-red-600">{errors.area}</p>}
+                                                    >
+                                                        <option value="">Seleccionar área</option>
+                                                        {areas.map((area) => (
+                                                            <option key={area.id} value={area.id}>
+                                                                {area.nombre}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                    {errors.area_id && <p className="mt-1 text-sm text-red-600">{errors.area_id}</p>}
                                                 </div>
                                             </div>
                                         )}

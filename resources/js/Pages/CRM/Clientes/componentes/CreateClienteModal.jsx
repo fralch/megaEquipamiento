@@ -1,16 +1,16 @@
 import { useForm } from '@inertiajs/react';
-import { FiX, FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiHome, FiHash, FiBriefcase } from "react-icons/fi";
+import { FiX, FiUser, FiMail, FiPhone, FiMapPin, FiSave, FiHome, FiHash, FiBriefcase, FiGrid } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
 
-export default function CreateClienteModal({ isOpen, onClose, empresas = [], usuarios = [] }) {
+export default function CreateClienteModal({ isOpen, onClose, empresas = [], usuarios = [], areas = [] }) {
     const { isDarkMode } = useTheme();
 
     const { data, setData, post, processing, errors, reset } = useForm({
         nombrecompleto: '',
         ruc: '',
         empresa_id: '',
+        area_id: '',
         sucursal: '',
-        area: '',
         cargo: '',
         email: '',
         telefono: '',
@@ -177,6 +177,37 @@ export default function CreateClienteModal({ isOpen, onClose, empresas = [], usu
                                     <p className="mt-1 text-sm text-red-600">{errors.usuario_id}</p>
                                 )}
                             </div>
+
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    <FiGrid className="inline w-4 h-4 mr-1" />
+                                    Área
+                                </label>
+                                <select
+                                    value={data.area_id}
+                                    onChange={(e) => setData('area_id', e.target.value)}
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    } ${errors.area_id ? 'border-red-500' : ''}`}
+                                >
+                                    <option value="">Seleccionar área</option>
+                                    {areas.map((area) => (
+                                        <option key={area.id} value={area.id}>
+                                            {area.nombre}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.area_id && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.area_id}</p>
+                                )}
+                                <p className={`mt-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    Selecciona el área organizacional (opcional)
+                                </p>
+                            </div>
                         </div>
                     </div>
 
@@ -211,29 +242,6 @@ export default function CreateClienteModal({ isOpen, onClose, empresas = [], usu
                                 </div>
 
                                 <div>
-                                    <label className={`block text-sm font-medium mb-2 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                        <FiBriefcase className="inline w-4 h-4 mr-1" />
-                                        Área
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={data.area}
-                                        onChange={(e) => setData('area', e.target.value)}
-                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            isDarkMode
-                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                        } ${errors.area ? 'border-red-500' : ''}`}
-                                        placeholder="Recursos Humanos"
-                                    />
-                                    {errors.area && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.area}</p>
-                                    )}
-                                </div>
-
-                                <div className="md:col-span-2">
                                     <label className={`block text-sm font-medium mb-2 ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                     }`}>

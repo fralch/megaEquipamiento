@@ -27,7 +27,7 @@ class Area extends Model
      */
     public function clientes()
     {
-        return $this->hasMany(Cliente::class, 'area', 'nombre');
+        return $this->hasMany(Cliente::class, 'area_id');
     }
 
     /**
