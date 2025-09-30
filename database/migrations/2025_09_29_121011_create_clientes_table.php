@@ -27,7 +27,7 @@ return new class extends Migration
 
             // Foreign key constraints
             $table->foreign('empresa_id')->references('id')->on('empresasclientes')->onDelete('set null');
-            $table->foreign('usuario_id')->references('id')->on('usuarios')->onDelete('cascade');
+            $table->foreign('usuario_id')->references('id_usuario')->on('usuarios')->onDelete('cascade');
         });
     }
 
