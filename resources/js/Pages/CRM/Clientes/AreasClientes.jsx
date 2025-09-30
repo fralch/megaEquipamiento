@@ -3,15 +3,18 @@ import { FiMapPin, FiEdit, FiTrash, FiPlus } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
 
+
 export default function AreasClientes() {
     const { isDarkMode } = useTheme();
 
+
     const areas = [
-        { id: 1, nombre: "Compras", descripcion: "Área de compras y adquisiciones", empresa: "TechCorp S.A.", estado: "Activo" },
-        { id: 2, nombre: "IT", descripcion: "Tecnología de la información", empresa: "Industria Moderna Ltda.", estado: "Activo" },
-        { id: 3, nombre: "Recursos Humanos", descripcion: "Gestión de personal", empresa: "Comercial Solutions Corp.", estado: "Inactivo" },
-        { id: 4, nombre: "Finanzas", descripcion: "Área financiera y contable", empresa: "Servicios Integrales S.R.L.", estado: "Activo" }
+        { id: 1, nombre: "Compras", descripcion: "Área de compras y adquisiciones", estado: "Activo" },
+        { id: 2, nombre: "IT", descripcion: "Tecnología de la información", estado: "Activo" },
+        { id: 3, nombre: "Recursos Humanos", descripcion: "Gestión de personal", estado: "Inactivo" },
+        { id: 4, nombre: "Finanzas", descripcion: "Área financiera y contable", estado: "Activo" }
     ];
+
 
     return (
         <>
@@ -38,9 +41,6 @@ export default function AreasClientes() {
                                     }`}>Descripción</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                    }`}>Empresa</th>
-                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                     }`}>Estado</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
@@ -58,9 +58,6 @@ export default function AreasClientes() {
                                         <td className={`px-6 py-4 text-sm ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-500'
                                         }`}>{area.descripcion}</td>
-                                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                        }`}>{area.empresa}</td>
                                         <td className={`px-6 py-4 whitespace-nowrap`}>
                                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                                                 area.estado === 'Activo'
