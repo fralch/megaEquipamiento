@@ -19,6 +19,7 @@ use App\Http\Controllers\SectorController;
 use App\Http\Controllers\CRM\UserRoleController;
 use App\Http\Controllers\EmpresaClienteController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\AreaController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -76,7 +77,7 @@ Route::get('/crm/empresas/configuracion-empresas', function () { return Inertia:
 
 // Rutas CRM - Clientes
 Route::get('/crm/clientes/empleados-clientes-particulares', [ClienteController::class, 'index'])->middleware('auth')->name('crm.clientes.empleados-clientes-particulares');
-Route::get('/crm/clientes/areas-clientes', function () { return Inertia::render('CRM/Clientes/AreasClientes'); })->middleware('auth')->name('crm.clientes.areas-clientes');
+Route::get('/crm/clientes/areas-clientes', [AreaController::class, 'index'])->middleware('auth')->name('crm.clientes.areas-clientes');
 
 // Rutas CRM - Empresas Clientes (CRUD completo)
 Route::middleware('auth')->prefix('crm')->group(function () {
@@ -95,6 +96,11 @@ Route::middleware('auth')->prefix('crm')->group(function () {
     Route::get('/api/clientes/particulares', [ClienteController::class, 'particulares'])->name('clientes.particulares');
     Route::get('/api/clientes/empresa/{empresaId}', [ClienteController::class, 'getByEmpresa'])->name('clientes.by-empresa');
     Route::get('/api/clientes/vendedor/{vendedorId}', [ClienteController::class, 'getByVendedor'])->name('clientes.by-vendedor');
+
+    // Rutas para gestión de Áreas
+    Route::resource('areas', AreaController::class)->except(['create', 'edit', 'show']);
+    Route::get('/api/areas/activas', [AreaController::class, 'getActivas'])->name('areas.activas');
+    Route::patch('/areas/{area}/toggle-estado', [AreaController::class, 'toggleEstado'])->name('areas.toggle-estado');
 });
 
 // Rutas CRM - Productos y Servicios
