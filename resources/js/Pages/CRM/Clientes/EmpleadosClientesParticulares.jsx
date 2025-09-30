@@ -2,11 +2,18 @@ import React, { useState } from 'react';
 import { Head, router } from '@inertiajs/react';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
 import { useTheme } from '../../../storage/ThemeContext';
+import CreateClienteModal from './componentes/CreateClienteModal';
+import EditClienteModal from './componentes/EditClienteModal';
+import ShowClienteModal from './componentes/ShowClienteModal';
 
-export default function EmpleadosClientesParticulares({ clientes = [], filters = {} }) {
+export default function EmpleadosClientesParticulares({ clientes = [], filters = {}, usuarios = [], empresas = [] }) {
     const { isDarkMode } = useTheme();
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [selectedClientes, setSelectedClientes] = useState([]);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [selectedCliente, setSelectedCliente] = useState(null);
 
     const filteredClientes = clientes.filter(cliente =>
         cliente.nombrecompleto.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -53,6 +60,20 @@ export default function EmpleadosClientesParticulares({ clientes = [], filters =
         }
     };
 
+    const handleCreate = () => {
+        setShowCreateModal(true);
+    };
+
+    const handleEdit = (cliente) => {
+        setSelectedCliente(cliente);
+        setShowEditModal(true);
+    };
+
+    const handleView = (cliente) => {
+        setSelectedCliente(cliente);
+        setShowViewModal(true);
+    };
+
     return (
         <CRMLayout>
             <Head title="Empleados - Clientes Particulares" />
@@ -96,7 +117,7 @@ export default function EmpleadosClientesParticulares({ clientes = [], filters =
                             </div>
                             <div className="flex gap-2">
                                 <button
-                                    onClick={() => router.visit(route('clientes.create'))}
+                                    onClick={handleCreate}
                                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                 >
                                     Agregar Cliente
@@ -236,7 +257,15 @@ export default function EmpleadosClientesParticulares({ clientes = [], filters =
                                         <td className="px-6 py-4 text-sm font-medium">
                                             <div className="flex space-x-2">
                                                 <button
-                                                    onClick={() => router.visit(route('clientes.edit', cliente.id))}
+                                                    onClick={() => handleView(cliente)}
+                                                    className={`${
+                                                        isDarkMode ? 'text-green-400 hover:text-green-300' : 'text-green-600 hover:text-green-900'
+                                                    }`}
+                                                >
+                                                    Ver
+                                                </button>
+                                                <button
+                                                    onClick={() => handleEdit(cliente)}
                                                     className={`${
                                                         isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-900'
                                                     }`}
@@ -273,6 +302,34 @@ export default function EmpleadosClientesParticulares({ clientes = [], filters =
                     )}
                 </div>
             </div>
+
+            {/* Modals */}
+            {showCreateModal && (
+                <CreateClienteModal
+                    isOpen={showCreateModal}
+                    onClose={() => setShowCreateModal(false)}
+                    empresas={empresas}
+                    usuarios={usuarios}
+                />
+            )}
+
+            {showEditModal && selectedCliente && (
+                <EditClienteModal
+                    isOpen={showEditModal}
+                    onClose={() => setShowEditModal(false)}
+                    cliente={selectedCliente}
+                    empresas={empresas}
+                    usuarios={usuarios}
+                />
+            )}
+
+            {showViewModal && selectedCliente && (
+                <ShowClienteModal
+                    isOpen={showViewModal}
+                    onClose={() => setShowViewModal(false)}
+                    cliente={selectedCliente}
+                />
+            )}
         </CRMLayout>
     );
 }

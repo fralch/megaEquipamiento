@@ -39,9 +39,17 @@ class ClienteController extends Controller
 
         $clientes = $query->orderBy('created_at', 'desc')->get();
 
+        $usuarios = Usuario::select('id_usuario', 'nombre', 'correo')->get();
+        $empresas = EmpresaCliente::where('activo', true)
+            ->select('id', 'razon_social', 'ruc')
+            ->orderBy('razon_social')
+            ->get();
+
         return Inertia::render('CRM/Clientes/EmpleadosClientesParticulares', [
             'clientes' => $clientes,
-            'filters' => $request->only(['tipo', 'search', 'vendedor_id'])
+            'filters' => $request->only(['tipo', 'search', 'vendedor_id']),
+            'usuarios' => $usuarios,
+            'empresas' => $empresas
         ]);
     }
 
