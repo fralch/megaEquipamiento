@@ -1055,4 +1055,47 @@ class ProductoController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Obtener todos los productos excluyendo los que contengan 'servicio' en el título
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProductosExcluyeServicios(Request $request)
+    {
+        $perPage = $request->input('per_page', 20);
+        $page = $request->input('page', 1);
+        
+        $perPage = max(1, min(100, (int)$perPage));
+        
+        $productos = Producto::with('marca')
+            ->where('nombre', 'NOT LIKE', '%servicio%')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+            
+        return response()->json($productos);
+    }
+
+    /**
+     * Obtener solo los productos que contengan 'servicio' en el título
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProductosSoloServicios(Request $request)
+    {
+        $perPage = $request->input('per_page', 20);
+        $page = $request->input('page', 1);
+        
+        $perPage = max(1, min(100, (int)$perPage));
+        
+        $productos = Producto::with('marca')
+            ->where('nombre', 'LIKE', '%servicio%')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+            
+        return response()->json($productos);
+    }
+    
 }
