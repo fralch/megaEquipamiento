@@ -72,8 +72,6 @@ Route::middleware('auth')->prefix('crm')->group(function () {
 
 // Rutas CRM - Nuestras Empresas
 Route::get('/crm/empresas/ver-empresas', function () { return Inertia::render('CRM/Empresas/VerEmpresas'); })->middleware('auth')->name('crm.empresas.ver-empresas');
-Route::get('/crm/empresas/agregar-empresa', function () { return Inertia::render('CRM/Empresas/AgregarEmpresa'); })->middleware('auth')->name('crm.empresas.agregar-empresa');
-Route::get('/crm/empresas/configuracion-empresas', function () { return Inertia::render('CRM/Empresas/ConfiguracionEmpresas'); })->middleware('auth')->name('crm.empresas.configuracion-empresas');
 
 // Rutas CRM - Clientes
 Route::get('/crm/clientes/empleados-clientes-particulares', [ClienteController::class, 'index'])->middleware('auth')->name('crm.clientes.empleados-clientes-particulares');

@@ -26,9 +26,7 @@ export default function CRMLayout({ children, title }) {
             icon: FiHome,
             key: "empresas",
             items: [
-                "Ver Empresas",
-                "Agregar Empresa",
-                "Configuración de Empresas"
+                "Ver Empresas"
             ]
         },
         {
@@ -81,8 +79,6 @@ export default function CRMLayout({ children, title }) {
 
         // Nuestras Empresas
         "Ver Empresas": "/crm/empresas/ver-empresas",
-        "Agregar Empresa": "/crm/empresas/agregar-empresa",
-        "Configuración de Empresas": "/crm/empresas/configuracion-empresas",
 
         // Clientes
         "Empleados y clientes particulares": "/crm/clientes/empleados-clientes-particulares",
