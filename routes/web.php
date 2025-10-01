@@ -71,7 +71,17 @@ Route::middleware('auth')->prefix('crm')->group(function () {
 });
 
 // Rutas CRM - Nuestras Empresas
-Route::get('/crm/empresas/ver-empresas', function () { return Inertia::render('CRM/Empresas/VerEmpresas'); })->middleware('auth')->name('crm.empresas.ver-empresas');
+Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
+    // Alias route for menu navigation (must be before resource)
+    Route::get('/empresas/ver-empresas', [\App\Http\Controllers\EmpresaController::class, 'index'])->name('empresas.ver-empresas');
+
+    // API routes (must be before resource)
+    Route::get('/api/empresas/buscar', [\App\Http\Controllers\EmpresaController::class, 'search'])->name('empresas.search');
+    Route::get('/api/empresas/usuario/{usuarioId}', [\App\Http\Controllers\EmpresaController::class, 'porUsuario'])->name('empresas.por-usuario');
+
+    // Resource routes (must be last)
+    Route::resource('empresas', \App\Http\Controllers\EmpresaController::class);
+});
 
 // Rutas CRM - Clientes
 Route::get('/crm/clientes/empleados-clientes-particulares', [ClienteController::class, 'index'])->middleware('auth')->name('crm.clientes.empleados-clientes-particulares');
