@@ -105,15 +105,17 @@ class EmpresaClienteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, EmpresaCliente $empresaCliente)
+    public function update(Request $request, $id)
     {
+        $empresaCliente = EmpresaCliente::findOrFail($id);
+
         $validated = $request->validate([
             'razon_social' => 'required|string|max:255',
             'ruc' => [
                 'required',
                 'string',
                 'size:11',
-                Rule::unique('empresasclientes', 'ruc')->ignore($empresaCliente->id)
+                Rule::unique('empresasclientes', 'ruc')->ignore($id)
             ],
             'sector' => 'required|string|max:100',
             'contacto_principal' => 'required|string|max:255',
@@ -121,7 +123,7 @@ class EmpresaClienteController extends Controller
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('empresasclientes', 'email')->ignore($empresaCliente->id)
+                Rule::unique('empresasclientes', 'email')->ignore($id)
             ],
             'telefono' => 'required|string|max:20',
             'direccion' => 'required|string',
