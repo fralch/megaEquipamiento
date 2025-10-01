@@ -228,29 +228,37 @@ export default function Servicios() {
                                                 ? servicio.imagenes[0] 
                                                 : null;
                                             
+                                            // Debug: Console logs para verificar datos de imágenes
+                                            console.log('Servicios.jsx - Servicio:', servicio.nombre);
+                                            console.log('Servicios.jsx - servicio.imagenes:', servicio.imagenes);
+                                            console.log('Servicios.jsx - Tipo de servicio.imagenes:', typeof servicio.imagenes);
+                                            console.log('Servicios.jsx - Array.isArray(servicio.imagenes):', Array.isArray(servicio.imagenes));
+                                            console.log('Servicios.jsx - primeraImagen:', primeraImagen);
+                                            console.log('Servicios.jsx - Ruta de imagen construida:', primeraImagen ? `/${primeraImagen}` : 'Sin imagen');
+                                            
                                             return (
                                                 <tr key={servicio.id} className={`${
                                                     isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                                 }`}>
                                                     {/* Imagen */}
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                                                            {primeraImagen ? (
-                                                                <img 
-                                                                    src={`/${primeraImagen}`}
-                                                                    alt={servicio.nombre}
-                                                                    className="w-full h-full object-cover"
-                                                                    onError={(e) => {
-                                                                        e.target.style.display = 'none';
-                                                                        e.target.nextSibling.style.display = 'flex';
-                                                                    }}
-                                                                />
-                                                            ) : null}
-                                                            <div className={`w-full h-full flex items-center justify-center ${primeraImagen ? 'hidden' : ''}`}>
-                                                                <FiImage className={`w-6 h-6 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
-                                                            </div>
-                                                        </div>
-                                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                                            {primeraImagen ? (
+                                                <img 
+                                                    src={primeraImagen}
+                                                    alt={servicio.nombre}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        e.target.nextSibling.style.display = 'flex';
+                                                    }}
+                                                />
+                                            ) : null}
+                                            <div className={`w-full h-full flex items-center justify-center ${primeraImagen ? 'hidden' : ''}`}>
+                                                <FiImage className={`w-6 h-6 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
+                                            </div>
+                                        </div>
+                                    </td>
                                                     
                                                     {/* Servicio */}
                                                     <td className={`px-6 py-4 text-sm font-medium ${

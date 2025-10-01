@@ -8,8 +8,18 @@ export default function ServiceModal({ servicio, isOpen, onClose }) {
 
     if (!isOpen || !servicio) return null;
 
+    // Debug: Console logs para verificar datos del servicio
+    console.log('ServiceModal - Datos del servicio:', servicio);
+    console.log('ServiceModal - servicio.imagen:', servicio.imagen);
+    console.log('ServiceModal - Tipo de servicio.imagen:', typeof servicio.imagen);
+    console.log('ServiceModal - Array.isArray(servicio.imagen):', Array.isArray(servicio.imagen));
+
     const images = servicio.imagen || [];
     const hasImages = images.length > 0;
+
+    console.log('ServiceModal - images procesadas:', images);
+    console.log('ServiceModal - hasImages:', hasImages);
+    console.log('ServiceModal - images.length:', images.length);
 
     const nextImage = () => {
         if (hasImages) {
@@ -90,11 +100,11 @@ export default function ServiceModal({ servicio, isOpen, onClose }) {
                                     {hasImages ? (
                                         <>
                                             <img
-                                                src={`/${images[currentImageIndex]}`}
+                                                src={images[currentImageIndex]}
                                                 alt={servicio.nombre}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
-                                                    e.target.src = '/img/no-image.png';
+                                                    e.target.src = '/img/no-image.svg';
                                                 }}
                                             />
                                             {images.length > 1 && (
@@ -137,11 +147,11 @@ export default function ServiceModal({ servicio, isOpen, onClose }) {
                                                 }`}
                                             >
                                                 <img
-                                                    src={`/${image}`}
+                                                    src={image}
                                                     alt={`${servicio.nombre} ${index + 1}`}
                                                     className="w-full h-full object-cover"
                                                     onError={(e) => {
-                                                        e.target.src = '/img/no-image.png';
+                                                        e.target.src = '/img/no-image.svg';
                                                     }}
                                                 />
                                             </button>

@@ -80,11 +80,11 @@ export default function ProductModal({ producto, isOpen, onClose }) {
                                     {hasImages ? (
                                         <>
                                             <img
-                                                src={`/${images[currentImageIndex]}`}
+                                                src={images[currentImageIndex]}
                                                 alt={producto.nombre}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
-                                                    e.target.src = '/img/no-image.png';
+                                                    e.target.src = '/img/no-image.svg';
                                                 }}
                                             />
                                             {images.length > 1 && (
@@ -127,11 +127,11 @@ export default function ProductModal({ producto, isOpen, onClose }) {
                                                 }`}
                                             >
                                                 <img
-                                                    src={`/${image}`}
+                                                    src={image}
                                                     alt={`${producto.nombre} ${index + 1}`}
                                                     className="w-full h-full object-cover"
                                                     onError={(e) => {
-                                                        e.target.src = '/img/no-image.png';
+                                                        e.target.src = '/img/no-image.svg';
                                                     }}
                                                 />
                                             </button>
