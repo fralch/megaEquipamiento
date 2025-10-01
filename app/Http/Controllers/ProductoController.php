@@ -1069,7 +1069,7 @@ class ProductoController extends Controller
         
         $perPage = max(1, min(100, (int)$perPage));
         
-        $productos = Producto::with('marca')
+        $productos = Producto::with(['marca', 'subcategoria'])
             ->where('nombre', 'NOT LIKE', '%servicio%')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);

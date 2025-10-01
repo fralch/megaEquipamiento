@@ -1,7 +1,8 @@
 import { Head } from "@inertiajs/react";
-import { FiPackage, FiEdit, FiTrash, FiPlus, FiLoader } from "react-icons/fi";
+import { FiPackage, FiEdit, FiTrash, FiPlus, FiLoader, FiEye, FiImage } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
+import ProductModal from './components/ProductModal';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -13,6 +14,8 @@ export default function Productos() {
     const [totalPages, setTotalPages] = useState(1);
     const [perPage, setPerPage] = useState(20);
     const [total, setTotal] = useState(0);
+    const [selectedProduct, setSelectedProduct] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const fetchProductos = async (page = 1, itemsPerPage = 20) => {
         try {
@@ -57,6 +60,21 @@ export default function Productos() {
         if (!stock || stock === 0) return { text: 'Agotado', class: 'bg-red-100 text-red-800' };
         if (stock <= 5) return { text: 'Bajo Stock', class: 'bg-yellow-100 text-yellow-800' };
         return { text: 'Disponible', class: 'bg-green-100 text-green-800' };
+    };
+
+    const handleViewProduct = (producto) => {
+        setSelectedProduct(producto);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedProduct(null);
+    };
+
+    const truncateText = (text, maxLength = 30) => {
+        if (!text) return '';
+        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
     };
 
     return (
@@ -105,60 +123,136 @@ export default function Productos() {
                                 <table className="w-full">
                                     <thead className={`border-b ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
                                         <tr>
-                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                            <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`}>Nombre</th>
-                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                            }`}>Imagen</th>
+                                            <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>Producto</th>
+                                            <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>SKU</th>
+                                            <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                             }`}>Marca</th>
-                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                            <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`}>Precio</th>
-                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                            }`}>Precio Base</th>
+                                            <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`}>Stock</th>
-                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                            }`}>Precio + Ganancia</th>
+                                            <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`}>Estado</th>
-                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                            }`}>Precio + IGV</th>
+                                            <th className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                             }`}>Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
                                         {productos.length > 0 ? productos.map((producto) => {
-                                            const stockStatus = getStockStatus(producto.stock);
+                                            const primeraImagen = producto.imagen && Array.isArray(producto.imagen) && producto.imagen.length > 0 
+                                                ? producto.imagen[0] 
+                                                : null;
+                                            
                                             return (
                                                 <tr key={producto.id} className={`${
                                                     isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                                 }`}>
-                                                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
-                                                        isDarkMode ? 'text-white' : 'text-gray-900'
-                                                    }`}>
-                                                        <div className="max-w-xs truncate" title={producto.nombre}>
-                                                            {producto.nombre}
+                                                    {/* Imagen */}
+                                                    <td className="px-4 py-4 whitespace-nowrap">
+                                                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
+                                                            {primeraImagen ? (
+                                                                <img
+                                                                    src={`/storage/${primeraImagen}`}
+                                                                    alt={producto.nombre}
+                                                                    className="w-full h-full object-cover"
+                                                                    onError={(e) => {
+                                                                        e.target.style.display = 'none';
+                                                                        e.target.nextSibling.style.display = 'flex';
+                                                                    }}
+                                                                />
+                                                            ) : null}
+                                                            <div className={`w-full h-full flex items-center justify-center ${primeraImagen ? 'hidden' : ''}`}>
+                                                                <FiImage className={`w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
+                                                            </div>
                                                         </div>
                                                     </td>
-                                                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                                    }`}>{producto.marca?.nombre || 'Sin marca'}</td>
-                                                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                                    }`}>{formatPrice(producto.precio)}</td>
-                                                    <td className={`px-6 py-4 whitespace-nowrap text-sm ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                                    }`}>{producto.stock || 0}</td>
-                                                    <td className={`px-6 py-4 whitespace-nowrap`}>
-                                                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${stockStatus.class}`}>
-                                                            {stockStatus.text}
-                                                        </span>
+                                                    
+                                                    {/* Producto */}
+                                                    <td className={`px-4 py-4 text-sm ${
+                                                        isDarkMode ? 'text-white' : 'text-gray-900'
+                                                    }`}>
+                                                        <div className="font-medium" title={producto.nombre}>
+                                                            {truncateText(producto.nombre, 40)}
+                                                        </div>
+                                                        {producto.descripcion && (
+                                                            <div className={`text-xs mt-1 ${
+                                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                            }`} title={producto.descripcion}>
+                                                                {truncateText(producto.descripcion, 50)}
+                                                            </div>
+                                                        )}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    
+                                                    {/* SKU */}
+                                                    <td className={`px-4 py-4 whitespace-nowrap text-sm font-mono ${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                    }`}>
+                                                        {producto.sku || 'N/A'}
+                                                    </td>
+                                                    
+                                                    {/* Marca */}
+                                                    <td className={`px-4 py-4 whitespace-nowrap text-sm ${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-500'
+                                                    }`}>
+                                                        {producto.marca?.nombre || 'Sin marca'}
+                                                    </td>
+                                                    
+                                                    {/* Precio Base (sin ganancia) */}
+                                                    <td className={`px-4 py-4 whitespace-nowrap text-sm ${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                    }`}>
+                                                        <div className="font-medium">
+                                                            {producto.precio_sin_ganancia ? `S/ ${parseFloat(producto.precio_sin_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                        </div>
+                                                        <div className="text-xs text-gray-400">Base</div>
+                                                    </td>
+                                                    
+                                                    {/* Precio con Ganancia (sin IGV) */}
+                                                    <td className={`px-4 py-4 whitespace-nowrap text-sm font-semibold ${
+                                                        isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                                    }`}>
+                                                        <div className="font-medium">
+                                                            {producto.precio_ganancia ? `S/ ${parseFloat(producto.precio_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                        </div>
+                                                        <div className="text-xs text-gray-400">Sin IGV</div>
+                                                    </td>
+                                                    
+                                                    {/* Precio con IGV */}
+                                                    <td className={`px-4 py-4 whitespace-nowrap text-sm font-semibold ${
+                                                        isDarkMode ? 'text-green-400' : 'text-green-600'
+                                                    }`}>
+                                                        <div className="font-medium">
+                                                            {producto.precio_igv ? `S/ ${parseFloat(producto.precio_igv).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                        </div>
+                                                        <div className="text-xs text-gray-400">Con IGV</div>
+                                                    </td>
+                                                    
+                                                    {/* Acciones */}
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                                                         <div className="flex gap-2">
-                                                            <button className="text-blue-600 hover:text-blue-900" title="Editar">
+                                                            <button 
+                                                                onClick={() => handleViewProduct(producto)}
+                                                                className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50" 
+                                                                title="Ver detalles"
+                                                            >
+                                                                <FiEye className="w-4 h-4" />
+                                                            </button>
+                                                            <button className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50" title="Editar">
                                                                 <FiEdit className="w-4 h-4" />
                                                             </button>
-                                                            <button className="text-red-600 hover:text-red-900" title="Eliminar">
+                                                            <button className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50" title="Eliminar">
                                                                 <FiTrash className="w-4 h-4" />
                                                             </button>
                                                         </div>
@@ -167,10 +261,13 @@ export default function Productos() {
                                             );
                                         }) : (
                                             <tr>
-                                                <td colSpan="6" className={`px-6 py-8 text-center text-sm ${
-                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                }`}>
-                                                    No se encontraron productos
+                                                <td colSpan="7" className={`px-4 py-8 text-center text-sm ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                    <div className="flex flex-col items-center gap-2">
+                                                        <FiPackage className="w-8 h-8" />
+                                                        <span>No se encontraron productos</span>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         )}
@@ -252,6 +349,13 @@ export default function Productos() {
                         </>
                     )}
                 </div>
+
+                {/* Modal */}
+                <ProductModal 
+                    producto={selectedProduct}
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                />
             </CRMLayout>
         </>
     );
