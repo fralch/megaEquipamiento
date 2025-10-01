@@ -37,14 +37,6 @@ export default function ProductModal({ producto, isOpen, onClose }) {
         });
     };
 
-    const getStockStatus = (stock) => {
-        if (!stock || stock === 0) return { text: 'Agotado', class: 'bg-red-100 text-red-800' };
-        if (stock <= 5) return { text: 'Bajo Stock', class: 'bg-yellow-100 text-yellow-800' };
-        return { text: 'Disponible', class: 'bg-green-100 text-green-800' };
-    };
-
-    const stockStatus = getStockStatus(producto.stock);
-
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
@@ -157,13 +149,6 @@ export default function ProductModal({ producto, isOpen, onClose }) {
                                     }`}>
                                         {producto.nombre}
                                     </h2>
-                                    {producto.sku && (
-                                        <p className={`text-sm ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            SKU: {producto.sku}
-                                        </p>
-                                    )}
                                 </div>
 
                                 {/* Información básica */}
@@ -192,19 +177,19 @@ export default function ProductModal({ producto, isOpen, onClose }) {
                                         isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
                                     }`}>
                                         <div className="flex items-center gap-2 mb-2">
-                                            <FiDollarSign className={`w-4 h-4 ${
+                                            <FiTag className={`w-4 h-4 ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                             }`} />
                                             <span className={`text-sm font-medium ${
                                                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                             }`}>
-                                                Precio
+                                                SKU
                                             </span>
                                         </div>
-                                        <p className={`text-lg font-bold ${
+                                        <p className={`${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
-                                            {formatPrice(producto.precio)}
+                                            {producto.sku || 'Sin SKU'}
                                         </p>
                                     </div>
 
@@ -212,25 +197,54 @@ export default function ProductModal({ producto, isOpen, onClose }) {
                                         isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
                                     }`}>
                                         <div className="flex items-center gap-2 mb-2">
-                                            <FiPackage className={`w-4 h-4 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`} />
+                                            <FiDollarSign className={`w-4 h-4 text-blue-500`} />
                                             <span className={`text-sm font-medium ${
                                                 isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                             }`}>
-                                                Stock
+                                                Precio Base
                                             </span>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className={`${
-                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                        <p className={`text-lg font-bold text-blue-600 ${
+                                            isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                                        }`}>
+                                            {formatPrice(producto.precio_sin_ganancia)}
+                                        </p>
+                                    </div>
+
+                                    <div className={`p-4 rounded-lg ${
+                                        isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
+                                    }`}>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <FiDollarSign className={`w-4 h-4 text-green-500`} />
+                                            <span className={`text-sm font-medium ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                             }`}>
-                                                {producto.stock || 0}
-                                            </span>
-                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${stockStatus.class}`}>
-                                                {stockStatus.text}
+                                                Precio + Ganancia
                                             </span>
                                         </div>
+                                        <p className={`text-lg font-bold text-green-600 ${
+                                            isDarkMode ? 'text-green-400' : 'text-green-600'
+                                        }`}>
+                                            {formatPrice(producto.precio_ganancia)}
+                                        </p>
+                                    </div>
+
+                                    <div className={`p-4 rounded-lg ${
+                                        isDarkMode ? 'bg-gray-800' : 'bg-gray-50'
+                                    }`}>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <FiDollarSign className={`w-4 h-4 text-purple-500`} />
+                                            <span className={`text-sm font-medium ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                            }`}>
+                                                Precio + IGV
+                                            </span>
+                                        </div>
+                                        <p className={`text-lg font-bold text-purple-600 ${
+                                            isDarkMode ? 'text-purple-400' : 'text-purple-600'
+                                        }`}>
+                                            {formatPrice(producto.precio_igv)}
+                                        </p>
                                     </div>
 
                                     <div className={`p-4 rounded-lg ${
