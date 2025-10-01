@@ -1,5 +1,5 @@
 import { Head } from "@inertiajs/react";
-import { FiPackage, FiEdit, FiTrash, FiPlus, FiLoader, FiEye, FiImage } from "react-icons/fi";
+import { FiPackage, FiEdit, FiTrash, FiPlus, FiLoader, FiEye, FiImage, FiSearch } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
 import ProductModal from './components/ProductModal';
@@ -16,14 +16,18 @@ export default function Productos() {
     const [total, setTotal] = useState(0);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
 
-    const fetchProductos = async (page = 1, itemsPerPage = 20) => {
+    const fetchProductos = async (page = 1, itemsPerPage = 20, search = '') => {
         try {
             setLoading(true);
-            const response = await axios.get('/api/productos/excluye-servicios', {
+            const endpoint = search ? '/api/productos/crm' : '/api/productos/excluye-servicios';
+            const response = await axios.get(endpoint, {
                 params: {
                     page: page,
-                    per_page: itemsPerPage
+                    per_page: itemsPerPage,
+                    ...(search && { search: search })
                 }
             });
             
@@ -42,13 +46,40 @@ export default function Productos() {
     };
 
     useEffect(() => {
-        fetchProductos(currentPage, perPage);
+        fetchProductos(currentPage, perPage, searchTerm);
     }, [currentPage, perPage]);
+
+    // Efecto separado para la búsqueda con debounce
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if (searchTerm !== '') {
+                setIsSearching(true);
+                fetchProductos(1, perPage, searchTerm).finally(() => {
+                    setIsSearching(false);
+                });
+            } else {
+                fetchProductos(1, perPage, '');
+            }
+        }, 500); // Debounce de 500ms
+
+        return () => clearTimeout(timeoutId);
+    }, [searchTerm, perPage]);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
             setCurrentPage(newPage);
         }
+    };
+
+    const handleSearch = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        setCurrentPage(1); // Reset to first page when searching
+    };
+
+    const clearSearch = () => {
+        setSearchTerm('');
+        setCurrentPage(1);
     };
 
     const formatPrice = (price) => {
@@ -82,10 +113,48 @@ export default function Productos() {
             <Head title="Productos" />
             <CRMLayout title="Gestión de Productos">
                 <div className="p-6">
+                    {/* Barra de búsqueda */}
+                    <div className="mb-6">
+                        <div className="relative max-w-md">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FiSearch className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Buscar productos por nombre, SKU, descripción o marca..."
+                                value={searchTerm}
+                                onChange={handleSearch}
+                                className={`block w-full pl-10 pr-10 py-2 border rounded-lg text-sm ${
+                                    isDarkMode 
+                                        ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-blue-500 focus:border-blue-500' 
+                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:ring-blue-500 focus:border-blue-500'
+                                } focus:outline-none focus:ring-2`}
+                            />
+                            {searchTerm && (
+                                <button
+                                    onClick={clearSearch}
+                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                >
+                                    <span className={`text-sm ${isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}>
+                                        ✕
+                                    </span>
+                                </button>
+                            )}
+                        </div>
+                        {isSearching && (
+                            <div className="mt-2 flex items-center gap-2">
+                                <FiLoader className="w-4 h-4 animate-spin text-blue-600" />
+                                <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    Buscando...
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="mb-6 flex justify-between items-center">
                         <div className="flex items-center gap-4">
                             <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                Mostrando {productos.length} de {total} productos
+                                {searchTerm ? `Resultados de búsqueda: ${productos.length} de ${total}` : `Mostrando ${productos.length} de ${total} productos`}
                             </span>
                             <select 
                                 value={perPage} 

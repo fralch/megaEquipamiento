@@ -145,6 +145,8 @@ Route::post('/product/eliminar-relacion', [ProductoController::class, 'eliminarR
 Route::get('/api/productos/excluye-servicios', [ProductoController::class, 'getProductosExcluyeServicios'])->name('productos.excluye-servicios');
 // Ruta para obtener productos que son servicios (para CRM)
 Route::get('/api/productos/solo-servicios', [ProductoController::class, 'getProductosSoloServicios'])->name('productos.solo-servicios');
+// Ruta para buscar productos en CRM
+Route::get('/api/productos/crm', [ProductoController::class, 'getProductosCRM'])->name('productos.crm');
 
 // Rutas de tags (web)
 Route::get('/productos/{id}/tags', [ProductoController::class, 'getProductoTags'])->name('productos.tags');

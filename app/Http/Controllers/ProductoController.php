@@ -1083,19 +1083,32 @@ class ProductoController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getProductosSoloServicios(Request $request)
+    public function getProductosCRM(Request $request)
     {
         $perPage = $request->input('per_page', 20);
         $page = $request->input('page', 1);
+        $search = $request->input('search', '');
         
         $perPage = max(1, min(100, (int)$perPage));
         
-        $productos = Producto::with('marca')
-            ->where('nombre', 'LIKE', '%servicio%')
-            ->orderBy('created_at', 'desc')
+        $query = Producto::with(['marca', 'subcategoria']);
+        
+        // Aplicar filtro de búsqueda si existe
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'LIKE', '%' . $search . '%')
+                  ->orWhere('sku', 'LIKE', '%' . $search . '%')
+                  ->orWhere('descripcion', 'LIKE', '%' . $search . '%')
+                  ->orWhereHas('marca', function($marcaQuery) use ($search) {
+                      $marcaQuery->where('nombre', 'LIKE', '%' . $search . '%');
+                  });
+            });
+        }
+        
+        $productos = $query->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
             
         return response()->json($productos);
     }
-    
 }
+
