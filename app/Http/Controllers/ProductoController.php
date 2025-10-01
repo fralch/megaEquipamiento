@@ -1131,5 +1131,88 @@ class ProductoController extends Controller
 
         return response()->json($productos);
     }
+
+    /**
+     * Obtener un producto para edición en CRM
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProductoCRM($id)
+    {
+        try {
+            $producto = Producto::with(['marca', 'subcategoria.categoria'])
+                ->findOrFail($id);
+
+            return response()->json([
+                'success' => true,
+                'producto' => $producto
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Producto no encontrado'
+            ], 404);
+        }
+    }
+
+    /**
+     * Actualizar producto desde CRM (solo descripción)
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateProductoCRM(Request $request, $id)
+    {
+        try {
+            $producto = Producto::findOrFail($id);
+
+            // Validar solo la descripción
+            $validatedData = $request->validate([
+                'descripcion' => 'required|string',
+            ]);
+
+            // Actualizar solo la descripción
+            $producto->descripcion = $validatedData['descripcion'];
+            $producto->save();
+
+            // Invalidar cache si las tablas existen
+            try {
+                Cache::forget("producto_{$producto->id_producto}");
+                Cache::forget('todas_categorias');
+            } catch (\Exception $e) {
+                // Cache tables don't exist, skip
+                Log::info('Cache tables not found, skipping cache invalidation');
+            }
+
+            // Recargar el producto con sus relaciones
+            $producto = $producto->fresh(['marca', 'subcategoria.categoria']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Descripción actualizada correctamente',
+                'producto' => $producto
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Producto no encontrado'
+            ], 404);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar producto en CRM: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar el producto: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
 

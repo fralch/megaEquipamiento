@@ -3,6 +3,7 @@ import { FiPackage, FiEdit, FiTrash, FiPlus, FiLoader, FiEye, FiImage, FiSearch 
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
 import ProductModal from './components/ProductModal';
+import EditProductModal from './components/EditProductModal';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -16,6 +17,8 @@ export default function Productos() {
     const [total, setTotal] = useState(0);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [productToEdit, setProductToEdit] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearching, setIsSearching] = useState(false);
 
@@ -101,6 +104,26 @@ export default function Productos() {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setSelectedProduct(null);
+    };
+
+    const handleEditProduct = (producto) => {
+        setProductToEdit(producto);
+        setIsEditModalOpen(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+        setProductToEdit(null);
+    };
+
+    const handleSaveProduct = (updatedProduct) => {
+        // Actualizar la lista de productos con el producto actualizado
+        setProductos(prevProductos =>
+            prevProductos.map(p =>
+                p.id_producto === updatedProduct.id_producto ? updatedProduct : p
+            )
+        );
+        handleCloseEditModal();
     };
 
     const truncateText = (text, maxLength = 30) => {
@@ -311,14 +334,18 @@ export default function Productos() {
                                                     {/* Acciones */}
                                                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                                                         <div className="flex gap-2">
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleViewProduct(producto)}
-                                                                className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50" 
+                                                                className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                                                                 title="Ver detalles"
                                                             >
                                                                 <FiEye className="w-4 h-4" />
                                                             </button>
-                                                            <button className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50" title="Editar">
+                                                            <button
+                                                                onClick={() => handleEditProduct(producto)}
+                                                                className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
+                                                                title="Editar"
+                                                            >
                                                                 <FiEdit className="w-4 h-4" />
                                                             </button>
                                                             <button className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50" title="Eliminar">
@@ -419,11 +446,19 @@ export default function Productos() {
                     )}
                 </div>
 
-                {/* Modal */}
-                <ProductModal 
+                {/* Modal de Vista */}
+                <ProductModal
                     producto={selectedProduct}
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
+                />
+
+                {/* Modal de Edición */}
+                <EditProductModal
+                    producto={productToEdit}
+                    isOpen={isEditModalOpen}
+                    onClose={handleCloseEditModal}
+                    onSave={handleSaveProduct}
                 />
             </CRMLayout>
         </>

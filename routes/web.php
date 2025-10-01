@@ -147,6 +147,11 @@ Route::get('/api/productos/excluye-servicios', [ProductoController::class, 'getP
 Route::get('/api/productos/solo-servicios', [ProductoController::class, 'getProductosSoloServicios'])->name('productos.solo-servicios');
 // Ruta para buscar productos en CRM
 Route::get('/api/productos/crm', [ProductoController::class, 'getProductosCRM'])->name('productos.crm');
+// Rutas para edición de productos en CRM
+Route::middleware('auth')->group(function () {
+    Route::get('/api/productos/crm/{id}', [ProductoController::class, 'getProductoCRM'])->name('productos.crm.show');
+    Route::put('/api/productos/crm/{id}', [ProductoController::class, 'updateProductoCRM'])->name('productos.crm.update');
+});
 
 // Rutas de tags (web)
 Route::get('/productos/{id}/tags', [ProductoController::class, 'getProductoTags'])->name('productos.tags');

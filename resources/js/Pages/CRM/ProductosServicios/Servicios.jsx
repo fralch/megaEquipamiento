@@ -3,6 +3,7 @@ import { FiSettings, FiEdit, FiTrash, FiPlus, FiLoader, FiEye, FiImage } from "r
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
 import ServiceModal from './components/ServiceModal';
+import EditProductModal from './components/EditProductModal';
 import { useState, useEffect } from 'react';
 
 export default function Servicios() {
@@ -16,6 +17,8 @@ export default function Servicios() {
     const [total, setTotal] = useState(0);
     const [selectedService, setSelectedService] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [serviceToEdit, setServiceToEdit] = useState(null);
 
     const fetchServicios = async (page = 1, itemsPerPage = 20) => {
         try {
@@ -66,6 +69,26 @@ export default function Servicios() {
             return { status: 'Inactivo', color: 'bg-red-100 text-red-800' };
         }
         return { status: 'Activo', color: 'bg-green-100 text-green-800' };
+    };
+
+    const handleEditService = (servicio) => {
+        setServiceToEdit(servicio);
+        setIsEditModalOpen(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+        setServiceToEdit(null);
+    };
+
+    const handleSaveService = (updatedService) => {
+        // Actualizar la lista de servicios con el servicio actualizado
+        setServicios(prevServicios =>
+            prevServicios.map(s =>
+                s.id_producto === updatedService.id_producto ? updatedService : s
+            )
+        );
+        handleCloseEditModal();
     };
 
     if (loading) {
@@ -309,7 +332,7 @@ export default function Servicios() {
                                                     {/* Acciones */}
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                         <div className="flex gap-2">
-                                                            <button 
+                                                            <button
                                                                 onClick={() => {
                                                                     setSelectedService(servicio);
                                                                     setIsModalOpen(true);
@@ -319,10 +342,14 @@ export default function Servicios() {
                                                             >
                                                                 <FiEye className="w-4 h-4" />
                                                             </button>
-                                                            <button className="text-green-600 hover:text-green-900 transition-colors">
+                                                            <button
+                                                                onClick={() => handleEditService(servicio)}
+                                                                className="text-green-600 hover:text-green-900 transition-colors"
+                                                                title="Editar"
+                                                            >
                                                                 <FiEdit className="w-4 h-4" />
                                                             </button>
-                                                            <button className="text-red-600 hover:text-red-900 transition-colors">
+                                                            <button className="text-red-600 hover:text-red-900 transition-colors" title="Eliminar">
                                                                 <FiTrash className="w-4 h-4" />
                                                             </button>
                                                         </div>
@@ -400,7 +427,7 @@ export default function Servicios() {
                     )}
                 </div>
                 
-                {/* Modal de Servicio */}
+                {/* Modal de Vista de Servicio */}
                 {isModalOpen && selectedService && (
                     <ServiceModal
                         servicio={selectedService}
@@ -411,6 +438,14 @@ export default function Servicios() {
                         }}
                     />
                 )}
+
+                {/* Modal de Edición de Servicio */}
+                <EditProductModal
+                    producto={serviceToEdit}
+                    isOpen={isEditModalOpen}
+                    onClose={handleCloseEditModal}
+                    onSave={handleSaveService}
+                />
             </CRMLayout>
         </>
     );
