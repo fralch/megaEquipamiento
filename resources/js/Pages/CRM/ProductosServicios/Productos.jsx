@@ -163,16 +163,16 @@ export default function Productos() {
                                                     <td className="px-4 py-4 whitespace-nowrap">
                                                         <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
                                                             {primeraImagen ? (
-                                                                <img
-                                                                    src={`/storage/${primeraImagen}`}
-                                                                    alt={producto.nombre}
-                                                                    className="w-full h-full object-cover"
-                                                                    onError={(e) => {
-                                                                        e.target.style.display = 'none';
-                                                                        e.target.nextSibling.style.display = 'flex';
-                                                                    }}
-                                                                />
-                                                            ) : null}
+                                                <img
+                                                    src={`/${primeraImagen}`}
+                                                    alt={producto.nombre}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        e.target.style.display = 'none';
+                                                        e.target.nextSibling.style.display = 'flex';
+                                                    }}
+                                                />
+                                            ) : null}
                                                             <div className={`w-full h-full flex items-center justify-center ${primeraImagen ? 'hidden' : ''}`}>
                                                                 <FiImage className={`w-5 h-5 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
                                                             </div>
