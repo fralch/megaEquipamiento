@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EmpresaCliente;
 use App\Models\Usuario;
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Validation\Rule;
@@ -15,12 +16,19 @@ class EmpresaClienteController extends Controller
      */
     public function index()
     {
-        $empresas = EmpresaCliente::with('usuario')
+        $empresas = EmpresaCliente::with(['usuario', 'clienteEnlazado'])
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $usuarios = Usuario::select('id_usuario', 'nombre', 'correo')->get();
+        $clientes = Cliente::select('id', 'nombrecompleto', 'email', 'ruc')
+            ->orderBy('nombrecompleto')
+            ->get();
+
         return Inertia::render('CRM/Clientes/EmpresasClientes', [
-            'empresas' => $empresas
+            'empresas' => $empresas,
+            'usuarios' => $usuarios,
+            'clientes' => $clientes
         ]);
     }
 
@@ -30,9 +38,13 @@ class EmpresaClienteController extends Controller
     public function create()
     {
         $usuarios = Usuario::select('id_usuario', 'nombre', 'correo')->get();
+        $clientes = Cliente::select('id', 'nombrecompleto', 'email', 'ruc')
+            ->orderBy('nombrecompleto')
+            ->get();
 
         return Inertia::render('CRM/Clientes/CrearEmpresaCliente', [
-            'usuarios' => $usuarios
+            'usuarios' => $usuarios,
+            'clientes' => $clientes
         ]);
     }
 
@@ -50,6 +62,7 @@ class EmpresaClienteController extends Controller
             'telefono' => 'required|string|max:20',
             'direccion' => 'required|string',
             'usuario_id' => 'required|exists:usuarios,id_usuario',
+            'cliente_id' => 'nullable|exists:clientes,id',
             'activo' => 'boolean'
         ]);
 
@@ -65,7 +78,7 @@ class EmpresaClienteController extends Controller
      */
     public function show(EmpresaCliente $empresaCliente)
     {
-        $empresaCliente->load('usuario');
+        $empresaCliente->load(['usuario', 'clienteEnlazado']);
 
         return Inertia::render('CRM/Clientes/DetalleEmpresaCliente', [
             'empresa' => $empresaCliente
@@ -78,10 +91,14 @@ class EmpresaClienteController extends Controller
     public function edit(EmpresaCliente $empresaCliente)
     {
         $usuarios = Usuario::select('id_usuario', 'nombre', 'correo')->get();
+        $clientes = Cliente::select('id', 'nombrecompleto', 'email', 'ruc')
+            ->orderBy('nombrecompleto')
+            ->get();
 
         return Inertia::render('CRM/Clientes/EditarEmpresaCliente', [
             'empresa' => $empresaCliente,
-            'usuarios' => $usuarios
+            'usuarios' => $usuarios,
+            'clientes' => $clientes
         ]);
     }
 
@@ -109,6 +126,7 @@ class EmpresaClienteController extends Controller
             'telefono' => 'required|string|max:20',
             'direccion' => 'required|string',
             'usuario_id' => 'required|exists:usuarios,id_usuario',
+            'cliente_id' => 'nullable|exists:clientes,id',
             'activo' => 'boolean'
         ]);
 

@@ -3,7 +3,7 @@ import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiSave, FiUser, FiHash } from "
 import { useTheme } from "../../../../storage/ThemeContext";
 import { router } from "@inertiajs/react";
 
-export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
+export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes = [] }) {
   const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState({
     razon_social: "",
@@ -14,6 +14,7 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
     telefono: "",
     direccion: "",
     usuario_id: "",
+    cliente_id: "",
     activo: true
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -101,6 +102,7 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
             telefono: "",
             direccion: "",
             usuario_id: "",
+            cliente_id: "",
             activo: true
           });
           setErrors({});
@@ -128,6 +130,7 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
       telefono: "",
       direccion: "",
       usuario_id: "",
+      cliente_id: "",
       activo: true
     });
     setErrors({});
@@ -283,6 +286,38 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
                 {errors.usuario_id && (
                   <p className="mt-1 text-sm text-red-600">{errors.usuario_id}</p>
                 )}
+              </div>
+
+              <div className="md:col-span-2">
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  <FiUser className="inline w-4 h-4 mr-1" />
+                  Cliente Enlazado (Opcional)
+                </label>
+                <select
+                  name="cliente_id"
+                  value={formData.cliente_id}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isDarkMode
+                      ? 'bg-gray-700 border-gray-600 text-white'
+                      : 'bg-white border-gray-300 text-gray-900'
+                  } ${errors.cliente_id ? 'border-red-500' : ''}`}
+                >
+                  <option value="">Sin cliente enlazado</option>
+                  {clientes?.map((cliente) => (
+                    <option key={cliente.id} value={cliente.id}>
+                      {cliente.nombrecompleto} - {cliente.ruc}
+                    </option>
+                  ))}
+                </select>
+                {errors.cliente_id && (
+                  <p className="mt-1 text-sm text-red-600">{errors.cliente_id}</p>
+                )}
+                <p className={`mt-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  Seleccione un cliente para enlazar esta empresa con un contacto principal
+                </p>
               </div>
             </div>
           </div>

@@ -7,7 +7,7 @@ import CreateEmpresaModal from './componentes/CreateEmpresaModal';
 import EditEmpresaModal from './componentes/EditEmpresaModal';
 import ShowEmpresaModal from './componentes/ShowEmpresaModal';
 
-export default function EmpresasClientes({ empresas = [], usuarios = [] }) {
+export default function EmpresasClientes({ empresas = [], usuarios = [], clientes = [] }) {
     const { isDarkMode } = useTheme();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -181,6 +181,7 @@ export default function EmpresasClientes({ empresas = [], usuarios = [] }) {
                     isOpen={showCreateModal}
                     onClose={() => setShowCreateModal(false)}
                     usuarios={usuarios}
+                    clientes={clientes}
                 />
             )}
 
@@ -190,6 +191,7 @@ export default function EmpresasClientes({ empresas = [], usuarios = [] }) {
                     onClose={() => setShowEditModal(false)}
                     empresa={selectedEmpresa}
                     usuarios={usuarios}
+                    clientes={clientes}
                 />
             )}
 

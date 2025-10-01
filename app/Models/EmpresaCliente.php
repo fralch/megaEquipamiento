@@ -20,6 +20,7 @@ class EmpresaCliente extends Model
         'telefono',
         'direccion',
         'usuario_id',
+        'cliente_id',
         'activo',
     ];
 
@@ -35,6 +36,14 @@ class EmpresaCliente extends Model
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id', 'id_usuario');
+    }
+
+    /**
+     * Relación con el cliente principal enlazado (opcional)
+     */
+    public function clienteEnlazado()
+    {
+        return $this->belongsTo(Cliente::class, 'cliente_id');
     }
 
     /**
