@@ -53,7 +53,7 @@ class EmpresaController extends Controller
         $empresa = Empresa::create($validated);
 
         return redirect()
-            ->route('empresas.index')
+            ->route('crm.empresas.index')
             ->with('success', 'Empresa creada exitosamente.');
     }
 
@@ -101,7 +101,7 @@ class EmpresaController extends Controller
         $empresa->update($validated);
 
         return redirect()
-            ->route('empresas.index')
+            ->route('crm.empresas.index')
             ->with('success', 'Empresa actualizada exitosamente.');
     }
 
@@ -118,7 +118,7 @@ class EmpresaController extends Controller
         $empresa->delete();
 
         return redirect()
-            ->route('empresas.index')
+            ->route('crm.empresas.index')
             ->with('success', 'Empresa eliminada exitosamente.');
     }
 
