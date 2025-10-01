@@ -1,7 +1,8 @@
 import { Head } from "@inertiajs/react";
-import { FiSettings, FiEdit, FiTrash, FiPlus, FiLoader } from "react-icons/fi";
+import { FiSettings, FiEdit, FiTrash, FiPlus, FiLoader, FiEye, FiImage } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
+import ServiceModal from './components/ServiceModal';
 import { useState, useEffect } from 'react';
 
 export default function Servicios() {
@@ -13,6 +14,8 @@ export default function Servicios() {
     const [totalPages, setTotalPages] = useState(1);
     const [perPage, setPerPage] = useState(20);
     const [total, setTotal] = useState(0);
+    const [selectedService, setSelectedService] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const fetchServicios = async (page = 1, itemsPerPage = 20) => {
         try {
@@ -188,16 +191,19 @@ export default function Servicios() {
                                     <tr>
                                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>Nombre</th>
+                                        }`}>Imagen</th>
+                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                        }`}>Servicio</th>
                                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                         }`}>Marca</th>
                                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>Precio</th>
+                                        }`}>SKU</th>
                                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>Descripción</th>
+                                        }`}>Precio Base</th>
                                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                         }`}>Estado</th>
@@ -209,7 +215,7 @@ export default function Servicios() {
                                 <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
                                     {servicios.length === 0 ? (
                                         <tr>
-                                            <td colSpan="6" className={`px-6 py-8 text-center text-sm ${
+                                            <td colSpan="7" className={`px-6 py-8 text-center text-sm ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                             }`}>
                                                 No se encontraron servicios
@@ -218,42 +224,94 @@ export default function Servicios() {
                                     ) : (
                                         servicios.map((servicio) => {
                                             const serviceStatus = getServiceStatus(servicio);
+                                            const primeraImagen = servicio.imagenes && servicio.imagenes.length > 0 
+                                                ? servicio.imagenes[0] 
+                                                : null;
+                                            
                                             return (
                                                 <tr key={servicio.id} className={`${
                                                     isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                                 }`}>
+                                                    {/* Imagen */}
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                                                            {primeraImagen ? (
+                                                                <img 
+                                                                    src={`/${primeraImagen}`}
+                                                                    alt={servicio.nombre}
+                                                                    className="w-full h-full object-cover"
+                                                                    onError={(e) => {
+                                                                        e.target.style.display = 'none';
+                                                                        e.target.nextSibling.style.display = 'flex';
+                                                                    }}
+                                                                />
+                                                            ) : null}
+                                                            <div className={`w-full h-full flex items-center justify-center ${primeraImagen ? 'hidden' : ''}`}>
+                                                                <FiImage className={`w-6 h-6 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`} />
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    
+                                                    {/* Servicio */}
                                                     <td className={`px-6 py-4 text-sm font-medium ${
                                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                                     }`}>
-                                                        <div className="max-w-xs truncate" title={servicio.nombre}>
-                                                            {servicio.nombre}
+                                                        <div className="max-w-xs">
+                                                            <div className="font-medium truncate" title={servicio.nombre}>
+                                                                {servicio.nombre}
+                                                            </div>
+                                                            {servicio.descripcion && (
+                                                                <div className={`text-xs mt-1 truncate ${
+                                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                                }`} title={servicio.descripcion}>
+                                                                    {servicio.descripcion}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </td>
+                                                    
+                                                    {/* Marca */}
                                                     <td className={`px-6 py-4 whitespace-nowrap text-sm ${
                                                         isDarkMode ? 'text-gray-300' : 'text-gray-500'
                                                     }`}>
                                                         {servicio.marca?.nombre || 'Sin marca'}
                                                     </td>
+                                                    
+                                                    {/* SKU */}
+                                                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-mono ${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                    }`}>
+                                                        {servicio.sku || 'N/A'}
+                                                    </td>
+                                                    
+                                                    {/* Precio Base */}
                                                     <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${
                                                         isDarkMode ? 'text-green-400' : 'text-green-600'
                                                     }`}>
-                                                        {formatPrice(servicio.precio)}
+                                                        {formatPrice(servicio.precio_sin_ganancia || servicio.precio)}
                                                     </td>
-                                                    <td className={`px-6 py-4 text-sm ${
-                                                        isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                                    }`}>
-                                                        <div className="max-w-xs truncate" title={servicio.descripcion}>
-                                                            {servicio.descripcion || 'Sin descripción'}
-                                                        </div>
-                                                    </td>
+                                                    
+                                                    {/* Estado */}
                                                     <td className={`px-6 py-4 whitespace-nowrap`}>
                                                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${serviceStatus.color}`}>
                                                             {serviceStatus.status}
                                                         </span>
                                                     </td>
+                                                    
+                                                    {/* Acciones */}
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                         <div className="flex gap-2">
-                                                            <button className="text-blue-600 hover:text-blue-900 transition-colors">
+                                                            <button 
+                                                                onClick={() => {
+                                                                    setSelectedService(servicio);
+                                                                    setIsModalOpen(true);
+                                                                }}
+                                                                className="text-blue-600 hover:text-blue-900 transition-colors"
+                                                                title="Ver detalles"
+                                                            >
+                                                                <FiEye className="w-4 h-4" />
+                                                            </button>
+                                                            <button className="text-green-600 hover:text-green-900 transition-colors">
                                                                 <FiEdit className="w-4 h-4" />
                                                             </button>
                                                             <button className="text-red-600 hover:text-red-900 transition-colors">
@@ -333,6 +391,18 @@ export default function Servicios() {
                         </div>
                     )}
                 </div>
+                
+                {/* Modal de Servicio */}
+                {isModalOpen && selectedService && (
+                    <ServiceModal
+                        servicio={selectedService}
+                        isOpen={isModalOpen}
+                        onClose={() => {
+                            setIsModalOpen(false);
+                            setSelectedService(null);
+                        }}
+                    />
+                )}
             </CRMLayout>
         </>
     );
