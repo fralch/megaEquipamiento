@@ -3,120 +3,121 @@ import { FiBarChart, FiEdit, FiTrash2, FiPlus, FiEye, FiSearch, FiDownload, FiSe
 import { useTheme } from '../../../storage/ThemeContext';
 import { useState } from 'react';
 import CRMLayout from '../../../Components/CRM/CRMLayout';
+import ShowCotizaciones from './components/ShowCotizaciones';
+import CreateCotizaciones from './components/CreateCotizaciones';
+import EditCotizaciones from './components/EditCotizaciones';
 
 export default function Cotizaciones() {
     const { isDarkMode } = useTheme();
     const [searchTerm, setSearchTerm] = useState('');
     const [filterEstado, setFilterEstado] = useState('all');
+    const [showModal, setShowModal] = useState(null);
+    const [selectedCotizacion, setSelectedCotizacion] = useState(null);
 
-    // Datos hardcodeados más detallados
+    // Simulated data - replace with actual API calls
     const cotizaciones = [
         {
             id: 1,
             numero: "COT-2024-001",
+            fechaCotizacion: "2024-01-15",
+            fechaVencimiento: "2024-02-15",
+            entrega: "15 días hábiles",
+            lugarEntrega: "Lima, Perú",
+            garantia: "12 meses",
+            formaPago: "50% adelanto, 50% contra entrega",
+            clienteId: 1,
             cliente: "Laboratorio San Marcos",
             contacto: "Ana García",
             email: "ana.garcia@sanmarcos.com",
             telefono: "+51 987 654 321",
-            total: "S/ 45,320",
-            subtotal: "S/ 38,407",
-            igv: "S/ 6,913",
-            fecha: "2024-01-15",
-            fechaVencimiento: "2024-02-15",
-            estado: "pendiente",
+            usuarioId: 1,
             vendedor: "Carlos Mendoza",
+            miempresaId: 1,
+            moneda: "soles",
+            tipoCambio: 3.75,
             productos: [
-                { nombre: "Microscopio Óptico Professional", cantidad: 2, precio: "S/ 15,500" },
-                { nombre: "Balanza Analítica 0.1mg", cantidad: 1, precio: "S/ 8,200" }
+                { id: 1, nombre: "Microscopio Óptico Professional", cantidad: 2, precio: 15500, total: 31000 },
+                { id: 2, nombre: "Balanza Analítica 0.1mg", cantidad: 1, precio: 8200, total: 8200 }
             ],
-            observaciones: "Cliente requiere entrega urgente en campus universitario"
+            totalMontoProductos: 39200,
+            productosAdicionales: [
+                { id: 1, descripcion: "Instalación y capacitación", precio: 3500 },
+                { id: 2, descripcion: "Mantenimiento preventivo (1 año)", precio: 2620 }
+            ],
+            totalAdicionales: 6120,
+            total: 45320,
+            estado: "pendiente"
         },
         {
             id: 2,
             numero: "COT-2024-002",
+            fechaCotizacion: "2024-01-18",
+            fechaVencimiento: "2024-02-18",
+            entrega: "20 días hábiles",
+            lugarEntrega: "Lima, Perú",
+            garantia: "24 meses",
+            formaPago: "30 días",
+            clienteId: 2,
             cliente: "Universidad San Marcos",
             contacto: "Dr. Mario López",
             email: "mario.lopez@unmsm.edu.pe",
             telefono: "+51 976 543 210",
-            total: "S/ 28,750",
-            subtotal: "S/ 24,365",
-            igv: "S/ 4,385",
-            fecha: "2024-01-18",
-            fechaVencimiento: "2024-02-18",
-            estado: "aprobada",
+            usuarioId: 2,
             vendedor: "José Ruiz",
+            miempresaId: 1,
+            moneda: "soles",
+            tipoCambio: 3.75,
             productos: [
-                { nombre: "Centrífuga de Mesa Digital", cantidad: 1, precio: "S/ 12,500" },
-                { nombre: "Kit de Reactivos Químicos", cantidad: 3, precio: "S/ 3,950" }
+                { id: 3, nombre: "Centrífuga de Mesa Digital", cantidad: 1, precio: 12500, total: 12500 },
+                { id: 4, nombre: "Kit de Reactivos Químicos", cantidad: 3, precio: 3950, total: 11850 }
             ],
-            observaciones: "Cotización aprobada por comité de compras"
+            totalMontoProductos: 24350,
+            productosAdicionales: [
+                { id: 3, descripcion: "Instalación especializada", precio: 4400 }
+            ],
+            totalAdicionales: 4400,
+            total: 28750,
+            estado: "aprobada"
         },
         {
             id: 3,
             numero: "COT-2024-003",
+            fechaCotizacion: "2024-01-20",
+            fechaVencimiento: "2024-02-20",
+            entrega: "10 días hábiles",
+            lugarEntrega: "Lima, Perú",
+            garantia: "18 meses",
+            formaPago: "Contado",
+            clienteId: 3,
             cliente: "BioLab Perú",
             contacto: "Laura Fernández",
             email: "laura.fernandez@biolab.com",
             telefono: "+51 954 321 098",
-            total: "S/ 67,890",
-            subtotal: "S/ 57,534",
-            igv: "S/ 10,356",
-            fecha: "2024-01-20",
-            fechaVencimiento: "2024-02-20",
-            estado: "enviada",
+            usuarioId: 1,
             vendedor: "Carlos Mendoza",
+            miempresaId: 1,
+            moneda: "soles",
+            tipoCambio: 3.75,
             productos: [
-                { nombre: "Espectrofotómetro UV-Vis", cantidad: 1, precio: "S/ 45,000" },
-                { nombre: "Sistema de Purificación de Agua", cantidad: 1, precio: "S/ 12,800" }
+                { id: 5, nombre: "Espectrofotómetro UV-Vis", cantidad: 1, precio: 45000, total: 45000 },
+                { id: 6, nombre: "Sistema de Purificación de Agua", cantidad: 1, precio: 12800, total: 12800 }
             ],
-            observaciones: "Cotización enviada, esperando respuesta del cliente"
-        },
-        {
-            id: 4,
-            numero: "COT-2024-004",
-            cliente: "Científica Lab",
-            contacto: "Diego Vargas",
-            email: "diego.vargas@cientifica.com",
-            telefono: "+51 943 210 987",
-            total: "S/ 22,150",
-            subtotal: "S/ 18,771",
-            igv: "S/ 3,379",
-            fecha: "2024-01-22",
-            fechaVencimiento: "2024-02-22",
-            estado: "rechazada",
-            vendedor: "Ana Torres",
-            productos: [
-                { nombre: "Incubadora de CO2", cantidad: 1, precio: "S/ 18,500" }
+            totalMontoProductos: 57800,
+            productosAdicionales: [
+                { id: 4, descripcion: "Calibración inicial", precio: 5000 },
+                { id: 5, descripcion: "Kit de mantenimiento", precio: 5090 }
             ],
-            observaciones: "Cliente optó por otra alternativa más económica"
-        },
-        {
-            id: 5,
-            numero: "COT-2024-005",
-            cliente: "Instituto de Investigación",
-            contacto: "Patricia Silva",
-            email: "patricia.silva@instituto.pe",
-            telefono: "+51 932 109 876",
-            total: "S/ 156,750",
-            subtotal: "S/ 132,838",
-            igv: "S/ 23,912",
-            fecha: "2024-01-25",
-            fechaVencimiento: "2024-02-25",
-            estado: "negociacion",
-            vendedor: "José Ruiz",
-            productos: [
-                { nombre: "Sistema HPLC Completo", cantidad: 1, precio: "S/ 125,000" },
-                { nombre: "Columnas Cromatográficas", cantidad: 5, precio: "S/ 6,300" }
-            ],
-            observaciones: "En proceso de negociación de términos y condiciones"
+            totalAdicionales: 10090,
+            total: 67890,
+            estado: "enviada"
         }
     ];
 
     const estadisticas = [
-        { titulo: "Total Cotizaciones", valor: "156", color: "blue", cambio: "+8%" },
-        { titulo: "Monto Total", valor: "S/ 2,450,000", color: "green", cambio: "+15%" },
-        { titulo: "Pendientes", valor: "23", color: "yellow", cambio: "+3%" },
-        { titulo: "Aprobadas", valor: "45", color: "purple", cambio: "+12%" }
+        { titulo: "Total Cotizaciones", valor: cotizaciones.length.toString(), color: "blue", cambio: "+8%" },
+        { titulo: "Monto Total", valor: `S/ ${cotizaciones.reduce((sum, cot) => sum + cot.total, 0).toLocaleString()}`, color: "green", cambio: "+15%" },
+        { titulo: "Pendientes", valor: cotizaciones.filter(c => c.estado === 'pendiente').length.toString(), color: "yellow", cambio: "+3%" },
+        { titulo: "Aprobadas", valor: cotizaciones.filter(c => c.estado === 'aprobada').length.toString(), color: "purple", cambio: "+12%" }
     ];
 
     const getEstadoInfo = (estado) => {
@@ -137,6 +138,31 @@ export default function Cotizaciones() {
         const matchesEstado = filterEstado === 'all' || cotizacion.estado === filterEstado;
         return matchesSearch && matchesEstado;
     });
+
+    const formatCurrency = (amount, currency) => {
+        const symbol = currency === 'dolares' ? '$' : 'S/';
+        return `${symbol} ${amount.toLocaleString()}`;
+    };
+
+    const handleShowDetails = (cotizacion) => {
+        setSelectedCotizacion(cotizacion);
+        setShowModal('show');
+    };
+
+    const handleEdit = (cotizacion) => {
+        setSelectedCotizacion(cotizacion);
+        setShowModal('edit');
+    };
+
+    const handleCreate = () => {
+        setSelectedCotizacion(null);
+        setShowModal('create');
+    };
+
+    const closeModal = () => {
+        setShowModal(null);
+        setSelectedCotizacion(null);
+    };
 
     return (
         <>
@@ -222,7 +248,10 @@ export default function Cotizaciones() {
                                 </select>
                             </div>
 
-                            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                            <button 
+                                onClick={handleCreate}
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                            >
                                 <FiPlus className="w-4 h-4" />
                                 Nueva Cotización
                             </button>
@@ -300,13 +329,13 @@ export default function Cotizaciones() {
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div>
                                                         <div className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            {cotizacion.total}
+                                                            {formatCurrency(cotizacion.total, cotizacion.moneda)}
                                                         </div>
                                                         <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            Subtotal: {cotizacion.subtotal}
+                                                            Productos: {formatCurrency(cotizacion.totalMontoProductos, cotizacion.moneda)}
                                                         </div>
                                                         <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            IGV: {cotizacion.igv}
+                                                            Adicionales: {formatCurrency(cotizacion.totalAdicionales, cotizacion.moneda)}
                                                         </div>
                                                     </div>
                                                 </td>
@@ -315,7 +344,7 @@ export default function Cotizaciones() {
                                                         <div className="flex items-center gap-1">
                                                             <FiCalendar className="w-3 h-3 text-gray-400" />
                                                             <span className={`text-xs ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                                {cotizacion.fecha}
+                                                                {cotizacion.fechaCotizacion}
                                                             </span>
                                                         </div>
                                                         <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -333,13 +362,21 @@ export default function Cotizaciones() {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                     <div className="flex items-center gap-2">
-                                                        <button className="p-1 rounded hover:bg-blue-100 text-blue-600 transition-colors duration-200" title="Ver detalles">
+                                                        <button 
+                                                            onClick={() => handleShowDetails(cotizacion)}
+                                                            className="p-1 rounded hover:bg-blue-100 text-blue-600 transition-colors duration-200" 
+                                                            title="Ver detalles"
+                                                        >
                                                             <FiEye className="w-4 h-4" />
                                                         </button>
                                                         <button className="p-1 rounded hover:bg-green-100 text-green-600 transition-colors duration-200" title="Descargar PDF">
                                                             <FiDownload className="w-4 h-4" />
                                                         </button>
-                                                        <button className="p-1 rounded hover:bg-yellow-100 text-yellow-600 transition-colors duration-200" title="Editar">
+                                                        <button 
+                                                            onClick={() => handleEdit(cotizacion)}
+                                                            className="p-1 rounded hover:bg-yellow-100 text-yellow-600 transition-colors duration-200" 
+                                                            title="Editar"
+                                                        >
                                                             <FiEdit className="w-4 h-4" />
                                                         </button>
                                                         <button className="p-1 rounded hover:bg-red-100 text-red-600 transition-colors duration-200" title="Eliminar">
@@ -377,6 +414,37 @@ export default function Cotizaciones() {
                         </div>
                     </div>
                 </div>
+
+                {/* Modals */}
+                {showModal === 'show' && selectedCotizacion && (
+                    <ShowCotizaciones 
+                        cotizacion={selectedCotizacion}
+                        onClose={closeModal}
+                    />
+                )}
+
+                {showModal === 'create' && (
+                    <CreateCotizaciones 
+                        onClose={closeModal}
+                        onSave={(newCotizacion) => {
+                            // Handle save logic here
+                            console.log('Nueva cotización:', newCotizacion);
+                            closeModal();
+                        }}
+                    />
+                )}
+
+                {showModal === 'edit' && selectedCotizacion && (
+                    <EditCotizaciones 
+                        cotizacion={selectedCotizacion}
+                        onClose={closeModal}
+                        onSave={(updatedCotizacion) => {
+                            // Handle update logic here
+                            console.log('Cotización actualizada:', updatedCotizacion);
+                            closeModal();
+                        }}
+                    />
+                )}
             </CRMLayout>
         </>
     );
