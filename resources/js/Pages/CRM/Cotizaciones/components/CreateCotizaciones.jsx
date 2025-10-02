@@ -177,21 +177,31 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className={`w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl ${
-                isDarkMode ? 'bg-gray-900 border border-gray-700' : 'bg-white border border-gray-200'
+            <div className={`w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-xl shadow-xl ${
+                isDarkMode ? 'bg-gray-800' : 'bg-white'
             }`}>
                 {/* Header */}
-                <div className={`sticky top-0 px-6 py-4 border-b flex items-center justify-between ${
-                    isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'
+                <div className={`flex items-center justify-between p-6 border-b ${
+                    isDarkMode ? 'border-gray-700' : 'border-gray-200'
                 }`}>
-                    <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        Nueva Cotización
-                    </h2>
+                    <div className="flex items-center">
+                        <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                            <FiDollarSign className="w-6 h-6 text-blue-600" />
+                        </div>
+                        <div>
+                            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                Nueva Cotización
+                            </h3>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                Crea una nueva cotización para tus clientes
+                            </p>
+                        </div>
+                    </div>
                     <button
                         onClick={onClose}
                         className={`p-2 rounded-lg hover:bg-gray-100 ${
-                            isDarkMode ? 'hover:bg-gray-800 text-gray-400' : 'text-gray-500'
-                        }`}
+                            isDarkMode ? 'hover:bg-gray-700 text-gray-400' : 'text-gray-500'
+                        } transition-colors duration-200`}
                     >
                         <FiX className="w-5 h-5" />
                     </button>
@@ -200,60 +210,66 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                 {/* Form */}
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     {/* Información General */}
-                    <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                        <h3 className={`text-lg font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <div>
+                        <h4 className={`text-md font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                             Información General
-                        </h3>
+                        </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div>
-                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    <FiCalendar className="inline w-4 h-4 mr-2" />
-                                    Fecha de Cotización
+                                <label className={`block text-sm font-medium mb-2 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    <FiCalendar className="inline w-4 h-4 mr-1" />
+                                    Fecha de Cotización *
                                 </label>
                                 <input
                                     type="date"
                                     name="fecha_cotizacion"
                                     value={formData.fecha_cotizacion}
                                     onChange={handleInputChange}
-                                    className={`w-full px-3 py-2 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white' 
-                                            : 'bg-white border-gray-300 text-gray-900'
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                                     }`}
                                     required
                                 />
                             </div>
                             <div>
-                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    <FiClock className="inline w-4 h-4 mr-2" />
-                                    Fecha de Vencimiento
+                                <label className={`block text-sm font-medium mb-2 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    <FiClock className="inline w-4 h-4 mr-1" />
+                                    Fecha de Vencimiento *
                                 </label>
                                 <input
                                     type="date"
                                     name="fecha_vencimiento"
                                     value={formData.fecha_vencimiento}
                                     onChange={handleInputChange}
-                                    className={`w-full px-3 py-2 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white' 
-                                            : 'bg-white border-gray-300 text-gray-900'
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                                     }`}
                                     required
                                 />
                             </div>
                             <div>
-                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    <FiDollarSign className="inline w-4 h-4 mr-2" />
-                                    Moneda
+                                <label className={`block text-sm font-medium mb-2 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    <FiDollarSign className="inline w-4 h-4 mr-1" />
+                                    Moneda *
                                 </label>
                                 <select
                                     name="moneda"
                                     value={formData.moneda}
                                     onChange={handleInputChange}
-                                    className={`w-full px-3 py-2 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white' 
-                                            : 'bg-white border-gray-300 text-gray-900'
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                                     }`}
                                     required
                                 >
@@ -264,9 +280,11 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                         </div>
                         {formData.moneda === 'dolares' && (
                             <div className="mt-4">
-                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                    <FiDollarSign className="inline w-4 h-4 mr-2" />
-                                    Tipo de Cambio
+                                <label className={`block text-sm font-medium mb-2 ${
+                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                }`}>
+                                    <FiDollarSign className="inline w-4 h-4 mr-1" />
+                                    Tipo de Cambio *
                                 </label>
                                 <input
                                     type="number"
@@ -274,10 +292,10 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                     name="tipo_cambio"
                                     value={formData.tipo_cambio}
                                     onChange={handleInputChange}
-                                    className={`w-full md:w-1/3 px-3 py-2 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white' 
-                                            : 'bg-white border-gray-300 text-gray-900'
+                                    className={`w-full md:w-1/3 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                                     }`}
                                     placeholder="3.750"
                                     required
@@ -693,22 +711,19 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                         <button
                             type="button"
                             onClick={onClose}
-                            className={`px-4 py-2 rounded-lg font-medium ${
-                                isDarkMode 
-                                    ? 'bg-gray-700 text-white hover:bg-gray-600' 
-                                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                            className={`px-4 py-2 text-sm font-medium rounded-lg border transition-colors duration-200 ${
+                                isDarkMode
+                                    ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
+                                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
                             }`}
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className={`px-4 py-2 rounded-lg font-medium ${
-                                isDarkMode 
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                            }`}
+                            className={`px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 flex items-center`}
                         >
+                            <FiDollarSign className="w-4 h-4 mr-2" />
                             Guardar Cotización
                         </button>
                     </div>
