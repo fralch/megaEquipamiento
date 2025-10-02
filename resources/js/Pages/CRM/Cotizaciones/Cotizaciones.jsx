@@ -145,6 +145,7 @@ export default function Cotizaciones() {
     };
 
     const handleShowDetails = (cotizacion) => {
+        console.log('👁️ Botón Ver detalles presionado!', cotizacion);
         setSelectedCotizacion(cotizacion);
         setShowModal('show');
     };
@@ -155,8 +156,11 @@ export default function Cotizaciones() {
     };
 
     const handleCreate = () => {
+        console.log('🚀 Botón Nueva Cotización presionado!');
+        console.log('Estado actual showModal:', showModal);
         setSelectedCotizacion(null);
         setShowModal('create');
+        console.log('Estado después de setShowModal:', 'create');
     };
 
     const closeModal = () => {
@@ -425,6 +429,7 @@ export default function Cotizaciones() {
 
                 {showModal === 'create' && (
                     <CreateCotizaciones 
+                        isOpen={true}
                         onClose={closeModal}
                         onSave={(newCotizacion) => {
                             // Handle save logic here
