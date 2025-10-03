@@ -9,8 +9,93 @@ import CreateUserModal from "./componentes/CreateUserModal";
 
 export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filters }) {
   const { isDarkMode } = useTheme();
-  const [searchTerm, setSearchTerm] = useState(filters?.search || "");
-  const [filterRole, setFilterRole] = useState(filters?.role || "all");
+  
+  // Datos hardcodeados para pruebas del frontend
+  const fallbackUsuarios = {
+    data: [
+      {
+        id_usuario: 1,
+        nombre: "Juan Carlos",
+        apellido: "Pérez García",
+        nombre_usuario: "jperez",
+        correo: "juan.perez@empresa.com",
+        telefono: "987654321",
+        direccion: "Av. Javier Prado 123, San Isidro",
+        created_at: "2024-01-15T10:30:00Z",
+        role: { id_rol: 1, nombre_rol: "admin" },
+      },
+      {
+        id_usuario: 2,
+        nombre: "María Elena",
+        apellido: "González López",
+        nombre_usuario: "mgonzalez",
+        correo: "maria.gonzalez@empresa.com",
+        telefono: "987654322",
+        direccion: "Calle Los Pinos 456, Miraflores",
+        created_at: "2024-01-20T14:15:00Z",
+        role: { id_rol: 2, nombre_rol: "editor" },
+      },
+      {
+        id_usuario: 3,
+        nombre: "Carlos Alberto",
+        apellido: "Rodríguez Silva",
+        nombre_usuario: "crodriguez",
+        correo: "carlos.rodriguez@empresa.com",
+        telefono: "987654323",
+        direccion: "Jr. Las Flores 789, San Borja",
+        created_at: "2024-02-01T09:45:00Z",
+        role: { id_rol: 3, nombre_rol: "usuario" },
+      },
+      {
+        id_usuario: 4,
+        nombre: "Ana Sofía",
+        apellido: "Martínez Torres",
+        nombre_usuario: "amartinez",
+        correo: "ana.martinez@empresa.com",
+        telefono: "987654324",
+        direccion: "Av. Arequipa 321, Lince",
+        created_at: "2024-02-10T16:20:00Z",
+        role: { id_rol: 2, nombre_rol: "editor" },
+      },
+      {
+        id_usuario: 5,
+        nombre: "Luis Fernando",
+        apellido: "Vásquez Morales",
+        nombre_usuario: "lvasquez",
+        correo: "luis.vasquez@empresa.com",
+        telefono: "987654325",
+        direccion: "Calle Real 654, Surco",
+        created_at: "2024-02-15T11:10:00Z",
+        role: { id_rol: 3, nombre_rol: "usuario" },
+      },
+    ],
+    from: 1,
+    to: 5,
+    total: 5,
+  };
+
+  const fallbackRoles = [
+    { id_rol: 1, nombre_rol: "admin", descripcion: "Administrador del sistema" },
+    { id_rol: 2, nombre_rol: "editor", descripcion: "Editor de contenido" },
+    { id_rol: 3, nombre_rol: "usuario", descripcion: "Usuario estándar" },
+  ];
+
+  const fallbackEstadisticas = {
+    total_usuarios: 5,
+    usuarios_activos: 4,
+    usuarios_inactivos: 1,
+    nuevos_este_mes: 2,
+  };
+
+  const fallbackFilters = { search: "", role: "all" };
+
+  const usuariosData = usuarios ?? fallbackUsuarios;
+  const rolesData = roles ?? fallbackRoles;
+  const estadisticasData = estadisticas ?? fallbackEstadisticas;
+  const filtersData = filters ?? fallbackFilters;
+
+  const [searchTerm, setSearchTerm] = useState(filtersData.search || "");
+  const [filterRole, setFilterRole] = useState(filtersData.role || "all");
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -44,17 +129,19 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
     return nombre.substring(0, 2);
   };
 
-  const filteredUsuarios = usuarios.data ? usuarios.data.filter((u) => {
-    const q = searchTerm.toLowerCase().trim();
-    const matchesSearch =
-      !q ||
-      u.nombre.toLowerCase().includes(q) ||
-      u.correo.toLowerCase().includes(q) ||
-      (u.telefono || "").toLowerCase().includes(q) ||
-      u.nombre_usuario.toLowerCase().includes(q);
-    const matchesRole = filterRole === "all" || (u.role && u.role.nombre_rol === filterRole);
-    return matchesSearch && matchesRole;
-  }) : [];
+  const filteredUsuarios = usuariosData.data
+    ? usuariosData.data.filter((u) => {
+        const q = searchTerm.toLowerCase().trim();
+        const matchesSearch =
+          !q ||
+          u.nombre.toLowerCase().includes(q) ||
+          u.correo.toLowerCase().includes(q) ||
+          (u.telefono || "").toLowerCase().includes(q) ||
+          u.nombre_usuario.toLowerCase().includes(q);
+        const matchesRole = filterRole === "all" || (u.role && u.role.nombre_rol === filterRole);
+        return matchesSearch && matchesRole;
+      })
+    : [];
 
   // Modal handlers
   const handleEditUser = (user) => {
@@ -187,47 +274,51 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
         <div className="p-6">
           {/* Estadísticas */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            {estadisticas.map((stat, index) => (
-              <div
-                key={index}
-                className={`rounded-xl shadow-sm border p-6 transition-all duration-300 hover:shadow-lg ${
-                  isDarkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p
-                      className={`text-sm font-medium ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
+            {Object.entries(estadisticasData).map(([key, value]) => {
+              const labels = {
+                total_usuarios: "Total Usuarios",
+                usuarios_activos: "Usuarios Activos",
+                usuarios_inactivos: "Usuarios Inactivos",
+                nuevos_este_mes: "Nuevos Este Mes",
+              };
+
+              return (
+                <div
+                  key={key}
+                  className={`rounded-xl shadow-sm border p-6 transition-all duration-300 hover:shadow-lg ${
+                    isDarkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p
+                        className={`text-sm font-medium ${
+                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
+                        {labels[key] || key}
+                      </p>
+                      <p
+                        className={`text-2xl font-bold mt-1 ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {value}
+                      </p>
+                    </div>
+                    <div
+                      className={`p-3 rounded-full ${
+                        isDarkMode
+                          ? "bg-blue-900/30 text-blue-300"
+                          : "bg-blue-50 text-blue-600"
                       }`}
                     >
-                      {stat.titulo}
-                    </p>
-                    <p
-                      className={`text-2xl font-bold mt-1 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}
-                    >
-                      {stat.valor}
-                    </p>
-                    <p className="text-sm text-green-600 mt-1">{stat.cambio}</p>
-                  </div>
-                  <div
-                    className={`p-3 rounded-full ${
-                      stat.color === "blue"
-                        ? "bg-blue-100 text-blue-600"
-                        : stat.color === "green"
-                        ? "bg-green-100 text-green-600"
-                        : stat.color === "purple"
-                        ? "bg-purple-100 text-purple-600"
-                        : "bg-orange-100 text-orange-600"
-                    }`}
-                  >
-                    <FiUsers className="w-6 h-6" />
+                      <FiUsers className="w-6 h-6" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Controles */}
@@ -269,7 +360,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                   } focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500`}
                 >
                   <option value="all">Todos los roles</option>
-                  {roles?.map((role) => (
+                  {rolesData.map((role) => (
                     <option key={role.id_rol} value={role.nombre_rol}>
                       {roleLabel(role.nombre_rol)}
                     </option>
@@ -434,9 +525,9 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
             >
               <div className="flex items-center justify-between">
                 <div className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-700"}`}>
-                  Mostrando <span className="font-medium">{usuarios.from || 0}</span> a{" "}
-                  <span className="font-medium">{usuarios.to || 0}</span> de{" "}
-                  <span className="font-medium">{usuarios.total || 0}</span> resultados
+                  Mostrando <span className="font-medium">{usuariosData.from || 1}</span> a{" "}
+                  <span className="font-medium">{usuariosData.to || filteredUsuarios.length}</span> de{" "}
+                  <span className="font-medium">{usuariosData.total || filteredUsuarios.length}</span> resultados
                 </div>
                 <div className="flex gap-2">
                   <button
@@ -464,7 +555,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
           isOpen={showEditModal}
           onClose={closeModals}
           user={selectedUser}
-          roles={roles}
+          roles={rolesData}
           onSave={handleSaveUser}
         />
         
@@ -477,7 +568,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
         <CreateUserModal
           isOpen={showCreateModal}
           onClose={closeModals}
-          roles={roles}
+          roles={rolesData}
           onSave={handleCreateNewUser}
         />
       </CRMLayout>

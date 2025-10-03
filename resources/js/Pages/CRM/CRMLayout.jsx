@@ -75,30 +75,30 @@ export default function CRMLayout({ children, title }) {
     const routeMap = {
         // Usuarios y Roles
         "Usuarios": "/crm/usuarios",
-        "Roles": "/crm/roles",
+        "Roles": "/crm/usuarios/roles",
 
         // Nuestras Empresas
-        "Ver Empresas": "/crm/empresas/ver-empresas",
+        "Ver Empresas": "/crm/empresas",
 
         // Clientes
-        "Empleados y clientes particulares": "/crm/clientes/empleados-clientes-particulares",
-        "Empresas de clientes": "/crm/clientes/empresas-clientes",
-        "Areas de clientes": "/crm/clientes/areas-clientes",
+        "Empleados y clientes particulares": "/crm/clientes/particulares",
+        "Empresas de clientes": "/crm/clientes/empresas",
+        "Areas de clientes": "/crm/clientes/areas",
 
         // Productos y Servicios
-        "PRODUCTOS": "/crm/productos-servicios/productos",
-        "SERVICIOS": "/crm/productos-servicios/servicios",
-        "TAXONOMIAS": "/crm/productos-servicios/taxonomias",
-        "MARCAS": "/crm/productos-servicios/marcas",
-        "PROCEDENCIAS": "/crm/productos-servicios/procedencias",
-        "CATEGORIAS": "/crm/productos-servicios/categorias",
-        "MONEDAS": "/crm/productos-servicios/monedas",
+        "PRODUCTOS": "/crm/productos",
+        "SERVICIOS": "/crm/productos/servicios",
+        "TAXONOMIAS": "/crm/productos/taxonomias",
+        "MARCAS": "/crm/productos/marcas",
+        "PROCEDENCIAS": "/crm/productos/procedencias",
+        "CATEGORIAS": "/crm/productos/categorias",
+        "MONEDAS": "/crm/productos/monedas",
 
         // Cotizaciones
-        "COTIZACIONES": "/crm/cotizaciones/cotizaciones",
+        "COTIZACIONES": "/crm/cotizaciones",
 
         // Conexiones APIs
-        "CONEXIONES API": "/crm/apis/conexiones-api"
+        "CONEXIONES API": "/crm"
     };
 
     return (
@@ -118,7 +118,7 @@ export default function CRMLayout({ children, title }) {
                                 src="https://megaequipamiento.pe/img/logo2.jpg"
                                 alt="CRM Pro Logo"
                                 className="h-16 w-auto cursor-pointer"
-                                onClick={() => router.visit('/crm/dashboard')}
+                                onClick={() => router.visit('/crm')}
                             />
                         </div>
                     </div>

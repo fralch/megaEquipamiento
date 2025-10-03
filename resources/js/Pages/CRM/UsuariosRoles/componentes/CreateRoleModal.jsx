@@ -53,7 +53,7 @@ export default function CreateRoleModal({ isOpen, onClose }) {
         setIsLoading(true);
         
         try {
-            const response = await fetch('/crm/roles', {
+            const response = await fetch('/crm/usuarios/roles', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

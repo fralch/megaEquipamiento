@@ -63,7 +63,7 @@ export default function EditRoleModal({ isOpen, onClose, role }) {
         setIsLoading(true);
         
         try {
-            const response = await fetch(`/crm/roles/${role.id_rol}`, {
+            const response = await fetch(`/crm/usuarios/roles/${role.id_rol}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

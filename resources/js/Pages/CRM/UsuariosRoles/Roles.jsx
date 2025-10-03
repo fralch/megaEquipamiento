@@ -10,6 +10,44 @@ import ShowRoleModal from './componentes/ShowRoleModal';
 export default function RolesUsuarios({ roles }) {
     const { isDarkMode } = useTheme();
     
+    // Datos mock para poder visualizar la UI sin depender del backend
+    const fallbackRoles = [
+        {
+            id_rol: 1,
+            nombre_rol: 'admin',
+            descripcion: 'Acceso completo al CRM y a la configuración del sistema',
+            usuarios_count: 6,
+            permisos: ['Gestionar usuarios', 'Ver reportes', 'Configurar CRM'],
+        },
+        {
+            id_rol: 2,
+            nombre_rol: 'editor',
+            descripcion: 'Puede administrar clientes, cotizaciones y catálogo de productos',
+            usuarios_count: 12,
+            permisos: ['Gestionar clientes', 'Gestionar cotizaciones', 'Ver reportes'],
+        },
+        {
+            id_rol: 3,
+            nombre_rol: 'usuario',
+            descripcion: 'Acceso solo lectura a información comercial y seguimiento de clientes',
+            usuarios_count: 18,
+            permisos: ['Ver clientes', 'Ver cotizaciones'],
+        },
+        {
+            id_rol: 4,
+            nombre_rol: 'ventas',
+            descripcion: 'Equipo comercial con permisos para registrar oportunidades y cotizaciones',
+            usuarios_count: 9,
+            permisos: ['Gestionar cotizaciones', 'Gestionar clientes asignados'],
+        },
+    ];
+
+    const rolesData = Array.isArray(roles?.data)
+        ? roles.data
+        : Array.isArray(roles)
+        ? roles
+        : fallbackRoles;
+
     // Modal states
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -34,7 +72,7 @@ export default function RolesUsuarios({ roles }) {
     const handleDeleteRole = async (role) => {
         if (confirm(`¿Estás seguro de que deseas eliminar el rol "${role.nombre_rol}"?`)) {
             try {
-                const response = await fetch(`/crm/roles/${role.id_rol}`, {
+                const response = await fetch(`/crm/usuarios/roles/${role.id_rol}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -112,7 +150,7 @@ export default function RolesUsuarios({ roles }) {
                                 </tr>
                             </thead>
                             <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
-                                {roles?.map((role) => (
+                                {rolesData.map((role) => (
                                     <tr key={role.id_rol} className={`${
                                         isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                     }`}>
@@ -169,7 +207,8 @@ export default function RolesUsuarios({ roles }) {
                                             </div>
                                         </td>
                                     </tr>
-                                )) || (
+                                )) }
+                                {rolesData.length === 0 && (
                                     <tr>
                                         <td colSpan="5" className={`px-6 py-4 text-center text-sm ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
