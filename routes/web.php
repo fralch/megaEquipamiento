@@ -40,6 +40,39 @@ Route::get('/contacto', function () { return Inertia::render('Contacto'); })->na
 Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
 
+// Rutas del CRM agrupadas por prefijo
+Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
+    Route::get('/', fn () => Inertia::render('CRM/Dashboard'))->name('dashboard');
+
+    Route::prefix('clientes')->name('clientes.')->group(function () {
+        Route::get('/areas', fn () => Inertia::render('CRM/Clientes/AreasClientes'))->name('areas');
+        Route::get('/empresas', fn () => Inertia::render('CRM/Clientes/EmpresasClientes'))->name('empresas');
+        Route::get('/particulares', fn () => Inertia::render('CRM/Clientes/EmpleadosClientesParticulares'))->name('particulares');
+        Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');
+    });
+
+    Route::get('/cotizaciones', fn () => Inertia::render('CRM/Cotizaciones/Cotizaciones'))->name('cotizaciones');
+
+    Route::prefix('empresas')->name('empresas.')->group(function () {
+        Route::get('/', fn () => Inertia::render('CRM/Empresas/VerEmpresas'))->name('index');
+    });
+
+    Route::prefix('productos')->name('productos.')->group(function () {
+        Route::get('/', fn () => Inertia::render('CRM/ProductosServicios/Productos'))->name('index');
+        Route::get('/servicios', fn () => Inertia::render('CRM/ProductosServicios/Servicios'))->name('servicios');
+        Route::get('/categorias', fn () => Inertia::render('CRM/ProductosServicios/Categorias'))->name('categorias');
+        Route::get('/marcas', fn () => Inertia::render('CRM/ProductosServicios/Marcas'))->name('marcas');
+        Route::get('/procedencias', fn () => Inertia::render('CRM/ProductosServicios/Procedencias'))->name('procedencias');
+        Route::get('/taxonomias', fn () => Inertia::render('CRM/ProductosServicios/Taxonomias'))->name('taxonomias');
+        Route::get('/monedas', fn () => Inertia::render('CRM/ProductosServicios/Monedas'))->name('monedas');
+    });
+
+    Route::prefix('usuarios')->name('usuarios.')->group(function () {
+        Route::get('/', fn () => Inertia::render('CRM/UsuariosRoles/Usuarios'))->name('index');
+        Route::get('/roles', fn () => Inertia::render('CRM/UsuariosRoles/Roles'))->name('roles');
+    });
+});
+
 
 // Rutas para crear y mostrar productos
 Route::get('/product/todo', [ProductoController::class, 'getProductosAll']);
