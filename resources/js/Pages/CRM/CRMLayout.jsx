@@ -60,14 +60,6 @@ export default function CRMLayout({ children, title }) {
             items: [
                 "COTIZACIONES"
             ]
-        },
-        {
-            title: "CONEXIONES APIS",
-            icon: FiSettings,
-            key: "apis",
-            items: [
-                "CONEXIONES API"
-            ]
         }
     ];
 
@@ -95,10 +87,7 @@ export default function CRMLayout({ children, title }) {
         "MONEDAS": "/crm/productos/monedas",
 
         // Cotizaciones
-        "COTIZACIONES": "/crm/cotizaciones",
-
-        // Conexiones APIs
-        "CONEXIONES API": "/crm"
+        "COTIZACIONES": "/crm/cotizaciones"
     };
 
     return (
