@@ -9,6 +9,82 @@ import ShowEmpresaModal from './components/ShowEmpresaModal';
 
 export default function VerEmpresas({ empresas, usuarios }) {
     const { isDarkMode } = useTheme();
+
+    const fallbackUsuarios = [
+        {
+            id_usuario: 1,
+            nombre: 'María',
+            apellido: 'Gómez',
+            nombre_usuario: 'mgomez',
+            correo: 'maria.gomez@megaequipamiento.com',
+        },
+        {
+            id_usuario: 2,
+            nombre: 'Carlos',
+            apellido: 'Ramírez',
+            nombre_usuario: 'cramirez',
+            correo: 'carlos.ramirez@megaequipamiento.com',
+        },
+        {
+            id_usuario: 3,
+            nombre: 'Lucía',
+            apellido: 'Fernández',
+            nombre_usuario: 'lfernandez',
+            correo: 'lucia.fernandez@megaequipamiento.com',
+        },
+    ];
+
+    const fallbackEmpresas = [
+        {
+            id: 101,
+            nombre: 'BioLab Perú S.A.C.',
+            ruc: '20604587123',
+            email: 'contacto@biolabperu.com',
+            telefono: '+51 1 550 2345',
+            imagen_destacada: null,
+            id_usuario: fallbackUsuarios[0].id_usuario,
+            usuario: fallbackUsuarios[0],
+            created_at: '2024-01-12T09:30:00Z',
+            updated_at: '2024-02-05T15:45:00Z',
+        },
+        {
+            id: 102,
+            nombre: 'Clínica Vida Integral',
+            ruc: '20587412365',
+            email: 'compras@clinicavidaintegral.pe',
+            telefono: '+51 987 654 321',
+            imagen_destacada: null,
+            id_usuario: fallbackUsuarios[1].id_usuario,
+            usuario: fallbackUsuarios[1],
+            created_at: '2023-11-28T14:10:00Z',
+            updated_at: '2024-02-18T11:20:00Z',
+        },
+        {
+            id: 103,
+            nombre: 'Laboratorio Andino EIRL',
+            ruc: '10456987321',
+            email: 'ventas@laboratorioandino.com',
+            telefono: '+51 1 440 9876',
+            imagen_destacada: null,
+            id_usuario: fallbackUsuarios[2].id_usuario,
+            usuario: fallbackUsuarios[2],
+            created_at: '2023-09-05T08:05:00Z',
+            updated_at: '2024-01-30T19:15:00Z',
+        },
+    ];
+
+    const empresasData = Array.isArray(empresas?.data)
+        ? empresas.data
+        : Array.isArray(empresas)
+        ? empresas
+        : fallbackEmpresas;
+
+    const usuariosData = Array.isArray(usuarios?.data)
+        ? usuarios.data
+        : Array.isArray(usuarios)
+        ? usuarios
+        : fallbackUsuarios;
+
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
@@ -48,7 +124,7 @@ export default function VerEmpresas({ empresas, usuarios }) {
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
                         <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            Lista de todas las empresas registradas ({empresas?.length || 0})
+                            Lista de todas las empresas registradas ({empresasData.length})
                         </p>
                         <button
                             onClick={handleCreate}
@@ -87,8 +163,8 @@ export default function VerEmpresas({ empresas, usuarios }) {
                                     </tr>
                                 </thead>
                                 <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
-                                    {empresas && empresas.length > 0 ? (
-                                        empresas.map((empresa) => (
+                                    {empresasData.length > 0 ? (
+                                        empresasData.map((empresa) => (
                                             <tr key={empresa.id} className={`${
                                                 isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                             }`}>
@@ -179,7 +255,7 @@ export default function VerEmpresas({ empresas, usuarios }) {
                 <CreateEmpresaModal
                     isOpen={showCreateModal}
                     onClose={() => setShowCreateModal(false)}
-                    usuarios={usuarios}
+                    usuarios={usuariosData}
                 />
 
                 <EditEmpresaModal
@@ -189,7 +265,7 @@ export default function VerEmpresas({ empresas, usuarios }) {
                         setSelectedEmpresa(null);
                     }}
                     empresa={selectedEmpresa}
-                    usuarios={usuarios}
+                    usuarios={usuariosData}
                 />
 
                 <ShowEmpresaModal
