@@ -58,12 +58,7 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
 
     Route::prefix('productos')->name('productos.')->group(function () {
         Route::get('/', fn () => Inertia::render('CRM/ProductosServicios/Productos'))->name('index');
-        Route::get('/servicios', fn () => Inertia::render('CRM/ProductosServicios/Servicios'))->name('servicios');
-        Route::get('/categorias', fn () => Inertia::render('CRM/ProductosServicios/Categorias'))->name('categorias');
         Route::get('/marcas', fn () => Inertia::render('CRM/ProductosServicios/Marcas'))->name('marcas');
-        Route::get('/procedencias', fn () => Inertia::render('CRM/ProductosServicios/Procedencias'))->name('procedencias');
-        Route::get('/taxonomias', fn () => Inertia::render('CRM/ProductosServicios/Taxonomias'))->name('taxonomias');
-        Route::get('/monedas', fn () => Inertia::render('CRM/ProductosServicios/Monedas'))->name('monedas');
     });
 
     Route::prefix('usuarios')->name('usuarios.')->group(function () {

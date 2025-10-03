@@ -44,12 +44,7 @@ export default function CRMLayout({ children, title }) {
             key: "productos",
             items: [
                 "PRODUCTOS",
-                "SERVICIOS",
-                "TAXONOMIAS",
-                "MARCAS",
-                "PROCEDENCIAS",
-                "CATEGORIAS",
-                "MONEDAS"
+                "MARCAS"
             ]
         },
         {
@@ -77,12 +72,7 @@ export default function CRMLayout({ children, title }) {
 
         // Productos y Servicios
         "PRODUCTOS": "/crm/productos",
-        "SERVICIOS": "/crm/productos/servicios",
-        "TAXONOMIAS": "/crm/productos/taxonomias",
         "MARCAS": "/crm/productos/marcas",
-        "PROCEDENCIAS": "/crm/productos/procedencias",
-        "CATEGORIAS": "/crm/productos/categorias",
-        "MONEDAS": "/crm/productos/monedas",
 
         // Cotizaciones
         "COTIZACIONES": "/crm/cotizaciones"
