@@ -45,7 +45,6 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
     Route::get('/', fn () => Inertia::render('CRM/Dashboard'))->name('dashboard');
 
     Route::prefix('clientes')->name('clientes.')->group(function () {
-        Route::get('/areas', fn () => Inertia::render('CRM/Clientes/AreasClientes'))->name('areas');
         Route::get('/empresas', fn () => Inertia::render('CRM/Clientes/EmpresasClientes'))->name('empresas');
         Route::get('/particulares', fn () => Inertia::render('CRM/Clientes/EmpleadosClientesParticulares'))->name('particulares');
         Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');

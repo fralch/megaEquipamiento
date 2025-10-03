@@ -35,8 +35,7 @@ export default function CRMLayout({ children, title }) {
             key: "clientes",
             items: [
                 "Empleados y clientes particulares",
-                "Empresas de clientes",
-                "Areas de clientes"
+                "Empresas de clientes"
             ]
         },
         {
@@ -75,7 +74,6 @@ export default function CRMLayout({ children, title }) {
         // Clientes
         "Empleados y clientes particulares": "/crm/clientes/particulares",
         "Empresas de clientes": "/crm/clientes/empresas",
-        "Areas de clientes": "/crm/clientes/areas",
 
         // Productos y Servicios
         "PRODUCTOS": "/crm/productos",
