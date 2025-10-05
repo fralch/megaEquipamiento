@@ -1512,96 +1512,98 @@ const ProductPage = ({ producto }) => {
                                     </h1>
                                 )}
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                                <div className="flex text-left space-x-4 flex-col">
-                                    <div className="ml-3">
-                                        {editMode.precio_ganancia ? (
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    type="number"
-                                                    className={`text-xl md:text-2xl font-semibold text-green-600 border rounded px-2 py-1 transition-colors duration-300 ${
-                                                        isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
-                                                    }`}
-                                                    value={tempInputs.precio_ganancia || producto.precio_ganancia}
-                                                    onChange={(e) => handleInputChange('precio_ganancia', e.target.value)}
-                                                    autoFocus
-                                                />
-                                                <button
-                                                    onClick={() => handleSave('precio_ganancia')}
-                                                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                            <div className={`grid ${productData.marca?.nombre?.toLowerCase() === 'aralab' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'} gap-6 md:gap-8`}>
+                                {productData.marca?.nombre?.toLowerCase() !== 'aralab' && (
+                                    <div className="flex text-left space-x-4 flex-col">
+                                        <div className="ml-3">
+                                            {editMode.precio_ganancia ? (
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="number"
+                                                        className={`text-xl md:text-2xl font-semibold text-green-600 border rounded px-2 py-1 transition-colors duration-300 ${
+                                                            isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
+                                                        }`}
+                                                        value={tempInputs.precio_ganancia || producto.precio_ganancia}
+                                                        onChange={(e) => handleInputChange('precio_ganancia', e.target.value)}
+                                                        autoFocus
+                                                    />
+                                                    <button
+                                                        onClick={() => handleSave('precio_ganancia')}
+                                                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                                                    >
+                                                        ✓
+                                                    </button>
+                                                    <button
+                                                        onClick={() => toggleEditMode('precio_ganancia')}
+                                                        className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <p
+                                                    className="text-xl md:text-2xl font-semibold text-green-600 cursor-pointer"
+                                                    onDoubleClick={() => toggleEditMode('precio_ganancia')}
+                                                    itemProp="offers" itemScope itemType="https://schema.org/Offer"
                                                 >
-                                                    ✓
-                                                </button>
-                                                <button
-                                                    onClick={() => toggleEditMode('precio_ganancia')}
-                                                    className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                                >
-                                                    ✕
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <p
-                                                className="text-xl md:text-2xl font-semibold text-green-600 cursor-pointer"
-                                                onDoubleClick={() => toggleEditMode('precio_ganancia')}
-                                                itemProp="offers" itemScope itemType="https://schema.org/Offer"
-                                            >
-                                                <span itemProp="price" content={productData.precio_ganancia}>
-                                                    {formatPrice(productData.precio_ganancia)}
-                                                </span>
-                                                <meta itemProp="priceCurrency" content="PEN" />
-                                                <meta itemProp="availability" content="https://schema.org/InStock" />
+                                                    <span itemProp="price" content={productData.precio_ganancia}>
+                                                        {formatPrice(productData.precio_ganancia)}
+                                                    </span>
+                                                    <meta itemProp="priceCurrency" content="PEN" />
+                                                    <meta itemProp="availability" content="https://schema.org/InStock" />
+                                                </p>
+                                            )}
+                                            <p className={`text-sm transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                (sin IGV)
                                             </p>
-                                        )}
-                                        <p className={`text-sm transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            (sin IGV)
-                                        </p>
-                                    </div>
-                                    <div>
-                                        {editMode.precio_igv ? (
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    type="number"
-                                                    className={`text-xl md:text-2xl font-semibold border rounded px-2 py-1 transition-colors duration-300 ${
-                                                        isDarkMode 
-                                                            ? 'text-gray-100 bg-gray-700 border-gray-600' 
-                                                            : 'text-gray-800 bg-white border-gray-300'
+                                        </div>
+                                        <div>
+                                            {editMode.precio_igv ? (
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="number"
+                                                        className={`text-xl md:text-2xl font-semibold border rounded px-2 py-1 transition-colors duration-300 ${
+                                                            isDarkMode
+                                                                ? 'text-gray-100 bg-gray-700 border-gray-600'
+                                                                : 'text-gray-800 bg-white border-gray-300'
+                                                        }`}
+                                                        value={tempInputs.precio_igv || producto.precio_igv}
+                                                        onChange={(e) => handleInputChange('precio_igv', e.target.value)}
+                                                        autoFocus
+                                                    />
+                                                    <button
+                                                        onClick={() => handleSave('precio_igv')}
+                                                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                                                    >
+                                                        ✓
+                                                    </button>
+                                                    <button
+                                                        onClick={() => toggleEditMode('precio_igv')}
+                                                        className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <p
+                                                    className={`text-xl md:text-2xl font-semibold cursor-pointer transition-colors duration-300 ${
+                                                        isDarkMode ? 'text-gray-100' : 'text-gray-800'
                                                     }`}
-                                                    value={tempInputs.precio_igv || producto.precio_igv}
-                                                    onChange={(e) => handleInputChange('precio_igv', e.target.value)}
-                                                    autoFocus
-                                                />
-                                                <button
-                                                    onClick={() => handleSave('precio_igv')}
-                                                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                                                    onDoubleClick={() => toggleEditMode('precio_igv')}
                                                 >
-                                                    ✓
-                                                </button>
-                                                <button
-                                                    onClick={() => toggleEditMode('precio_igv')}
-                                                    className="px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                                >
-                                                    ✕
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <p
-                                                className={`text-xl md:text-2xl font-semibold cursor-pointer transition-colors duration-300 ${
-                                                    isDarkMode ? 'text-gray-100' : 'text-gray-800'
-                                                }`}
-                                                onDoubleClick={() => toggleEditMode('precio_igv')}
-                                            >
-                                                {formatPrice(productData.precio_igv)}
+                                                    {formatPrice(productData.precio_igv)}
+                                                </p>
+                                            )}
+                                            <p className={`text-sm transition-colors duration-300 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                (con IGV)
                                             </p>
-                                        )}
-                                        <p className={`text-sm transition-colors duration-300 ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            (con IGV)
-                                        </p>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                                 <div className={`text-sm flex flex-col space-y-2 transition-colors duration-300 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                 }`}>
