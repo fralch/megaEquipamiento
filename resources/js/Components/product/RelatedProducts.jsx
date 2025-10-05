@@ -490,9 +490,11 @@ const RelatedProducts = ({ productId, currentProductSubcategoryId }) => {
                         
                         {/* Precio y SKU */}
                         <div className="border-t border-slate-600 pt-3">
-                            <div className="flex justify-between items-center mb-2">
-                                <span className="text-2xl font-bold text-blue-400">{formatPrice(product.precio_ganancia)}</span>
-                            </div>
+                            {product.marca?.nombre !== 'aralab' && (
+                                <div className="flex justify-between items-center mb-2">
+                                    <span className="text-2xl font-bold text-blue-400">{formatPrice(product.precio_ganancia)}</span>
+                                </div>
+                            )}
                             <div className="text-xs text-gray-400">
                                 SKU: {product.sku}
                             </div>

@@ -688,11 +688,13 @@ const Card = React.memo(({ product }) => {
           </p>
         ))}
         <div className="flex justify-between items-center mt-2">
-          <span className={`text-xl font-bold transition-colors duration-300 ${
-            isDarkMode ? 'text-blue-400' : 'text-blue-600'
-          }`}>
-            {formatPrice(product.priceWithProfit)}
-          </span>
+            {product.nombre_marca?.toLowerCase() !== 'aralab' && (
+              <span className={`text-xl font-bold transition-colors duration-300 ${
+                isDarkMode ? 'text-blue-400' : 'text-blue-600'
+              }`}>
+                {formatPrice(product.priceWithProfit)}
+              </span>
+            )}
         </div>
       </div>
 
