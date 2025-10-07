@@ -119,24 +119,68 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // Helpers para label y color por rol
-  const roleLabel = (nombreRol) => {
-    switch(nombreRol) {
-      case 'admin': return 'Admin';
-      case 'editor': return 'Editor';
-      case 'usuario': return 'Usuario';
-      default: return nombreRol;
+  const resolveUserRole = (entity) => entity?.role ?? entity?.rol ?? null;
+
+  const toTitleCase = (value = "") =>
+    value
+      .toString()
+      .toLowerCase()
+      .replace(/(^|\s|[-_\/])\p{L}/gu, (match) => match.toUpperCase());
+
+  const normalizeRoleKey = (role) => {
+    if (!role) return 'sin-rol';
+    const candidates = [role.slug, role.key, role.codigo, role.nombre_interno, role.nombre_rol, role.nombre];
+    const raw = candidates.find((item) =>
+      (typeof item === 'string' && item.trim().length > 0) || typeof item === 'number'
+    );
+    return raw ? raw.toString().trim().toLowerCase() : 'sin-rol';
+  };
+
+  const formatRoleName = (role) => {
+    if (!role) return 'Sin rol';
+    const candidates = [role.nombre_rol, role.nombre, role.slug, role.key, role.codigo];
+    const raw = candidates.find((item) => typeof item === 'string' && item.trim().length > 0);
+    if (!raw) {
+      return 'Sin rol';
+    }
+    return toTitleCase(raw);
+  };
+
+  const rolePillClasses = (roleKey) => {
+    switch (roleKey) {
+      case 'admin':
+      case 'administrator':
+      case 'administrador':
+        return 'bg-purple-100 text-purple-800';
+      case 'editor':
+      case 'edicion':
+        return 'bg-blue-100 text-blue-800';
+      case 'usuario':
+      case 'user':
+      case 'cliente':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const rolePillClasses = (nombreRol) => {
-    switch(nombreRol) {
-      case 'admin': return "bg-purple-100 text-purple-800";
-      case 'editor': return "bg-blue-100 text-blue-800";
-      case 'usuario': return "bg-green-100 text-green-800";
-      default: return "bg-gray-100 text-gray-800";
-    }
+  const userRoleMeta = (entity) => {
+    const role = resolveUserRole(entity);
+    const key = normalizeRoleKey(role);
+    return {
+      role,
+      key,
+      label: formatRoleName(role),
+    };
   };
+
+  const roleOptions = rolesData.reduce((acc, currentRole) => {
+    const value = normalizeRoleKey(currentRole);
+    if (!acc.some((option) => option.value === value)) {
+      acc.push({ value, label: formatRoleName(currentRole) });
+    }
+    return acc;
+  }, []);
 
   const formatDateValue = (value, options) => {
     if (!value) return null;
@@ -183,28 +227,31 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
     return source.substring(0, 2).toUpperCase();
   };
 
-  const filteredUsuarios = usuariosData.data
-    ? usuariosData.data.filter((u) => {
-        const q = searchTerm.toLowerCase().trim();
-        const matchesSearch =
-          !q ||
-          normalizeSearchValue(u.nombre).includes(q) ||
-          normalizeSearchValue(u.apellido).includes(q) ||
-          normalizeSearchValue(u.correo).includes(q) ||
-          normalizeSearchValue(u.telefono).includes(q) ||
-          normalizeSearchValue(u.nombre_usuario).includes(q) ||
-          normalizeSearchValue(u.ultima_conexion).includes(q);
-        const matchesRole =
-          filterRole === "all" ||
-          ((u.role || u.rol) && (u.role?.nombre_rol || u.rol?.nombre_rol) === filterRole);
-        const isActive = u.activo !== false;
-        const matchesStatus =
-          filterStatus === "all" ||
-          (filterStatus === "active" && isActive) ||
-          (filterStatus === "inactive" && !isActive);
-        return matchesSearch && matchesRole && matchesStatus;
-      })
-    : [];
+  const usuariosList = Array.isArray(usuariosData?.data) ? usuariosData.data : [];
+
+  const hasUsersWithoutRole = usuariosList.some((userRecord) => userRoleMeta(userRecord).key === 'sin-rol');
+
+  const filteredUsuarios = usuariosList.filter((u) => {
+    const q = searchTerm.toLowerCase().trim();
+    const matchesSearch =
+      !q ||
+      normalizeSearchValue(u.nombre).includes(q) ||
+      normalizeSearchValue(u.apellido).includes(q) ||
+      normalizeSearchValue(u.correo).includes(q) ||
+      normalizeSearchValue(u.telefono).includes(q) ||
+      normalizeSearchValue(u.nombre_usuario).includes(q) ||
+      normalizeSearchValue(u.ultima_conexion).includes(q);
+    const { key: roleKey } = userRoleMeta(u);
+    const matchesRole =
+      filterRole === "all" ||
+      roleKey === filterRole;
+    const isActive = u.activo !== false;
+    const matchesStatus =
+      filterStatus === "all" ||
+      (filterStatus === "active" && isActive) ||
+      (filterStatus === "inactive" && !isActive);
+    return matchesSearch && matchesRole && matchesStatus;
+  });
 
   // Modal handlers
   const handleEditUser = (user) => {
@@ -423,11 +470,14 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                   } focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500`}
                 >
                   <option value="all">Todos los roles</option>
-                  {rolesData.map((role) => (
-                    <option key={role.id_rol} value={role.nombre_rol}>
-                      {roleLabel(role.nombre_rol)}
+                  {roleOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
                     </option>
                   ))}
+                  {hasUsersWithoutRole && !roleOptions.some((option) => option.value === 'sin-rol') && (
+                    <option value="sin-rol">Sin rol</option>
+                  )}
                 </select>
 
                 {/* Filtro por estado */}
@@ -483,12 +533,15 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                 <tbody
                   className={`divide-y ${isDarkMode ? "divide-gray-800" : "divide-gray-200"}`}
                 >
-                  {filteredUsuarios.map((u) => (
-                    <tr
-                      key={u.id_usuario}
-                      className={`hover:${isDarkMode ? "bg-gray-800" : "bg-gray-50"} transition-colors duration-200`}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
+                  {filteredUsuarios.map((u) => {
+                    const { label: roleLabelValue, key: roleKey } = userRoleMeta(u);
+
+                    return (
+                      <tr
+                        key={u.id_usuario}
+                        className={`hover:${isDarkMode ? "bg-gray-800" : "bg-gray-50"} transition-colors duration-200`}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
                             {generateAvatar(u.nombre, u.nombre_usuario)}
@@ -510,9 +563,9 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                             </div>
                           </div>
                         </div>
-                      </td>
+                        </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <FiMail className="w-4 h-4 text-gray-400" />
                           <div>
@@ -537,19 +590,19 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                             )}
                           </div>
                         </div>
-                      </td>
+                        </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${rolePillClasses(
-                            (u.role || u.rol)?.nombre_rol || 'usuario'
+                            roleKey
                           )}`}
                         >
-                          {roleLabel((u.role || u.rol)?.nombre_rol || 'usuario')}
+                          {roleLabelValue}
                         </span>
-                      </td>
+                        </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
                           <span
                             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mb-1 ${
@@ -566,9 +619,9 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                             Registrado: {formatDateOnly(u.created_at) ?? "—"}
                           </span>
                         </div>
-                      </td>
+                        </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`text-sm ${
                             isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -576,9 +629,9 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                         >
                           {formatDateTime(u.ultima_conexion) ?? "Sin registro"}
                         </span>
-                      </td>
+                        </td>
 
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleViewUser(u)}
@@ -602,9 +655,10 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                             <FiTrash2 className="w-4 h-4" />
                           </button>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

@@ -20,6 +20,31 @@ export default function ShowUserModal({ isOpen, onClose, user }) {
   const isActive = user.activo !== false;
   const lastConnection = formatDateTime(user.ultima_conexion);
 
+  const toTitleCase = (value = "") =>
+    value
+      .toString()
+      .toLowerCase()
+      .replace(/(^|[\s\-_/])\p{L}/gu, (match) => match.toUpperCase());
+
+  const normalizeRoleKey = (role) => {
+    if (!role) return 'sin-rol';
+    const candidates = [role.slug, role.key, role.codigo, role.nombre_interno, role.nombre_rol, role.nombre];
+    const raw = candidates.find((item) =>
+      (typeof item === 'string' && item.trim().length > 0) || typeof item === 'number'
+    );
+    return raw ? raw.toString().trim().toLowerCase() : 'sin-rol';
+  };
+
+  const formatRoleName = (role) => {
+    if (!role) return 'Sin rol';
+    const candidates = [role.nombre_rol, role.nombre, role.slug, role.key, role.codigo];
+    const raw = candidates.find((item) => typeof item === 'string' && item.trim().length > 0);
+    if (!raw) {
+      return 'Sin rol';
+    }
+    return toTitleCase(raw);
+  };
+
   // Generar avatar con iniciales
   const generateAvatar = (nombre = "", nombreUsuario = "") => {
     const source = nombre?.trim() || nombreUsuario?.trim();
@@ -33,33 +58,45 @@ export default function ShowUserModal({ isOpen, onClose, user }) {
     return source.substring(0, 2).toUpperCase();
   };
 
-  // Helper para label y color por rol
-  const roleLabel = (nombreRol) => {
-    switch(nombreRol) {
-      case 'admin': return 'Administrador';
-      case 'editor': return 'Editor';
-      case 'usuario': return 'Usuario';
-      default: return nombreRol;
+  const rolePillClasses = (roleKey) => {
+    switch (roleKey) {
+      case 'admin':
+      case 'administrator':
+      case 'administrador':
+        return "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/25";
+      case 'editor':
+      case 'edicion':
+        return "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25";
+      case 'usuario':
+      case 'user':
+      case 'cliente':
+        return "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25";
+      default:
+        return "bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg shadow-gray-500/25";
     }
   };
 
-  const rolePillClasses = (nombreRol) => {
-    switch(nombreRol) {
-      case 'admin': return "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/25";
-      case 'editor': return "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25";
-      case 'usuario': return "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/25";
-      default: return "bg-gradient-to-r from-gray-500 to-gray-600 text-white shadow-lg shadow-gray-500/25";
+  const getAvatarGradient = (roleKey) => {
+    switch (roleKey) {
+      case 'admin':
+      case 'administrator':
+      case 'administrador':
+        return "from-purple-500 via-purple-600 to-purple-700";
+      case 'editor':
+      case 'edicion':
+        return "from-blue-500 via-blue-600 to-blue-700";
+      case 'usuario':
+      case 'user':
+      case 'cliente':
+        return "from-green-500 via-green-600 to-green-700";
+      default:
+        return "from-gray-500 via-gray-600 to-gray-700";
     }
   };
 
-  const getAvatarGradient = (nombreRol) => {
-    switch(nombreRol) {
-      case 'admin': return "from-purple-500 via-purple-600 to-purple-700";
-      case 'editor': return "from-blue-500 via-blue-600 to-blue-700";
-      case 'usuario': return "from-green-500 via-green-600 to-green-700";
-      default: return "from-gray-500 via-gray-600 to-gray-700";
-    }
-  };
+  const assignedRole = user.rol ?? user.role ?? null;
+  const roleKey = normalizeRoleKey(assignedRole);
+  const roleLabelValue = formatRoleName(assignedRole);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto animate-in fade-in duration-200">
@@ -138,7 +175,7 @@ export default function ShowUserModal({ isOpen, onClose, user }) {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${
-                    getAvatarGradient(user.role?.nombre_rol || 'usuario')
+                    getAvatarGradient(roleKey)
                   } flex items-center justify-center text-white font-bold text-sm shadow-lg ring-2 ${
                     isDarkMode ? "ring-gray-700/50" : "ring-white/50"
                   } transition-transform hover:scale-105 duration-200`}>
@@ -171,10 +208,10 @@ export default function ShowUserModal({ isOpen, onClose, user }) {
                   </p>
                   <div className="flex items-center gap-3">
                     <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full transition-all hover:scale-105 duration-200 ${
-                      rolePillClasses(user.role?.nombre_rol || 'usuario')
+                      rolePillClasses(roleKey)
                     }`}>
                       <FiShield className="w-3 h-3 mr-1" />
-                      {roleLabel(user.role?.nombre_rol || 'usuario')}
+                      {roleLabelValue}
                     </span>
                   </div>
                 </div>
