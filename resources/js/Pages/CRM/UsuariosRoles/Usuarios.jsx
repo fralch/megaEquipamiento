@@ -416,7 +416,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                 <select
                   value={filterRole}
                   onChange={(e) => setFilterRole(e.target.value)}
-                  className={`px-4 py-2 rounded-lg border ${
+                  className={`px-4 py-2 rounded-lg border pr-10 ${
                     isDarkMode
                       ? "bg-gray-800 border-gray-700 text-white"
                       : "bg-white border-gray-300 text-gray-900"
@@ -434,7 +434,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className={`px-4 py-2 rounded-lg border ${
+                  className={`px-4 py-2 rounded-lg border pr-10 ${
                     isDarkMode
                       ? "bg-gray-800 border-gray-700 text-white"
                       : "bg-white border-gray-300 text-gray-900"
