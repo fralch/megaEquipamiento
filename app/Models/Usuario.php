@@ -17,8 +17,10 @@ class Usuario extends Authenticatable
         'contraseña',
         'correo',
         'nombre',
+        'apellido',
         'direccion',
         'telefono',
+        'id_rol',
     ];
 
     protected $hidden = [
@@ -33,5 +35,13 @@ class Usuario extends Authenticatable
     public function getAuthPassword()
     {
         return $this->contraseña;
+    }
+
+    /**
+     * Relación con el modelo Rol
+     */
+    public function rol()
+    {
+        return $this->belongsTo(Rol::class, 'id_rol', 'id_rol');
     }
 }

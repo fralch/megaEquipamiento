@@ -16,6 +16,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\TagParentController;
 use App\Http\Controllers\ProductoTagController;
 use App\Http\Controllers\SectorController;
+use App\Http\Controllers\CRM\UsuariosRoles\UsuariosGestionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -62,7 +63,16 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
     });
 
     Route::prefix('usuarios')->name('usuarios.')->group(function () {
-        Route::get('/', fn () => Inertia::render('CRM/UsuariosRoles/Usuarios'))->name('index');
+        Route::get('/', [UsuariosGestionController::class, 'index'])->name('index');
+        Route::post('/', [UsuariosGestionController::class, 'store'])->name('store');
+        Route::get('/{id}', [UsuariosGestionController::class, 'show'])->name('show');
+        Route::match(['put', 'post'], '/{id}', [UsuariosGestionController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [UsuariosGestionController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/toggle-status', [UsuariosGestionController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/{id}/change-password', [UsuariosGestionController::class, 'changePassword'])->name('change-password');
+        Route::post('/{id}/reset-password', [UsuariosGestionController::class, 'resetPassword'])->name('reset-password');
+        Route::post('/bulk-delete', [UsuariosGestionController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::get('/export', [UsuariosGestionController::class, 'export'])->name('export');
         Route::get('/roles', fn () => Inertia::render('CRM/UsuariosRoles/Roles'))->name('roles');
     });
 });

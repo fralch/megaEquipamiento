@@ -138,7 +138,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
           u.correo.toLowerCase().includes(q) ||
           (u.telefono || "").toLowerCase().includes(q) ||
           u.nombre_usuario.toLowerCase().includes(q);
-        const matchesRole = filterRole === "all" || (u.role && u.role.nombre_rol === filterRole);
+        const matchesRole = filterRole === "all" || ((u.role || u.rol) && (u.role?.nombre_rol || u.rol?.nombre_rol) === filterRole);
         return matchesSearch && matchesRole;
       })
     : [];
@@ -228,7 +228,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
   const handleDeleteUser = async (userId) => {
     if (confirm('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')) {
       try {
-        const response = await fetch(`/crm/usuarios/${userId}`, {
+        const response = await fetch(`/crm/usuarios/${userId}/delete`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -464,10 +464,10 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${rolePillClasses(
-                            u.role?.nombre_rol || 'usuario'
+                            (u.role || u.rol)?.nombre_rol || 'usuario'
                           )}`}
                         >
-                          {roleLabel(u.role?.nombre_rol || 'usuario')}
+                          {roleLabel((u.role || u.rol)?.nombre_rol || 'usuario')}
                         </span>
                       </td>
 
