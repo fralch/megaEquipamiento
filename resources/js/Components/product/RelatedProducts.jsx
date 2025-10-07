@@ -445,7 +445,7 @@ const RelatedProducts = ({ productId, currentProductSubcategoryId }) => {
                         {/* Badge de marca y bandera */}
                         <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
                             <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">
-                                {product.marca?.nombre || 'PRODUCTO'}
+                                {(product.marca?.nombre || 'PRODUCTO').toUpperCase()}
                             </span>
                             {product.pais && (() => {
                                 const countryName = (product.pais || '').toLowerCase();
