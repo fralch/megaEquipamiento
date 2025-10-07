@@ -432,27 +432,7 @@ export default function CreateUserModal({ isOpen, onClose, roles, onSave }) {
               </div>
             </div>
 
-            {/* Última conexión */}
-            <div>
-              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
-                Última conexión
-              </label>
-              <input
-                type="datetime-local"
-                name="ultima_conexion"
-                value={formData.ultima_conexion}
-                onChange={handleInputChange}
-                className={`w-full px-4 py-2 rounded-lg border ${
-                  isDarkMode
-                    ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400"
-                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
-                } focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500`}
-                placeholder="Selecciona fecha y hora"
-              />
-              <p className={`mt-1 text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
-                Si no hay registro previo de acceso, deja este campo vacío.
-              </p>
-            </div>
+            
 
             {/* Buttons */}
             <div className="flex gap-3 pt-4">
