@@ -6,6 +6,7 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -31,6 +32,10 @@ class AuthController extends Controller
             ]);
         }
 
+        $usuario->forceFill([
+            'ultima_conexion' => Carbon::now(),
+        ])->save();
+
         Auth::login($usuario);
 
         return redirect()->route('welcome');
@@ -54,6 +59,7 @@ class AuthController extends Controller
             'nombre' => $request->nombre,
             'direccion' => $request->direccion,
             'telefono' => $request->telefono,
+            'ultima_conexion' => Carbon::now(),
         ]);
 
         Auth::login($usuario);
