@@ -21,6 +21,8 @@ class Usuario extends Authenticatable
         'direccion',
         'telefono',
         'id_rol',
+        'activo',
+        'ultima_conexion',
     ];
 
     protected $hidden = [
@@ -30,6 +32,8 @@ class Usuario extends Authenticatable
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'activo' => 'boolean',
+        'ultima_conexion' => 'datetime',
     ];
 
     public function getAuthPassword()
