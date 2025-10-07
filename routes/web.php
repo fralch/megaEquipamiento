@@ -17,6 +17,7 @@ use App\Http\Controllers\TagParentController;
 use App\Http\Controllers\ProductoTagController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\CRM\UsuariosRoles\UsuariosGestionController;
+use App\Http\Controllers\CRM\UsuariosRoles\RolesUsuariosController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -73,7 +74,19 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
         Route::post('/{id}/reset-password', [UsuariosGestionController::class, 'resetPassword'])->name('reset-password');
         Route::post('/bulk-delete', [UsuariosGestionController::class, 'bulkDelete'])->name('bulk-delete');
         Route::get('/export', [UsuariosGestionController::class, 'export'])->name('export');
-        Route::get('/roles', fn () => Inertia::render('CRM/UsuariosRoles/Roles'))->name('roles');
+
+        // Rutas de roles
+        Route::prefix('roles')->name('roles.')->group(function () {
+            Route::get('/', [RolesUsuariosController::class, 'index'])->name('index');
+            Route::post('/', [RolesUsuariosController::class, 'store'])->name('store');
+            Route::get('/{id}', [RolesUsuariosController::class, 'show'])->name('show');
+            Route::match(['put', 'post'], '/{id}', [RolesUsuariosController::class, 'update'])->name('update');
+            Route::match(['delete', 'post'], '/{id}/delete', [RolesUsuariosController::class, 'destroy'])->name('destroy');
+            Route::get('/users-count', [RolesUsuariosController::class, 'getUsersCount'])->name('users-count');
+            Route::post('/assign-role', [RolesUsuariosController::class, 'assignRole'])->name('assign');
+            Route::post('/{userId}/remove-role', [RolesUsuariosController::class, 'removeRole'])->name('remove');
+            Route::post('/bulk-assign', [RolesUsuariosController::class, 'bulkAssignRole'])->name('bulk-assign');
+        });
     });
 });
 

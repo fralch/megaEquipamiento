@@ -72,7 +72,7 @@ export default function RolesUsuarios({ roles }) {
     const handleDeleteRole = async (role) => {
         if (confirm(`¿Estás seguro de que deseas eliminar el rol "${role.nombre_rol}"?`)) {
             try {
-                const response = await fetch(`/crm/usuarios/roles/${role.id_rol}`, {
+                const response = await fetch(`/crm/usuarios/roles/${role.id_rol}/delete`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
