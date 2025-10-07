@@ -20,7 +20,7 @@ class UsuariosGestionController extends Controller
     {
         $query = Usuario::query()->with('rol');
 
-        // B�squeda
+        // Búsqueda
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -49,7 +49,8 @@ class UsuariosGestionController extends Controller
         $sortOrder = $request->get('sort_order', 'desc');
         $query->orderBy($sortBy, $sortOrder);
 
-        // Paginaci�n
+        // Paginación
+        $perPage = $request->get('per_page', 10);
         $perPage = $request->get('per_page', 15);
         $usuarios = $query->paginate($perPage);
 
@@ -84,7 +85,7 @@ class UsuariosGestionController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'nombre_usuario' => 'required|string|max:50|unique:usuarios,nombre_usuario',
-            'contrase�a' => 'required|string|min:8|confirmed',
+            'contraseña' => 'required|string|min:8',
             'correo' => 'required|email|max:100|unique:usuarios,correo',
             'nombre' => 'nullable|string|max:50',
             'apellido' => 'nullable|string|max:50',
@@ -95,13 +96,12 @@ class UsuariosGestionController extends Controller
             'ultima_conexion' => 'nullable|date'
         ], [
             'nombre_usuario.required' => 'El nombre de usuario es obligatorio',
-            'nombre_usuario.unique' => 'Este nombre de usuario ya est� en uso',
-            'contrase�a.required' => 'La contrase�a es obligatoria',
-            'contrase�a.min' => 'La contrase�a debe tener al menos 8 caracteres',
-            'contrase�a.confirmed' => 'Las contrase�as no coinciden',
-            'correo.required' => 'El correo electr�nico es obligatorio',
-            'correo.email' => 'El correo electr�nico no es v�lido',
-            'correo.unique' => 'Este correo electr�nico ya est� registrado',
+            'nombre_usuario.unique' => 'Este nombre de usuario ya esta en uso',
+            'contraseña.required' => 'La contraseña es obligatoria',
+            'contraseña.min' => 'La contraseña debe tener al menos 8 caracteres',
+            'correo.required' => 'El correo electronico es obligatorio',
+            'correo.email' => 'El correo electronico no es valido',
+            'correo.unique' => 'Este correo electronico ya esta registrado',
             'id_rol.exists' => 'El rol seleccionado no existe',
             'activo.boolean' => 'El estado seleccionado no es valido',
             'ultima_conexion.date' => 'La fecha de ultima conexion no es valida'
@@ -113,7 +113,7 @@ class UsuariosGestionController extends Controller
 
         $usuario = Usuario::create([
             'nombre_usuario' => $request->nombre_usuario,
-            'contrase�a' => Hash::make($request->contrase�a),
+            'contraseña' => Hash::make($request->contraseña),
             'correo' => $request->correo,
             'nombre' => $request->nombre,
             'apellido' => $request->apellido,
@@ -159,7 +159,7 @@ class UsuariosGestionController extends Controller
                 'max:100',
                 Rule::unique('usuarios', 'correo')->ignore($usuario->id_usuario, 'id_usuario')
             ],
-            'contrase�a' => 'nullable|string|min:8|confirmed',
+            'contraseña' => 'nullable|string|min:8',
             'nombre' => 'nullable|string|max:50',
             'apellido' => 'nullable|string|max:50',
             'direccion' => 'nullable|string|max:255',
@@ -169,12 +169,11 @@ class UsuariosGestionController extends Controller
             'ultima_conexion' => 'nullable|date'
         ], [
             'nombre_usuario.required' => 'El nombre de usuario es obligatorio',
-            'nombre_usuario.unique' => 'Este nombre de usuario ya est� en uso',
-            'correo.required' => 'El correo electr�nico es obligatorio',
-            'correo.email' => 'El correo electr�nico no es v�lido',
-            'correo.unique' => 'Este correo electr�nico ya est� registrado',
-            'contrase�a.min' => 'La contrase�a debe tener al menos 8 caracteres',
-            'contrase�a.confirmed' => 'Las contrase�as no coinciden',
+            'nombre_usuario.unique' => 'Este nombre de usuario ya esta en uso',
+            'correo.required' => 'El correo electronico es obligatorio',
+            'correo.email' => 'El correo electronico no es valido',
+            'correo.unique' => 'Este correo electronico ya esta registrado',
+            'contraseña.min' => 'La contraseña debe tener al menos 8 caracteres',
             'id_rol.exists' => 'El rol seleccionado no existe',
             'activo.boolean' => 'El estado seleccionado no es valido',
             'ultima_conexion.date' => 'La fecha de ultima conexion no es valida'
@@ -205,9 +204,9 @@ class UsuariosGestionController extends Controller
         }
 
 
-        // Solo actualizar contrase�a si se proporciona una nueva
-        if ($request->filled('contrase�a')) {
-            $dataToUpdate['contrase�a'] = Hash::make($request->contrase�a);
+        // Solo actualizar contraseña si se proporciona una nueva
+        if ($request->filled('contraseña')) {
+            $dataToUpdate['contraseña'] = Hash::make($request->contraseña);
         }
 
         $usuario->update($dataToUpdate);
@@ -222,7 +221,7 @@ class UsuariosGestionController extends Controller
     {
         $usuario = Usuario::findOrFail($id);
 
-        // Prevenir eliminaci�n del usuario actual
+        // Prevenir eliminación del usuario actual autenticado
         if (auth()->check() && auth()->user()->id_usuario === $usuario->id_usuario) {
             return back()->withErrors(['error' => 'No puedes eliminar tu propio usuario']);
         }
@@ -248,7 +247,7 @@ class UsuariosGestionController extends Controller
             return back()->with('success', "Usuario {$status} exitosamente");
         }
 
-        return back()->withErrors(['error' => 'Esta funcionalidad no est� disponible']);
+        return back()->withErrors(['error' => 'Esta funcionalidad no esta disponible en este momento']);
     }
 
     /**
@@ -257,13 +256,12 @@ class UsuariosGestionController extends Controller
     public function changePassword(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'contrase�a_actual' => 'required|string',
-            'contrase�a_nueva' => 'required|string|min:8|confirmed',
+            'contraseña_actual' => 'required|string',
+            'contraseña_nueva' => 'required|string|min:8',
         ], [
-            'contrase�a_actual.required' => 'La contrase�a actual es obligatoria',
-            'contrase�a_nueva.required' => 'La nueva contrase�a es obligatoria',
-            'contrase�a_nueva.min' => 'La nueva contrase�a debe tener al menos 8 caracteres',
-            'contrase�a_nueva.confirmed' => 'Las contrase�as no coinciden'
+            'contraseña_actual.required' => 'La contraseña actual es obligatoria',
+            'contraseña_nueva.required' => 'La nueva contraseña es obligatoria',
+            'contraseña_nueva.min' => 'La nueva contraseña debe tener al menos 8 caracteres',
         ]);
 
         if ($validator->fails()) {
@@ -272,16 +270,16 @@ class UsuariosGestionController extends Controller
 
         $usuario = Usuario::findOrFail($id);
 
-        // Verificar contrase�a actual
-        if (!Hash::check($request->contrase�a_actual, $usuario->contrase�a)) {
-            return back()->withErrors(['contrase�a_actual' => 'La contrase�a actual es incorrecta']);
+        // Verificar contraseña actual
+        if (!Hash::check($request->contraseña_actual, $usuario->contraseña)) {
+            return back()->withErrors(['contraseña_actual' => 'La contraseña actual es incorrecta']);
         }
 
         $usuario->update([
-            'contrase�a' => Hash::make($request->contrase�a_nueva)
+            'contraseña' => Hash::make($request->contraseña_nueva)
         ]);
 
-        return back()->with('success', 'Contrase�a cambiada exitosamente');
+        return back()->with('success', 'Contraseña cambiada exitosamente');
     }
 
     /**
@@ -290,11 +288,10 @@ class UsuariosGestionController extends Controller
     public function resetPassword(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'contrase�a_nueva' => 'required|string|min:8|confirmed',
+            'contraseña_nueva' => 'required|string|min:8',
         ], [
-            'contrase�a_nueva.required' => 'La nueva contrase�a es obligatoria',
-            'contrase�a_nueva.min' => 'La nueva contrase�a debe tener al menos 8 caracteres',
-            'contrase�a_nueva.confirmed' => 'Las contrase�as no coinciden'
+            'contraseña_nueva.required' => 'La nueva contraseña es obligatoria',
+            'contraseña_nueva.min' => 'La nueva contraseña debe tener al menos 8 caracteres',
         ]);
 
         if ($validator->fails()) {
@@ -304,10 +301,10 @@ class UsuariosGestionController extends Controller
         $usuario = Usuario::findOrFail($id);
 
         $usuario->update([
-            'contrase�a' => Hash::make($request->contrase�a_nueva)
+            'contraseña' => Hash::make($request->contraseña_nueva)
         ]);
 
-        return back()->with('success', 'Contrase�a restablecida exitosamente');
+        return back()->with('success', 'Contraseña restablecida exitosamente');
     }
 
     /**
@@ -324,7 +321,7 @@ class UsuariosGestionController extends Controller
             return back()->withErrors($validator);
         }
 
-        // Prevenir eliminaci�n del usuario actual
+        // Prevenir eliminación del usuario actual autenticado
         $currentUserId = auth()->check() ? auth()->user()->id_usuario : null;
         $idsToDelete = array_diff($request->ids, [$currentUserId]);
 
@@ -363,7 +360,7 @@ class UsuariosGestionController extends Controller
         ob_start();
 
         // Encabezados CSV
-        fputcsv($handle, ['ID', 'Usuario', 'Correo', 'Nombre', 'Apellido', 'Tel�fono', 'Direcci�n', 'Rol', 'Fecha Creaci�n']);
+        fputcsv($handle, ['ID', 'Usuario', 'Correo', 'Nombre', 'Apellido', 'Teléfono', 'Dirección', 'Rol', 'Fecha Creación']);
 
         foreach ($usuarios as $usuario) {
             fputcsv($handle, [
