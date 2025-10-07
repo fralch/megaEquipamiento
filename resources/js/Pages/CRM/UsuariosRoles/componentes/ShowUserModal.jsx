@@ -1,18 +1,36 @@
-import { FiX, FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiShield, FiCheck, FiStar } from "react-icons/fi";
+import { FiX, FiUser, FiMail, FiPhone, FiMapPin, FiCalendar, FiShield, FiCheck, FiStar, FiClock } from "react-icons/fi";
 import { useTheme } from "../../../../storage/ThemeContext";
 
 export default function ShowUserModal({ isOpen, onClose, user }) {
   const { isDarkMode } = useTheme();
+  const formatDateTime = (value) => {
+    if (!value) return null;
+    const dateValue = new Date(value);
+    if (Number.isNaN(dateValue.getTime())) {
+      return null;
+    }
+    return dateValue.toLocaleString('es-ES', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    });
+  };
 
   if (!isOpen || !user) return null;
 
+  const isActive = user.activo !== false;
+  const lastConnection = formatDateTime(user.ultima_conexion);
+
   // Generar avatar con iniciales
-  const generateAvatar = (nombre) => {
-    const words = nombre.split(' ');
-    if (words.length >= 2) {
-      return words[0][0] + words[1][0];
+  const generateAvatar = (nombre = "", nombreUsuario = "") => {
+    const source = nombre?.trim() || nombreUsuario?.trim();
+    if (!source) {
+      return "??";
     }
-    return nombre.substring(0, 2);
+    const words = source.split(/\s+/);
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return source.substring(0, 2).toUpperCase();
   };
 
   // Helper para label y color por rol
@@ -124,11 +142,19 @@ export default function ShowUserModal({ isOpen, onClose, user }) {
                   } flex items-center justify-center text-white font-bold text-sm shadow-lg ring-2 ${
                     isDarkMode ? "ring-gray-700/50" : "ring-white/50"
                   } transition-transform hover:scale-105 duration-200`}>
-                    {generateAvatar(user.nombre).toUpperCase()}
+                    {generateAvatar(user.nombre, user.nombre_usuario)}
                   </div>
                   {/* Status indicator */}
-                  <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center ring-2 ring-white dark:ring-gray-900 shadow-sm">
-                    <FiCheck className="w-2 h-2 text-white" />
+                  <div
+                    className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center ring-2 ${
+                      isActive ? "bg-green-500" : "bg-red-500"
+                    } ${isDarkMode ? "ring-gray-900" : "ring-white"} shadow-sm`}
+                  >
+                    {isActive ? (
+                      <FiCheck className="w-2 h-2 text-white" />
+                    ) : (
+                      <FiX className="w-2 h-2 text-white" />
+                    )}
                   </div>
                 </div>
                 
@@ -313,47 +339,98 @@ export default function ShowUserModal({ isOpen, onClose, user }) {
                   </div>
                 </div>
               </div>
+
+              <div className={`group p-3 rounded-lg transition-all duration-200 hover:scale-[1.01] ${
+                isDarkMode 
+                  ? "bg-gray-800/40 hover:bg-gray-800/60 border border-gray-700/30" 
+                  : "bg-white/60 hover:bg-white/80 border border-gray-200/30"
+              } backdrop-blur-sm shadow-sm hover:shadow-md`}>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${
+                    isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
+                  } group-hover:scale-110 transition-transform duration-200`}>
+                    <FiClock className={`w-4 h-4 ${
+                      isDarkMode ? "text-blue-400" : "text-blue-600"
+                    }`} />
+                  </div>
+                  <div className="flex-1">
+                    <p className={`text-xs font-semibold mb-0.5 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                    }`}>
+                      Última conexión
+                    </p>
+                    <p className={`text-sm font-medium ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}>
+                      {lastConnection ?? "Sin registro"}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Status Badge mejorado */}
           <div className="px-6 pb-6">
-            <div className={`relative p-3 rounded-lg ${
-              isDarkMode 
-                ? "bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-700/30" 
+          <div className={`relative p-3 rounded-lg ${
+            isActive
+              ? isDarkMode
+                ? "bg-gradient-to-r from-green-900/30 to-emerald-900/30 border border-green-700/30"
                 : "bg-gradient-to-r from-green-50/50 to-emerald-50/50 border border-green-200/30"
-            } backdrop-blur-sm shadow-sm overflow-hidden`}>
+              : isDarkMode
+                ? "bg-gradient-to-r from-red-900/30 to-rose-900/30 border border-red-700/30"
+                : "bg-gradient-to-r from-red-50/50 to-rose-50/50 border border-red-200/30"
+          } backdrop-blur-sm shadow-sm overflow-hidden`}>
               
               {/* Decorative background pattern */}
               <div className="absolute inset-0 opacity-5">
-                <div className="w-full h-full bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg"></div>
+                <div className={`w-full h-full bg-gradient-to-br ${
+                  isActive
+                    ? "from-green-400 to-emerald-500"
+                    : "from-red-400 to-rose-500"
+                } rounded-lg`}></div>
               </div>
               
               <div className="relative">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="relative">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <div className="absolute inset-0 w-2 h-2 bg-green-500 rounded-full animate-ping opacity-75"></div>
+                      <div className={`w-2 h-2 rounded-full animate-pulse ${
+                        isActive ? "bg-green-500" : "bg-red-500"
+                      }`}></div>
+                      <div className={`absolute inset-0 w-2 h-2 rounded-full animate-ping opacity-75 ${
+                        isActive ? "bg-green-500" : "bg-red-500"
+                      }`}></div>
                     </div>
                     <span className={`text-sm font-bold ${
-                      isDarkMode ? "text-green-400" : "text-green-800"
+                      isActive
+                        ? isDarkMode ? "text-green-400" : "text-green-800"
+                        : isDarkMode ? "text-red-400" : "text-red-700"
                     }`}>
-                      Usuario Activo
+                      {isActive ? "Usuario Activo" : "Usuario Inactivo"}
                     </span>
                   </div>
                   <div className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                    isDarkMode 
-                      ? "bg-green-500/20 text-green-400" 
-                      : "bg-green-100 text-green-800"
+                    isActive
+                      ? isDarkMode ? "bg-green-500/20 text-green-400" : "bg-green-100 text-green-800"
+                      : isDarkMode ? "bg-red-500/20 text-red-300" : "bg-red-100 text-red-700"
                   }`}>
-                    ONLINE
+                    {isActive ? "ONLINE" : "OFFLINE"}
                   </div>
                 </div>
                 <p className={`text-xs mt-1 ${
-                  isDarkMode ? "text-green-300/80" : "text-green-700/80"
+                  isActive
+                    ? isDarkMode ? "text-green-300/80" : "text-green-700/80"
+                    : isDarkMode ? "text-red-300/80" : "text-red-700/80"
                 }`}>
-                  El usuario está disponible y puede acceder al sistema
+                  {isActive
+                    ? "El usuario está disponible y puede acceder al sistema"
+                    : "El acceso está restringido hasta que se active nuevamente"}
+                </p>
+                <p className={`text-xs mt-1 ${
+                  isDarkMode ? "text-gray-300/80" : "text-gray-600"
+                }`}>
+                  Último acceso: {lastConnection ?? "Sin registro"}
                 </p>
               </div>
             </div>

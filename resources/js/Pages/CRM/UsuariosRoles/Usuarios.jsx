@@ -22,6 +22,8 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
         telefono: "987654321",
         direccion: "Av. Javier Prado 123, San Isidro",
         created_at: "2024-01-15T10:30:00Z",
+        activo: true,
+        ultima_conexion: "2024-03-05T08:15:00Z",
         role: { id_rol: 1, nombre_rol: "admin" },
       },
       {
@@ -33,6 +35,8 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
         telefono: "987654322",
         direccion: "Calle Los Pinos 456, Miraflores",
         created_at: "2024-01-20T14:15:00Z",
+        activo: false,
+        ultima_conexion: "2024-02-28T17:40:00Z",
         role: { id_rol: 2, nombre_rol: "editor" },
       },
       {
@@ -44,6 +48,8 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
         telefono: "987654323",
         direccion: "Jr. Las Flores 789, San Borja",
         created_at: "2024-02-01T09:45:00Z",
+        activo: true,
+        ultima_conexion: "2024-03-02T10:05:00Z",
         role: { id_rol: 3, nombre_rol: "usuario" },
       },
       {
@@ -55,6 +61,8 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
         telefono: "987654324",
         direccion: "Av. Arequipa 321, Lince",
         created_at: "2024-02-10T16:20:00Z",
+        activo: true,
+        ultima_conexion: null,
         role: { id_rol: 2, nombre_rol: "editor" },
       },
       {
@@ -66,6 +74,8 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
         telefono: "987654325",
         direccion: "Calle Real 654, Surco",
         created_at: "2024-02-15T11:10:00Z",
+        activo: false,
+        ultima_conexion: "2024-03-01T09:30:00Z",
         role: { id_rol: 3, nombre_rol: "usuario" },
       },
     ],
@@ -87,15 +97,23 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
     nuevos_este_mes: 2,
   };
 
-  const fallbackFilters = { search: "", role: "all" };
+  const fallbackFilters = { search: "", role: "all", activo: "all" };
 
   const usuariosData = usuarios ?? fallbackUsuarios;
   const rolesData = roles ?? fallbackRoles;
   const estadisticasData = estadisticas ?? fallbackEstadisticas;
   const filtersData = filters ?? fallbackFilters;
 
+  const initialStatusFilter = (() => {
+    const value = filtersData.activo;
+    if (value === true || value === 'true' || value === 1 || value === '1') return 'active';
+    if (value === false || value === 'false' || value === 0 || value === '0') return 'inactive';
+    return 'all';
+  })();
+
   const [searchTerm, setSearchTerm] = useState(filtersData.search || "");
   const [filterRole, setFilterRole] = useState(filtersData.role || "all");
+  const [filterStatus, setFilterStatus] = useState(initialStatusFilter);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -120,13 +138,49 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
     }
   };
 
-  // Generar avatar con iniciales
-  const generateAvatar = (nombre) => {
-    const words = nombre.split(' ');
-    if (words.length >= 2) {
-      return words[0][0] + words[1][0];
+  const formatDateValue = (value, options) => {
+    if (!value) return null;
+    const dateValue = new Date(value);
+    if (Number.isNaN(dateValue.getTime())) {
+      return null;
     }
-    return nombre.substring(0, 2);
+
+    try {
+      return new Intl.DateTimeFormat('es-PE', options).format(dateValue);
+    } catch (error) {
+      return dateValue.toLocaleString('es-PE', options);
+    }
+  };
+
+  const formatDateOnly = (value) => formatDateValue(value, { dateStyle: 'medium' });
+
+  const formatDateTime = (value) => formatDateValue(value, { dateStyle: 'medium', timeStyle: 'short' });
+
+  const statusBadgeClasses = (isActive) => {
+    if (isActive) {
+      return isDarkMode
+        ? "bg-green-900/30 text-green-300 border border-green-500/30"
+        : "bg-green-100 text-green-800";
+    }
+
+    return isDarkMode
+      ? "bg-red-900/30 text-red-300 border border-red-500/30"
+      : "bg-red-100 text-red-700";
+  };
+
+  const normalizeSearchValue = (value) => (value ?? "").toString().toLowerCase();
+
+  // Generar avatar con iniciales
+  const generateAvatar = (nombre = "", nombreUsuario = "") => {
+    const source = nombre?.trim() || nombreUsuario?.trim();
+    if (!source) {
+      return "??";
+    }
+    const words = source.split(/\s+/);
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return source.substring(0, 2).toUpperCase();
   };
 
   const filteredUsuarios = usuariosData.data
@@ -134,12 +188,21 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
         const q = searchTerm.toLowerCase().trim();
         const matchesSearch =
           !q ||
-          u.nombre.toLowerCase().includes(q) ||
-          u.correo.toLowerCase().includes(q) ||
-          (u.telefono || "").toLowerCase().includes(q) ||
-          u.nombre_usuario.toLowerCase().includes(q);
-        const matchesRole = filterRole === "all" || ((u.role || u.rol) && (u.role?.nombre_rol || u.rol?.nombre_rol) === filterRole);
-        return matchesSearch && matchesRole;
+          normalizeSearchValue(u.nombre).includes(q) ||
+          normalizeSearchValue(u.apellido).includes(q) ||
+          normalizeSearchValue(u.correo).includes(q) ||
+          normalizeSearchValue(u.telefono).includes(q) ||
+          normalizeSearchValue(u.nombre_usuario).includes(q) ||
+          normalizeSearchValue(u.ultima_conexion).includes(q);
+        const matchesRole =
+          filterRole === "all" ||
+          ((u.role || u.rol) && (u.role?.nombre_rol || u.rol?.nombre_rol) === filterRole);
+        const isActive = u.activo !== false;
+        const matchesStatus =
+          filterStatus === "all" ||
+          (filterStatus === "active" && isActive) ||
+          (filterStatus === "inactive" && !isActive);
+        return matchesSearch && matchesRole && matchesStatus;
       })
     : [];
 
@@ -366,6 +429,21 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                     </option>
                   ))}
                 </select>
+
+                {/* Filtro por estado */}
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className={`px-4 py-2 rounded-lg border ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-700 text-white"
+                      : "bg-white border-gray-300 text-gray-900"
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500`}
+                >
+                  <option value="all">Todos los estados</option>
+                  <option value="active">Solo activos</option>
+                  <option value="inactive">Solo inactivos</option>
+                </select>
               </div>
 
               <button 
@@ -388,7 +466,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
               <table className="w-full">
                 <thead className={`${isDarkMode ? "bg-gray-800" : "bg-gray-50"}`}>
                   <tr>
-                    {["Usuario", "Contacto", "Rol", "Estado", "Acciones"].map(
+                    {["Usuario", "Contacto", "Rol", "Estado", "Última conexión", "Acciones"].map(
                       (h) => (
                         <th
                           key={h}
@@ -413,7 +491,7 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-semibold text-sm">
-                            {generateAvatar(u.nombre).toUpperCase()}
+                            {generateAvatar(u.nombre, u.nombre_usuario)}
                           </div>
                           <div className="ml-4">
                             <div
@@ -473,17 +551,31 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
 
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full mb-1 bg-green-100 text-green-800">
-                            Activo
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mb-1 ${
+                              statusBadgeClasses(u.activo !== false)
+                            }`}
+                          >
+                            {u.activo === false ? "Inactivo" : "Activo"}
                           </span>
                           <span
                             className={`text-xs ${
                               isDarkMode ? "text-gray-400" : "text-gray-500"
                             }`}
                           >
-                            Registrado: {new Date(u.created_at).toLocaleDateString()}
+                            Registrado: {formatDateOnly(u.created_at) ?? "—"}
                           </span>
                         </div>
+                      </td>
+
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`text-sm ${
+                            isDarkMode ? "text-gray-300" : "text-gray-700"
+                          }`}
+                        >
+                          {formatDateTime(u.ultima_conexion) ?? "Sin registro"}
+                        </span>
                       </td>
 
                       <td className="px-6 py-4 whitespace-nowrap text-sm">

@@ -4,6 +4,14 @@ import { useTheme } from "../../../../storage/ThemeContext";
 
 export default function CreateUserModal({ isOpen, onClose, roles, onSave }) {
   const { isDarkMode } = useTheme();
+  const toDateTimePayload = (value) => {
+    if (!value) return null;
+    const [datePart, timePartRaw] = value.split('T');
+    if (!datePart) return null;
+    const timePart = (timePartRaw || '').split('.')[0];
+    const normalizedTime = timePart.length === 5 ? `${timePart}:00` : (timePart || '00:00:00');
+    return `${datePart} ${normalizedTime}`;
+  };
   const [formData, setFormData] = useState({
     nombre: "",
     correo: "",
@@ -12,18 +20,21 @@ export default function CreateUserModal({ isOpen, onClose, roles, onSave }) {
     nombre_usuario: "",
     password: "",
     password_confirmation: "",
-    id_rol: ""
+    id_rol: "",
+    activo: true,
+    ultima_conexion: ""
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
+    const fieldValue = type === "checkbox" ? checked : value;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: fieldValue
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -86,7 +97,9 @@ export default function CreateUserModal({ isOpen, onClose, roles, onSave }) {
         direccion: formData.direccion,
         nombre_usuario: formData.nombre_usuario,
         contraseña: formData.password, // El backend espera 'contraseña'
-        id_rol: formData.id_rol
+        id_rol: formData.id_rol,
+        activo: formData.activo,
+        ultima_conexion: toDateTimePayload(formData.ultima_conexion)
       };
 
       await onSave(dataToSend);
@@ -100,7 +113,9 @@ export default function CreateUserModal({ isOpen, onClose, roles, onSave }) {
         nombre_usuario: "",
         password: "",
         password_confirmation: "",
-        id_rol: ""
+        id_rol: "",
+        activo: true,
+        ultima_conexion: ""
       });
       setErrors({});
       onClose();
@@ -124,7 +139,9 @@ export default function CreateUserModal({ isOpen, onClose, roles, onSave }) {
       nombre_usuario: "",
       password: "",
       password_confirmation: "",
-      id_rol: ""
+      id_rol: "",
+      activo: true,
+      ultima_conexion: ""
     });
     setErrors({});
     onClose();
@@ -370,6 +387,71 @@ export default function CreateUserModal({ isOpen, onClose, roles, onSave }) {
               {errors.id_rol && (
                 <p className="mt-1 text-sm text-red-600">{errors.id_rol}</p>
               )}
+            </div>
+
+            {/* Estado */}
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                Estado
+              </label>
+              <div
+                className={`flex items-center justify-between px-4 py-3 rounded-lg border ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-700"
+                    : "bg-gray-50 border-gray-200"
+                }`}
+              >
+                <div>
+                  <p className={`text-sm font-medium ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                    {formData.activo ? "Usuario activo" : "Usuario inactivo"}
+                  </p>
+                  <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                    Desmarca si quieres crear el usuario sin acceso inmediato.
+                  </p>
+                </div>
+                <label className="inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="activo"
+                    checked={formData.activo}
+                    onChange={handleInputChange}
+                    className="sr-only"
+                  />
+                  <span
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      formData.activo ? "bg-green-500" : "bg-gray-400"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        formData.activo ? "translate-x-5" : "translate-x-1"
+                      }`}
+                    />
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            {/* Última conexión */}
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                Última conexión
+              </label>
+              <input
+                type="datetime-local"
+                name="ultima_conexion"
+                value={formData.ultima_conexion}
+                onChange={handleInputChange}
+                className={`w-full px-4 py-2 rounded-lg border ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400"
+                    : "bg-white border-gray-300 text-gray-900 placeholder-gray-500"
+                } focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500`}
+                placeholder="Selecciona fecha y hora"
+              />
+              <p className={`mt-1 text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                Si no hay registro previo de acceso, deja este campo vacío.
+              </p>
             </div>
 
             {/* Buttons */}

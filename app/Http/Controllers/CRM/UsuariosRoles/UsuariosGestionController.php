@@ -36,6 +36,14 @@ class UsuariosGestionController extends Controller
             $query->where('id_rol', $request->id_rol);
         }
 
+        // Filtro por estado
+        if ($request->has('activo')) {
+            $activoFilter = filter_var($request->activo, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($activoFilter !== null) {
+                $query->where('activo', $activoFilter);
+            }
+        }
+
         // Ordenamiento
         $sortBy = $request->get('sort_by', 'id_usuario');
         $sortOrder = $request->get('sort_order', 'desc');
@@ -50,8 +58,8 @@ class UsuariosGestionController extends Controller
 
         // Calcular estadísticas
         $totalUsuarios = Usuario::count();
-        $usuariosActivos = $totalUsuarios; // Si no hay campo activo, todos son activos
-        $usuariosInactivos = 0;
+        $usuariosActivos = Usuario::where('activo', true)->count();
+        $usuariosInactivos = Usuario::where('activo', false)->count();
         $nuevosEsteMes = Usuario::whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
             ->count();
@@ -65,7 +73,7 @@ class UsuariosGestionController extends Controller
                 'usuarios_inactivos' => $usuariosInactivos,
                 'nuevos_este_mes' => $nuevosEsteMes,
             ],
-            'filters' => $request->only(['search', 'id_rol', 'sort_by', 'sort_order', 'per_page'])
+            'filters' => $request->only(['search', 'id_rol', 'activo', 'sort_by', 'sort_order', 'per_page'])
         ]);
     }
 
@@ -82,7 +90,9 @@ class UsuariosGestionController extends Controller
             'apellido' => 'nullable|string|max:50',
             'direccion' => 'nullable|string|max:255',
             'telefono' => 'nullable|string|max:20',
-            'id_rol' => 'nullable|exists:roles,id_rol'
+            'id_rol' => 'nullable|exists:roles,id_rol',
+            'activo' => 'sometimes|boolean',
+            'ultima_conexion' => 'nullable|date'
         ], [
             'nombre_usuario.required' => 'El nombre de usuario es obligatorio',
             'nombre_usuario.unique' => 'Este nombre de usuario ya est� en uso',
@@ -92,7 +102,9 @@ class UsuariosGestionController extends Controller
             'correo.required' => 'El correo electr�nico es obligatorio',
             'correo.email' => 'El correo electr�nico no es v�lido',
             'correo.unique' => 'Este correo electr�nico ya est� registrado',
-            'id_rol.exists' => 'El rol seleccionado no existe'
+            'id_rol.exists' => 'El rol seleccionado no existe',
+            'activo.boolean' => 'El estado seleccionado no es valido',
+            'ultima_conexion.date' => 'La fecha de ultima conexion no es valida'
         ]);
 
         if ($validator->fails()) {
@@ -107,7 +119,9 @@ class UsuariosGestionController extends Controller
             'apellido' => $request->apellido,
             'direccion' => $request->direccion,
             'telefono' => $request->telefono,
-            'id_rol' => $request->id_rol
+            'id_rol' => $request->id_rol,
+            'activo' => $request->has('activo') ? $request->boolean('activo') : true,
+            'ultima_conexion' => $request->ultima_conexion,
         ]);
 
         return back()->with('success', 'Usuario creado exitosamente');
@@ -150,7 +164,9 @@ class UsuariosGestionController extends Controller
             'apellido' => 'nullable|string|max:50',
             'direccion' => 'nullable|string|max:255',
             'telefono' => 'nullable|string|max:20',
-            'id_rol' => 'nullable|exists:roles,id_rol'
+            'id_rol' => 'nullable|exists:roles,id_rol',
+            'activo' => 'sometimes|boolean',
+            'ultima_conexion' => 'nullable|date'
         ], [
             'nombre_usuario.required' => 'El nombre de usuario es obligatorio',
             'nombre_usuario.unique' => 'Este nombre de usuario ya est� en uso',
@@ -159,7 +175,9 @@ class UsuariosGestionController extends Controller
             'correo.unique' => 'Este correo electr�nico ya est� registrado',
             'contrase�a.min' => 'La contrase�a debe tener al menos 8 caracteres',
             'contrase�a.confirmed' => 'Las contrase�as no coinciden',
-            'id_rol.exists' => 'El rol seleccionado no existe'
+            'id_rol.exists' => 'El rol seleccionado no existe',
+            'activo.boolean' => 'El estado seleccionado no es valido',
+            'ultima_conexion.date' => 'La fecha de ultima conexion no es valida'
         ]);
 
         if ($validator->fails()) {
@@ -175,6 +193,17 @@ class UsuariosGestionController extends Controller
             'telefono' => $request->telefono,
             'id_rol' => $request->id_rol
         ];
+
+        if ($request->has('activo')) {
+            $dataToUpdate['activo'] = $request->boolean('activo');
+        }
+
+        if ($request->has('ultima_conexion')) {
+            $dataToUpdate['ultima_conexion'] = $request->filled('ultima_conexion')
+                ? $request->ultima_conexion
+                : null;
+        }
+
 
         // Solo actualizar contrase�a si se proporciona una nueva
         if ($request->filled('contrase�a')) {
