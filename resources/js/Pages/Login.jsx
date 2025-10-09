@@ -306,15 +306,7 @@ export default function Login() {
                     </form>
                 )}
 
-                <div className="text-center mt-4">
-                    <button
-                        type="button"
-                        onClick={() => setIsLogin(!isLogin)}
-                        className="font-medium text-[#005dad] hover:text-[#004c8e] transition-colors duration-300"
-                    >
-                        {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
-                    </button>
-                </div>
+              
             </div>
         </div>
     );
