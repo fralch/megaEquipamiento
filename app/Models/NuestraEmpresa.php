@@ -17,7 +17,6 @@ class NuestraEmpresa extends Model
         'email',
         'telefono',
         'ruc',
-        'imagen_destacada',
         'imagen_logo',
         'imagen_firma',
         'id_usuario',
@@ -34,17 +33,6 @@ class NuestraEmpresa extends Model
     public function usuario()
     {
         return $this->belongsTo(Usuario::class, 'id_usuario', 'id_usuario');
-    }
-
-    /**
-     * Accessor para obtener la URL completa de la imagen destacada
-     */
-    public function getImagenDestacadaUrlAttribute()
-    {
-        if ($this->imagen_destacada) {
-            return asset($this->imagen_destacada);
-        }
-        return null;
     }
 
     /**

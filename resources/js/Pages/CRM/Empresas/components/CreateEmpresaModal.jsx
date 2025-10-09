@@ -11,12 +11,10 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         email: '',
         telefono: '',
         id_usuario: '',
-        imagen_destacada: null,
         imagen_logo: null,
         imagen_firma: null
     });
     const [errors, setErrors] = useState({});
-    const [imagePreview, setImagePreview] = useState(null);
     const [logoPreview, setLogoPreview] = useState(null);
     const [firmaPreview, setFirmaPreview] = useState(null);
 
@@ -29,23 +27,6 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         // Clear error for this field
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: null }));
-        }
-    };
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setFormData(prev => ({
-                ...prev,
-                imagen_destacada: file
-            }));
-
-            // Create preview
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
         }
     };
 
@@ -92,7 +73,6 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         if (formData.email) data.append('email', formData.email);
         if (formData.telefono) data.append('telefono', formData.telefono);
         if (formData.id_usuario) data.append('id_usuario', formData.id_usuario);
-        if (formData.imagen_destacada) data.append('imagen_destacada', formData.imagen_destacada);
         if (formData.imagen_logo) data.append('imagen_logo', formData.imagen_logo);
         if (formData.imagen_firma) data.append('imagen_firma', formData.imagen_firma);
 
@@ -132,12 +112,10 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
             email: '',
             telefono: '',
             id_usuario: '',
-            imagen_destacada: null,
             imagen_logo: null,
             imagen_firma: null
         });
         setErrors({});
-        setImagePreview(null);
         setLogoPreview(null);
         setFirmaPreview(null);
         onClose();
@@ -312,41 +290,6 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
                                 </select>
                                 {errors.id_usuario && (
                                     <p className="mt-1 text-sm text-red-500">{errors.id_usuario}</p>
-                                )}
-                            </div>
-
-                            {/* Imagen */}
-                            <div className="md:col-span-2">
-                                <label className={`block text-sm font-medium mb-2 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>
-                                    Imagen Destacada
-                                </label>
-                                <div className="flex items-center gap-4">
-                                    <label className={`flex items-center justify-center px-4 py-2 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
-                                        isDarkMode
-                                            ? 'border-gray-600 hover:border-gray-500 text-gray-400'
-                                            : 'border-gray-300 hover:border-gray-400 text-gray-600'
-                                    }`}>
-                                        <FiUpload className="w-5 h-5 mr-2" />
-                                        <span>Seleccionar imagen</span>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                            className="hidden"
-                                        />
-                                    </label>
-                                    {imagePreview && (
-                                        <img
-                                            src={imagePreview}
-                                            alt="Preview"
-                                            className="w-16 h-16 rounded-lg object-cover"
-                                        />
-                                    )}
-                                </div>
-                                {errors.imagen_destacada && (
-                                    <p className="mt-1 text-sm text-red-500">{errors.imagen_destacada}</p>
                                 )}
                             </div>
 

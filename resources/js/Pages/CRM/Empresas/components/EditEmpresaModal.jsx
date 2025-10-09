@@ -11,13 +11,11 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
     email: "",
     telefono: "",
     id_usuario: "",
-    imagen_destacada: null,
     imagen_logo: null,
     imagen_firma: null
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [preview, setPreview] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [firmaPreview, setFirmaPreview] = useState(null);
 
@@ -29,15 +27,9 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
         email: empresa.email || "",
         telefono: empresa.telefono || "",
         id_usuario: empresa.id_usuario || "",
-        imagen_destacada: null,
         imagen_logo: null,
         imagen_firma: null
       });
-
-      // Set preview if image exists
-      if (empresa.imagen_destacada) {
-        setPreview(empresa.imagen_destacada_url || `/${empresa.imagen_destacada}`);
-      }
 
       // Set logo preview if exists
       if (empresa.imagen_logo) {
@@ -64,23 +56,6 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
         ...prev,
         [name]: ""
       }));
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        imagen_destacada: file
-      }));
-
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
     }
   };
 
@@ -368,39 +343,6 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
                   <p className="mt-1 text-sm text-red-600">{errors.telefono}</p>
                 )}
               </div>
-            </div>
-          </div>
-
-          {/* Imagen destacada */}
-          <div>
-            <h4 className={`text-md font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Imagen Destacada
-            </h4>
-            <div>
-              <label className={`block text-sm font-medium mb-2 ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                <FiImage className="inline w-4 h-4 mr-1" />
-                Subir Nueva Imagen
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                  isDarkMode
-                    ? 'bg-gray-700 border-gray-600 text-white'
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-              />
-              {preview && (
-                <div className="mt-4">
-                  <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    Vista previa:
-                  </p>
-                  <img src={preview} alt="Preview" className="w-32 h-32 object-cover rounded-lg" />
-                </div>
-              )}
             </div>
           </div>
 
