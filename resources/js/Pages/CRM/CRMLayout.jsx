@@ -1,4 +1,4 @@
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import {
     FiHome, FiUsers, FiDollarSign, FiActivity, FiChevronDown,
     FiSettings, FiShoppingBag, FiBarChart, FiBell, FiSearch,
@@ -8,8 +8,19 @@ import { useTheme } from '../../storage/ThemeContext';
 import { useCRM } from '../../storage/CRMContext';
 
 export default function CRMLayout({ children, title }) {
+    const { auth } = usePage().props;
     const { isDarkMode, toggleDarkMode } = useTheme();
     const { expandedMenus, toggleMenu } = useCRM();
+
+    // Función para generar iniciales del usuario
+    const getUserInitials = (name) => {
+        if (!name) return 'U';
+        const names = name.trim().split(' ');
+        if (names.length === 1) {
+            return names[0].charAt(0).toUpperCase();
+        }
+        return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
+    };
 
     const menuItems = [
         {
@@ -106,7 +117,7 @@ export default function CRMLayout({ children, title }) {
                     <div className="flex items-center gap-4">
                         <div className="relative">
                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                                <span className="text-white text-lg font-bold">EK</span>
+                                <span className="text-white text-lg font-bold">{getUserInitials(auth?.user?.nombre)}</span>
                             </div>
                             <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
                         </div>
@@ -114,12 +125,12 @@ export default function CRMLayout({ children, title }) {
                             <h3 className={`font-semibold truncate ${
                                 isDarkMode ? 'text-white' : 'text-gray-900'
                             }`}>
-                                Ezra Kreiger
+                                {auth?.user?.nombre || 'Usuario'}
                             </h3>
                             <p className={`text-sm truncate ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
                             }`}>
-                                Administrador
+                                {auth?.user?.nombre_usuario || 'Usuario'}
                             </p>
                         </div>
                     </div>
