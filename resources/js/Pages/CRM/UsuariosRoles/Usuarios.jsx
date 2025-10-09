@@ -338,15 +338,17 @@ export default function UsuariosEmpleados({ usuarios, roles, estadisticas, filte
   const handleDeleteUser = async (userId) => {
     if (confirm('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')) {
       try {
+        // Crear FormData para enviar correctamente el _method
+        const formData = new FormData();
+        formData.append('_method', 'DELETE');
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').getAttribute('content'));
+
         const response = await fetch(`/crm/usuarios/${userId}/delete`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
           },
-          body: JSON.stringify({
-            _method: 'DELETE'
-          }),
+          body: formData,
         });
 
         if (response.ok) {
