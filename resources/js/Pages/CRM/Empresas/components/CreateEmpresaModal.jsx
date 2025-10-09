@@ -45,7 +45,7 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const data = new FormData();
@@ -56,14 +56,33 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         if (formData.id_usuario) data.append('id_usuario', formData.id_usuario);
         if (formData.imagen_destacada) data.append('imagen_destacada', formData.imagen_destacada);
 
-        router.post(route('crm.empresas.store'), data, {
-            onSuccess: () => {
+        try {
+            const response = await fetch(route('crm.empresas.store'), {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: data
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                alert('Empresa creada exitosamente');
                 handleClose();
-            },
-            onError: (errors) => {
-                setErrors(errors);
+            } else {
+                if (result.errors) {
+                    setErrors(result.errors);
+                } else {
+                    alert('Error al crear la empresa: ' + (result.message || 'Error desconocido'));
+                }
             }
-        });
+        } catch (error) {
+            console.error('Error al crear empresa:', error);
+            alert('Error al crear la empresa');
+        }
     };
 
     const handleClose = () => {

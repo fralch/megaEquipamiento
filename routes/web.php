@@ -18,6 +18,7 @@ use App\Http\Controllers\ProductoTagController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\CRM\UsuariosRoles\UsuariosGestionController;
 use App\Http\Controllers\CRM\UsuariosRoles\RolesUsuariosController;
+use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -56,6 +57,16 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
 
     Route::prefix('empresas')->name('empresas.')->group(function () {
         Route::get('/', fn () => Inertia::render('CRM/Empresas/VerEmpresas'))->name('index');
+        
+        // API routes for empresas CRUD operations
+        Route::get('/data', [NuestrasEmpresasController::class, 'index'])->name('data');
+        Route::post('/store', [NuestrasEmpresasController::class, 'store'])->name('store');
+        Route::get('/usuarios', [NuestrasEmpresasController::class, 'getUsuarios'])->name('usuarios');
+        Route::get('/search', [NuestrasEmpresasController::class, 'search'])->name('search');
+        Route::post('/bulk-delete', [NuestrasEmpresasController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::get('/{id}', [NuestrasEmpresasController::class, 'show'])->name('show');
+        Route::match(['put', 'post'], '/{id}', [NuestrasEmpresasController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [NuestrasEmpresasController::class, 'destroy'])->name('destroy');
     });
 
     Route::prefix('productos')->name('productos.')->group(function () {

@@ -99,7 +99,7 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
 
     try {
       const submitData = new FormData();
-      submitData.append('_method', 'PATCH');
+      submitData.append('_method', 'PUT');
 
       Object.keys(formData).forEach(key => {
         if (formData[key] !== null && formData[key] !== '') {
@@ -107,20 +107,33 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
         }
       });
 
-      router.post(route('crm.empresas.update', empresa.id), submitData, {
-        onSuccess: () => {
-          onClose();
-          setErrors({});
+      const response = await fetch(route('crm.empresas.update', empresa.id), {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         },
-        onError: (errors) => {
-          setErrors(errors);
-        },
-        onFinish: () => {
-          setIsLoading(false);
-        }
+        body: submitData
       });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        alert('Empresa actualizada exitosamente');
+        onClose();
+        setErrors({});
+      } else {
+        if (data.errors) {
+          setErrors(data.errors);
+        } else {
+          alert('Error al actualizar la empresa: ' + (data.message || 'Error desconocido'));
+        }
+      }
     } catch (error) {
       console.error('Error al actualizar empresa:', error);
+      alert('Error al actualizar la empresa');
+    } finally {
       setIsLoading(false);
     }
   };
