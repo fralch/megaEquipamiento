@@ -11,11 +11,15 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
     email: "",
     telefono: "",
     id_usuario: "",
-    imagen_destacada: null
+    imagen_destacada: null,
+    imagen_logo: null,
+    imagen_firma: null
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [preview, setPreview] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
+  const [firmaPreview, setFirmaPreview] = useState(null);
 
   useEffect(() => {
     if (empresa) {
@@ -25,12 +29,24 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
         email: empresa.email || "",
         telefono: empresa.telefono || "",
         id_usuario: empresa.id_usuario || "",
-        imagen_destacada: null
+        imagen_destacada: null,
+        imagen_logo: null,
+        imagen_firma: null
       });
 
       // Set preview if image exists
       if (empresa.imagen_destacada) {
-        setPreview(`/storage/${empresa.imagen_destacada}`);
+        setPreview(empresa.imagen_destacada_url || `/${empresa.imagen_destacada}`);
+      }
+
+      // Set logo preview if exists
+      if (empresa.imagen_logo) {
+        setLogoPreview(empresa.imagen_logo_url || `/${empresa.imagen_logo}`);
+      }
+
+      // Set firma preview if exists
+      if (empresa.imagen_firma) {
+        setFirmaPreview(empresa.imagen_firma_url || `/${empresa.imagen_firma}`);
       }
     }
   }, [empresa]);
@@ -63,6 +79,40 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        imagen_logo: file
+      }));
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleFirmaChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        imagen_firma: file
+      }));
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFirmaPreview(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -349,6 +399,72 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
                     Vista previa:
                   </p>
                   <img src={preview} alt="Preview" className="w-32 h-32 object-cover rounded-lg" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Logo de la empresa */}
+          <div>
+            <h4 className={`text-md font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Logo de la Empresa (Opcional)
+            </h4>
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                <FiImage className="inline w-4 h-4 mr-1" />
+                Subir Logo
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleLogoChange}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
+              />
+              {logoPreview && (
+                <div className="mt-4">
+                  <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Vista previa del logo:
+                  </p>
+                  <img src={logoPreview} alt="Logo Preview" className="w-32 h-32 object-cover rounded-lg" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Firma de la empresa */}
+          <div>
+            <h4 className={`text-md font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Firma de la Empresa (Opcional)
+            </h4>
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+              }`}>
+                <FiImage className="inline w-4 h-4 mr-1" />
+                Subir Firma
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFirmaChange}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                  isDarkMode
+                    ? 'bg-gray-700 border-gray-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
+              />
+              {firmaPreview && (
+                <div className="mt-4">
+                  <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Vista previa de la firma:
+                  </p>
+                  <img src={firmaPreview} alt="Firma Preview" className="w-32 h-32 object-cover rounded-lg" />
                 </div>
               )}
             </div>

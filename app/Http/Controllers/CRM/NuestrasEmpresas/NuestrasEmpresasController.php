@@ -81,6 +81,8 @@ class NuestrasEmpresasController extends Controller
             'ruc' => 'nullable|string|max:11|unique:nuestras_empresas,ruc',
             'id_usuario' => 'nullable|exists:usuarios,id_usuario',
             'imagen_destacada' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'imagen_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'imagen_firma' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
             'nombre.required' => 'El nombre de la empresa es obligatorio',
             'nombre.max' => 'El nombre no puede exceder 255 caracteres',
@@ -92,6 +94,12 @@ class NuestrasEmpresasController extends Controller
             'imagen_destacada.image' => 'El archivo debe ser una imagen',
             'imagen_destacada.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif, svg',
             'imagen_destacada.max' => 'La imagen no puede ser mayor a 2MB',
+            'imagen_logo.image' => 'El logo debe ser una imagen',
+            'imagen_logo.mimes' => 'El logo debe ser de tipo: jpeg, png, jpg, gif, svg',
+            'imagen_logo.max' => 'El logo no puede ser mayor a 2MB',
+            'imagen_firma.image' => 'La firma debe ser una imagen',
+            'imagen_firma.mimes' => 'La firma debe ser de tipo: jpeg, png, jpg, gif, svg',
+            'imagen_firma.max' => 'La firma no puede ser mayor a 2MB',
         ]);
 
         if ($validator->fails()) {
@@ -108,8 +116,24 @@ class NuestrasEmpresasController extends Controller
             if ($request->hasFile('imagen_destacada')) {
                 $image = $request->file('imagen_destacada');
                 $imageName = time() . '_' . $image->getClientOriginalName();
-                $imagePath = $image->storeAs('empresas', $imageName, 'public');
-                $data['imagen_destacada'] = $imagePath;
+                $image->move(public_path('img/empresas'), $imageName);
+                $data['imagen_destacada'] = 'img/empresas/' . $imageName;
+            }
+
+            // Manejar la subida del logo
+            if ($request->hasFile('imagen_logo')) {
+                $logo = $request->file('imagen_logo');
+                $logoName = time() . '_logo_' . $logo->getClientOriginalName();
+                $logo->move(public_path('img/empresas/logos'), $logoName);
+                $data['imagen_logo'] = 'img/empresas/logos/' . $logoName;
+            }
+
+            // Manejar la subida de la firma
+            if ($request->hasFile('imagen_firma')) {
+                $firma = $request->file('imagen_firma');
+                $firmaName = time() . '_firma_' . $firma->getClientOriginalName();
+                $firma->move(public_path('img/empresas/firmas'), $firmaName);
+                $data['imagen_firma'] = 'img/empresas/firmas/' . $firmaName;
             }
 
             $empresa = NuestraEmpresa::create($data);
@@ -137,9 +161,15 @@ class NuestrasEmpresasController extends Controller
         try {
             $empresa = NuestraEmpresa::with('usuario')->findOrFail($id);
 
+            // Agregar URLs completas de las imágenes
+            $empresaData = $empresa->toArray();
+            $empresaData['imagen_destacada_url'] = $empresa->imagen_destacada ? asset($empresa->imagen_destacada) : null;
+            $empresaData['imagen_logo_url'] = $empresa->imagen_logo ? asset($empresa->imagen_logo) : null;
+            $empresaData['imagen_firma_url'] = $empresa->imagen_firma ? asset($empresa->imagen_firma) : null;
+
             return response()->json([
                 'success' => true,
-                'empresa' => $empresa
+                'empresa' => $empresaData
             ]);
 
         } catch (\Exception $e) {
@@ -170,6 +200,8 @@ class NuestrasEmpresasController extends Controller
                 ],
                 'id_usuario' => 'nullable|exists:usuarios,id_usuario',
                 'imagen_destacada' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'imagen_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'imagen_firma' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ], [
                 'nombre.required' => 'El nombre de la empresa es obligatorio',
                 'nombre.max' => 'El nombre no puede exceder 255 caracteres',
@@ -181,6 +213,12 @@ class NuestrasEmpresasController extends Controller
                 'imagen_destacada.image' => 'El archivo debe ser una imagen',
                 'imagen_destacada.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg, gif, svg',
                 'imagen_destacada.max' => 'La imagen no puede ser mayor a 2MB',
+                'imagen_logo.image' => 'El logo debe ser una imagen',
+                'imagen_logo.mimes' => 'El logo debe ser de tipo: jpeg, png, jpg, gif, svg',
+                'imagen_logo.max' => 'El logo no puede ser mayor a 2MB',
+                'imagen_firma.image' => 'La firma debe ser una imagen',
+                'imagen_firma.mimes' => 'La firma debe ser de tipo: jpeg, png, jpg, gif, svg',
+                'imagen_firma.max' => 'La firma no puede ser mayor a 2MB',
             ]);
 
             if ($validator->fails()) {
@@ -195,14 +233,40 @@ class NuestrasEmpresasController extends Controller
             // Manejar la subida de nueva imagen
             if ($request->hasFile('imagen_destacada')) {
                 // Eliminar imagen anterior si existe
-                if ($empresa->imagen_destacada && Storage::disk('public')->exists($empresa->imagen_destacada)) {
-                    Storage::disk('public')->delete($empresa->imagen_destacada);
+                if ($empresa->imagen_destacada && file_exists(public_path($empresa->imagen_destacada))) {
+                    unlink(public_path($empresa->imagen_destacada));
                 }
 
                 $image = $request->file('imagen_destacada');
                 $imageName = time() . '_' . $image->getClientOriginalName();
-                $imagePath = $image->storeAs('empresas', $imageName, 'public');
-                $data['imagen_destacada'] = $imagePath;
+                $image->move(public_path('img/empresas'), $imageName);
+                $data['imagen_destacada'] = 'img/empresas/' . $imageName;
+            }
+
+            // Manejar la subida del nuevo logo
+            if ($request->hasFile('imagen_logo')) {
+                // Eliminar logo anterior si existe
+                if ($empresa->imagen_logo && file_exists(public_path($empresa->imagen_logo))) {
+                    unlink(public_path($empresa->imagen_logo));
+                }
+
+                $logo = $request->file('imagen_logo');
+                $logoName = time() . '_logo_' . $logo->getClientOriginalName();
+                $logo->move(public_path('img/empresas/logos'), $logoName);
+                $data['imagen_logo'] = 'img/empresas/logos/' . $logoName;
+            }
+
+            // Manejar la subida de la nueva firma
+            if ($request->hasFile('imagen_firma')) {
+                // Eliminar firma anterior si existe
+                if ($empresa->imagen_firma && file_exists(public_path($empresa->imagen_firma))) {
+                    unlink(public_path($empresa->imagen_firma));
+                }
+
+                $firma = $request->file('imagen_firma');
+                $firmaName = time() . '_firma_' . $firma->getClientOriginalName();
+                $firma->move(public_path('img/empresas/firmas'), $firmaName);
+                $data['imagen_firma'] = 'img/empresas/firmas/' . $firmaName;
             }
 
             $empresa->update($data);
@@ -231,8 +295,18 @@ class NuestrasEmpresasController extends Controller
             $empresa = NuestraEmpresa::findOrFail($id);
 
             // Eliminar imagen si existe
-            if ($empresa->imagen_destacada && Storage::disk('public')->exists($empresa->imagen_destacada)) {
-                Storage::disk('public')->delete($empresa->imagen_destacada);
+            if ($empresa->imagen_destacada && file_exists(public_path($empresa->imagen_destacada))) {
+                unlink(public_path($empresa->imagen_destacada));
+            }
+
+            // Eliminar logo si existe
+            if ($empresa->imagen_logo && file_exists(public_path($empresa->imagen_logo))) {
+                unlink(public_path($empresa->imagen_logo));
+            }
+
+            // Eliminar firma si existe
+            if ($empresa->imagen_firma && file_exists(public_path($empresa->imagen_firma))) {
+                unlink(public_path($empresa->imagen_firma));
             }
 
             $empresa->delete();
@@ -272,8 +346,14 @@ class NuestrasEmpresasController extends Controller
 
             // Eliminar imágenes asociadas
             foreach ($empresas as $empresa) {
-                if ($empresa->imagen_destacada && Storage::disk('public')->exists($empresa->imagen_destacada)) {
-                    Storage::disk('public')->delete($empresa->imagen_destacada);
+                if ($empresa->imagen_destacada && file_exists(public_path($empresa->imagen_destacada))) {
+                    unlink(public_path($empresa->imagen_destacada));
+                }
+                if ($empresa->imagen_logo && file_exists(public_path($empresa->imagen_logo))) {
+                    unlink(public_path($empresa->imagen_logo));
+                }
+                if ($empresa->imagen_firma && file_exists(public_path($empresa->imagen_firma))) {
+                    unlink(public_path($empresa->imagen_firma));
                 }
             }
 

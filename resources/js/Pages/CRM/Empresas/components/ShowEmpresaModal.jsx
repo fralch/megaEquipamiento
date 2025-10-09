@@ -52,14 +52,64 @@ export default function ShowEmpresaModal({ isOpen, onClose, empresa }) {
 
         {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Imagen destacada */}
-          {empresa.imagen_destacada && (
-            <div className="flex justify-center">
-              <img
-                src={`/storage/${empresa.imagen_destacada}`}
-                alt={empresa.nombre}
-                className="w-48 h-48 object-cover rounded-lg shadow-md"
-              />
+          {/* Imágenes de la empresa */}
+          {(empresa.imagen_destacada || empresa.imagen_logo || empresa.imagen_firma) && (
+            <div>
+              <h5 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+                Imágenes de la Empresa
+              </h5>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Imagen destacada */}
+                {empresa.imagen_destacada && (
+                  <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div className="flex items-center mb-2">
+                      <FiImage className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        Imagen Destacada
+                      </span>
+                    </div>
+                    <img
+                      src={empresa.imagen_destacada_url || `/${empresa.imagen_destacada}`}
+                      alt={`${empresa.nombre} - Imagen destacada`}
+                      className="w-full h-32 object-cover rounded-lg shadow-md"
+                    />
+                  </div>
+                )}
+
+                {/* Logo */}
+                {empresa.imagen_logo && (
+                  <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div className="flex items-center mb-2">
+                      <FiImage className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        Logo
+                      </span>
+                    </div>
+                    <img
+                      src={empresa.imagen_logo_url || `/${empresa.imagen_logo}`}
+                      alt={`${empresa.nombre} - Logo`}
+                      className="w-full h-32 object-cover rounded-lg shadow-md"
+                    />
+                  </div>
+                )}
+
+                {/* Firma */}
+                {empresa.imagen_firma && (
+                  <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div className="flex items-center mb-2">
+                      <FiImage className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        Firma
+                      </span>
+                    </div>
+                    <img
+                      src={empresa.imagen_firma_url || `/${empresa.imagen_firma}`}
+                      alt={`${empresa.nombre} - Firma`}
+                      className="w-full h-32 object-cover rounded-lg shadow-md"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

@@ -18,6 +18,8 @@ class NuestraEmpresa extends Model
         'telefono',
         'ruc',
         'imagen_destacada',
+        'imagen_logo',
+        'imagen_firma',
         'id_usuario',
     ];
 
@@ -40,7 +42,29 @@ class NuestraEmpresa extends Model
     public function getImagenDestacadaUrlAttribute()
     {
         if ($this->imagen_destacada) {
-            return asset('storage/' . $this->imagen_destacada);
+            return asset($this->imagen_destacada);
+        }
+        return null;
+    }
+
+    /**
+     * Accessor para obtener la URL completa del logo
+     */
+    public function getImagenLogoUrlAttribute()
+    {
+        if ($this->imagen_logo) {
+            return asset($this->imagen_logo);
+        }
+        return null;
+    }
+
+    /**
+     * Accessor para obtener la URL completa de la firma
+     */
+    public function getImagenFirmaUrlAttribute()
+    {
+        if ($this->imagen_firma) {
+            return asset($this->imagen_firma);
         }
         return null;
     }

@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('telefono')->nullable();
             $table->string('ruc')->nullable();
             $table->string('imagen_destacada')->nullable();
+            $table->string('imagen_logo')->nullable();
+            $table->string('imagen_firma')->nullable();
             $table->bigInteger('id_usuario')->unsigned()->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('updated_at')->nullable();
@@ -32,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('empresas');
+        Schema::dropIfExists('nuestras_empresas');
     }
 };
