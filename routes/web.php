@@ -50,10 +50,10 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
     Route::get('/', fn () => Inertia::render('CRM/Dashboard'))->name('dashboard');
 
     Route::prefix('clientes')->name('clientes.')->group(function () {
-        // Vistas
-        Route::get('/empresas', fn () => Inertia::render('CRM/Clientes/EmpresasClientes'))->name('empresas');
-        Route::get('/particulares', fn () => Inertia::render('CRM/Clientes/Cliente'))->name('particulares');
-        Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');
+                // Rutas principales que cargan las vistas con datos
+                Route::get('/empresas', [EmpresasClientesController::class, 'index'])->name('empresas.index');
+                Route::get('/particulares', [ClientesParticularesController::class, 'index'])->name('particulares.index');
+                Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');
 
         // API routes para clientes particulares
         Route::prefix('particulares')->name('particulares.')->group(function () {

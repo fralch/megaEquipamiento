@@ -5,8 +5,10 @@ namespace App\Http\Controllers\CRM\Clientes;
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\Usuario;
+use App\Models\EmpresaCliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Inertia\Inertia;
 
 class ClientesParticularesController extends Controller
 {
@@ -17,7 +19,7 @@ class ClientesParticularesController extends Controller
     {
         $query = Cliente::with('vendedor');
 
-        // B�squeda
+        // Búsqueda
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -38,11 +40,42 @@ class ClientesParticularesController extends Controller
         $sortDirection = $request->input('sort_direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
 
-        // Paginaci�n
+        // Paginación
         $perPage = $request->input('per_page', 15);
         $clientes = $query->paginate($perPage);
 
-        return response()->json($clientes);
+        // Si es una petición web (navegador), renderizar la vista con Inertia
+        if ($request->expectsJson() || $request->wantsJson()) {
+            return response()->json($clientes);
+        }
+
+        // Cargar datos adicionales para la vista
+        $usuarios = Usuario::where('activo', true)
+            ->select('id_usuario', 'nombre', 'apellido', 'correo')
+            ->orderBy('nombre')
+            ->get();
+
+        $empresas = EmpresaCliente::where('activo', true)
+            ->select('id', 'razon_social', 'ruc', 'email')
+            ->orderBy('razon_social')
+            ->get();
+
+        // Renderizar la vista con Inertia
+        return Inertia::render('CRM/Clientes/Cliente', [
+            'clientes' => $clientes->items(), // Obtener solo los datos del paginador
+            'pagination' => [
+                'current_page' => $clientes->currentPage(),
+                'last_page' => $clientes->lastPage(),
+                'per_page' => $clientes->perPage(),
+                'total' => $clientes->total(),
+                'from' => $clientes->firstItem(),
+                'to' => $clientes->lastItem(),
+            ],
+            'usuarios' => $usuarios,
+            'empresas' => $empresas,
+            'areas' => [], // Por ahora vacío, se puede agregar si existe el modelo Area
+            'filters' => $request->only(['search', 'vendedor_id', 'sort_field', 'sort_direction'])
+        ]);
     }
 
     /**

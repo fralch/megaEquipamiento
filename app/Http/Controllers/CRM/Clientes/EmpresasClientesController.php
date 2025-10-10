@@ -5,8 +5,10 @@ namespace App\Http\Controllers\CRM\Clientes;
 use App\Http\Controllers\Controller;
 use App\Models\EmpresaCliente;
 use App\Models\Usuario;
+use App\Models\Cliente;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Inertia\Inertia;
 
 class EmpresasClientesController extends Controller
 {
@@ -17,7 +19,7 @@ class EmpresasClientesController extends Controller
     {
         $query = EmpresaCliente::with('vendedor');
 
-        // Búsqueda
+        // BÃºsqueda
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -44,11 +46,32 @@ class EmpresasClientesController extends Controller
         $sortDirection = $request->input('sort_direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
 
-        // Paginación
+        // PaginaciÃ³n
         $perPage = $request->input('per_page', 15);
         $empresas = $query->paginate($perPage);
 
-        return response()->json($empresas);
+        // Si es una peticiÃ³n web (navegador), renderizar la vista con Inertia
+        if ($request->expectsJson() || $request->wantsJson()) {
+            return response()->json($empresas);
+        }
+
+        // Cargar datos adicionales para la vista
+        $usuarios = Usuario::where('activo', true)
+            ->select('id_usuario', 'nombre', 'apellido', 'correo')
+            ->orderBy('nombre')
+            ->get();
+
+        $clientes = Cliente::select('id', 'nombrecompleto', 'ruc_dni', 'email')
+            ->orderBy('nombrecompleto')
+            ->get();
+
+        // Renderizar la vista con Inertia
+        return Inertia::render('CRM/Clientes/EmpresasClientes', [
+            'empresas' => $empresas,
+            'usuarios' => $usuarios,
+            'clientes' => $clientes,
+            'filters' => $request->only(['search', 'vendedor_id', 'activo', 'sort_field', 'sort_direction'])
+        ]);
     }
 
     /**
