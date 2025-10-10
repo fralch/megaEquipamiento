@@ -6,7 +6,7 @@ import CreateClienteModal from './componentes/CreateClienteModal';
 import EditClienteModal from './componentes/EditClienteModal';
 import ShowClienteModal from './componentes/ShowClienteModal';
 
-export default function EmpleadosClientesParticulares({ clientes = [], filters = {}, usuarios = [], empresas = [], areas = [] }) {
+export default function Cliente({ clientes = [], filters = {}, usuarios = [], empresas = [], areas = [] }) {
     const { isDarkMode } = useTheme();
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [selectedClientes, setSelectedClientes] = useState([]);
@@ -39,7 +39,7 @@ export default function EmpleadosClientesParticulares({ clientes = [], filters =
     };
 
     const handleSearch = () => {
-        router.get(route('crm.clientes.empleados-clientes-particulares'), {
+        router.get(route('crm.clientes.particulares'), {
             search: searchTerm
         }, {
             preserveState: true,

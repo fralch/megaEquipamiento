@@ -49,7 +49,7 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
 
     Route::prefix('clientes')->name('clientes.')->group(function () {
         Route::get('/empresas', fn () => Inertia::render('CRM/Clientes/EmpresasClientes'))->name('empresas');
-        Route::get('/particulares', fn () => Inertia::render('CRM/Clientes/EmpleadosClientesParticulares'))->name('particulares');
+        Route::get('/particulares', fn () => Inertia::render('CRM/Clientes/Cliente'))->name('particulares');
         Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');
     });
 

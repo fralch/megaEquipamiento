@@ -45,7 +45,7 @@ export default function CRMLayout({ children, title }) {
             icon: FiUsers,
             key: "clientes",
             items: [
-                "Empleados y clientes particulares",
+                "Clientes particulares",
                 "Empresas de clientes"
             ]
         },
@@ -78,7 +78,7 @@ export default function CRMLayout({ children, title }) {
         "Ver Empresas": "/crm/empresas",
 
         // Clientes
-        "Empleados y clientes particulares": "/crm/clientes/particulares",
+        "Clientes particulares": "/crm/clientes/particulares",
         "Empresas de clientes": "/crm/clientes/empresas",
 
         // Productos y Servicios
