@@ -19,8 +19,6 @@ use App\Http\Controllers\SectorController;
 use App\Http\Controllers\CRM\UsuariosRoles\UsuariosGestionController;
 use App\Http\Controllers\CRM\UsuariosRoles\RolesUsuariosController;
 use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
-use App\Http\Controllers\CRM\Clientes\ClienteController;
-use App\Http\Controllers\CRM\Clientes\EmpresaClienteController;
 use App\Http\Controllers\CRM\Clientes\ClientesParticularesController;
 use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
 use Illuminate\Foundation\Application;
