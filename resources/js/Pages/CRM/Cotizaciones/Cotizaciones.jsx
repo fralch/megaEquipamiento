@@ -1,157 +1,119 @@
-import { Head } from "@inertiajs/react";
+import { Head, router } from "@inertiajs/react";
 import { FiBarChart, FiEdit, FiTrash2, FiPlus, FiEye, FiSearch, FiDownload, FiSend, FiClock, FiUser, FiCalendar } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CRMLayout from '../CRMLayout';
 import ShowCotizaciones from './components/ShowCotizaciones';
 import CreateCotizaciones from './components/CreateCotizaciones';
 import EditCotizaciones from './components/EditCotizaciones';
+import axios from 'axios';
 
-export default function Cotizaciones() {
+export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], pagination: initialPagination = null, filters: initialFilters = {} }) {
     const { isDarkMode } = useTheme();
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterEstado, setFilterEstado] = useState('all');
+    const [searchTerm, setSearchTerm] = useState(initialFilters.search || '');
+    const [filterEstado, setFilterEstado] = useState(initialFilters.estado || 'all');
     const [activeModal, setActiveModal] = useState(null);
     const [selectedCotizacion, setSelectedCotizacion] = useState(null);
-
-    // Simulated data - replace with actual API calls
-    const cotizaciones = [
-        {
-            id: 1,
-            numero: "COT-2024-001",
-            fecha_cotizacion: "2024-01-15",
-            fecha_vencimiento: "2024-02-15",
-            entrega: "15 días hábiles",
-            lugar_entrega: "Lima, Perú",
-            garantia: "12 meses",
-            forma_pago: "50% adelanto, 50% contra entrega",
-            cliente_id: 1,
-            cliente: "Laboratorio San Marcos",
-            contacto: "Ana García",
-            email: "ana.garcia@sanmarcos.com",
-            telefono: "+51 987 654 321",
-            usuario_id: 1,
-            vendedor: "Carlos Mendoza",
-            miempresa_id: 1,
-            moneda: "soles",
-            tipo_cambio: 3.75,
-            productos: [
-                { id: 1, nombre: "Microscopio Óptico Professional", cantidad: 2, precio_unitario: 15500, subtotal: 31000 },
-                { id: 2, nombre: "Balanza Analítica 0.1mg", cantidad: 1, precio_unitario: 8200, subtotal: 8200 }
-            ],
-            total_monto_productos: 39200,
-            productos_adicionales: [
-                { id: 1, nombre: "Instalación y capacitación", cantidad: 1, precio_unitario: 3500, subtotal: 3500 },
-                { id: 2, nombre: "Mantenimiento preventivo (1 año)", cantidad: 1, precio_unitario: 2620, subtotal: 2620 }
-            ],
-            total_adicionales_monto: 6120,
-            total: 45320,
-            estado: "pendiente"
-        },
-        {
-            id: 2,
-            numero: "COT-2024-002",
-            fecha_cotizacion: "2024-01-18",
-            fecha_vencimiento: "2024-02-18",
-            entrega: "20 días hábiles",
-            lugar_entrega: "Lima, Perú",
-            garantia: "24 meses",
-            forma_pago: "30 días",
-            cliente_id: 2,
-            cliente: "Universidad San Marcos",
-            contacto: "Dr. Mario López",
-            email: "mario.lopez@unmsm.edu.pe",
-            telefono: "+51 976 543 210",
-            usuario_id: 2,
-            vendedor: "José Ruiz",
-            miempresa_id: 1,
-            moneda: "soles",
-            tipo_cambio: 3.75,
-            productos: [
-                { id: 3, nombre: "Centrífuga de Mesa Digital", cantidad: 1, precio_unitario: 12500, subtotal: 12500 },
-                { id: 4, nombre: "Kit de Reactivos Químicos", cantidad: 3, precio_unitario: 3950, subtotal: 11850 }
-            ],
-            total_monto_productos: 24350,
-            productos_adicionales: [
-                { id: 3, nombre: "Instalación especializada", cantidad: 1, precio_unitario: 4400, subtotal: 4400 }
-            ],
-            total_adicionales_monto: 4400,
-            total: 28750,
-            estado: "aprobada"
-        },
-        {
-            id: 3,
-            numero: "COT-2024-003",
-            fecha_cotizacion: "2024-01-20",
-            fecha_vencimiento: "2024-02-20",
-            entrega: "10 días hábiles",
-            lugar_entrega: "Lima, Perú",
-            garantia: "18 meses",
-            forma_pago: "Contado",
-            cliente_id: 3,
-            cliente: "BioLab Perú",
-            contacto: "Laura Fernández",
-            email: "laura.fernandez@biolab.com",
-            telefono: "+51 954 321 098",
-            usuario_id: 1,
-            vendedor: "Carlos Mendoza",
-            miempresa_id: 1,
-            moneda: "soles",
-            tipo_cambio: 3.75,
-            productos: [
-                { id: 5, nombre: "Espectrofotómetro UV-Vis", cantidad: 1, precio_unitario: 45000, subtotal: 45000 },
-                { id: 6, nombre: "Sistema de Purificación de Agua", cantidad: 1, precio_unitario: 12800, subtotal: 12800 }
-            ],
-            total_monto_productos: 57800,
-            productos_adicionales: [
-                { id: 4, nombre: "Calibración inicial", cantidad: 1, precio_unitario: 5000, subtotal: 5000 },
-                { id: 5, nombre: "Kit de mantenimiento", cantidad: 1, precio_unitario: 5090, subtotal: 5090 }
-            ],
-            total_adicionales_monto: 10090,
-            total: 67890,
-            estado: "enviada"
-        }
-    ];
-
-    const estadisticas = [
-        { titulo: "Total Cotizaciones", valor: cotizaciones.length.toString(), color: "blue", cambio: "+8%" },
-        { titulo: "Monto Total", valor: `S/ ${cotizaciones.reduce((sum, cot) => sum + cot.total, 0).toLocaleString()}`, color: "green", cambio: "+15%" },
-        { titulo: "Pendientes", valor: cotizaciones.filter(c => c.estado === 'pendiente').length.toString(), color: "yellow", cambio: "+3%" },
-        { titulo: "Aprobadas", valor: cotizaciones.filter(c => c.estado === 'aprobada').length.toString(), color: "purple", cambio: "+12%" }
-    ];
-
-    const getEstadoInfo = (estado) => {
-        const estados = {
-            'pendiente': { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800', icon: FiClock },
-            'enviada': { label: 'Enviada', color: 'bg-blue-100 text-blue-800', icon: FiSend },
-            'aprobada': { label: 'Aprobada', color: 'bg-green-100 text-green-800', icon: FiEye },
-            'rechazada': { label: 'Rechazada', color: 'bg-red-100 text-red-800', icon: FiTrash2 },
-            'negociacion': { label: 'En Negociación', color: 'bg-purple-100 text-purple-800', icon: FiUser }
-        };
-        return estados[estado] || estados['pendiente'];
-    };
-
-    const filteredCotizaciones = cotizaciones.filter(cotizacion => {
-        const matchesSearch = cotizacion.numero.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            cotizacion.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            cotizacion.contacto.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesEstado = filterEstado === 'all' || cotizacion.estado === filterEstado;
-        return matchesSearch && matchesEstado;
+    const [cotizaciones, setCotizaciones] = useState(initialCotizaciones);
+    const [pagination, setPagination] = useState(initialPagination);
+    const [estadisticas, setEstadisticas] = useState({
+        total: 0,
+        monto_total: 0,
+        pendientes: 0,
+        aprobadas: 0,
     });
+    const [loading, setLoading] = useState(false);
 
-    const formatCurrency = (amount, currency) => {
-        const symbol = currency === 'dolares' ? '$' : 'S/';
-        return `${symbol} ${amount.toLocaleString()}`;
+    // Cargar estadísticas
+    useEffect(() => {
+        fetchEstadisticas();
+    }, []);
+
+    // Cargar cotizaciones cuando cambian los filtros
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchCotizaciones();
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm, filterEstado]);
+
+    const fetchEstadisticas = async () => {
+        try {
+            const response = await axios.get('/crm/cotizaciones/estadisticas');
+            if (response.data.success) {
+                setEstadisticas(response.data.data);
+            }
+        } catch (error) {
+            console.error('Error al cargar estadísticas:', error);
+        }
     };
 
-    const handleShowDetails = (cotizacion) => {
-        setSelectedCotizacion(cotizacion);
-        setActiveModal('show');
+    const fetchCotizaciones = async () => {
+        setLoading(true);
+        try {
+            const params = {};
+            if (searchTerm) params.search = searchTerm;
+            if (filterEstado !== 'all') params.estado = filterEstado;
+
+            const response = await axios.get('/crm/cotizaciones', { params });
+
+            if (response.data.data) {
+                setCotizaciones(response.data.data);
+                setPagination({
+                    current_page: response.data.current_page,
+                    last_page: response.data.last_page,
+                    per_page: response.data.per_page,
+                    total: response.data.total,
+                });
+            }
+        } catch (error) {
+            console.error('Error al cargar cotizaciones:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleEdit = (cotizacion) => {
-        setSelectedCotizacion(cotizacion);
-        setActiveModal('edit');
+    const handleDelete = async (id) => {
+        if (!confirm('¿Está seguro de eliminar esta cotización?')) return;
+
+        try {
+            const response = await axios.delete(`/crm/cotizaciones/${id}/delete`);
+            if (response.data.success) {
+                fetchCotizaciones();
+                fetchEstadisticas();
+                alert('Cotización eliminada exitosamente');
+            }
+        } catch (error) {
+            console.error('Error al eliminar cotización:', error);
+            alert('Error al eliminar cotización');
+        }
+    };
+
+    const handleShowDetails = async (cotizacion) => {
+        try {
+            const response = await axios.get(`/crm/cotizaciones/${cotizacion.id}`);
+            if (response.data.success) {
+                setSelectedCotizacion(response.data.data);
+                setActiveModal('show');
+            }
+        } catch (error) {
+            console.error('Error al cargar detalles:', error);
+            alert('Error al cargar detalles de la cotización');
+        }
+    };
+
+    const handleEdit = async (cotizacion) => {
+        try {
+            const response = await axios.get(`/crm/cotizaciones/${cotizacion.id}`);
+            if (response.data.success) {
+                setSelectedCotizacion(response.data.data);
+                setActiveModal('edit');
+            }
+        } catch (error) {
+            console.error('Error al cargar cotización:', error);
+            alert('Error al cargar cotización');
+        }
     };
 
     const handleCreate = () => {
@@ -164,6 +126,56 @@ export default function Cotizaciones() {
         setSelectedCotizacion(null);
     };
 
+    const handleSaveSuccess = () => {
+        closeModal();
+        fetchCotizaciones();
+        fetchEstadisticas();
+    };
+
+    const getEstadoInfo = (estado) => {
+        const estados = {
+            'pendiente': { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800', icon: FiClock },
+            'enviada': { label: 'Enviada', color: 'bg-blue-100 text-blue-800', icon: FiSend },
+            'aprobada': { label: 'Aprobada', color: 'bg-green-100 text-green-800', icon: FiEye },
+            'rechazada': { label: 'Rechazada', color: 'bg-red-100 text-red-800', icon: FiTrash2 },
+            'negociacion': { label: 'En Negociación', color: 'bg-purple-100 text-purple-800', icon: FiUser }
+        };
+        return estados[estado] || estados['pendiente'];
+    };
+
+    const formatCurrency = (amount, currency = 'soles') => {
+        const symbol = currency === 'dolares' ? '$' : 'S/';
+        return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        return new Date(dateString).toLocaleDateString('es-PE');
+    };
+
+    const estadisticasDisplay = [
+        {
+            titulo: "Total Cotizaciones",
+            valor: estadisticas.total?.toString() || '0',
+            color: "blue"
+        },
+        {
+            titulo: "Monto Total",
+            valor: formatCurrency(estadisticas.monto_total || 0),
+            color: "green"
+        },
+        {
+            titulo: "Pendientes",
+            valor: estadisticas.pendientes?.toString() || '0',
+            color: "yellow"
+        },
+        {
+            titulo: "Aprobadas",
+            valor: estadisticas.aprobadas?.toString() || '0',
+            color: "purple"
+        }
+    ];
+
     return (
         <>
             <Head title="Cotizaciones" />
@@ -172,7 +184,7 @@ export default function Cotizaciones() {
 
                     {/* Estadísticas */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                        {estadisticas.map((stat, index) => (
+                        {estadisticasDisplay.map((stat, index) => (
                             <div key={index} className={`rounded-xl shadow-sm border p-6 transition-all duration-300 hover:shadow-lg ${
                                 isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
                             }`}>
@@ -187,9 +199,6 @@ export default function Cotizaciones() {
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         }`}>
                                             {stat.valor}
-                                        </p>
-                                        <p className="text-sm text-green-600 mt-1">
-                                            {stat.cambio}
                                         </p>
                                     </div>
                                     <div className={`p-3 rounded-full ${
@@ -248,7 +257,7 @@ export default function Cotizaciones() {
                                 </select>
                             </div>
 
-                            <button 
+                            <button
                                 onClick={handleCreate}
                                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
                             >
@@ -262,163 +271,170 @@ export default function Cotizaciones() {
                     <div className={`rounded-xl shadow-sm border overflow-hidden ${
                         isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
                     }`}>
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                                    <tr>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            Cotización
-                                        </th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            Cliente
-                                        </th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            Monto
-                                        </th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            Fechas
-                                        </th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            Estado
-                                        </th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                            isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                        }`}>
-                                            Acciones
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
-                                    {filteredCotizaciones.map((cotizacion) => {
-                                        const estadoInfo = getEstadoInfo(cotizacion.estado);
-                                        const EstadoIcon = estadoInfo.icon;
-                                        return (
-                                            <tr key={cotizacion.id} className={`hover:${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-colors duration-200`}>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div>
-                                                        <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            {cotizacion.numero}
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            Vendedor: {cotizacion.vendedor}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div>
-                                                        <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            {cotizacion.cliente}
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            {cotizacion.contacto}
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            {cotizacion.email}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div>
-                                                        <div className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                            {formatCurrency(cotizacion.total, cotizacion.moneda)}
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            Productos: {formatCurrency(cotizacion.total_monto_productos, cotizacion.moneda)}
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            Adicionales: {formatCurrency(cotizacion.total_adicionales_monto, cotizacion.moneda)}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div>
-                                                        <div className="flex items-center gap-1">
-                                                            <FiCalendar className="w-3 h-3 text-gray-400" />
-                                                            <span className={`text-xs ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                                {cotizacion.fecha_cotizacion}
-                                                            </span>
-                                                        </div>
-                                                        <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            Vence: {cotizacion.fecha_vencimiento}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="flex items-center gap-2">
-                                                        <EstadoIcon className="w-4 h-4" />
-                                                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${estadoInfo.color}`}>
-                                                            {estadoInfo.label}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <div className="flex items-center gap-2">
-                                                        <button 
-                                                            onClick={() => handleShowDetails(cotizacion)}
-                                                            className="p-1 rounded hover:bg-blue-100 text-blue-600 transition-colors duration-200" 
-                                                            title="Ver detalles"
-                                                        >
-                                                            <FiEye className="w-4 h-4" />
-                                                        </button>
-                                                        <button className="p-1 rounded hover:bg-green-100 text-green-600 transition-colors duration-200" title="Descargar PDF">
-                                                            <FiDownload className="w-4 h-4" />
-                                                        </button>
-                                                        <button 
-                                                            onClick={() => handleEdit(cotizacion)}
-                                                            className="p-1 rounded hover:bg-yellow-100 text-yellow-600 transition-colors duration-200" 
-                                                            title="Editar"
-                                                        >
-                                                            <FiEdit className="w-4 h-4" />
-                                                        </button>
-                                                        <button className="p-1 rounded hover:bg-red-100 text-red-600 transition-colors duration-200" title="Eliminar">
-                                                            <FiTrash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* Footer con información adicional */}
-                        <div className={`px-6 py-3 border-t ${isDarkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                            <div className="flex items-center justify-between">
-                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>
-                                    Mostrando <span className="font-medium">{filteredCotizaciones.length}</span> de{' '}
-                                    <span className="font-medium">{cotizaciones.length}</span> cotizaciones
-                                </div>
-                                <div className="flex gap-2">
-                                    <button className={`px-3 py-1 rounded text-sm ${
-                                        isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-white text-gray-700 hover:bg-gray-50'
-                                    } border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
-                                        Exportar Excel
-                                    </button>
-                                    <button className={`px-3 py-1 rounded text-sm ${
-                                        isDarkMode ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-white text-gray-700 hover:bg-gray-50'
-                                    } border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
-                                        Imprimir
-                                    </button>
-                                </div>
+                        {loading ? (
+                            <div className="flex items-center justify-center p-12">
+                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                             </div>
-                        </div>
+                        ) : (
+                            <>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full">
+                                        <thead className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                                            <tr>
+                                                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                }`}>
+                                                    Cotización
+                                                </th>
+                                                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                }`}>
+                                                    Cliente
+                                                </th>
+                                                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                }`}>
+                                                    Monto
+                                                </th>
+                                                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                }`}>
+                                                    Fechas
+                                                </th>
+                                                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                }`}>
+                                                    Estado
+                                                </th>
+                                                <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                }`}>
+                                                    Acciones
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
+                                            {cotizaciones && cotizaciones.length > 0 ? (
+                                                cotizaciones.map((cotizacion) => {
+                                                    const estadoInfo = getEstadoInfo(cotizacion.estado);
+                                                    const EstadoIcon = estadoInfo.icon;
+                                                    return (
+                                                        <tr key={cotizacion.id} className={`hover:${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-colors duration-200`}>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <div>
+                                                                    <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                                        {cotizacion.numero}
+                                                                    </div>
+                                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                        Vendedor: {cotizacion.vendedor_nombre || 'N/A'}
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <div>
+                                                                    <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                                        {cotizacion.cliente_nombre || 'N/A'}
+                                                                    </div>
+                                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                        {cotizacion.cliente_contacto || ''}
+                                                                    </div>
+                                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                        {cotizacion.cliente_email || ''}
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <div>
+                                                                    <div className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                                        {formatCurrency(cotizacion.total, cotizacion.moneda)}
+                                                                    </div>
+                                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                        Productos: {formatCurrency(cotizacion.total_monto_productos, cotizacion.moneda)}
+                                                                    </div>
+                                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                        Adicionales: {formatCurrency(cotizacion.total_adicionales_monto, cotizacion.moneda)}
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <div>
+                                                                    <div className="flex items-center gap-1">
+                                                                        <FiCalendar className="w-3 h-3 text-gray-400" />
+                                                                        <span className={`text-xs ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                                            {formatDate(cotizacion.fecha_cotizacion)}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                        Vence: {formatDate(cotizacion.fecha_vencimiento)}
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                                <div className="flex items-center gap-2">
+                                                                    <EstadoIcon className="w-4 h-4" />
+                                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${estadoInfo.color}`}>
+                                                                        {estadoInfo.label}
+                                                                    </span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                                <div className="flex items-center gap-2">
+                                                                    <button
+                                                                        onClick={() => handleShowDetails(cotizacion)}
+                                                                        className="p-1 rounded hover:bg-blue-100 text-blue-600 transition-colors duration-200"
+                                                                        title="Ver detalles"
+                                                                    >
+                                                                        <FiEye className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleEdit(cotizacion)}
+                                                                        className="p-1 rounded hover:bg-yellow-100 text-yellow-600 transition-colors duration-200"
+                                                                        title="Editar"
+                                                                    >
+                                                                        <FiEdit className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleDelete(cotizacion.id)}
+                                                                        className="p-1 rounded hover:bg-red-100 text-red-600 transition-colors duration-200"
+                                                                        title="Eliminar"
+                                                                    >
+                                                                        <FiTrash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan="6" className="px-6 py-12 text-center">
+                                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                            No hay cotizaciones para mostrar
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Footer con información adicional */}
+                                <div className={`px-6 py-3 border-t ${isDarkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+                                    <div className="flex items-center justify-between">
+                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>
+                                            Mostrando <span className="font-medium">{cotizaciones?.length || 0}</span> cotizaciones
+                                            {pagination && <span> de <span className="font-medium">{pagination.total}</span></span>}
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 
                 {/* Modals */}
                 {activeModal === 'show' && selectedCotizacion && (
-                    <ShowCotizaciones 
+                    <ShowCotizaciones
                         isOpen={activeModal === 'show'}
                         cotizacion={selectedCotizacion}
                         onClose={closeModal}
@@ -426,25 +442,19 @@ export default function Cotizaciones() {
                 )}
 
                 {activeModal === 'create' && (
-                    <CreateCotizaciones 
+                    <CreateCotizaciones
                         isOpen={activeModal === 'create'}
                         onClose={closeModal}
-                        onSave={(newCotizacion) => {
-                            // TODO: integrar persistencia real
-                            closeModal();
-                        }}
+                        onSave={handleSaveSuccess}
                     />
                 )}
 
                 {activeModal === 'edit' && selectedCotizacion && (
-                    <EditCotizaciones 
+                    <EditCotizaciones
                         isOpen={activeModal === 'edit'}
                         cotizacion={selectedCotizacion}
                         onClose={closeModal}
-                        onSave={(updatedCotizacion) => {
-                            // TODO: integrar persistencia real
-                            closeModal();
-                        }}
+                        onSave={handleSaveSuccess}
                     />
                 )}
             </CRMLayout>

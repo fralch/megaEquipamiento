@@ -22,6 +22,7 @@ use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
 use App\Http\Controllers\CRM\Clientes\ClientesParticularesController;
 use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
 use App\Http\Controllers\CRM\Productos\ProductoGestionController;
+use App\Http\Controllers\CRM\Cotizaciones\CotizacionesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -80,7 +81,17 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
         });
     });
 
-    Route::get('/cotizaciones', fn () => Inertia::render('CRM/Cotizaciones/Cotizaciones'))->name('cotizaciones');
+    // Rutas para cotizaciones
+    Route::prefix('cotizaciones')->name('cotizaciones.')->group(function () {
+        Route::get('/', [CotizacionesController::class, 'index'])->name('index');
+        Route::get('/create-data', [CotizacionesController::class, 'create'])->name('create-data');
+        Route::post('/store', [CotizacionesController::class, 'store'])->name('store');
+        Route::get('/estadisticas', [CotizacionesController::class, 'estadisticas'])->name('estadisticas');
+        Route::get('/{id}', [CotizacionesController::class, 'show'])->name('show');
+        Route::match(['put', 'post'], '/{id}', [CotizacionesController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [CotizacionesController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/cambiar-estado', [CotizacionesController::class, 'cambiarEstado'])->name('cambiar-estado');
+    });
 
     Route::prefix('empresas')->name('empresas.')->group(function () {
         Route::get('/', fn () => Inertia::render('CRM/Empresas/VerEmpresas'))->name('index');

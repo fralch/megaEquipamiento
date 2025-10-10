@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiPlus, FiTrash2, FiSearch } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
+import axios from 'axios';
 
 export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const { isDarkMode } = useTheme();
-    
+
     const [formData, setFormData] = useState({
         fecha_cotizacion: new Date().toISOString().split('T')[0],
         fecha_vencimiento: '',
@@ -13,6 +14,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         garantia: '',
         forma_pago: '',
         cliente_id: '',
+        cliente_tipo: 'particular',
         usuario_id: '',
         miempresa_id: '',
         moneda: 'soles',
@@ -28,30 +30,57 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const [vendedores, setVendedores] = useState([]);
     const [empresas, setEmpresas] = useState([]);
     const [productosDisponibles, setProductosDisponibles] = useState([]);
-    const [showClienteSearch, setShowClienteSearch] = useState(false);
-    const [clienteSearch, setClienteSearch] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [loadingProductos, setLoadingProductos] = useState(false);
 
-    // Simulated data - replace with actual API calls
+    // Cargar datos iniciales cuando se abre el modal
     useEffect(() => {
-        // Load initial data
-        setClientes([
-            { id: 1, nombre: 'Cliente Ejemplo 1', email: 'cliente1@example.com' },
-            { id: 2, nombre: 'Cliente Ejemplo 2', email: 'cliente2@example.com' }
-        ]);
-        setVendedores([
-            { id: 1, nombre: 'Vendedor 1' },
-            { id: 2, nombre: 'Vendedor 2' }
-        ]);
-        setEmpresas([
-            { id: 1, nombre: 'Mi Empresa 1' },
-            { id: 2, nombre: 'Mi Empresa 2' }
-        ]);
-        setProductosDisponibles([
-            { id: 1, nombre: 'Producto A', precio: 100.00 },
-            { id: 2, nombre: 'Producto B', precio: 150.00 },
-            { id: 3, nombre: 'Producto C', precio: 200.00 }
-        ]);
-    }, []);
+        if (isOpen) {
+            loadFormData();
+            loadProductos();
+        }
+    }, [isOpen]);
+
+    const loadFormData = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get('/crm/cotizaciones/create-data');
+            if (response.data.success) {
+                const data = response.data.data;
+                setClientes(data.clientes || []);
+                setVendedores(data.vendedores || []);
+                setEmpresas(data.empresas || []);
+            }
+        } catch (error) {
+            console.error('Error al cargar datos del formulario:', error);
+            alert('Error al cargar datos. Por favor, intente nuevamente.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadProductos = async () => {
+        setLoadingProductos(true);
+        try {
+            const response = await axios.get('/api/productos/excluye-servicios', {
+                params: { per_page: 100 }
+            });
+
+            if (response.data.data) {
+                const productos = response.data.data.map(p => ({
+                    id: p.id_producto,
+                    nombre: p.nombre,
+                    precio: parseFloat(p.precio_igv || p.precio_ganancia || 0),
+                    sku: p.sku
+                }));
+                setProductosDisponibles(productos);
+            }
+        } catch (error) {
+            console.error('Error al cargar productos:', error);
+        } finally {
+            setLoadingProductos(false);
+        }
+    };
 
     // Calculate totals when products change
     useEffect(() => {
@@ -77,6 +106,27 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             ...prev,
             [name]: value
         }));
+    };
+
+    const handleClienteChange = (e) => {
+        const value = e.target.value;
+        if (value) {
+            // Encontrar el cliente seleccionado
+            const selectedCliente = clientes.find(c => c.id == value);
+            if (selectedCliente) {
+                setFormData(prev => ({
+                    ...prev,
+                    cliente_id: value,
+                    cliente_tipo: selectedCliente.tipo || 'particular'
+                }));
+            }
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                cliente_id: '',
+                cliente_tipo: 'particular'
+            }));
+        }
     };
 
     const addProducto = () => {
@@ -162,10 +212,69 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSave(formData);
-        onClose();
+
+        // Validar que haya al menos un producto
+        if (formData.productos.length === 0) {
+            alert('Debe agregar al menos un producto a la cotización');
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            // Preparar datos para enviar
+            const dataToSend = {
+                fecha_cotizacion: formData.fecha_cotizacion,
+                fecha_vencimiento: formData.fecha_vencimiento,
+                entrega: formData.entrega || null,
+                lugar_entrega: formData.lugar_entrega || null,
+                garantia: formData.garantia || null,
+                forma_pago: formData.forma_pago || null,
+                cliente_id: parseInt(formData.cliente_id),
+                cliente_tipo: formData.cliente_tipo,
+                usuario_id: parseInt(formData.usuario_id),
+                miempresa_id: parseInt(formData.miempresa_id),
+                moneda: formData.moneda,
+                tipo_cambio: parseFloat(formData.tipo_cambio),
+                productos: formData.productos.map(p => ({
+                    producto_id: p.id || null,
+                    nombre: p.nombre,
+                    cantidad: parseInt(p.cantidad),
+                    precio_unitario: parseFloat(p.precio_unitario),
+                    descripcion: p.descripcion || null
+                })),
+                productos_adicionales: formData.productos_adicionales.map(p => ({
+                    nombre: p.nombre,
+                    cantidad: parseInt(p.cantidad),
+                    precio_unitario: parseFloat(p.precio_unitario),
+                    descripcion: p.descripcion || null
+                })),
+                notas: formData.notas || null
+            };
+
+            const response = await axios.post('/crm/cotizaciones/store', dataToSend);
+
+            if (response.data.success) {
+                alert('Cotización creada exitosamente');
+                onSave(); // Notificar al padre para que recargue
+                onClose();
+            } else {
+                alert('Error al crear cotización: ' + (response.data.message || 'Error desconocido'));
+            }
+        } catch (error) {
+            console.error('Error al crear cotización:', error);
+            if (error.response?.data?.errors) {
+                const errors = error.response.data.errors;
+                const errorMessages = Object.values(errors).flat().join('\n');
+                alert('Errores de validación:\n' + errorMessages);
+            } else {
+                alert('Error al crear cotización: ' + (error.response?.data?.message || error.message));
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     const formatCurrency = (amount) => {
@@ -313,26 +422,37 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     <FiUser className="inline w-4 h-4 mr-2" />
-                                    Cliente
+                                    Cliente *
                                 </label>
-                                <select
-                                    name="cliente_id"
-                                    value={formData.cliente_id}
-                                    onChange={handleInputChange}
-                                    className={`w-full px-3 py-2 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white' 
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                    }`}
-                                    required
-                                >
-                                    <option value="">Seleccionar cliente</option>
-                                    {clientes.map(cliente => (
-                                        <option key={cliente.id} value={cliente.id}>
-                                            {cliente.nombre}
-                                        </option>
-                                    ))}
-                                </select>
+                                {loading ? (
+                                    <div className="flex items-center justify-center py-2">
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+                                    </div>
+                                ) : (
+                                    <select
+                                        name="cliente_id"
+                                        value={formData.cliente_id}
+                                        onChange={handleClienteChange}
+                                        className={`w-full px-3 py-2 border rounded-lg ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-white'
+                                                : 'bg-white border-gray-300 text-gray-900'
+                                        }`}
+                                        required
+                                    >
+                                        <option value="">Seleccionar cliente</option>
+                                        {clientes.map(cliente => (
+                                            <option key={`${cliente.tipo}-${cliente.id}`} value={cliente.id} data-tipo={cliente.tipo}>
+                                                {cliente.tipo === 'empresa' ? '🏢 ' : '👤 '}{cliente.nombre}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+                                {formData.cliente_id && (
+                                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        Tipo: {formData.cliente_tipo === 'empresa' ? 'Empresa' : 'Particular'}
+                                    </p>
+                                )}
                             </div>
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
