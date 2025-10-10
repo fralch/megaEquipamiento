@@ -81,30 +81,37 @@ class EmpresasClientesController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'razon_social' => 'required|string|max:255',
-            'ruc' => 'required|string|max:11',
-            'contacto_principal' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'telefono' => 'nullable|string|max:255',
-            'direccion' => 'nullable|string',
+            'ruc' => 'required|string|size:11|unique:empresasclientes,ruc',
+            'contacto_principal' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'telefono' => 'required|string|max:20',
+            'direccion' => 'required|string|max:500',
             'usuario_id' => 'required|exists:usuarios,id_usuario',
-            'activo' => 'boolean',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return back()->withErrors($validator->errors());
         }
 
-        $empresa = EmpresaCliente::create($request->all());
-        $empresa->load('vendedor');
+        try {
+            $empresa = EmpresaCliente::create([
+                'razon_social' => $request->razon_social,
+                'ruc' => $request->ruc,
+                'sector' => $request->sector,
+                'contacto_principal' => $request->contacto_principal,
+                'email' => $request->email,
+                'telefono' => $request->telefono,
+                'direccion' => $request->direccion,
+                'usuario_id' => $request->usuario_id,
+                'cliente_id' => $request->cliente_id,
+                'activo' => $request->activo ?? true,
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Empresa cliente creada exitosamente',
-            'data' => $empresa
-        ], 201);
+            return redirect()->route('crm.clientes.empresas.index')->with('success', 'Empresa cliente creada exitosamente');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Error al crear la empresa cliente: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -129,30 +136,37 @@ class EmpresasClientesController extends Controller
 
         $validator = Validator::make($request->all(), [
             'razon_social' => 'required|string|max:255',
-            'ruc' => 'required|string|max:11',
-            'contacto_principal' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'telefono' => 'nullable|string|max:255',
-            'direccion' => 'nullable|string',
+            'ruc' => 'required|string|size:11|unique:empresasclientes,ruc,' . $id,
+            'contacto_principal' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'telefono' => 'required|string|max:20',
+            'direccion' => 'required|string|max:500',
             'usuario_id' => 'required|exists:usuarios,id_usuario',
-            'activo' => 'boolean',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return back()->withErrors($validator->errors());
         }
 
-        $empresa->update($request->all());
-        $empresa->load('vendedor');
+        try {
+            $empresa->update([
+                'razon_social' => $request->razon_social,
+                'ruc' => $request->ruc,
+                'sector' => $request->sector,
+                'contacto_principal' => $request->contacto_principal,
+                'email' => $request->email,
+                'telefono' => $request->telefono,
+                'direccion' => $request->direccion,
+                'usuario_id' => $request->usuario_id,
+                'cliente_id' => $request->cliente_id,
+                'activo' => $request->activo ?? true,
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Empresa cliente actualizada exitosamente',
-            'data' => $empresa
-        ]);
+            return redirect()->route('crm.clientes.empresas.index')->with('success', 'Empresa cliente actualizada exitosamente');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Error al actualizar la empresa cliente: ' . $e->getMessage()]);
+        }
     }
 
     /**

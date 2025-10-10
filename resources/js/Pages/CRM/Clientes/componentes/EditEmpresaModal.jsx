@@ -107,7 +107,7 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
     setIsLoading(true);
 
     try {
-      router.patch(route('empresas-clientes.update', empresa.id), formData, {
+      router.put(route('crm.clientes.empresas.update', empresa.id), formData, {
         onSuccess: () => {
           onClose();
           setErrors({});

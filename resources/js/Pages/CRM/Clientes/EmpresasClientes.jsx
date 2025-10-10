@@ -7,12 +7,23 @@ import CreateEmpresaModal from './componentes/CreateEmpresaModal';
 import EditEmpresaModal from './componentes/EditEmpresaModal';
 import ShowEmpresaModal from './componentes/ShowEmpresaModal';
 
-export default function EmpresasClientes({ empresas = [], usuarios = [], clientes = [] }) {
+export default function EmpresasClientes({ empresas = { data: [] }, usuarios = [], clientes = [] }) {
     const { isDarkMode } = useTheme();
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
     const [selectedEmpresa, setSelectedEmpresa] = useState(null);
+
+    // Debug: verificar qué datos están llegando
+    console.log('Empresas recibidas:', empresas);
+    console.log('Estructura de empresas:', {
+        total: empresas.total,
+        currentPage: empresas.current_page,
+        dataLength: empresas.data?.length
+    });
+
+    // Extraer el array de empresas del objeto paginado
+    const empresasData = empresas.data || [];
 
     const handleDelete = (empresaId) => {
         if (confirm('¿Estás seguro de que deseas eliminar esta empresa cliente?')) {
@@ -88,7 +99,7 @@ export default function EmpresasClientes({ empresas = [], usuarios = [], cliente
                                 </tr>
                             </thead>
                             <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
-                                {empresas.length > 0 ? empresas.map((empresa) => (
+                                {empresasData.length > 0 ? empresasData.map((empresa) => (
                                     <tr key={empresa.id} className={`${
                                         isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                     }`}>
