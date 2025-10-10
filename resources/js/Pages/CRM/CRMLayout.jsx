@@ -54,8 +54,7 @@ export default function CRMLayout({ children, title }) {
             icon: FiPackage,
             key: "productos",
             items: [
-                "PRODUCTOS",
-                "MARCAS"
+                "PRODUCTOS"
             ]
         },
         {
@@ -83,7 +82,6 @@ export default function CRMLayout({ children, title }) {
 
         // Productos y Servicios
         "PRODUCTOS": "/crm/productos",
-        "MARCAS": "/crm/productos/marcas",
 
         // Cotizaciones
         "COTIZACIONES": "/crm/cotizaciones"

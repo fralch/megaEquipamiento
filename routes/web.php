@@ -96,8 +96,7 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
     });
 
     Route::prefix('productos')->name('productos.')->group(function () {
-        Route::get('/', fn () => Inertia::render('CRM/ProductosServicios/Productos'))->name('index');
-        Route::get('/marcas', fn () => Inertia::render('CRM/ProductosServicios/Marcas'))->name('marcas');
+        Route::get('/', fn () => Inertia::render('CRM/Productos/Productos'))->name('index');
     });
 
     // Rutas de roles (deben ir antes de las rutas de usuarios para evitar conflictos)
