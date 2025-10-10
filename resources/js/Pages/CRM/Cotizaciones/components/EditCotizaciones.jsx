@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiPlus, FiTrash2, FiSave } from "react-icons/fi";
+import { useState, useEffect, useRef } from 'react';
+import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiPlus, FiTrash2, FiSave, FiSearch } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
 import axios from 'axios';
 
@@ -34,6 +34,14 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
     const [productosDisponibles, setProductosDisponibles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingProductos, setLoadingProductos] = useState(false);
+
+    // Estados para búsqueda de productos adicionales
+    const [searchProductoAdicional, setSearchProductoAdicional] = useState('');
+    const [productosAdicionalesResultados, setProductosAdicionalesResultados] = useState([]);
+    const [showProductoAdicionalDropdown, setShowProductoAdicionalDropdown] = useState(false);
+    const [loadingSearchAdicional, setLoadingSearchAdicional] = useState(false);
+    const searchAdicionalTimeoutRef = useRef(null);
+    const dropdownAdicionalRef = useRef(null);
 
     // Load form data (clientes, vendedores, empresas)
     const loadFormData = async () => {
@@ -81,6 +89,20 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
             loadProductos();
         }
     }, [isOpen]);
+
+    // Handle click outside dropdown for additional products search
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownAdicionalRef.current && !dropdownAdicionalRef.current.contains(event.target)) {
+                setShowProductoAdicionalDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     // Load cotizacion data when modal opens
     useEffect(() => {
@@ -320,6 +342,79 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
         } finally {
             setLoading(false);
         }
+    };
+
+    // Buscar productos adicionales con debounce
+    const buscarProductosAdicionales = async (termino) => {
+        if (termino.trim().length < 2) {
+            setProductosAdicionalesResultados([]);
+            setShowProductoAdicionalDropdown(false);
+            return;
+        }
+
+        setLoadingSearchAdicional(true);
+        try {
+            const response = await axios.get('/api/productos/crm/buscar', {
+                params: { q: termino, limit: 20 }
+            });
+
+            if (response.data.success) {
+                setProductosAdicionalesResultados(response.data.data || []);
+                setShowProductoAdicionalDropdown(true);
+            }
+        } catch (error) {
+            console.error('Error al buscar productos adicionales:', error);
+        } finally {
+            setLoadingSearchAdicional(false);
+        }
+    };
+
+    // Handler para búsqueda de productos adicionales con debounce
+    const handleSearchAdicionalChange = (value) => {
+        setSearchProductoAdicional(value);
+
+        if (searchAdicionalTimeoutRef.current) {
+            clearTimeout(searchAdicionalTimeoutRef.current);
+        }
+
+        searchAdicionalTimeoutRef.current = setTimeout(() => {
+            buscarProductosAdicionales(value);
+        }, 300);
+    };
+
+    // Seleccionar producto adicional del dropdown
+    const selectProductoAdicional = (producto) => {
+        // Los productos siempre vienen en dólares por defecto
+        let precioFinal = producto.precio || 0;
+        
+        // Si la moneda actual es soles, convertir el precio
+        if (formData.moneda === 'soles') {
+            precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
+        }
+        
+        const newProducto = {
+            id: producto.id,
+            nombre: producto.nombre,
+            cantidad: 1,
+            precio_unitario: precioFinal,
+            subtotal: precioFinal
+        };
+
+        setFormData(prev => ({
+            ...prev,
+            productos_adicionales: [...prev.productos_adicionales, newProducto]
+        }));
+
+        // Limpiar búsqueda
+        setSearchProductoAdicional('');
+        setProductosAdicionalesResultados([]);
+        setShowProductoAdicionalDropdown(false);
+
+        // Recalcular totales
+        calculateTotals({
+            ...formData,
+            productos_adicionales: [...formData.productos_adicionales, newProducto]
+        });
     };
 
     const formatCurrency = (amount) => {
@@ -756,18 +851,62 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
                             <h3 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                 Productos Adicionales
                             </h3>
-                            <button
-                                type="button"
-                                onClick={addProductoAdicional}
-                                className={`px-3 py-2 rounded-lg flex items-center gap-2 ${
+                        </div>
+
+                        {/* Buscador de productos adicionales */}
+                        <div className="mb-4 relative" ref={dropdownAdicionalRef}>
+                            <div className="relative">
+                                <FiSearch className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`} />
+                                <input
+                                    type="text"
+                                    value={searchProductoAdicional}
+                                    onChange={(e) => handleSearchAdicionalChange(e.target.value)}
+                                    placeholder="Buscar producto adicional..."
+                                    className={`w-full pl-10 pr-10 py-2 border rounded-lg ${
+                                        isDarkMode 
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                    }`}
+                                />
+                                {loadingSearchAdicional && (
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Dropdown de resultados */}
+                            {showProductoAdicionalDropdown && productosAdicionalesResultados.length > 0 && (
+                                <div className={`absolute z-10 w-full mt-1 border rounded-lg shadow-lg max-h-60 overflow-y-auto ${
                                     isDarkMode 
-                                        ? 'bg-green-600 hover:bg-green-700 text-white' 
-                                        : 'bg-green-500 hover:bg-green-600 text-white'
-                                }`}
-                            >
-                                <FiPlus className="w-4 h-4" />
-                                Agregar Adicional
-                            </button>
+                                        ? 'bg-gray-700 border-gray-600' 
+                                        : 'bg-white border-gray-300'
+                                }`}>
+                                    {productosAdicionalesResultados.map((producto) => (
+                                        <div
+                                            key={producto.id}
+                                            onClick={() => selectProductoAdicional(producto)}
+                                            className={`p-3 cursor-pointer border-b last:border-b-0 hover:bg-opacity-50 ${
+                                                isDarkMode 
+                                                    ? 'border-gray-600 hover:bg-gray-600' 
+                                                    : 'border-gray-200 hover:bg-gray-100'
+                                            }`}
+                                        >
+                                            <div className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                {producto.nombre}
+                                            </div>
+                                            <div className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                                SKU: {producto.sku} | Marca: {producto.marca}
+                                            </div>
+                                            <div className={`text-sm font-medium ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+                                                ${producto.precio}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                         
                         {formData.productos_adicionales.map((producto, index) => (

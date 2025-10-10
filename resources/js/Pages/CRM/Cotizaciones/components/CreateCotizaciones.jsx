@@ -42,6 +42,14 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const searchTimeoutRef = useRef(null);
     const dropdownRef = useRef(null);
 
+    // Estados para búsqueda de productos adicionales
+    const [searchProductoAdicional, setSearchProductoAdicional] = useState('');
+    const [productosAdicionalesResultados, setProductosAdicionalesResultados] = useState([]);
+    const [showProductoAdicionalDropdown, setShowProductoAdicionalDropdown] = useState(false);
+    const [loadingSearchAdicional, setLoadingSearchAdicional] = useState(false);
+    const searchAdicionalTimeoutRef = useRef(null);
+    const dropdownAdicionalRef = useRef(null);
+
     // Cargar datos iniciales cuando se abre el modal
     useEffect(() => {
         if (isOpen) {
@@ -54,6 +62,9 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setShowProductoDropdown(false);
+            }
+            if (dropdownAdicionalRef.current && !dropdownAdicionalRef.current.contains(event.target)) {
+                setShowProductoAdicionalDropdown(false);
             }
         };
 
@@ -410,6 +421,73 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Buscar productos adicionales con debounce
+    const buscarProductosAdicionales = async (termino) => {
+        if (termino.trim().length < 2) {
+            setProductosAdicionalesResultados([]);
+            setShowProductoAdicionalDropdown(false);
+            return;
+        }
+
+        setLoadingSearchAdicional(true);
+        try {
+            const response = await axios.get('/api/productos/crm/buscar', {
+                params: { q: termino, limit: 20 }
+            });
+
+            if (response.data.success) {
+                setProductosAdicionalesResultados(response.data.data || []);
+                setShowProductoAdicionalDropdown(true);
+            }
+        } catch (error) {
+            console.error('Error al buscar productos adicionales:', error);
+        } finally {
+            setLoadingSearchAdicional(false);
+        }
+    };
+
+    // Handler para búsqueda de productos adicionales con debounce
+    const handleSearchAdicionalChange = (value) => {
+        setSearchProductoAdicional(value);
+
+        if (searchAdicionalTimeoutRef.current) {
+            clearTimeout(searchAdicionalTimeoutRef.current);
+        }
+
+        searchAdicionalTimeoutRef.current = setTimeout(() => {
+            buscarProductosAdicionales(value);
+        }, 300);
+    };
+
+    // Seleccionar producto adicional del dropdown
+    const selectProductoAdicional = (producto) => {
+        // Los productos siempre vienen en dólares por defecto
+        let precioFinal = producto.precio || 0;
+        
+        // Si la moneda actual es soles, convertir el precio
+        if (formData.moneda === 'soles') {
+            precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
+        }
+        
+        const newProducto = {
+            id: producto.id,
+            nombre: producto.nombre,
+            cantidad: 1,
+            precio_unitario: precioFinal,
+            subtotal: precioFinal
+        };
+
+        setFormData(prev => ({
+            ...prev,
+            productos_adicionales: [...prev.productos_adicionales, newProducto]
+        }));
+
+        // Limpiar búsqueda
+        setSearchProductoAdicional('');
+        setProductosAdicionalesResultados([]);
+        setShowProductoAdicionalDropdown(false);
     };
 
     const formatCurrency = (amount) => {
@@ -913,18 +991,66 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                             <h3 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                 Productos Adicionales
                             </h3>
-                            <button
-                                type="button"
-                                onClick={addProductoAdicional}
-                                className={`px-3 py-2 rounded-lg flex items-center gap-2 ${
-                                    isDarkMode
-                                        ? 'bg-green-600 hover:bg-green-700 text-white'
-                                        : 'bg-green-500 hover:bg-green-600 text-white'
-                                }`}
-                            >
-                                <FiPlus className="w-4 h-4" />
-                                Agregar Adicional
-                            </button>
+                        </div>
+
+                        {/* Buscador de productos adicionales */}
+                        <div className="mb-4 relative" ref={dropdownAdicionalRef}>
+                            <div className="relative">
+                                <FiSearch className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                }`} />
+                                <input
+                                    type="text"
+                                    value={searchProductoAdicional}
+                                    onChange={(e) => handleSearchAdicionalChange(e.target.value)}
+                                    placeholder="Buscar producto adicional..."
+                                    className={`w-full pl-10 pr-4 py-2 border rounded-lg ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                    }`}
+                                />
+                                {loadingSearchAdicional && (
+                                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Dropdown de resultados */}
+                            {showProductoAdicionalDropdown && productosAdicionalesResultados.length > 0 && (
+                                <div className={`absolute z-10 w-full mt-1 border rounded-lg shadow-lg max-h-60 overflow-y-auto ${
+                                    isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
+                                }`}>
+                                    {productosAdicionalesResultados.map((producto) => (
+                                        <div
+                                            key={producto.id}
+                                            onClick={() => selectProductoAdicional(producto)}
+                                            className={`p-3 cursor-pointer border-b last:border-b-0 hover:bg-opacity-50 ${
+                                                isDarkMode
+                                                    ? 'border-gray-600 hover:bg-gray-600'
+                                                    : 'border-gray-200 hover:bg-gray-100'
+                                            }`}
+                                        >
+                                            <div className="flex justify-between items-start">
+                                                <div className="flex-1">
+                                                    <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                        {producto.nombre}
+                                                    </h4>
+                                                    <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                                        SKU: {producto.sku} | Marca: {producto.marca}
+                                                    </p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className={`font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+                                                        ${parseFloat(producto.precio || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                         {formData.productos_adicionales.map((producto, index) => (
@@ -1066,3 +1192,70 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         </div>
     );
 }
+
+// Buscar productos adicionales con debounce
+const buscarProductosAdicionales = async (termino) => {
+    if (termino.trim().length < 2) {
+        setProductosAdicionalesResultados([]);
+        setShowProductoAdicionalDropdown(false);
+        return;
+    }
+
+    setLoadingSearchAdicional(true);
+    try {
+        const response = await axios.get('/api/productos/crm/buscar', {
+            params: { q: termino, limit: 20 }
+        });
+
+        if (response.data.success) {
+            setProductosAdicionalesResultados(response.data.data || []);
+            setShowProductoAdicionalDropdown(true);
+        }
+    } catch (error) {
+        console.error('Error al buscar productos adicionales:', error);
+    } finally {
+        setLoadingSearchAdicional(false);
+    }
+};
+
+// Handler para búsqueda de productos adicionales con debounce
+const handleSearchAdicionalChange = (value) => {
+    setSearchProductoAdicional(value);
+
+    if (searchAdicionalTimeoutRef.current) {
+        clearTimeout(searchAdicionalTimeoutRef.current);
+    }
+
+    searchAdicionalTimeoutRef.current = setTimeout(() => {
+        buscarProductosAdicionales(value);
+    }, 300);
+};
+
+// Seleccionar producto adicional del dropdown
+const selectProductoAdicional = (producto) => {
+    // Los productos siempre vienen en dólares por defecto
+    let precioFinal = producto.precio || 0;
+    
+    // Si la moneda actual es soles, convertir el precio
+    if (formData.moneda === 'soles') {
+        precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
+    }
+    
+    const newProducto = {
+        id: producto.id,
+        nombre: producto.nombre,
+        cantidad: 1,
+        precio_unitario: precioFinal,
+        subtotal: precioFinal
+    };
+
+    setFormData(prev => ({
+        ...prev,
+        productos_adicionales: [...prev.productos_adicionales, newProducto]
+    }));
+
+    // Limpiar búsqueda
+    setSearchProductoAdicional('');
+    setProductosAdicionalesResultados([]);
+    setShowProductoAdicionalDropdown(false);
+};
