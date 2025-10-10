@@ -17,8 +17,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         cliente_tipo: 'particular',
         usuario_id: '',
         miempresa_id: '',
-        moneda: 'soles',
-        tipo_cambio: 1.0,
+        moneda: 'dolares',
+        tipo_cambio: 3.7,
         productos: [],
         total_monto_productos: 0,
         productos_adicionales: [],
@@ -126,12 +126,20 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
     // Seleccionar producto del dropdown
     const selectProducto = (producto) => {
+        // Los productos siempre vienen en dólares por defecto
+        let precioFinal = producto.precio || 0;
+        
+        // Si la moneda actual es soles, convertir el precio
+        if (formData.moneda === 'soles') {
+            precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
+        }
+        
         const newProducto = {
             id: producto.id,
             nombre: producto.nombre,
             cantidad: 1,
-            precio_unitario: producto.precio || 0,
-            subtotal: producto.precio || 0
+            precio_unitario: precioFinal,
+            subtotal: precioFinal
         };
 
         setFormData(prev => ({
@@ -163,8 +171,86 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         }));
     }, [formData.productos, formData.productos_adicionales]);
 
+    // Función para convertir precios según la moneda
+    const convertPrice = (price, fromCurrency, toCurrency, exchangeRate) => {
+        if (fromCurrency === toCurrency) return price;
+        
+        if (fromCurrency === 'dolares' && toCurrency === 'soles') {
+            return price * exchangeRate;
+        } else if (fromCurrency === 'soles' && toCurrency === 'dolares') {
+            return price / exchangeRate;
+        }
+        
+        return price;
+    };
+
+    // Función para convertir todos los productos cuando cambia la moneda
+    const convertAllProducts = (newCurrency, exchangeRate) => {
+        const currentCurrency = formData.moneda;
+        
+        if (currentCurrency === newCurrency) return;
+
+        // Convertir productos existentes
+        if (formData.productos.length > 0) {
+            const convertedProducts = formData.productos.map(producto => {
+                const newPrice = convertPrice(
+                    parseFloat(producto.precio_unitario || 0),
+                    currentCurrency,
+                    newCurrency,
+                    exchangeRate
+                );
+                
+                return {
+                    ...producto,
+                    precio_unitario: newPrice,
+                    subtotal: newPrice * parseFloat(producto.cantidad || 0)
+                };
+            });
+
+            setFormData(prev => ({
+                ...prev,
+                productos: convertedProducts
+            }));
+        }
+
+        // Convertir productos adicionales
+        if (formData.productos_adicionales.length > 0) {
+            const convertedAdditionalProducts = formData.productos_adicionales.map(producto => {
+                const newPrice = convertPrice(
+                    parseFloat(producto.precio_unitario || 0),
+                    currentCurrency,
+                    newCurrency,
+                    exchangeRate
+                );
+                
+                return {
+                    ...producto,
+                    precio_unitario: newPrice,
+                    subtotal: newPrice * parseFloat(producto.cantidad || 0)
+                };
+            });
+
+            setFormData(prev => ({
+                ...prev,
+                productos_adicionales: convertedAdditionalProducts
+            }));
+        }
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+        
+        // Si se cambia la moneda, convertir automáticamente los precios
+        if (name === 'moneda' && value !== formData.moneda) {
+            convertAllProducts(value, formData.tipo_cambio);
+        }
+        
+        // Si se cambia el tipo de cambio, reconvertir los precios si la moneda actual es soles
+        if (name === 'tipo_cambio' && formData.moneda === 'soles') {
+            const newExchangeRate = parseFloat(value) || 3.7;
+            convertAllProducts('soles', newExchangeRate);
+        }
+        
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -435,14 +521,14 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                     <option value="dolares">Dólares (USD)</option>
                                 </select>
                             </div>
-                        </div>
-                        {formData.moneda === 'dolares' && (
-                            <div className="mt-4">
+                            
+                            {/* Tipo de Cambio - Siempre visible */}
+                            <div>
                                 <label className={`block text-sm font-medium mb-2 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
                                     <FiDollarSign className="inline w-4 h-4 mr-1" />
-                                    Tipo de Cambio *
+                                    Tipo de Cambio (USD → PEN) *
                                 </label>
                                 <input
                                     type="number"
@@ -450,16 +536,19 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                     name="tipo_cambio"
                                     value={formData.tipo_cambio}
                                     onChange={handleInputChange}
-                                    className={`w-full md:w-1/3 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                         isDarkMode
                                             ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                                             : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                                     }`}
-                                    placeholder="3.750"
+                                    placeholder="3.700"
                                     required
                                 />
+                                <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    Usado para convertir precios entre dólares y soles
+                                </p>
                             </div>
-                        )}
+                        </div>
                     </div>
 
                     {/* Cliente y Vendedor */}
