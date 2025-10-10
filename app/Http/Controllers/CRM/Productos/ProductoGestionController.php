@@ -33,6 +33,7 @@ class ProductoGestionController extends Controller
             $search = $request->input('search', '');
             $marcaId = $request->input('marca_id');
             $subcategoriaId = $request->input('subcategoria_id');
+            $categoriaId = $request->input('categoria_id');
             
             // Validar per_page
             $perPage = max(1, min(100, (int)$perPage));
@@ -59,6 +60,13 @@ class ProductoGestionController extends Controller
             // Filtro por subcategoría
             if ($subcategoriaId) {
                 $query->where('id_subcategoria', $subcategoriaId);
+            }
+            
+            // Filtro por categoría
+            if ($categoriaId) {
+                $query->whereHas('subcategoria', function($subQuery) use ($categoriaId) {
+                    $subQuery->where('id_categoria', $categoriaId);
+                });
             }
             
             // Ordenar por fecha de creación descendente
@@ -237,6 +245,23 @@ class ProductoGestionController extends Controller
             Log::error('Error al obtener subcategorías: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Error al obtener subcategorías',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get all categories for filters
+     */
+    public function getCategorias()
+    {
+        try {
+            $categorias = \App\Models\Categoria::orderBy('nombre')->get();
+            return response()->json($categorias);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener categorías: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Error al obtener categorías',
                 'message' => $e->getMessage()
             ], 500);
         }

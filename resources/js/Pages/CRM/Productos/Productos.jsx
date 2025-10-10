@@ -1,10 +1,10 @@
+import React, { useState, useEffect, useCallback } from 'react';
 import { Head } from "@inertiajs/react";
-import { FiPackage, FiEdit, FiTrash, FiPlus, FiLoader, FiEye, FiImage, FiSearch } from "react-icons/fi";
+import { FiPackage, FiEdit, FiTrash, FiPlus, FiLoader, FiEye, FiImage, FiSearch, FiFilter } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../CRMLayout';
 import ProductModal from './components/ProductModal';
 import EditProductModal from './components/EditProductModal';
-import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function Productos() {
@@ -22,15 +22,60 @@ export default function Productos() {
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearching, setIsSearching] = useState(false);
 
-    const fetchProductos = async (page = 1, itemsPerPage = 20, search = '') => {
+    // Estados para filtros
+    const [marcas, setMarcas] = useState([]);
+    const [categorias, setCategorias] = useState([]);
+    const [subcategorias, setSubcategorias] = useState([]);
+    const [selectedMarca, setSelectedMarca] = useState('');
+    const [selectedCategoria, setSelectedCategoria] = useState('');
+    const [selectedSubcategoria, setSelectedSubcategoria] = useState('');
+    const [showFilters, setShowFilters] = useState(false);
+
+    // Función para obtener marcas
+    const fetchMarcas = async () => {
+        try {
+            const response = await axios.get('/api/productos/crm/marcas');
+            setMarcas(response.data || []);
+        } catch (error) {
+            console.error('Error fetching marcas:', error);
+            setMarcas([]);
+        }
+    };
+
+    // Función para obtener categorías
+    const fetchCategorias = async () => {
+        try {
+            const response = await axios.get('/api/productos/crm/categorias');
+            setCategorias(response.data || []);
+        } catch (error) {
+            console.error('Error fetching categorias:', error);
+            setCategorias([]);
+        }
+    };
+
+    // Función para obtener subcategorías
+    const fetchSubcategorias = async () => {
+        try {
+            const response = await axios.get('/api/productos/crm/subcategorias');
+            setSubcategorias(response.data || []);
+        } catch (error) {
+            console.error('Error fetching subcategorias:', error);
+            setSubcategorias([]);
+        }
+    };
+
+    const fetchProductos = async (page = 1, itemsPerPage = 20, search = '', marcaId = '', categoriaId = '', subcategoriaId = '') => {
         try {
             setLoading(true);
-            const endpoint = search ? '/api/productos/crm' : '/api/productos/excluye-servicios';
+            const endpoint = '/api/productos/crm';
             const response = await axios.get(endpoint, {
                 params: {
                     page: page,
                     per_page: itemsPerPage,
-                    ...(search && { search: search })
+                    ...(search && { search: search }),
+                    ...(marcaId && { marca_id: marcaId }),
+                    ...(categoriaId && { categoria_id: categoriaId }),
+                    ...(subcategoriaId && { subcategoria_id: subcategoriaId })
                 }
             });
             
@@ -48,25 +93,36 @@ export default function Productos() {
         }
     };
 
+    // Cargar datos de filtros al montar el componente
     useEffect(() => {
-        fetchProductos(currentPage, perPage, searchTerm);
+        fetchMarcas();
+        fetchCategorias();
+        fetchSubcategorias();
+    }, []);
+
+    // Actualizar productos cuando cambian los filtros
+    useEffect(() => {
+        if (currentPage > 0) {
+            fetchProductos(currentPage, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
+        }
+    }, [selectedMarca, selectedCategoria, selectedSubcategoria]);
+
+    // Efecto para manejar la paginación
+    useEffect(() => {
+        fetchProductos(currentPage, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
     }, [currentPage, perPage]);
 
-    // Efecto separado para la búsqueda con debounce
+    // Efecto para la búsqueda y filtros con debounce
     useEffect(() => {
         const timeoutId = setTimeout(() => {
-            if (searchTerm !== '') {
-                setIsSearching(true);
-                fetchProductos(1, perPage, searchTerm).finally(() => {
-                    setIsSearching(false);
-                });
-            } else {
-                fetchProductos(1, perPage, '');
-            }
+            setIsSearching(true);
+            fetchProductos(1, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria).finally(() => {
+                setIsSearching(false);
+            });
         }, 500); // Debounce de 500ms
 
         return () => clearTimeout(timeoutId);
-    }, [searchTerm, perPage]);
+    }, [searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria, perPage]);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -170,6 +226,146 @@ export default function Productos() {
                                 <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                                     Buscando...
                                 </span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Sección de Filtros */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                                    isDarkMode 
+                                        ? 'bg-gray-800 border-gray-700 text-white hover:bg-gray-700' 
+                                        : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
+                                }`}
+                            >
+                                <FiFilter className="w-4 h-4" />
+                                <span>Filtros</span>
+                                <span className={`transform transition-transform ${showFilters ? 'rotate-180' : ''}`}>
+                                    ▼
+                                </span>
+                            </button>
+                            
+                            {/* Indicadores de filtros activos */}
+                            {(selectedMarca || selectedCategoria || selectedSubcategoria) && (
+                                <div className="flex items-center gap-2">
+                                    <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                        Filtros activos:
+                                    </span>
+                                    {selectedMarca && (
+                                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                            Marca: {marcas.find(m => m.id_marca == selectedMarca)?.nombre}
+                                        </span>
+                                    )}
+                                    {selectedCategoria && (
+                                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                                            Categoría: {categorias.find(c => c.id_categoria == selectedCategoria)?.nombre}
+                                        </span>
+                                    )}
+                                    {selectedSubcategoria && (
+                                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                                            Subcategoría: {subcategorias.find(s => s.id_subcategoria == selectedSubcategoria)?.nombre}
+                                        </span>
+                                    )}
+                                    <button
+                                        onClick={() => {
+                                            setSelectedMarca('');
+                                            setSelectedCategoria('');
+                                            setSelectedSubcategoria('');
+                                        }}
+                                        className="text-red-600 hover:text-red-800 text-sm"
+                                    >
+                                        Limpiar filtros
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Panel de filtros */}
+                        {showFilters && (
+                            <div className={`p-4 rounded-lg border ${
+                                isDarkMode 
+                                    ? 'bg-gray-800 border-gray-700' 
+                                    : 'bg-gray-50 border-gray-200'
+                            }`}>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {/* Filtro por Marca */}
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Marca
+                                        </label>
+                                        <select
+                                            value={selectedMarca}
+                                            onChange={(e) => setSelectedMarca(e.target.value)}
+                                            className={`w-full px-3 py-2 border rounded-lg text-sm ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-700 border-gray-600 text-white' 
+                                                    : 'bg-white border-gray-300 text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                        >
+                                            <option value="">Todas las marcas</option>
+                                            {marcas.map((marca) => (
+                                                <option key={marca.id_marca} value={marca.id_marca}>
+                                                    {marca.nombre}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* Filtro por Categoría */}
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Categoría
+                                        </label>
+                                        <select
+                                            value={selectedCategoria}
+                                            onChange={(e) => setSelectedCategoria(e.target.value)}
+                                            className={`w-full px-3 py-2 border rounded-lg text-sm ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-700 border-gray-600 text-white' 
+                                                    : 'bg-white border-gray-300 text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                        >
+                                            <option value="">Todas las categorías</option>
+                                            {categorias.map((categoria) => (
+                                                <option key={categoria.id_categoria} value={categoria.id_categoria}>
+                                                    {categoria.nombre}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* Filtro por Subcategoría */}
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Subcategoría
+                                        </label>
+                                        <select
+                                            value={selectedSubcategoria}
+                                            onChange={(e) => setSelectedSubcategoria(e.target.value)}
+                                            className={`w-full px-3 py-2 border rounded-lg text-sm ${
+                                                isDarkMode 
+                                                    ? 'bg-gray-700 border-gray-600 text-white' 
+                                                    : 'bg-white border-gray-300 text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                        >
+                                            <option value="">Todas las subcategorías</option>
+                                            {subcategorias.map((subcategoria) => (
+                                                <option key={subcategoria.id_subcategoria} value={subcategoria.id_subcategoria}>
+                                                    {subcategoria.nombre} ({subcategoria.categoria?.nombre})
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>

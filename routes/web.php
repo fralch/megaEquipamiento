@@ -268,6 +268,7 @@ Route::get('/api/productos/crm', [ProductoGestionController::class, 'getProducto
 Route::get('/api/productos/excluye-servicios', [ProductoGestionController::class, 'getProductosExcluyeServicios'])->name('api.productos.excluye-servicios');
 Route::get('/api/productos/crm/marcas', [ProductoGestionController::class, 'getMarcas'])->name('api.productos.crm.marcas');
 Route::get('/api/productos/crm/subcategorias', [ProductoGestionController::class, 'getSubcategorias'])->name('api.productos.crm.subcategorias');
+Route::get('/api/productos/crm/categorias', [ProductoGestionController::class, 'getCategorias'])->name('api.productos.crm.categorias');
 Route::match(['put', 'post'], '/api/productos/crm/{id}', [ProductoGestionController::class, 'update'])->name('api.productos.crm.update');
 
 Route::get('/sector/{id_tag_parent}/products/{id_tag}', [SectorController::class, 'getProductsByTag'])->name('sector.products-by-tag');
