@@ -19,7 +19,7 @@ export default function Cliente({ clientes = [], filters = {}, usuarios = [], em
         cliente.nombrecompleto.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (cliente.email && cliente.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (cliente.telefono && cliente.telefono.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (cliente.ruc && cliente.ruc.toLowerCase().includes(searchTerm.toLowerCase()))
+        (cliente.ruc_dni && cliente.ruc_dni.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     const handleSelectCliente = (clienteId) => {
@@ -49,7 +49,7 @@ export default function Cliente({ clientes = [], filters = {}, usuarios = [], em
 
     const handleDelete = (clienteId) => {
         if (confirm('¿Está seguro de eliminar este cliente?')) {
-            router.delete(route('clientes.destroy', clienteId), {
+            router.delete(route('crm.clientes.particulares.destroy', clienteId), {
                 onSuccess: () => {
                     alert('Cliente eliminado exitosamente');
                 },
@@ -158,22 +158,17 @@ export default function Cliente({ clientes = [], filters = {}, usuarios = [], em
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-500'
                                     }`}>
-                                        Empresa/RUC
+                                        RUC/DNI
                                     </th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-500'
                                     }`}>
-                                        Cargo/Área
+                                        Cargo
                                     </th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-500'
                                     }`}>
                                         Vendedor
-                                    </th>
-                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                    }`}>
-                                        Tipo
                                     </th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-300' : 'text-gray-500'
@@ -225,34 +220,17 @@ export default function Cliente({ clientes = [], filters = {}, usuarios = [], em
                                         <td className="px-6 py-4">
                                             <div className={`text-sm ${
                                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>
-                                                {cliente.empresa ? cliente.empresa.razon_social : 'Cliente Particular'}
-                                            </div>
-                                            <div className={`text-sm ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`}>RUC: {cliente.ruc}</div>
+                                            }`}>{cliente.ruc_dni || 'N/A'}</div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={`text-sm ${
                                                 isDarkMode ? 'text-white' : 'text-gray-900'
                                             }`}>{cliente.cargo || 'N/A'}</div>
-                                            <div className={`text-sm ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`}>{cliente.area_relacion ? cliente.area_relacion.nombre : (cliente.area || 'N/A')}</div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={`text-sm ${
                                                 isDarkMode ? 'text-white' : 'text-gray-900'
-                                            }`}>{cliente.vendedor?.nombre || 'N/A'}</div>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                                cliente.empresa_id
-                                                    ? 'bg-blue-100 text-blue-800'
-                                                    : 'bg-purple-100 text-purple-800'
-                                            }`}>
-                                                {cliente.empresa_id ? 'Empleado' : 'Particular'}
-                                            </span>
+                                            }`}>{cliente.vendedor?.nombre || 'N/A'} {cliente.vendedor?.apellido || ''}</div>
                                         </td>
                                         <td className="px-6 py-4 text-sm font-medium">
                                             <div className="flex space-x-2">

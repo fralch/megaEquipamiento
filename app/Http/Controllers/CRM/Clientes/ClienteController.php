@@ -3,27 +3,26 @@
 namespace App\Http\Controllers\CRM\Clientes;
 
 use App\Http\Controllers\Controller;
-use App\Models\EmpresaCliente;
+use App\Models\Cliente;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class EmpresasClientesController extends Controller
+class ClienteController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = EmpresaCliente::with('vendedor');
+        $query = Cliente::with('vendedor');
 
-        // Búsqueda
+        // BÃºsqueda
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->where('razon_social', 'like', "%{$search}%")
-                    ->orWhere('ruc', 'like', "%{$search}%")
-                    ->orWhere('contacto_principal', 'like', "%{$search}%")
+                $q->where('nombrecompleto', 'like', "%{$search}%")
+                    ->orWhere('ruc_dni', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
                     ->orWhere('telefono', 'like', "%{$search}%");
             });
@@ -34,21 +33,16 @@ class EmpresasClientesController extends Controller
             $query->where('usuario_id', $request->input('vendedor_id'));
         }
 
-        // Filtro por estado activo
-        if ($request->has('activo')) {
-            $query->where('activo', $request->input('activo'));
-        }
-
         // Ordenamiento
         $sortField = $request->input('sort_field', 'created_at');
         $sortDirection = $request->input('sort_direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
 
-        // Paginación
+        // PaginaciÃ³n
         $perPage = $request->input('per_page', 15);
-        $empresas = $query->paginate($perPage);
+        $clientes = $query->paginate($perPage);
 
-        return response()->json($empresas);
+        return response()->json($clientes);
     }
 
     /**
@@ -57,14 +51,13 @@ class EmpresasClientesController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'razon_social' => 'required|string|max:255',
-            'ruc' => 'required|string|max:11',
-            'contacto_principal' => 'nullable|string|max:255',
+            'nombrecompleto' => 'required|string|max:255',
+            'ruc_dni' => 'nullable|string|max:255',
+            'cargo' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'telefono' => 'nullable|string|max:255',
             'direccion' => 'nullable|string',
             'usuario_id' => 'required|exists:usuarios,id_usuario',
-            'activo' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -74,13 +67,13 @@ class EmpresasClientesController extends Controller
             ], 422);
         }
 
-        $empresa = EmpresaCliente::create($request->all());
-        $empresa->load('vendedor');
+        $cliente = Cliente::create($request->all());
+        $cliente->load('vendedor');
 
         return response()->json([
             'success' => true,
-            'message' => 'Empresa cliente creada exitosamente',
-            'data' => $empresa
+            'message' => 'Cliente creado exitosamente',
+            'data' => $cliente
         ], 201);
     }
 
@@ -89,11 +82,11 @@ class EmpresasClientesController extends Controller
      */
     public function show($id)
     {
-        $empresa = EmpresaCliente::with('vendedor')->findOrFail($id);
+        $cliente = Cliente::with('vendedor')->findOrFail($id);
 
         return response()->json([
             'success' => true,
-            'data' => $empresa
+            'data' => $cliente
         ]);
     }
 
@@ -102,17 +95,16 @@ class EmpresasClientesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $empresa = EmpresaCliente::findOrFail($id);
+        $cliente = Cliente::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'razon_social' => 'required|string|max:255',
-            'ruc' => 'required|string|max:11',
-            'contacto_principal' => 'nullable|string|max:255',
+            'nombrecompleto' => 'required|string|max:255',
+            'ruc_dni' => 'nullable|string|max:255',
+            'cargo' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'telefono' => 'nullable|string|max:255',
             'direccion' => 'nullable|string',
             'usuario_id' => 'required|exists:usuarios,id_usuario',
-            'activo' => 'boolean',
         ]);
 
         if ($validator->fails()) {
@@ -122,13 +114,13 @@ class EmpresasClientesController extends Controller
             ], 422);
         }
 
-        $empresa->update($request->all());
-        $empresa->load('vendedor');
+        $cliente->update($request->all());
+        $cliente->load('vendedor');
 
         return response()->json([
             'success' => true,
-            'message' => 'Empresa cliente actualizada exitosamente',
-            'data' => $empresa
+            'message' => 'Cliente actualizado exitosamente',
+            'data' => $cliente
         ]);
     }
 
@@ -137,53 +129,12 @@ class EmpresasClientesController extends Controller
      */
     public function destroy($id)
     {
-        $empresa = EmpresaCliente::findOrFail($id);
-        $empresa->delete();
+        $cliente = Cliente::findOrFail($id);
+        $cliente->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Empresa cliente eliminada exitosamente'
-        ]);
-    }
-
-    /**
-     * Bulk delete empresas
-     */
-    public function bulkDelete(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'ids' => 'required|array',
-            'ids.*' => 'exists:empresasclientes,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        EmpresaCliente::whereIn('id', $request->ids)->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Empresas eliminadas exitosamente'
-        ]);
-    }
-
-    /**
-     * Toggle the activo status of an empresa
-     */
-    public function toggleActivo($id)
-    {
-        $empresa = EmpresaCliente::findOrFail($id);
-        $empresa->activo = !$empresa->activo;
-        $empresa->save();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Estado actualizado exitosamente',
-            'data' => $empresa
+            'message' => 'Cliente eliminado exitosamente'
         ]);
     }
 

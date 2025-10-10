@@ -19,6 +19,10 @@ use App\Http\Controllers\SectorController;
 use App\Http\Controllers\CRM\UsuariosRoles\UsuariosGestionController;
 use App\Http\Controllers\CRM\UsuariosRoles\RolesUsuariosController;
 use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
+use App\Http\Controllers\CRM\Clientes\ClienteController;
+use App\Http\Controllers\CRM\Clientes\EmpresaClienteController;
+use App\Http\Controllers\CRM\Clientes\ClientesParticularesController;
+use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -48,9 +52,33 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
     Route::get('/', fn () => Inertia::render('CRM/Dashboard'))->name('dashboard');
 
     Route::prefix('clientes')->name('clientes.')->group(function () {
+        // Vistas
         Route::get('/empresas', fn () => Inertia::render('CRM/Clientes/EmpresasClientes'))->name('empresas');
         Route::get('/particulares', fn () => Inertia::render('CRM/Clientes/Cliente'))->name('particulares');
         Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');
+
+        // API routes para clientes particulares
+        Route::prefix('particulares')->name('particulares.')->group(function () {
+            Route::get('/data', [ClientesParticularesController::class, 'index'])->name('data');
+            Route::post('/store', [ClientesParticularesController::class, 'store'])->name('store');
+            Route::get('/vendedores', [ClientesParticularesController::class, 'getVendedores'])->name('vendedores');
+            Route::post('/bulk-delete', [ClientesParticularesController::class, 'bulkDelete'])->name('bulk-delete');
+            Route::get('/{id}', [ClientesParticularesController::class, 'show'])->name('show');
+            Route::match(['put', 'post'], '/{id}', [ClientesParticularesController::class, 'update'])->name('update');
+            Route::match(['delete', 'post'], '/{id}/delete', [ClientesParticularesController::class, 'destroy'])->name('destroy');
+        });
+
+        // API routes para empresas clientes
+        Route::prefix('empresas')->name('empresas.')->group(function () {
+            Route::get('/data', [EmpresasClientesController::class, 'index'])->name('data');
+            Route::post('/store', [EmpresasClientesController::class, 'store'])->name('store');
+            Route::get('/vendedores', [EmpresasClientesController::class, 'getVendedores'])->name('vendedores');
+            Route::post('/bulk-delete', [EmpresasClientesController::class, 'bulkDelete'])->name('bulk-delete');
+            Route::post('/{id}/toggle-activo', [EmpresasClientesController::class, 'toggleActivo'])->name('toggle-activo');
+            Route::get('/{id}', [EmpresasClientesController::class, 'show'])->name('show');
+            Route::match(['put', 'post'], '/{id}', [EmpresasClientesController::class, 'update'])->name('update');
+            Route::match(['delete', 'post'], '/{id}/delete', [EmpresasClientesController::class, 'destroy'])->name('destroy');
+        });
     });
 
     Route::get('/cotizaciones', fn () => Inertia::render('CRM/Cotizaciones/Cotizaciones'))->name('cotizaciones');

@@ -8,7 +8,7 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class EmpresasClientesController extends Controller
+class EmpresaClienteController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +17,7 @@ class EmpresasClientesController extends Controller
     {
         $query = EmpresaCliente::with('vendedor');
 
-        // Búsqueda
+        // BÃºsqueda
         if ($request->has('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -44,7 +44,7 @@ class EmpresasClientesController extends Controller
         $sortDirection = $request->input('sort_direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
 
-        // Paginación
+        // PaginaciÃ³n
         $perPage = $request->input('per_page', 15);
         $empresas = $query->paginate($perPage);
 
@@ -143,31 +143,6 @@ class EmpresasClientesController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Empresa cliente eliminada exitosamente'
-        ]);
-    }
-
-    /**
-     * Bulk delete empresas
-     */
-    public function bulkDelete(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'ids' => 'required|array',
-            'ids.*' => 'exists:empresasclientes,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        EmpresaCliente::whereIn('id', $request->ids)->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Empresas eliminadas exitosamente'
         ]);
     }
 

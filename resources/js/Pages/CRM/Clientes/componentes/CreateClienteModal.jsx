@@ -7,10 +7,7 @@ export default function CreateClienteModal({ isOpen, onClose, empresas = [], usu
 
     const { data, setData, post, processing, errors, reset } = useForm({
         nombrecompleto: '',
-        ruc: '',
-        empresa_id: '',
-        area_id: '',
-        sucursal: '',
+        ruc_dni: '',
         cargo: '',
         email: '',
         telefono: '',
@@ -20,7 +17,7 @@ export default function CreateClienteModal({ isOpen, onClose, empresas = [], usu
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('clientes.store'), {
+        post(route('crm.clientes.particulares.store'), {
             onSuccess: () => {
                 reset();
                 onClose();
@@ -104,21 +101,21 @@ export default function CreateClienteModal({ isOpen, onClose, empresas = [], usu
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
                                     <FiHash className="inline w-4 h-4 mr-1" />
-                                    RUC
+                                    RUC/DNI
                                 </label>
                                 <input
                                     type="text"
-                                    value={data.ruc}
-                                    onChange={(e) => setData('ruc', e.target.value)}
+                                    value={data.ruc_dni}
+                                    onChange={(e) => setData('ruc_dni', e.target.value)}
                                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                         isDarkMode
                                             ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                                             : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                    } ${errors.ruc ? 'border-red-500' : ''}`}
-                                    placeholder="20123456789"
+                                    } ${errors.ruc_dni ? 'border-red-500' : ''}`}
+                                    placeholder="20123456789 o 12345678"
                                 />
-                                {errors.ruc && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.ruc}</p>
+                                {errors.ruc_dni && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.ruc_dni}</p>
                                 )}
                             </div>
 
@@ -126,36 +123,31 @@ export default function CreateClienteModal({ isOpen, onClose, empresas = [], usu
                                 <label className={`block text-sm font-medium mb-2 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
-                                    <FiHome className="inline w-4 h-4 mr-1" />
-                                    Empresa (opcional)
+                                    <FiBriefcase className="inline w-4 h-4 mr-1" />
+                                    Cargo
                                 </label>
-                                <select
-                                    value={data.empresa_id}
-                                    onChange={(e) => setData('empresa_id', e.target.value)}
+                                <input
+                                    type="text"
+                                    value={data.cargo}
+                                    onChange={(e) => setData('cargo', e.target.value)}
                                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                         isDarkMode
-                                            ? 'bg-gray-700 border-gray-600 text-white'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                    } ${errors.empresa_id ? 'border-red-500' : ''}`}
-                                >
-                                    <option value="">Cliente Particular</option>
-                                    {empresas.map((empresa) => (
-                                        <option key={empresa.id} value={empresa.id}>
-                                            {empresa.razon_social}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.empresa_id && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.empresa_id}</p>
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                    } ${errors.cargo ? 'border-red-500' : ''}`}
+                                    placeholder="Gerente de Compras"
+                                />
+                                {errors.cargo && (
+                                    <p className="mt-1 text-sm text-red-600">{errors.cargo}</p>
                                 )}
                             </div>
 
-                            <div>
+                            <div className="md:col-span-2">
                                 <label className={`block text-sm font-medium mb-2 ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
                                     <FiUser className="inline w-4 h-4 mr-1" />
-                                    Vendedor Asignado
+                                    Vendedor Asignado *
                                 </label>
                                 <select
                                     value={data.usuario_id}
@@ -165,11 +157,12 @@ export default function CreateClienteModal({ isOpen, onClose, empresas = [], usu
                                             ? 'bg-gray-700 border-gray-600 text-white'
                                             : 'bg-white border-gray-300 text-gray-900'
                                     } ${errors.usuario_id ? 'border-red-500' : ''}`}
+                                    required
                                 >
                                     <option value="">Seleccionar vendedor</option>
                                     {usuarios.map((usuario) => (
                                         <option key={usuario.id_usuario} value={usuario.id_usuario}>
-                                            {usuario.nombre}
+                                            {usuario.nombre} {usuario.apellido}
                                         </option>
                                     ))}
                                 </select>
@@ -177,95 +170,8 @@ export default function CreateClienteModal({ isOpen, onClose, empresas = [], usu
                                     <p className="mt-1 text-sm text-red-600">{errors.usuario_id}</p>
                                 )}
                             </div>
-
-                            <div>
-                                <label className={`block text-sm font-medium mb-2 ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}>
-                                    <FiGrid className="inline w-4 h-4 mr-1" />
-                                    Área
-                                </label>
-                                <select
-                                    value={data.area_id}
-                                    onChange={(e) => setData('area_id', e.target.value)}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                        isDarkMode
-                                            ? 'bg-gray-700 border-gray-600 text-white'
-                                            : 'bg-white border-gray-300 text-gray-900'
-                                    } ${errors.area_id ? 'border-red-500' : ''}`}
-                                >
-                                    <option value="">Seleccionar área</option>
-                                    {areas.map((area) => (
-                                        <option key={area.id} value={area.id}>
-                                            {area.nombre}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.area_id && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.area_id}</p>
-                                )}
-                                <p className={`mt-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    Selecciona el área organizacional (opcional)
-                                </p>
-                            </div>
                         </div>
                     </div>
-
-                    {/* Información de empresa (solo si se selecciona una empresa) */}
-                    {data.empresa_id && (
-                        <div>
-                            <h4 className={`text-md font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                Información de Empresa
-                            </h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className={`block text-sm font-medium mb-2 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                        <FiBriefcase className="inline w-4 h-4 mr-1" />
-                                        Sucursal
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={data.sucursal}
-                                        onChange={(e) => setData('sucursal', e.target.value)}
-                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            isDarkMode
-                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                        } ${errors.sucursal ? 'border-red-500' : ''}`}
-                                        placeholder="Sucursal Lima"
-                                    />
-                                    {errors.sucursal && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.sucursal}</p>
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label className={`block text-sm font-medium mb-2 ${
-                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                    }`}>
-                                        <FiBriefcase className="inline w-4 h-4 mr-1" />
-                                        Cargo
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={data.cargo}
-                                        onChange={(e) => setData('cargo', e.target.value)}
-                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                                            isDarkMode
-                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                                        } ${errors.cargo ? 'border-red-500' : ''}`}
-                                        placeholder="Gerente de Compras"
-                                    />
-                                    {errors.cargo && (
-                                        <p className="mt-1 text-sm text-red-600">{errors.cargo}</p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     {/* Información de contacto */}
                     <div>

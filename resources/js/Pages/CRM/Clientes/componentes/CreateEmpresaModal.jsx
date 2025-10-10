@@ -8,13 +8,11 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
   const [formData, setFormData] = useState({
     razon_social: "",
     ruc: "",
-    sector: "",
     contacto_principal: "",
     email: "",
     telefono: "",
     direccion: "",
     usuario_id: "",
-    cliente_id: "",
     activo: true
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -47,10 +45,6 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
       newErrors.ruc = "El RUC es requerido";
     } else if (formData.ruc.length !== 11) {
       newErrors.ruc = "El RUC debe tener 11 dígitos";
-    }
-
-    if (!formData.sector.trim()) {
-      newErrors.sector = "El sector es requerido";
     }
 
     if (!formData.contacto_principal.trim()) {
@@ -90,19 +84,17 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
     setIsLoading(true);
 
     try {
-      router.post(route('empresas-clientes.store'), formData, {
+      router.post(route('crm.clientes.empresas.store'), formData, {
         onSuccess: () => {
           onClose();
           setFormData({
             razon_social: "",
             ruc: "",
-            sector: "",
             contacto_principal: "",
             email: "",
             telefono: "",
             direccion: "",
             usuario_id: "",
-            cliente_id: "",
             activo: true
           });
           setErrors({});
@@ -124,13 +116,11 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
     setFormData({
       razon_social: "",
       ruc: "",
-      sector: "",
       contacto_principal: "",
       email: "",
       telefono: "",
       direccion: "",
       usuario_id: "",
-      cliente_id: "",
       activo: true
     });
     setErrors({});
@@ -228,43 +218,12 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
                 )}
               </div>
 
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Sector *
-                </label>
-                <select
-                  name="sector"
-                  value={formData.sector}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
-                  } ${errors.sector ? 'border-red-500' : ''}`}
-                >
-                  <option value="">Seleccionar sector</option>
-                  <option value="salud">Salud</option>
-                  <option value="educacion">Educación</option>
-                  <option value="industria">Industria</option>
-                  <option value="gobierno">Gobierno</option>
-                  <option value="mineria">Minería</option>
-                  <option value="agricultura">Agricultura</option>
-                  <option value="tecnologia">Tecnología</option>
-                  <option value="construccion">Construcción</option>
-                </select>
-                {errors.sector && (
-                  <p className="mt-1 text-sm text-red-600">{errors.sector}</p>
-                )}
-              </div>
-
-              <div>
+              <div className="md:col-span-2">
                 <label className={`block text-sm font-medium mb-2 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-700'
                 }`}>
                   <FiUser className="inline w-4 h-4 mr-1" />
-                  Usuario Responsable *
+                  Vendedor Asignado *
                 </label>
                 <select
                   name="usuario_id"
@@ -286,38 +245,6 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
                 {errors.usuario_id && (
                   <p className="mt-1 text-sm text-red-600">{errors.usuario_id}</p>
                 )}
-              </div>
-
-              <div className="md:col-span-2">
-                <label className={`block text-sm font-medium mb-2 ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  <FiUser className="inline w-4 h-4 mr-1" />
-                  Cliente Enlazado (Opcional)
-                </label>
-                <select
-                  name="cliente_id"
-                  value={formData.cliente_id}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
-                  } ${errors.cliente_id ? 'border-red-500' : ''}`}
-                >
-                  <option value="">Sin cliente enlazado</option>
-                  {clientes?.map((cliente) => (
-                    <option key={cliente.id} value={cliente.id}>
-                      {cliente.nombrecompleto} - {cliente.ruc}
-                    </option>
-                  ))}
-                </select>
-                {errors.cliente_id && (
-                  <p className="mt-1 text-sm text-red-600">{errors.cliente_id}</p>
-                )}
-                <p className={`mt-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  Seleccione un cliente para enlazar esta empresa con un contacto principal
-                </p>
               </div>
             </div>
           </div>

@@ -16,12 +16,12 @@ export default function EmpresasClientes({ empresas = [], usuarios = [], cliente
 
     const handleDelete = (empresaId) => {
         if (confirm('¿Estás seguro de que deseas eliminar esta empresa cliente?')) {
-            router.delete(route('empresas-clientes.destroy', empresaId));
+            router.delete(route('crm.clientes.empresas.destroy', empresaId));
         }
     };
 
     const handleToggleStatus = (empresaId) => {
-        router.patch(route('empresas-clientes.toggle-status', empresaId));
+        router.post(route('crm.clientes.empresas.toggle-activo', empresaId));
     };
 
     const handleCreate = () => {
@@ -75,9 +75,6 @@ export default function EmpresasClientes({ empresas = [], usuarios = [], cliente
                                     }`}>RUC</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                    }`}>Sector</th>
-                                    <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                     }`}>Contacto Principal</th>
                                     <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
                                         isDarkMode ? 'text-gray-400' : 'text-gray-500'
@@ -101,9 +98,6 @@ export default function EmpresasClientes({ empresas = [], usuarios = [], cliente
                                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-500'
                                         }`}>{empresa.ruc}</td>
-                                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-500'
-                                        }`}>{empresa.sector}</td>
                                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${
                                             isDarkMode ? 'text-gray-300' : 'text-gray-500'
                                         }`}>{empresa.contacto_principal}</td>
@@ -162,7 +156,7 @@ export default function EmpresasClientes({ empresas = [], usuarios = [], cliente
                                     </tr>
                                 )) : (
                                     <tr>
-                                        <td colSpan="7" className={`px-6 py-8 text-center text-sm ${
+                                        <td colSpan="6" className={`px-6 py-8 text-center text-sm ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                         }`}>
                                             No hay empresas clientes registradas.
