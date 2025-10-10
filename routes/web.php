@@ -21,6 +21,7 @@ use App\Http\Controllers\CRM\UsuariosRoles\RolesUsuariosController;
 use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
 use App\Http\Controllers\CRM\Clientes\ClientesParticularesController;
 use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
+use App\Http\Controllers\CRM\Productos\ProductoGestionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -96,7 +97,15 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
     });
 
     Route::prefix('productos')->name('productos.')->group(function () {
-        Route::get('/', fn () => Inertia::render('CRM/Productos/Productos'))->name('index');
+        Route::get('/', [ProductoGestionController::class, 'index'])->name('index');
+        
+        // API routes for CRM product management
+        Route::get('/marcas', [ProductoGestionController::class, 'getMarcas'])->name('marcas');
+        Route::get('/subcategorias', [ProductoGestionController::class, 'getSubcategorias'])->name('subcategorias');
+        Route::get('/{id}', [ProductoGestionController::class, 'show'])->name('show');
+        Route::post('/store', [ProductoGestionController::class, 'store'])->name('store');
+        Route::match(['put', 'post'], '/{id}', [ProductoGestionController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [ProductoGestionController::class, 'destroy'])->name('destroy');
     });
 
     // Rutas de roles (deben ir antes de las rutas de usuarios para evitar conflictos)
@@ -253,6 +262,14 @@ Route::get('/tags/{id}/productos', [ProductoTagController::class, 'getProductsBy
 
 // Rutas públicas para sectores
 Route::get('/api/tag-parents', [TagParentController::class, 'getPublicTagParents'])->name('api.tag-parents');
+
+// API routes for CRM products (used by frontend components)
+Route::get('/api/productos/crm', [ProductoGestionController::class, 'getProductosCRM'])->name('api.productos.crm');
+Route::get('/api/productos/excluye-servicios', [ProductoGestionController::class, 'getProductosExcluyeServicios'])->name('api.productos.excluye-servicios');
+Route::get('/api/productos/crm/marcas', [ProductoGestionController::class, 'getMarcas'])->name('api.productos.crm.marcas');
+Route::get('/api/productos/crm/subcategorias', [ProductoGestionController::class, 'getSubcategorias'])->name('api.productos.crm.subcategorias');
+Route::match(['put', 'post'], '/api/productos/crm/{id}', [ProductoGestionController::class, 'update'])->name('api.productos.crm.update');
+
 Route::get('/sector/{id_tag_parent}/products/{id_tag}', [SectorController::class, 'getProductsByTag'])->name('sector.products-by-tag');
 Route::get('/sector/{id_tag_parent}/search', [SectorController::class, 'searchProducts'])->name('sector.search');
 Route::get('/sector/{id_tag_parent}/stats', [SectorController::class, 'getStats'])->name('sector.stats');
