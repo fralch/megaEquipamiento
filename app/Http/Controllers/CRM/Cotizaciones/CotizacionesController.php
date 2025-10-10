@@ -31,7 +31,7 @@ class CotizacionesController extends Controller
                 'detallesAdicionales'
             ]);
 
-            // Filtro por b鷖queda
+            // Filtro por b煤squeda
             if ($request->has('search') && $request->search) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
@@ -54,13 +54,13 @@ class CotizacionesController extends Controller
             $sortDirection = $request->input('sort_direction', 'desc');
             $query->orderBy($sortField, $sortDirection);
 
-            // Paginaci髇
+            // Paginaci贸n
             $perPage = $request->input('per_page', 15);
             $cotizaciones = $query->paginate($perPage);
 
-            // Cargar informaci髇 de clientes para cada cotizaci髇
+            // Cargar informaci贸n de clientes para cada cotizaci贸n
             $cotizaciones->getCollection()->transform(function ($cotizacion) {
-                // Cargar cliente din醡icamente
+                // Cargar cliente din谩micamente
                 if ($cotizacion->cliente_tipo === 'empresa') {
                     $cliente = EmpresaCliente::find($cotizacion->cliente_id);
                     $cotizacion->cliente_nombre = $cliente->razon_social ?? 'N/A';
@@ -82,7 +82,7 @@ class CotizacionesController extends Controller
                 return $cotizacion;
             });
 
-            // Si es una petici髇 AJAX, retornar JSON
+            // Si es una petici贸n AJAX, retornar JSON
             if ($request->expectsJson() || $request->wantsJson()) {
                 return response()->json($cotizaciones);
             }
@@ -110,7 +110,7 @@ class CotizacionesController extends Controller
     }
 
     /**
-     * Get data for creating a new cotizaci髇
+     * Get data for creating a new cotizaci贸n
      */
     public function create()
     {
@@ -172,7 +172,7 @@ class CotizacionesController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener datos para crear cotizaci髇: ' . $e->getMessage());
+            Log::error('Error al obtener datos para crear cotizaci贸n: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Error al obtener datos',
                 'message' => $e->getMessage()
@@ -181,7 +181,7 @@ class CotizacionesController extends Controller
     }
 
     /**
-     * Store a newly created cotizaci髇
+     * Store a newly created cotizaci贸n
      */
     public function store(Request $request)
     {
@@ -220,7 +220,7 @@ class CotizacionesController extends Controller
         try {
             DB::beginTransaction();
 
-            // Crear la cotizaci髇
+            // Crear la cotizaci贸n
             $cotizacion = Cotizacion::create([
                 'fecha_cotizacion' => $request->fecha_cotizacion,
                 'fecha_vencimiento' => $request->fecha_vencimiento,
@@ -289,22 +289,22 @@ class CotizacionesController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cotizaci髇 creada exitosamente',
+                'message' => 'Cotizaci贸n creada exitosamente',
                 'data' => $cotizacion
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error al crear cotizaci髇: ' . $e->getMessage());
+            Log::error('Error al crear cotizaci贸n: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'error' => 'Error al crear cotizaci髇',
+                'error' => 'Error al crear cotizaci贸n',
                 'message' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Display the specified cotizaci髇
+     * Display the specified cotizaci贸n
      */
     public function show($id)
     {
@@ -316,7 +316,7 @@ class CotizacionesController extends Controller
                 'detallesAdicionales'
             ])->findOrFail($id);
 
-            // Cargar informaci髇 del cliente
+            // Cargar informaci贸n del cliente
             if ($cotizacion->cliente_tipo === 'empresa') {
                 $cliente = EmpresaCliente::find($cotizacion->cliente_id);
                 $cotizacion->cliente_info = [
@@ -346,17 +346,17 @@ class CotizacionesController extends Controller
                 'data' => $cotizacion
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener cotizaci髇: ' . $e->getMessage());
+            Log::error('Error al obtener cotizaci贸n: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'error' => 'Cotizaci髇 no encontrada',
+                'error' => 'Cotizaci贸n no encontrada',
                 'message' => $e->getMessage()
             ], 404);
         }
     }
 
     /**
-     * Update the specified cotizaci髇
+     * Update the specified cotizaci贸n
      */
     public function update(Request $request, $id)
     {
@@ -398,7 +398,7 @@ class CotizacionesController extends Controller
 
             $cotizacion = Cotizacion::findOrFail($id);
 
-            // Actualizar datos b醩icos
+            // Actualizar datos b谩sicos
             $cotizacion->update($request->except(['productos', 'productos_adicionales']));
 
             // Si se enviaron productos, actualizar los detalles
@@ -467,22 +467,22 @@ class CotizacionesController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cotizaci髇 actualizada exitosamente',
+                'message' => 'Cotizaci贸n actualizada exitosamente',
                 'data' => $cotizacion
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error al actualizar cotizaci髇: ' . $e->getMessage());
+            Log::error('Error al actualizar cotizaci贸n: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'error' => 'Error al actualizar cotizaci髇',
+                'error' => 'Error al actualizar cotizaci贸n',
                 'message' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Remove the specified cotizaci髇
+     * Remove the specified cotizaci贸n
      */
     public function destroy($id)
     {
@@ -494,28 +494,28 @@ class CotizacionesController extends Controller
             // Eliminar todos los detalles
             $cotizacion->detalles()->delete();
 
-            // Eliminar la cotizaci髇
+            // Eliminar la cotizaci贸n
             $cotizacion->delete();
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cotizaci髇 eliminada exitosamente'
+                'message' => 'Cotizaci贸n eliminada exitosamente'
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error al eliminar cotizaci髇: ' . $e->getMessage());
+            Log::error('Error al eliminar cotizaci贸n: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'error' => 'Error al eliminar cotizaci髇',
+                'error' => 'Error al eliminar cotizaci贸n',
                 'message' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * Cambiar el estado de una cotizaci髇
+     * Cambiar el estado de una cotizaci贸n
      */
     public function cambiarEstado(Request $request, $id)
     {
@@ -540,7 +540,7 @@ class CotizacionesController extends Controller
                 'data' => $cotizacion
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al cambiar estado de cotizaci髇: ' . $e->getMessage());
+            Log::error('Error al cambiar estado de cotizaci贸n: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'error' => 'Error al cambiar estado',
@@ -550,7 +550,7 @@ class CotizacionesController extends Controller
     }
 
     /**
-     * Obtener estad韘ticas de cotizaciones
+     * Obtener estad铆sticas de cotizaciones
      */
     public function estadisticas()
     {
@@ -574,10 +574,10 @@ class CotizacionesController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener estad韘ticas: ' . $e->getMessage());
+            Log::error('Error al obtener estad铆sticas: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'error' => 'Error al obtener estad韘ticas',
+                'error' => 'Error al obtener estad铆sticas',
                 'message' => $e->getMessage()
             ], 500);
         }

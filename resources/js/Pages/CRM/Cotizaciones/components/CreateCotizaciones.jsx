@@ -27,11 +27,24 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     });
 
     const [clientes, setClientes] = useState([]);
+    const [clientesParticulares, setClientesParticulares] = useState([]);
+    const [clientesEmpresas, setClientesEmpresas] = useState([]);
     const [vendedores, setVendedores] = useState([]);
     const [empresas, setEmpresas] = useState([]);
     const [productosDisponibles, setProductosDisponibles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [loadingProductos, setLoadingProductos] = useState(false);
+
+    // Estados para búsqueda de productos principales
+    const [searchProducto, setSearchProducto] = useState('');
+    const [showProductoDropdown, setShowProductoDropdown] = useState(false);
+    const [filteredProductos, setFilteredProductos] = useState([]);
+    const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
+
+    // Estados para búsqueda de productos adicionales
+    const [searchProductoAdicional, setSearchProductoAdicional] = useState('');
+    const [showProductoAdicionalDropdown, setShowProductoAdicionalDropdown] = useState(false);
+    const [filteredProductosAdicionales, setFilteredProductosAdicionales] = useState([]);
 
     // Cargar datos iniciales cuando se abre el modal
     useEffect(() => {
@@ -48,6 +61,13 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             if (response.data.success) {
                 const data = response.data.data;
                 setClientes(data.clientes || []);
+                
+                // Separar clientes por tipo
+                const particulares = (data.clientes || []).filter(cliente => cliente.tipo === 'particular');
+                const empresas = (data.clientes || []).filter(cliente => cliente.tipo === 'empresa');
+                
+                setClientesParticulares(particulares);
+                setClientesEmpresas(empresas);
                 setVendedores(data.vendedores || []);
                 setEmpresas(data.empresas || []);
             }
@@ -210,6 +230,87 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                 productos_adicionales: newProductos
             };
         });
+    };
+
+    // Función para búsqueda de productos principales
+    const handleProductoSearch = (value) => {
+        setSearchProducto(value);
+        
+        if (value.trim() === '') {
+            setFilteredProductos([]);
+            setShowProductoDropdown(false);
+            return;
+        }
+
+        const filtered = productosDisponibles.filter(producto =>
+            producto.nombre.toLowerCase().includes(value.toLowerCase()) ||
+            (producto.sku && producto.sku.toLowerCase().includes(value.toLowerCase()))
+        );
+
+        setFilteredProductos(filtered);
+        setShowProductoDropdown(filtered.length > 0);
+        setSelectedProductIndex(-1);
+    };
+
+    // Función para seleccionar producto principal
+    const selectProducto = (producto) => {
+        const newProducto = {
+            id: producto.id,
+            nombre: producto.nombre,
+            cantidad: 1,
+            precio_unitario: producto.precio,
+            subtotal: producto.precio
+        };
+
+        setFormData(prev => ({
+            ...prev,
+            productos: [...prev.productos, newProducto]
+        }));
+
+        // Limpiar búsqueda
+        setSearchProducto('');
+        setFilteredProductos([]);
+        setShowProductoDropdown(false);
+        setSelectedProductIndex(-1);
+    };
+
+    // Función para búsqueda de productos adicionales
+    const handleProductoAdicionalSearch = (value) => {
+        setSearchProductoAdicional(value);
+        
+        if (value.trim() === '') {
+            setFilteredProductosAdicionales([]);
+            setShowProductoAdicionalDropdown(false);
+            return;
+        }
+
+        const filtered = productosDisponibles.filter(producto =>
+            producto.nombre.toLowerCase().includes(value.toLowerCase()) ||
+            (producto.sku && producto.sku.toLowerCase().includes(value.toLowerCase()))
+        );
+
+        setFilteredProductosAdicionales(filtered);
+        setShowProductoAdicionalDropdown(filtered.length > 0);
+    };
+
+    // Función para seleccionar producto adicional
+    const selectProductoAdicional = (producto) => {
+        const newProducto = {
+            nombre: producto.nombre,
+            cantidad: 1,
+            precio_unitario: producto.precio,
+            subtotal: producto.precio
+        };
+
+        setFormData(prev => ({
+            ...prev,
+            productos_adicionales: [...prev.productos_adicionales, newProducto]
+        }));
+
+        // Limpiar búsqueda
+        setSearchProductoAdicional('');
+        setFilteredProductosAdicionales([]);
+        setShowProductoAdicionalDropdown(false);
     };
 
     const handleSubmit = async (e) => {
@@ -419,10 +520,33 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                             Cliente y Vendedor
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {/* Tipo de Cliente */}
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     <FiUser className="inline w-4 h-4 mr-2" />
-                                    Cliente *
+                                    Tipo de Cliente *
+                                </label>
+                                <select
+                                    name="cliente_tipo"
+                                    value={formData.cliente_tipo}
+                                    onChange={handleInputChange}
+                                    className={`w-full px-3 py-2 border rounded-lg ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                    required
+                                >
+                                    <option value="particular">👤 Cliente Particular</option>
+                                    <option value="empresa">🏢 Cliente Empresa</option>
+                                </select>
+                            </div>
+                            
+                            {/* Cliente */}
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                    <FiUser className="inline w-4 h-4 mr-2" />
+                                    {formData.cliente_tipo === 'empresa' ? 'Empresa' : 'Cliente Particular'} *
                                 </label>
                                 {loading ? (
                                     <div className="flex items-center justify-center py-2">
@@ -440,18 +564,22 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                         }`}
                                         required
                                     >
-                                        <option value="">Seleccionar cliente</option>
-                                        {clientes.map(cliente => (
-                                            <option key={`${cliente.tipo}-${cliente.id}`} value={cliente.id} data-tipo={cliente.tipo}>
-                                                {cliente.tipo === 'empresa' ? '🏢 ' : '👤 '}{cliente.nombre}
-                                            </option>
-                                        ))}
+                                        <option value="">
+                                            {formData.cliente_tipo === 'empresa' ? 'Seleccionar empresa' : 'Seleccionar cliente'}
+                                        </option>
+                                        {formData.cliente_tipo === 'empresa' 
+                                            ? clientesEmpresas.map(cliente => (
+                                                <option key={cliente.id} value={cliente.id}>
+                                                    {cliente.nombre}
+                                                </option>
+                                            ))
+                                            : clientesParticulares.map(cliente => (
+                                                <option key={cliente.id} value={cliente.id}>
+                                                    {cliente.nombre}
+                                                </option>
+                                            ))
+                                        }
                                     </select>
-                                )}
-                                {formData.cliente_id && (
-                                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                        Tipo: {formData.cliente_tipo === 'empresa' ? 'Empresa' : 'Particular'}
-                                    </p>
                                 )}
                             </div>
                             <div>
@@ -588,56 +716,110 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
                     {/* Productos */}
                     <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className={`text-lg font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                Productos
-                            </h3>
-                            <button
-                                type="button"
-                                onClick={addProducto}
-                                className={`px-3 py-2 rounded-lg flex items-center gap-2 ${
-                                    isDarkMode 
-                                        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                }`}
-                            >
-                                <FiPlus className="w-4 h-4" />
-                                Agregar Producto
-                            </button>
+                        {/* Búsqueda de productos */}
+                        <div className="mb-4">
+                            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <FiSearch className="inline w-4 h-4 mr-2" />
+                                Buscar y Agregar Producto
+                            </label>
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={searchProducto}
+                                    onChange={(e) => handleProductoSearch(e.target.value)}
+                                    onFocus={() => setShowProductoDropdown(true)}
+                                    className={`w-full px-3 py-2 pr-8 border rounded-lg ${
+                                        isDarkMode 
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                    }`}
+                                    placeholder="Buscar producto por nombre o SKU..."
+                                />
+                                <FiSearch className={`absolute right-3 top-3 w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                
+                                {/* Dropdown de productos filtrados */}
+                                {showProductoDropdown && filteredProductos.length > 0 && (
+                                    <div className={`absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border rounded-lg shadow-lg ${
+                                        isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
+                                    }`}>
+                                        {filteredProductos.map((producto) => (
+                                            <div
+                                                key={producto.id}
+                                                onClick={() => selectProducto(producto)}
+                                                className={`px-3 py-2 cursor-pointer hover:${isDarkMode ? 'bg-gray-600' : 'bg-gray-100'} ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                }`}
+                                            >
+                                                <div className="font-medium">{producto.nombre}</div>
+                                                {producto.sku && (
+                                                    <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                        SKU: {producto.sku}
+                                                    </div>
+                                                )}
+                                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                    Precio: S/ {producto.precio.toFixed(2)}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         
                         {formData.productos.map((producto, index) => (
-                            <div key={index} className={`mb-4 p-3 border rounded-lg ${
+                            <div key={index} className={`mb-4 p-3 border rounded-lg relative ${
                                 isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-white'
                             }`}>
                                 <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                                    <div className="md:col-span-2">
+                                    <div className="md:col-span-2 relative">
                                         <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Producto
                                         </label>
-                                        <select
-                                            value={producto.id}
-                                            onChange={(e) => {
-                                                const selectedProduct = productosDisponibles.find(p => p.id == e.target.value);
-                                                if (selectedProduct) {
-                                                    updateProducto(index, 'id', selectedProduct.id);
-                                                    updateProducto(index, 'nombre', selectedProduct.nombre);
-                                                    updateProducto(index, 'precio_unitario', selectedProduct.precio);
-                                                }
-                                            }}
-                                            className={`w-full px-3 py-2 border rounded-lg ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-600 border-gray-500 text-white' 
-                                                    : 'bg-white border-gray-300 text-gray-900'
-                                            }`}
-                                        >
-                                            <option value="">Seleccionar producto</option>
-                                            {productosDisponibles.map(prod => (
-                                                <option key={prod.id} value={prod.id}>
-                                                    {prod.nombre}
-                                                </option>
-                                            ))}
-                                        </select>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={producto.nombre}
+                                                onChange={(e) => handleProductoSearch(index, e.target.value)}
+                                                onFocus={() => {
+                                                    setSelectedProductIndex(index);
+                                                    setShowProductoDropdown(true);
+                                                }}
+                                                className={`w-full px-3 py-2 pr-8 border rounded-lg ${
+                                                    isDarkMode 
+                                                        ? 'bg-gray-600 border-gray-500 text-white' 
+                                                        : 'bg-white border-gray-300 text-gray-900'
+                                                }`}
+                                                placeholder="Buscar producto..."
+                                            />
+                                            <FiSearch className={`absolute right-3 top-3 w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                        </div>
+                                        
+                                        {/* Dropdown de productos filtrados */}
+                                        {showProductoDropdown && selectedProductIndex === index && filteredProductos.length > 0 && (
+                                            <div className={`absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border rounded-lg shadow-lg ${
+                                                isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
+                                            }`}>
+                                                {filteredProductos.map((prod) => (
+                                                    <div
+                                                        key={prod.id_producto}
+                                                        onClick={() => selectProducto(index, prod)}
+                                                        className={`px-3 py-2 cursor-pointer hover:${isDarkMode ? 'bg-gray-600' : 'bg-gray-100'} ${
+                                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                                        }`}
+                                                    >
+                                                        <div className="font-medium">{prod.nombre}</div>
+                                                        {prod.codigo && (
+                                                            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                Código: {prod.codigo}
+                                                            </div>
+                                                        )}
+                                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                            Precio: {formatCurrency(prod.precio_venta)}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                     <div>
                                         <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -730,21 +912,59 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                 isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-white'
                             }`}>
                                 <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                                    <div className="md:col-span-2">
+                                    <div className="md:col-span-2 relative">
                                         <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Producto Adicional
                                         </label>
-                                        <input
-                                            type="text"
-                                            value={producto.nombre}
-                                            onChange={(e) => updateProductoAdicional(index, 'nombre', e.target.value)}
-                                            className={`w-full px-3 py-2 border rounded-lg ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-600 border-gray-500 text-white' 
-                                                    : 'bg-white border-gray-300 text-gray-900'
-                                            }`}
-                                            placeholder="Nombre del producto adicional"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={searchProductoAdicional[index] || producto.nombre}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    updateProductoAdicional(index, 'nombre', value);
+                                                    handleProductoAdicionalSearch(index, value);
+                                                }}
+                                                className={`w-full px-3 py-2 pr-10 border rounded-lg ${
+                                                    isDarkMode 
+                                                        ? 'bg-gray-600 border-gray-500 text-white' 
+                                                        : 'bg-white border-gray-300 text-gray-900'
+                                                }`}
+                                                placeholder="Buscar producto adicional..."
+                                            />
+                                            <FiSearch className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`} />
+                                            
+                                            {/* Dropdown de productos adicionales filtrados */}
+                                            {showProductoAdicionalDropdown[index] && filteredProductosAdicionales[index] && filteredProductosAdicionales[index].length > 0 && (
+                                                <div className={`absolute z-50 w-full mt-1 max-h-60 overflow-y-auto border rounded-lg shadow-lg ${
+                                                    isDarkMode 
+                                                        ? 'bg-gray-700 border-gray-600' 
+                                                        : 'bg-white border-gray-300'
+                                                }`}>
+                                                    {filteredProductosAdicionales[index].map((prod, prodIndex) => (
+                                                        <div
+                                                            key={prodIndex}
+                                                            onClick={() => selectProductoAdicional(index, prod)}
+                                                            className={`px-3 py-2 cursor-pointer hover:${
+                                                                isDarkMode ? 'bg-gray-600' : 'bg-gray-100'
+                                                            } ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+                                                        >
+                                                            <div className="font-medium">{prod.nombre}</div>
+                                                            {prod.codigo && (
+                                                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                    Código: {prod.codigo}
+                                                                </div>
+                                                            )}
+                                                            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                Precio: {formatCurrency(prod.precio_venta || 0)}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                     <div>
                                         <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -841,10 +1061,22 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                         </button>
                         <button
                             type="submit"
-                            className={`px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 flex items-center`}
+                            disabled={loading}
+                            className={`px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200 flex items-center ${
+                                loading ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                         >
-                            <FiDollarSign className="w-4 h-4 mr-2" />
-                            Guardar Cotización
+                            {loading ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                    Guardando...
+                                </>
+                            ) : (
+                                <>
+                                    <FiDollarSign className="w-4 h-4 mr-2" />
+                                    Guardar Cotización
+                                </>
+                            )}
                         </button>
                     </div>
                 </form>
