@@ -53,10 +53,20 @@ export default function Productos() {
         }
     };
 
-    // Función para obtener subcategorías
-    const fetchSubcategorias = async () => {
+    // Función para obtener subcategorías (todas o por categoría)
+    const fetchSubcategorias = async (categoriaId = null) => {
         try {
-            const response = await axios.get('/api/productos/crm/subcategorias');
+            console.log('=== fetchSubcategorias DEBUG ===');
+            console.log('Called with categoriaId:', categoriaId, 'type:', typeof categoriaId);
+            console.log('Stack trace:', new Error().stack);
+            
+            let url = '/api/productos/crm/subcategorias';
+            if (categoriaId) {
+                url = `/api/productos/crm/subcategorias/${categoriaId}`;
+            }
+            console.log('Making request to URL:', url);
+            const response = await axios.get(url);
+            console.log('Response received:', response.data.length, 'subcategories');
             setSubcategorias(response.data || []);
         } catch (error) {
             console.error('Error fetching subcategorias:', error);
@@ -97,7 +107,10 @@ export default function Productos() {
     useEffect(() => {
         fetchMarcas();
         fetchCategorias();
-        fetchSubcategorias();
+        // Only fetch all subcategories if no category is selected
+        if (!selectedCategoria) {
+            fetchSubcategorias();
+        }
     }, []);
 
     // Actualizar productos cuando cambian los filtros
@@ -274,6 +287,8 @@ export default function Productos() {
                                             setSelectedMarca('');
                                             setSelectedCategoria('');
                                             setSelectedSubcategoria('');
+                                            // Reset subcategories to show all when clearing filters
+                                            fetchSubcategorias();
                                         }}
                                         className="text-red-600 hover:text-red-800 text-sm"
                                     >
@@ -325,7 +340,21 @@ export default function Productos() {
                                         </label>
                                         <select
                                             value={selectedCategoria}
-                                            onChange={(e) => setSelectedCategoria(e.target.value)}
+                                            onChange={(e) => {
+                                                const newCategoriaId = e.target.value;
+                                                console.log('Category onChange - raw value:', newCategoriaId, 'type:', typeof newCategoriaId);
+                                                setSelectedCategoria(newCategoriaId);
+                                                // Reset subcategory selection when category changes
+                                                setSelectedSubcategoria('');
+                                                // Fetch subcategories for the selected category
+                                                if (newCategoriaId && newCategoriaId !== '') {
+                                                    console.log('Calling fetchSubcategorias with ID:', newCategoriaId);
+                                                    fetchSubcategorias(newCategoriaId);
+                                                } else {
+                                                    console.log('Calling fetchSubcategorias without ID (all subcategories)');
+                                                    fetchSubcategorias(); // Fetch all subcategories
+                                                }
+                                            }}
                                             className={`w-full px-3 py-2 border rounded-lg text-sm ${
                                                 isDarkMode 
                                                     ? 'bg-gray-700 border-gray-600 text-white' 

@@ -369,4 +369,26 @@ class ProductoGestionController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Get subcategories by category ID for CRM filters
+     * Endpoint: /api/productos/crm/subcategorias/{categoria_id}
+     */
+    public function getSubcategoriasByCategoria($categoria_id)
+    {
+        try {
+            $subcategorias = Subcategoria::where('id_categoria', $categoria_id)
+                ->orderBy('nombre')
+                ->get(['id_subcategoria', 'nombre']);
+            
+            return response()->json($subcategorias);
+            
+        } catch (\Exception $e) {
+            Log::error('Error al obtener subcategorías por categoría: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Error al obtener subcategorías',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
