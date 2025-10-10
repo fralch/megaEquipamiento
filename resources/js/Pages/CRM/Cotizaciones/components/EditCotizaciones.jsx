@@ -85,17 +85,19 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
     // Load cotizacion data when modal opens
     useEffect(() => {
         if (isOpen && cotizacion) {
-            // Map detalles_productos to productos format
-            const productos = (cotizacion.detalles_productos || []).map(detalle => ({
-                id: detalle.producto_id,
+            // Mapear productos - soportar tanto detalles_productos como productos (nuevo formato)
+            const productosData = cotizacion.productos || cotizacion.detalles_productos || [];
+            const productos = productosData.map(detalle => ({
+                id: detalle.id || detalle.producto_id,
                 nombre: detalle.nombre,
                 cantidad: detalle.cantidad,
                 precio_unitario: detalle.precio_unitario,
                 subtotal: detalle.subtotal
             }));
 
-            // Map detalles_adicionales to productos_adicionales format
-            const productosAdicionales = (cotizacion.detalles_adicionales || []).map(detalle => ({
+            // Mapear productos adicionales - soportar tanto detalles_adicionales como productos_adicionales
+            const productosAdicionalesData = cotizacion.productos_adicionales || cotizacion.detalles_adicionales || [];
+            const productosAdicionales = productosAdicionalesData.map(detalle => ({
                 nombre: detalle.nombre,
                 cantidad: detalle.cantidad,
                 precio_unitario: detalle.precio_unitario,
@@ -643,41 +645,43 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
                                         <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Producto
                                         </label>
-                                        <select
-                                            value={producto.id || ''}
-                                            onChange={(e) => {
-                                                const selectedProduct = productosDisponibles.find(p => p.id == e.target.value);
-                                                if (selectedProduct) {
-                                                    updateProducto(index, 'id', selectedProduct.id);
-                                                    updateProducto(index, 'nombre', selectedProduct.nombre);
-                                                    updateProducto(index, 'precio_unitario', selectedProduct.precio);
-                                                }
-                                            }}
-                                            className={`w-full px-3 py-2 border rounded-lg ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-600 border-gray-500 text-white' 
-                                                    : 'bg-white border-gray-300 text-gray-900'
-                                            }`}
-                                        >
-                                            <option value="">Seleccionar producto</option>
-                                            {productosDisponibles.map(prod => (
-                                                <option key={prod.id} value={prod.id}>
-                                                    {prod.nombre}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        {producto.nombre && !producto.id && (
-                                            <input
-                                                type="text"
-                                                value={producto.nombre}
-                                                onChange={(e) => updateProducto(index, 'nombre', e.target.value)}
-                                                className={`w-full mt-2 px-3 py-2 border rounded-lg ${
-                                                    isDarkMode 
-                                                        ? 'bg-gray-600 border-gray-500 text-white' 
+                                        {producto.nombre ? (
+                                            <div className={`w-full px-3 py-2 border rounded-lg ${
+                                                isDarkMode
+                                                    ? 'bg-gray-700 border-gray-600 text-white'
+                                                    : 'bg-gray-100 border-gray-300 text-gray-900'
+                                            }`}>
+                                                {producto.nombre}
+                                                {producto.id && (
+                                                    <span className={`ml-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                        (ID: {producto.id})
+                                                    </span>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <select
+                                                value={producto.id || ''}
+                                                onChange={(e) => {
+                                                    const selectedProduct = productosDisponibles.find(p => p.id == e.target.value);
+                                                    if (selectedProduct) {
+                                                        updateProducto(index, 'id', selectedProduct.id);
+                                                        updateProducto(index, 'nombre', selectedProduct.nombre);
+                                                        updateProducto(index, 'precio_unitario', selectedProduct.precio);
+                                                    }
+                                                }}
+                                                className={`w-full px-3 py-2 border rounded-lg ${
+                                                    isDarkMode
+                                                        ? 'bg-gray-600 border-gray-500 text-white'
                                                         : 'bg-white border-gray-300 text-gray-900'
                                                 }`}
-                                                placeholder="Nombre del producto"
-                                            />
+                                            >
+                                                <option value="">Seleccionar producto</option>
+                                                {productosDisponibles.map(prod => (
+                                                    <option key={prod.id} value={prod.id}>
+                                                        {prod.nombre}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         )}
                                     </div>
                                     <div>

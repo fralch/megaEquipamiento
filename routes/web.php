@@ -277,6 +277,7 @@ Route::get('/api/tag-parents', [TagParentController::class, 'getPublicTagParents
 // API routes for CRM products (used by frontend components)
 Route::get('/api/productos/crm', [ProductoGestionController::class, 'getProductosCRM'])->name('api.productos.crm');
 Route::get('/api/productos/excluye-servicios', [ProductoGestionController::class, 'getProductosExcluyeServicios'])->name('api.productos.excluye-servicios');
+Route::get('/api/productos/crm/buscar', [ProductoGestionController::class, 'buscarProductos'])->name('api.productos.crm.buscar');
 Route::get('/api/productos/crm/marcas', [ProductoGestionController::class, 'getMarcas'])->name('api.productos.crm.marcas');
 Route::get('/api/productos/crm/subcategorias', [ProductoGestionController::class, 'getSubcategorias'])->name('api.productos.crm.subcategorias');
 Route::get('/api/productos/crm/categorias', [ProductoGestionController::class, 'getCategorias'])->name('api.productos.crm.categorias');

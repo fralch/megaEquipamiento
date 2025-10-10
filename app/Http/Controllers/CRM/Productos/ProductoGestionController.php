@@ -380,13 +380,89 @@ class ProductoGestionController extends Controller
             $subcategorias = Subcategoria::where('id_categoria', $categoria_id)
                 ->orderBy('nombre')
                 ->get(['id_subcategoria', 'nombre']);
-            
+
             return response()->json($subcategorias);
-            
+
         } catch (\Exception $e) {
             Log::error('Error al obtener subcategorías por categoría: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Error al obtener subcategorías',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Search products for quotations (optimized for autocomplete)
+     * Endpoint: /api/productos/crm/buscar
+     */
+    public function buscarProductos(Request $request)
+    {
+        try {
+            $search = $request->input('q', '');
+            $limit = $request->input('limit', 20);
+
+            // Validar limit
+            $limit = max(1, min(50, (int)$limit));
+
+            if (empty($search) || strlen($search) < 2) {
+                return response()->json([
+                    'success' => true,
+                    'data' => []
+                ]);
+            }
+
+            $productos = Producto::with(['marca', 'subcategoria.categoria'])
+                ->where(function($query) use ($search) {
+                    $query->where('nombre', 'LIKE', '%' . $search . '%')
+                          ->orWhere('sku', 'LIKE', '%' . $search . '%')
+                          ->orWhere('descripcion', 'LIKE', '%' . $search . '%')
+                          ->orWhereHas('marca', function($subQuery) use ($search) {
+                              $subQuery->where('nombre', 'LIKE', '%' . $search . '%');
+                          });
+                })
+                // Excluir servicios si es necesario
+                ->where(function($q) {
+                    $q->whereNull('caracteristicas')
+                      ->orWhere('caracteristicas', 'not like', '%servicio%')
+                      ->orWhere('caracteristicas', 'not like', '%service%');
+                })
+                ->limit($limit)
+                ->orderByRaw("
+                    CASE
+                        WHEN nombre LIKE ? THEN 1
+                        WHEN sku LIKE ? THEN 2
+                        WHEN nombre LIKE ? THEN 3
+                        ELSE 4
+                    END
+                ", [$search . '%', $search . '%', '%' . $search . '%'])
+                ->get()
+                ->map(function($producto) {
+                    return [
+                        'id' => $producto->id_producto,
+                        'nombre' => $producto->nombre,
+                        'sku' => $producto->sku,
+                        'descripcion' => $producto->descripcion,
+                        'precio' => $producto->precio_igv ?? $producto->precio_ganancia ?? $producto->precio_sin_ganancia ?? 0,
+                        'precio_sin_igv' => $producto->precio_ganancia ?? $producto->precio_sin_ganancia ?? 0,
+                        'marca' => $producto->marca ? $producto->marca->nombre : null,
+                        'categoria' => $producto->subcategoria && $producto->subcategoria->categoria
+                            ? $producto->subcategoria->categoria->nombre
+                            : null,
+                        'subcategoria' => $producto->subcategoria ? $producto->subcategoria->nombre : null,
+                    ];
+                });
+
+            return response()->json([
+                'success' => true,
+                'data' => $productos
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error al buscar productos: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al buscar productos',
                 'message' => $e->getMessage()
             ], 500);
         }

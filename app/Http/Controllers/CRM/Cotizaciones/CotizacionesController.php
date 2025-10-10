@@ -319,7 +319,7 @@ class CotizacionesController extends Controller
             // Cargar información del cliente
             if ($cotizacion->cliente_tipo === 'empresa') {
                 $cliente = EmpresaCliente::find($cotizacion->cliente_id);
-                $cotizacion->cliente_info = [
+                $cotizacion->cliente = (object)[
                     'tipo' => 'empresa',
                     'nombre' => $cliente->razon_social ?? 'N/A',
                     'contacto' => $cliente->contacto_principal ?? 'N/A',
@@ -330,7 +330,7 @@ class CotizacionesController extends Controller
                 ];
             } else {
                 $cliente = Cliente::find($cotizacion->cliente_id);
-                $cotizacion->cliente_info = [
+                $cotizacion->cliente = (object)[
                     'tipo' => 'particular',
                     'nombre' => $cliente->nombrecompleto ?? 'N/A',
                     'contacto' => $cliente->nombrecompleto ?? 'N/A',
@@ -340,6 +340,45 @@ class CotizacionesController extends Controller
                     'ruc_dni' => $cliente->ruc_dni ?? 'N/A',
                 ];
             }
+
+            // Mapear nombre del vendedor
+            if ($cotizacion->vendedor) {
+                $cotizacion->vendedor = (object)[
+                    'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
+                    'correo' => $cotizacion->vendedor->correo ?? '',
+                ];
+            }
+
+            // Mapear nombre de mi empresa
+            if ($cotizacion->miEmpresa) {
+                $cotizacion->mi_empresa = (object)[
+                    'nombre' => $cotizacion->miEmpresa->nombre,
+                    'ruc' => $cotizacion->miEmpresa->ruc ?? '',
+                    'email' => $cotizacion->miEmpresa->email ?? '',
+                    'telefono' => $cotizacion->miEmpresa->telefono ?? '',
+                ];
+            }
+
+            // Transformar detallesProductos a productos para el frontend
+            $cotizacion->productos = $cotizacion->detallesProductos->map(function ($detalle) {
+                return [
+                    'id' => $detalle->producto_id,
+                    'nombre' => $detalle->nombre,
+                    'cantidad' => $detalle->cantidad,
+                    'precio_unitario' => $detalle->precio_unitario,
+                    'subtotal' => $detalle->subtotal,
+                ];
+            });
+
+            // Transformar detallesAdicionales a productos_adicionales para el frontend
+            $cotizacion->productos_adicionales = $cotizacion->detallesAdicionales->map(function ($detalle) {
+                return [
+                    'nombre' => $detalle->nombre,
+                    'cantidad' => $detalle->cantidad,
+                    'precio_unitario' => $detalle->precio_unitario,
+                    'subtotal' => $detalle->subtotal,
+                ];
+            });
 
             return response()->json([
                 'success' => true,

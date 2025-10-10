@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiPlus, FiTrash2, FiSearch } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
 import axios from 'axios';
@@ -23,7 +23,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         total_monto_productos: 0,
         productos_adicionales: [],
         total_adicionales_monto: 0,
-        total: 0
+        total: 0,
+        notas: ''
     });
 
     const [clientes, setClientes] = useState([]);
@@ -31,28 +32,34 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const [clientesEmpresas, setClientesEmpresas] = useState([]);
     const [vendedores, setVendedores] = useState([]);
     const [empresas, setEmpresas] = useState([]);
-    const [productosDisponibles, setProductosDisponibles] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [loadingProductos, setLoadingProductos] = useState(false);
 
-    // Estados para búsqueda de productos principales
+    // Estados para búsqueda de productos
     const [searchProducto, setSearchProducto] = useState('');
+    const [productosResultados, setProductosResultados] = useState([]);
     const [showProductoDropdown, setShowProductoDropdown] = useState(false);
-    const [filteredProductos, setFilteredProductos] = useState([]);
-    const [selectedProductIndex, setSelectedProductIndex] = useState(-1);
-
-    // Estados para búsqueda de productos adicionales
-    const [searchProductoAdicional, setSearchProductoAdicional] = useState('');
-    const [showProductoAdicionalDropdown, setShowProductoAdicionalDropdown] = useState(false);
-    const [filteredProductosAdicionales, setFilteredProductosAdicionales] = useState([]);
+    const [loadingSearch, setLoadingSearch] = useState(false);
+    const searchTimeoutRef = useRef(null);
+    const dropdownRef = useRef(null);
 
     // Cargar datos iniciales cuando se abre el modal
     useEffect(() => {
         if (isOpen) {
             loadFormData();
-            loadProductos();
         }
     }, [isOpen]);
+
+    // Cerrar dropdown cuando se hace clic fuera
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowProductoDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const loadFormData = async () => {
         setLoading(true);
@@ -61,11 +68,11 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             if (response.data.success) {
                 const data = response.data.data;
                 setClientes(data.clientes || []);
-                
+
                 // Separar clientes por tipo
                 const particulares = (data.clientes || []).filter(cliente => cliente.tipo === 'particular');
                 const empresas = (data.clientes || []).filter(cliente => cliente.tipo === 'empresa');
-                
+
                 setClientesParticulares(particulares);
                 setClientesEmpresas(empresas);
                 setVendedores(data.vendedores || []);
@@ -79,37 +86,73 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         }
     };
 
-    const loadProductos = async () => {
-        setLoadingProductos(true);
+    // Buscar productos con debounce
+    const buscarProductos = async (termino) => {
+        if (termino.trim().length < 2) {
+            setProductosResultados([]);
+            setShowProductoDropdown(false);
+            return;
+        }
+
+        setLoadingSearch(true);
         try {
-            const response = await axios.get('/api/productos/excluye-servicios', {
-                params: { per_page: 100 }
+            const response = await axios.get('/api/productos/crm/buscar', {
+                params: { q: termino, limit: 20 }
             });
 
-            if (response.data.data) {
-                const productos = response.data.data.map(p => ({
-                    id: p.id_producto,
-                    nombre: p.nombre,
-                    precio: parseFloat(p.precio_igv || p.precio_ganancia || 0),
-                    sku: p.sku
-                }));
-                setProductosDisponibles(productos);
+            if (response.data.success) {
+                setProductosResultados(response.data.data || []);
+                setShowProductoDropdown(true);
             }
         } catch (error) {
-            console.error('Error al cargar productos:', error);
+            console.error('Error al buscar productos:', error);
         } finally {
-            setLoadingProductos(false);
+            setLoadingSearch(false);
         }
+    };
+
+    // Handler para búsqueda con debounce
+    const handleSearchChange = (value) => {
+        setSearchProducto(value);
+
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+
+        searchTimeoutRef.current = setTimeout(() => {
+            buscarProductos(value);
+        }, 300);
+    };
+
+    // Seleccionar producto del dropdown
+    const selectProducto = (producto) => {
+        const newProducto = {
+            id: producto.id,
+            nombre: producto.nombre,
+            cantidad: 1,
+            precio_unitario: producto.precio || 0,
+            subtotal: producto.precio || 0
+        };
+
+        setFormData(prev => ({
+            ...prev,
+            productos: [...prev.productos, newProducto]
+        }));
+
+        // Limpiar búsqueda
+        setSearchProducto('');
+        setProductosResultados([]);
+        setShowProductoDropdown(false);
     };
 
     // Calculate totals when products change
     useEffect(() => {
-        const totalProductos = formData.productos.reduce((sum, producto) => 
-            sum + (parseFloat(producto.cantidad) * parseFloat(producto.precio_unitario)), 0);
-        
-        const totalAdicionales = formData.productos_adicionales.reduce((sum, producto) => 
-            sum + (parseFloat(producto.cantidad) * parseFloat(producto.precio_unitario)), 0);
-        
+        const totalProductos = formData.productos.reduce((sum, producto) =>
+            sum + (parseFloat(producto.cantidad || 0) * parseFloat(producto.precio_unitario || 0)), 0);
+
+        const totalAdicionales = formData.productos_adicionales.reduce((sum, producto) =>
+            sum + (parseFloat(producto.cantidad || 0) * parseFloat(producto.precio_unitario || 0)), 0);
+
         const total = totalProductos + totalAdicionales;
 
         setFormData(prev => ({
@@ -131,7 +174,6 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const handleClienteChange = (e) => {
         const value = e.target.value;
         if (value) {
-            // Encontrar el cliente seleccionado
             const selectedCliente = clientes.find(c => c.id == value);
             if (selectedCliente) {
                 setFormData(prev => ({
@@ -149,19 +191,6 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         }
     };
 
-    const addProducto = () => {
-        setFormData(prev => ({
-            ...prev,
-            productos: [...prev.productos, {
-                id: '',
-                nombre: '',
-                cantidad: 1,
-                precio_unitario: 0,
-                subtotal: 0
-            }]
-        }));
-    };
-
     const removeProducto = (index) => {
         setFormData(prev => ({
             ...prev,
@@ -176,11 +205,11 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                 ...newProductos[index],
                 [field]: value
             };
-            
+
             // Calculate subtotal
             if (field === 'cantidad' || field === 'precio_unitario') {
-                const cantidad = field === 'cantidad' ? parseFloat(value) : parseFloat(newProductos[index].cantidad);
-                const precio = field === 'precio_unitario' ? parseFloat(value) : parseFloat(newProductos[index].precio_unitario);
+                const cantidad = field === 'cantidad' ? parseFloat(value || 0) : parseFloat(newProductos[index].cantidad || 0);
+                const precio = field === 'precio_unitario' ? parseFloat(value || 0) : parseFloat(newProductos[index].precio_unitario || 0);
                 newProductos[index].subtotal = cantidad * precio;
             }
 
@@ -217,11 +246,11 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                 ...newProductos[index],
                 [field]: value
             };
-            
+
             // Calculate subtotal
             if (field === 'cantidad' || field === 'precio_unitario') {
-                const cantidad = field === 'cantidad' ? parseFloat(value) : parseFloat(newProductos[index].cantidad);
-                const precio = field === 'precio_unitario' ? parseFloat(value) : parseFloat(newProductos[index].precio_unitario);
+                const cantidad = field === 'cantidad' ? parseFloat(value || 0) : parseFloat(newProductos[index].cantidad || 0);
+                const precio = field === 'precio_unitario' ? parseFloat(value || 0) : parseFloat(newProductos[index].precio_unitario || 0);
                 newProductos[index].subtotal = cantidad * precio;
             }
 
@@ -230,87 +259,6 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                 productos_adicionales: newProductos
             };
         });
-    };
-
-    // Función para búsqueda de productos principales
-    const handleProductoSearch = (value) => {
-        setSearchProducto(value);
-        
-        if (value.trim() === '') {
-            setFilteredProductos([]);
-            setShowProductoDropdown(false);
-            return;
-        }
-
-        const filtered = productosDisponibles.filter(producto =>
-            producto.nombre.toLowerCase().includes(value.toLowerCase()) ||
-            (producto.sku && producto.sku.toLowerCase().includes(value.toLowerCase()))
-        );
-
-        setFilteredProductos(filtered);
-        setShowProductoDropdown(filtered.length > 0);
-        setSelectedProductIndex(-1);
-    };
-
-    // Función para seleccionar producto principal
-    const selectProducto = (producto) => {
-        const newProducto = {
-            id: producto.id,
-            nombre: producto.nombre,
-            cantidad: 1,
-            precio_unitario: producto.precio,
-            subtotal: producto.precio
-        };
-
-        setFormData(prev => ({
-            ...prev,
-            productos: [...prev.productos, newProducto]
-        }));
-
-        // Limpiar búsqueda
-        setSearchProducto('');
-        setFilteredProductos([]);
-        setShowProductoDropdown(false);
-        setSelectedProductIndex(-1);
-    };
-
-    // Función para búsqueda de productos adicionales
-    const handleProductoAdicionalSearch = (value) => {
-        setSearchProductoAdicional(value);
-        
-        if (value.trim() === '') {
-            setFilteredProductosAdicionales([]);
-            setShowProductoAdicionalDropdown(false);
-            return;
-        }
-
-        const filtered = productosDisponibles.filter(producto =>
-            producto.nombre.toLowerCase().includes(value.toLowerCase()) ||
-            (producto.sku && producto.sku.toLowerCase().includes(value.toLowerCase()))
-        );
-
-        setFilteredProductosAdicionales(filtered);
-        setShowProductoAdicionalDropdown(filtered.length > 0);
-    };
-
-    // Función para seleccionar producto adicional
-    const selectProductoAdicional = (producto) => {
-        const newProducto = {
-            nombre: producto.nombre,
-            cantidad: 1,
-            precio_unitario: producto.precio,
-            subtotal: producto.precio
-        };
-
-        setFormData(prev => ({
-            ...prev,
-            productos_adicionales: [...prev.productos_adicionales, newProducto]
-        }));
-
-        // Limpiar búsqueda
-        setSearchProductoAdicional('');
-        setFilteredProductosAdicionales([]);
-        setShowProductoAdicionalDropdown(false);
     };
 
     const handleSubmit = async (e) => {
@@ -359,7 +307,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
             if (response.data.success) {
                 alert('Cotización creada exitosamente');
-                onSave(); // Notificar al padre para que recargue
+                onSave();
                 onClose();
             } else {
                 alert('Error al crear cotización: ' + (response.data.message || 'Error desconocido'));
@@ -380,7 +328,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
     const formatCurrency = (amount) => {
         const symbol = formData.moneda === 'dolares' ? '$' : 'S/';
-        return `${symbol} ${parseFloat(amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
+        return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
     };
 
     if (!isOpen) return null;
@@ -541,7 +489,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                     <option value="empresa">🏢 Cliente Empresa</option>
                                 </select>
                             </div>
-                            
+
                             {/* Cliente */}
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -567,7 +515,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                         <option value="">
                                             {formData.cliente_tipo === 'empresa' ? 'Seleccionar empresa' : 'Seleccionar cliente'}
                                         </option>
-                                        {formData.cliente_tipo === 'empresa' 
+                                        {formData.cliente_tipo === 'empresa'
                                             ? clientesEmpresas.map(cliente => (
                                                 <option key={cliente.id} value={cliente.id}>
                                                     {cliente.nombre}
@@ -585,15 +533,15 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     <FiUser className="inline w-4 h-4 mr-2" />
-                                    Vendedor
+                                    Vendedor *
                                 </label>
                                 <select
                                     name="usuario_id"
                                     value={formData.usuario_id}
                                     onChange={handleInputChange}
                                     className={`w-full px-3 py-2 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white' 
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white'
                                             : 'bg-white border-gray-300 text-gray-900'
                                     }`}
                                     required
@@ -609,7 +557,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     <FiHome className="inline w-4 h-4 mr-2" />
-                                    Mi Empresa
+                                    Mi Empresa *
                                 </label>
                                 <select
                                     name="miempresa_id"
@@ -650,8 +598,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                     value={formData.entrega}
                                     onChange={handleInputChange}
                                     className={`w-full px-3 py-2 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white' 
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white'
                                             : 'bg-white border-gray-300 text-gray-900'
                                     }`}
                                     placeholder="Ej: 15 días hábiles"
@@ -668,8 +616,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                     value={formData.lugar_entrega}
                                     onChange={handleInputChange}
                                     className={`w-full px-3 py-2 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white' 
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white'
                                             : 'bg-white border-gray-300 text-gray-900'
                                     }`}
                                     placeholder="Ej: Lima, Perú"
@@ -686,8 +634,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                     value={formData.garantia}
                                     onChange={handleInputChange}
                                     className={`w-full px-3 py-2 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white' 
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white'
                                             : 'bg-white border-gray-300 text-gray-900'
                                     }`}
                                     placeholder="Ej: 12 meses"
@@ -704,8 +652,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                     value={formData.forma_pago}
                                     onChange={handleInputChange}
                                     className={`w-full px-3 py-2 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white' 
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white'
                                             : 'bg-white border-gray-300 text-gray-900'
                                     }`}
                                     placeholder="Ej: 50% adelanto, 50% contra entrega"
@@ -716,8 +664,12 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
                     {/* Productos */}
                     <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                        <h3 className={`text-lg font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                            Productos
+                        </h3>
+
                         {/* Búsqueda de productos */}
-                        <div className="mb-4">
+                        <div className="mb-4 relative" ref={dropdownRef}>
                             <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 <FiSearch className="inline w-4 h-4 mr-2" />
                                 Buscar y Agregar Producto
@@ -726,38 +678,50 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                 <input
                                     type="text"
                                     value={searchProducto}
-                                    onChange={(e) => handleProductoSearch(e.target.value)}
-                                    onFocus={() => setShowProductoDropdown(true)}
-                                    className={`w-full px-3 py-2 pr-8 border rounded-lg ${
-                                        isDarkMode 
-                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                    onChange={(e) => handleSearchChange(e.target.value)}
+                                    className={`w-full px-3 py-2 pr-10 border rounded-lg ${
+                                        isDarkMode
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                                             : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                                     }`}
-                                    placeholder="Buscar producto por nombre o SKU..."
+                                    placeholder="Buscar producto por nombre, SKU o descripción..."
                                 />
-                                <FiSearch className={`absolute right-3 top-3 w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-                                
+                                {loadingSearch ? (
+                                    <div className="absolute right-3 top-3">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                    </div>
+                                ) : (
+                                    <FiSearch className={`absolute right-3 top-3 w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                )}
+
                                 {/* Dropdown de productos filtrados */}
-                                {showProductoDropdown && filteredProductos.length > 0 && (
+                                {showProductoDropdown && productosResultados.length > 0 && (
                                     <div className={`absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border rounded-lg shadow-lg ${
                                         isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
                                     }`}>
-                                        {filteredProductos.map((producto) => (
+                                        {productosResultados.map((producto) => (
                                             <div
                                                 key={producto.id}
                                                 onClick={() => selectProducto(producto)}
                                                 className={`px-3 py-2 cursor-pointer hover:${isDarkMode ? 'bg-gray-600' : 'bg-gray-100'} ${
                                                     isDarkMode ? 'text-white' : 'text-gray-900'
-                                                }`}
+                                                } border-b last:border-b-0 ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}
                                             >
                                                 <div className="font-medium">{producto.nombre}</div>
-                                                {producto.sku && (
-                                                    <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                        SKU: {producto.sku}
-                                                    </div>
-                                                )}
-                                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                    Precio: S/ {producto.precio.toFixed(2)}
+                                                <div className="flex items-center gap-4 text-sm">
+                                                    {producto.sku && (
+                                                        <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                            SKU: {producto.sku}
+                                                        </span>
+                                                    )}
+                                                    {producto.marca && (
+                                                        <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                            Marca: {producto.marca}
+                                                        </span>
+                                                    )}
+                                                    <span className={`font-medium ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+                                                        S/ {parseFloat(producto.precio || 0).toFixed(2)}
+                                                    </span>
                                                 </div>
                                             </div>
                                         ))}
@@ -765,61 +729,28 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                 )}
                             </div>
                         </div>
-                        
+
+                        {/* Lista de productos agregados */}
                         {formData.productos.map((producto, index) => (
-                            <div key={index} className={`mb-4 p-3 border rounded-lg relative ${
+                            <div key={index} className={`mb-4 p-3 border rounded-lg ${
                                 isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-white'
                             }`}>
                                 <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                                    <div className="md:col-span-2 relative">
+                                    <div className="md:col-span-2">
                                         <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Producto
                                         </label>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                value={producto.nombre}
-                                                onChange={(e) => handleProductoSearch(index, e.target.value)}
-                                                onFocus={() => {
-                                                    setSelectedProductIndex(index);
-                                                    setShowProductoDropdown(true);
-                                                }}
-                                                className={`w-full px-3 py-2 pr-8 border rounded-lg ${
-                                                    isDarkMode 
-                                                        ? 'bg-gray-600 border-gray-500 text-white' 
-                                                        : 'bg-white border-gray-300 text-gray-900'
-                                                }`}
-                                                placeholder="Buscar producto..."
-                                            />
-                                            <FiSearch className={`absolute right-3 top-3 w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-                                        </div>
-                                        
-                                        {/* Dropdown de productos filtrados */}
-                                        {showProductoDropdown && selectedProductIndex === index && filteredProductos.length > 0 && (
-                                            <div className={`absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border rounded-lg shadow-lg ${
-                                                isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
-                                            }`}>
-                                                {filteredProductos.map((prod) => (
-                                                    <div
-                                                        key={prod.id_producto}
-                                                        onClick={() => selectProducto(index, prod)}
-                                                        className={`px-3 py-2 cursor-pointer hover:${isDarkMode ? 'bg-gray-600' : 'bg-gray-100'} ${
-                                                            isDarkMode ? 'text-white' : 'text-gray-900'
-                                                        }`}
-                                                    >
-                                                        <div className="font-medium">{prod.nombre}</div>
-                                                        {prod.codigo && (
-                                                            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                                Código: {prod.codigo}
-                                                            </div>
-                                                        )}
-                                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            Precio: {formatCurrency(prod.precio_venta)}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
+                                        <input
+                                            type="text"
+                                            value={producto.nombre}
+                                            onChange={(e) => updateProducto(index, 'nombre', e.target.value)}
+                                            className={`w-full px-3 py-2 border rounded-lg ${
+                                                isDarkMode
+                                                    ? 'bg-gray-600 border-gray-500 text-white'
+                                                    : 'bg-white border-gray-300 text-gray-900'
+                                            }`}
+                                            readOnly
+                                        />
                                     </div>
                                     <div>
                                         <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -831,8 +762,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                             value={producto.cantidad}
                                             onChange={(e) => updateProducto(index, 'cantidad', e.target.value)}
                                             className={`w-full px-3 py-2 border rounded-lg ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-600 border-gray-500 text-white' 
+                                                isDarkMode
+                                                    ? 'bg-gray-600 border-gray-500 text-white'
                                                     : 'bg-white border-gray-300 text-gray-900'
                                             }`}
                                         />
@@ -847,8 +778,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                             value={producto.precio_unitario}
                                             onChange={(e) => updateProducto(index, 'precio_unitario', e.target.value)}
                                             className={`w-full px-3 py-2 border rounded-lg ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-600 border-gray-500 text-white' 
+                                                isDarkMode
+                                                    ? 'bg-gray-600 border-gray-500 text-white'
                                                     : 'bg-white border-gray-300 text-gray-900'
                                             }`}
                                         />
@@ -858,8 +789,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                             type="button"
                                             onClick={() => removeProducto(index)}
                                             className={`w-full px-3 py-2 rounded-lg flex items-center justify-center ${
-                                                isDarkMode 
-                                                    ? 'bg-red-600 hover:bg-red-700 text-white' 
+                                                isDarkMode
+                                                    ? 'bg-red-600 hover:bg-red-700 text-white'
                                                     : 'bg-red-500 hover:bg-red-600 text-white'
                                             }`}
                                         >
@@ -874,7 +805,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                 </div>
                             </div>
                         ))}
-                        
+
                         <div className={`mt-4 pt-3 border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
                             <div className="flex justify-between items-center">
                                 <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -897,8 +828,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                 type="button"
                                 onClick={addProductoAdicional}
                                 className={`px-3 py-2 rounded-lg flex items-center gap-2 ${
-                                    isDarkMode 
-                                        ? 'bg-green-600 hover:bg-green-700 text-white' 
+                                    isDarkMode
+                                        ? 'bg-green-600 hover:bg-green-700 text-white'
                                         : 'bg-green-500 hover:bg-green-600 text-white'
                                 }`}
                             >
@@ -906,65 +837,27 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                 Agregar Adicional
                             </button>
                         </div>
-                        
+
                         {formData.productos_adicionales.map((producto, index) => (
                             <div key={index} className={`mb-4 p-3 border rounded-lg ${
                                 isDarkMode ? 'border-gray-600 bg-gray-700' : 'border-gray-200 bg-white'
                             }`}>
                                 <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                                    <div className="md:col-span-2 relative">
+                                    <div className="md:col-span-2">
                                         <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Producto Adicional
                                         </label>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                value={searchProductoAdicional[index] || producto.nombre}
-                                                onChange={(e) => {
-                                                    const value = e.target.value;
-                                                    updateProductoAdicional(index, 'nombre', value);
-                                                    handleProductoAdicionalSearch(index, value);
-                                                }}
-                                                className={`w-full px-3 py-2 pr-10 border rounded-lg ${
-                                                    isDarkMode 
-                                                        ? 'bg-gray-600 border-gray-500 text-white' 
-                                                        : 'bg-white border-gray-300 text-gray-900'
-                                                }`}
-                                                placeholder="Buscar producto adicional..."
-                                            />
-                                            <FiSearch className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                            }`} />
-                                            
-                                            {/* Dropdown de productos adicionales filtrados */}
-                                            {showProductoAdicionalDropdown[index] && filteredProductosAdicionales[index] && filteredProductosAdicionales[index].length > 0 && (
-                                                <div className={`absolute z-50 w-full mt-1 max-h-60 overflow-y-auto border rounded-lg shadow-lg ${
-                                                    isDarkMode 
-                                                        ? 'bg-gray-700 border-gray-600' 
-                                                        : 'bg-white border-gray-300'
-                                                }`}>
-                                                    {filteredProductosAdicionales[index].map((prod, prodIndex) => (
-                                                        <div
-                                                            key={prodIndex}
-                                                            onClick={() => selectProductoAdicional(index, prod)}
-                                                            className={`px-3 py-2 cursor-pointer hover:${
-                                                                isDarkMode ? 'bg-gray-600' : 'bg-gray-100'
-                                                            } ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-                                                        >
-                                                            <div className="font-medium">{prod.nombre}</div>
-                                                            {prod.codigo && (
-                                                                <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                                    Código: {prod.codigo}
-                                                                </div>
-                                                            )}
-                                                            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                                Precio: {formatCurrency(prod.precio_venta || 0)}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <input
+                                            type="text"
+                                            value={producto.nombre}
+                                            onChange={(e) => updateProductoAdicional(index, 'nombre', e.target.value)}
+                                            className={`w-full px-3 py-2 border rounded-lg ${
+                                                isDarkMode
+                                                    ? 'bg-gray-600 border-gray-500 text-white'
+                                                    : 'bg-white border-gray-300 text-gray-900'
+                                            }`}
+                                            placeholder="Nombre del producto adicional"
+                                        />
                                     </div>
                                     <div>
                                         <label className={`block text-sm font-medium mb-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -976,8 +869,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                             value={producto.cantidad}
                                             onChange={(e) => updateProductoAdicional(index, 'cantidad', e.target.value)}
                                             className={`w-full px-3 py-2 border rounded-lg ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-600 border-gray-500 text-white' 
+                                                isDarkMode
+                                                    ? 'bg-gray-600 border-gray-500 text-white'
                                                     : 'bg-white border-gray-300 text-gray-900'
                                             }`}
                                         />
@@ -992,8 +885,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                             value={producto.precio_unitario}
                                             onChange={(e) => updateProductoAdicional(index, 'precio_unitario', e.target.value)}
                                             className={`w-full px-3 py-2 border rounded-lg ${
-                                                isDarkMode 
-                                                    ? 'bg-gray-600 border-gray-500 text-white' 
+                                                isDarkMode
+                                                    ? 'bg-gray-600 border-gray-500 text-white'
                                                     : 'bg-white border-gray-300 text-gray-900'
                                             }`}
                                         />
@@ -1003,8 +896,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                             type="button"
                                             onClick={() => removeProductoAdicional(index)}
                                             className={`w-full px-3 py-2 rounded-lg flex items-center justify-center ${
-                                                isDarkMode 
-                                                    ? 'bg-red-600 hover:bg-red-700 text-white' 
+                                                isDarkMode
+                                                    ? 'bg-red-600 hover:bg-red-700 text-white'
                                                     : 'bg-red-500 hover:bg-red-600 text-white'
                                             }`}
                                         >
@@ -1019,7 +912,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                 </div>
                             </div>
                         ))}
-                        
+
                         <div className={`mt-4 pt-3 border-t ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
                             <div className="flex justify-between items-center">
                                 <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
