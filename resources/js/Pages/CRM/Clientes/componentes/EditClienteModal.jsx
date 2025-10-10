@@ -39,7 +39,7 @@ export default function EditClienteModal({ isOpen, onClose, cliente, empresas = 
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        put(route('clientes.update', cliente.id), {
+        put(route('crm.clientes.particulares.update', cliente.id), {
             onSuccess: () => {
                 reset();
                 onClose();

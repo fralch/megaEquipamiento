@@ -94,20 +94,14 @@ class ClientesParticularesController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return back()->withErrors($validator->errors());
         }
 
         $cliente = Cliente::create($request->all());
         $cliente->load('vendedor');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Cliente creado exitosamente',
-            'data' => $cliente
-        ], 201);
+        return redirect()->route('crm.clientes.particulares.index')
+            ->with('success', 'Cliente creado exitosamente');
     }
 
     /**
@@ -141,20 +135,14 @@ class ClientesParticularesController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return back()->withErrors($validator->errors());
         }
 
         $cliente->update($request->all());
         $cliente->load('vendedor');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Cliente actualizado exitosamente',
-            'data' => $cliente
-        ]);
+        return redirect()->route('crm.clientes.particulares.index')
+            ->with('success', 'Cliente actualizado exitosamente');
     }
 
     /**
