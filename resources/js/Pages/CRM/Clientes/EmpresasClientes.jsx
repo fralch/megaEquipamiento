@@ -1,7 +1,7 @@
-import { Head, Link, router } from "@inertiajs/react";
-import { FiHome, FiEdit, FiTrash, FiPlus, FiEye, FiToggleLeft, FiToggleRight } from "react-icons/fi";
+import { Head, Link, router, usePage } from "@inertiajs/react";
+import { FiHome, FiEdit, FiTrash, FiPlus, FiEye, FiToggleLeft, FiToggleRight, FiCheckCircle, FiX } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CRMLayout from '../CRMLayout';
 import CreateEmpresaModal from './componentes/CreateEmpresaModal';
 import EditEmpresaModal from './componentes/EditEmpresaModal';
@@ -9,30 +9,44 @@ import ShowEmpresaModal from './componentes/ShowEmpresaModal';
 
 export default function EmpresasClientes({ empresas = { data: [] }, usuarios = [], clientes = [] }) {
     const { isDarkMode } = useTheme();
+    const { flash } = usePage().props;
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
     const [selectedEmpresa, setSelectedEmpresa] = useState(null);
-
-    // Debug: verificar qué datos están llegando
-    console.log('Empresas recibidas:', empresas);
-    console.log('Estructura de empresas:', {
-        total: empresas.total,
-        currentPage: empresas.current_page,
-        dataLength: empresas.data?.length
-    });
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
     // Extraer el array de empresas del objeto paginado
     const empresasData = empresas.data || [];
 
+    // Mostrar alerta de éxito cuando hay un mensaje flash
+    useEffect(() => {
+        if (flash?.success) {
+            setShowSuccessAlert(true);
+            setTimeout(() => {
+                setShowSuccessAlert(false);
+            }, 3000);
+        }
+    }, [flash]);
+
     const handleDelete = (empresaId) => {
         if (confirm('¿Estás seguro de que deseas eliminar esta empresa cliente?')) {
-            router.delete(route('crm.clientes.empresas.destroy', empresaId));
+            router.delete(route('crm.clientes.empresas.destroy', empresaId), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    // La página se recargará automáticamente con los datos actualizados
+                }
+            });
         }
     };
 
     const handleToggleStatus = (empresaId) => {
-        router.post(route('crm.clientes.empresas.toggle-activo', empresaId));
+        router.post(route('crm.clientes.empresas.toggle-activo', empresaId), {}, {
+            preserveScroll: true,
+            onSuccess: () => {
+                // La página se recargará automáticamente con los datos actualizados
+            }
+        });
     };
 
     const handleCreate = () => {
@@ -53,6 +67,24 @@ export default function EmpresasClientes({ empresas = { data: [] }, usuarios = [
         <>
             <Head title="Empresas de Clientes" />
             <CRMLayout title="Empresas de Clientes">
+                {/* Success Alert */}
+                {showSuccessAlert && flash?.success && (
+                    <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
+                        <div className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg ${
+                            isDarkMode ? 'bg-green-800 text-white' : 'bg-green-50 text-green-800'
+                        } border border-green-200`}>
+                            <FiCheckCircle className="w-5 h-5 text-green-600" />
+                            <span className="font-medium">{flash.success}</span>
+                            <button
+                                onClick={() => setShowSuccessAlert(false)}
+                                className="ml-2 hover:bg-green-100 rounded p-1 transition-colors"
+                            >
+                                <FiX className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>

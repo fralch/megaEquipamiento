@@ -175,12 +175,10 @@ class EmpresasClientesController extends Controller
     public function destroy($id)
     {
         $empresa = EmpresaCliente::findOrFail($id);
+        $razonSocial = $empresa->razon_social;
         $empresa->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Empresa cliente eliminada exitosamente'
-        ]);
+        return redirect()->back()->with('success', "Empresa '{$razonSocial}' eliminada exitosamente");
     }
 
     /**
@@ -217,11 +215,9 @@ class EmpresasClientesController extends Controller
         $empresa->activo = !$empresa->activo;
         $empresa->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Estado actualizado exitosamente',
-            'data' => $empresa
-        ]);
+        $estadoTexto = $empresa->activo ? 'activada' : 'desactivada';
+
+        return redirect()->back()->with('success', "Empresa {$estadoTexto} exitosamente");
     }
 
     /**
