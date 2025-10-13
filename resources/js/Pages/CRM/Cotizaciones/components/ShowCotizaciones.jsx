@@ -1,8 +1,10 @@
 import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiDownload } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
+import { useState } from 'react';
 
 export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
     const { isDarkMode } = useTheme();
+    const [isExporting, setIsExporting] = useState(false);
 
     if (!isOpen || !cotizacion) return null;
 
@@ -20,9 +22,40 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
         });
     };
 
-    const handleExportPdf = () => {
-        // Abrir la URL de exportación en una nueva pestaña
-        window.open(`/crm/cotizaciones/${cotizacion.id}/export-pdf`, '_blank');
+    const handleExportPdf = async () => {
+        try {
+            setIsExporting(true);
+
+            // Hacer la petición fetch para descargar el PDF
+            const response = await fetch(`/crm/cotizaciones/${cotizacion.id}/export-pdf`);
+
+            if (!response.ok) {
+                throw new Error('Error al generar el PDF');
+            }
+
+            // Obtener el blob del PDF
+            const blob = await response.blob();
+
+            // Crear URL del blob
+            const url = window.URL.createObjectURL(blob);
+
+            // Crear enlace temporal y descargar
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Cotizacion_${cotizacion.numero || cotizacion.id}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+
+            // Limpiar
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+
+            setIsExporting(false);
+        } catch (error) {
+            console.error('Error al exportar PDF:', error);
+            alert('Error al generar el PDF. Por favor, intente nuevamente.');
+            setIsExporting(false);
+        }
     };
 
     return (
@@ -305,14 +338,36 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                 }`}>
                     <button
                         onClick={handleExportPdf}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                        disabled={isExporting}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                            isExporting
+                                ? 'bg-blue-400 cursor-not-allowed'
+                                : 'bg-blue-600 hover:bg-blue-700'
+                        } text-white`}
                     >
-                        <FiDownload className="w-4 h-4" />
-                        Exportar a PDF
+                        {isExporting ? (
+                            <>
+                                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Generando PDF...
+                            </>
+                        ) : (
+                            <>
+                                <FiDownload className="w-4 h-4" />
+                                Exportar a PDF
+                            </>
+                        )}
                     </button>
                     <button
                         onClick={onClose}
-                        className={`px-4 py-2 rounded-lg font-medium ${
+                        disabled={isExporting}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+                            isExporting
+                                ? 'opacity-50 cursor-not-allowed'
+                                : ''
+                        } ${
                             isDarkMode
                                 ? 'bg-gray-700 text-white hover:bg-gray-600'
                                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
