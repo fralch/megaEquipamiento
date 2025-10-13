@@ -633,7 +633,7 @@ class CotizacionesController extends Controller
         try {
             $cotizacion = Cotizacion::with([
                 'vendedor:id_usuario,nombre,apellido,correo',
-                'miEmpresa:id,nombre,ruc,email,telefono,imagen_logo,imagen_firma',
+                'miEmpresa', // Cargar todos los campos de NuestraEmpresa
                 'detallesProductos.producto',
                 'detallesAdicionales'
             ])->findOrFail($id);
@@ -719,12 +719,29 @@ class CotizacionesController extends Controller
                 ];
             }
 
+            // Preparar datos de nuestra empresa como array independiente
+            $empresa = null;
+            if ($cotizacion->miEmpresa) {
+                $empresa = [
+                    'id' => $cotizacion->miEmpresa->id,
+                    'nombre' => $cotizacion->miEmpresa->nombre,
+                    'email' => $cotizacion->miEmpresa->email,
+                    'telefono' => $cotizacion->miEmpresa->telefono,
+                    'ruc' => $cotizacion->miEmpresa->ruc,
+                    'imagen_logo' => $cotizacion->miEmpresa->imagen_logo,
+                    'imagen_firma' => $cotizacion->miEmpresa->imagen_firma,
+                    'id_usuario' => $cotizacion->miEmpresa->id_usuario,
+                    'created_at' => $cotizacion->miEmpresa->created_at,
+                    'updated_at' => $cotizacion->miEmpresa->updated_at,
+                ];
+            }
+
             // Preparar datos para el PDF
             $data = [
                 'cotizacion' => $cotizacion,
                 'productos' => $productos,
                 'productos_adicionales' => $cotizacion->detallesAdicionales,
-                'empresa' => $cotizacion->miEmpresa,
+                'empresa' => $empresa,
                 'cliente' => $cotizacion->cliente,
                 'vendedor' => $vendedor,
             ];

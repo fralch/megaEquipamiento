@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotización {{ $cotizacion->numero }}</title>
     <style>
-        /* Configuración para página A4 vertical */
+         /* Configuración para página A4 vertical */
         @page {
             size: A4 portrait;
             margin: 15mm 10mm 15mm 10mm;
@@ -381,17 +381,24 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header con Empresa (sin logo por compatibilidad) -->
+    <div class="container">u
+        <!-- Header con Empresa -->
         <div class="header">
             <div class="header-content">
                 <div class="empresa-info" style="width: 100%; text-align: center;">
-                    <div class="empresa-nombre">{{ $empresa->nombre ?? 'N/A' }}</div>
+                    @if($empresa && $empresa['imagen_logo'])
+                        <div style="text-align: center; margin-bottom: 10px;">
+                            <img src="{{ public_path($empresa['imagen_logo']) }}" 
+                                 alt="Logo {{ $empresa['nombre'] ?? 'Empresa' }}" 
+                                 style="max-height: 80px; max-width: 200px; height: auto;">
+                        </div>
+                    @endif
+                    <div class="empresa-nombre">{{ $empresa['nombre'] ?? 'N/A' }}</div>
                     <div class="empresa-datos">
                         @if($empresa)
-                            <div><strong>RUC:</strong> {{ $empresa->ruc }}</div>
-                            <div><strong>Email:</strong> {{ $empresa->email }}</div>
-                            <div><strong>Teléfono:</strong> {{ $empresa->telefono }}</div>
+                            <div><strong>RUC:</strong> {{ $empresa['ruc'] }}</div>
+                            <div><strong>Email:</strong> {{ $empresa['email'] }}</div>
+                            <div><strong>Teléfono:</strong> {{ $empresa['telefono'] }}</div>
                         @endif
                     </div>
                 </div>
@@ -625,17 +632,24 @@
             </div>
         @endif
 
-        <!-- Firma (sin imagen por compatibilidad) -->
+        <!-- Firma -->
         <div class="firma-section">
+            @if($empresa && $empresa['imagen_firma'])
+                <div style="text-align: center; margin-bottom: 10px;">
+                    <img src="{{ public_path($empresa['imagen_firma']) }}" 
+                         alt="Firma {{ $vendedor->nombre ?? 'Vendedor' }}" 
+                         style="max-height: 60px; max-width: 150px; height: auto;">
+                </div>
+            @endif
             <div class="firma-linea"></div>
             <div class="firma-nombre">{{ $vendedor->nombre ?? 'N/A' }}</div>
-            <div class="firma-cargo">{{ $empresa->nombre ?? 'Vendedor' }}</div>
+            <div class="firma-cargo">{{ $empresa['nombre'] ?? 'Vendedor' }}</div>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <p>Este documento es una cotización formal. Válido hasta {{ \Carbon\Carbon::parse($cotizacion->fecha_vencimiento)->format('d/m/Y') }}</p>
-            <p>{{ $empresa->nombre ?? '' }} - {{ $empresa->ruc ?? '' }}</p>
+            <p>{{ $empresa['nombre'] ?? '' }} - {{ $empresa['ruc'] ?? '' }}</p>
         </div>
     </div>
 </body>
