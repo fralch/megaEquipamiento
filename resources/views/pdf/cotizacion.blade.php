@@ -162,6 +162,9 @@
             border: 1px solid #e5e7eb;
             border-radius: 4px;
         }
+        /* Imagen destacada para el producto con mayor subtotal */
+        .producto-imagen--grande { width: 120px; height: 120px; }
+        .producto-imagen--grande img { max-width: 120px; max-height: 120px; }
         .producto-contenido {
             display: table-cell;
             vertical-align: top;
@@ -421,10 +424,19 @@
             <div class="section">
                 <div class="section-title">PRODUCTOS COTIZADOS</div>
 
+                @php
+                    $maxProductoIndex = null;
+                    $maxSubtotal = -1;
+                    foreach($productos as $idx => $p) {
+                        $val = isset($p['subtotal']) ? (float) $p['subtotal'] : 0;
+                        if ($val > $maxSubtotal) { $maxSubtotal = $val; $maxProductoIndex = $idx; }
+                    }
+                @endphp
+
                 @foreach($productos as $producto)
                     <div class="producto">
                         {{-- Imagen del producto --}}
-                        <div class="producto-imagen">
+                        <div class="producto-imagen {{ $loop->index === $maxProductoIndex ? 'producto-imagen--grande' : '' }}">
                             @if(!empty($producto['imagen']))
                                 <img src="{{ $producto['imagen'] }}" alt="{{ $producto['nombre'] }}" onerror="this.style.display='none'">
                             @else
