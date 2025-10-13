@@ -87,6 +87,7 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
         Route::get('/create-data', [CotizacionesController::class, 'create'])->name('create-data');
         Route::post('/store', [CotizacionesController::class, 'store'])->name('store');
         Route::get('/estadisticas', [CotizacionesController::class, 'estadisticas'])->name('estadisticas');
+        Route::get('/{id}/export-pdf', [CotizacionesController::class, 'exportPdf'])->name('export-pdf');
         Route::get('/{id}', [CotizacionesController::class, 'show'])->name('show');
         Route::match(['put', 'post'], '/{id}', [CotizacionesController::class, 'update'])->name('update');
         Route::match(['delete', 'post'], '/{id}/delete', [CotizacionesController::class, 'destroy'])->name('destroy');

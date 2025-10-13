@@ -1,4 +1,4 @@
-import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome } from "react-icons/fi";
+import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiDownload } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
 
 export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
@@ -18,6 +18,11 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
             month: 'long',
             day: 'numeric'
         });
+    };
+
+    const handleExportPdf = () => {
+        // Abrir la URL de exportación en una nueva pestaña
+        window.open(`/crm/cotizaciones/${cotizacion.id}/export-pdf`, '_blank');
     };
 
     return (
@@ -295,14 +300,21 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                 </div>
 
                 {/* Footer */}
-                <div className={`px-6 py-4 border-t flex justify-end ${
+                <div className={`px-6 py-4 border-t flex justify-between items-center ${
                     isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-gray-50'
                 }`}>
                     <button
+                        onClick={handleExportPdf}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                    >
+                        <FiDownload className="w-4 h-4" />
+                        Exportar a PDF
+                    </button>
+                    <button
                         onClick={onClose}
                         className={`px-4 py-2 rounded-lg font-medium ${
-                            isDarkMode 
-                                ? 'bg-gray-700 text-white hover:bg-gray-600' 
+                            isDarkMode
+                                ? 'bg-gray-700 text-white hover:bg-gray-600'
                                 : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                         }`}
                     >

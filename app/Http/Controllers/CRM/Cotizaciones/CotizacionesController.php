@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CotizacionesController extends Controller
 {
@@ -617,6 +618,105 @@ class CotizacionesController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'Error al obtener estadísticas',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Exportar cotización a PDF
+     */
+    public function exportPdf($id)
+    {
+        try {
+            $cotizacion = Cotizacion::with([
+                'vendedor:id_usuario,nombre,apellido,correo',
+                'miEmpresa:id,nombre,ruc,email,telefono,imagen_logo,imagen_firma',
+                'detallesProductos.producto',
+                'detallesAdicionales'
+            ])->findOrFail($id);
+
+            // Cargar información del cliente
+            if ($cotizacion->cliente_tipo === 'empresa') {
+                $cliente = EmpresaCliente::find($cotizacion->cliente_id);
+                $cotizacion->cliente = (object)[
+                    'tipo' => 'empresa',
+                    'nombre' => $cliente->razon_social ?? 'N/A',
+                    'contacto' => $cliente->contacto_principal ?? 'N/A',
+                    'email' => $cliente->email ?? 'N/A',
+                    'telefono' => $cliente->telefono ?? 'N/A',
+                    'direccion' => $cliente->direccion ?? 'N/A',
+                    'ruc' => $cliente->ruc ?? 'N/A',
+                ];
+            } else {
+                $cliente = Cliente::find($cotizacion->cliente_id);
+                $cotizacion->cliente = (object)[
+                    'tipo' => 'particular',
+                    'nombre' => $cliente->nombrecompleto ?? 'N/A',
+                    'contacto' => $cliente->nombrecompleto ?? 'N/A',
+                    'email' => $cliente->email ?? 'N/A',
+                    'telefono' => $cliente->telefono ?? 'N/A',
+                    'direccion' => $cliente->direccion ?? 'N/A',
+                    'ruc_dni' => $cliente->ruc_dni ?? 'N/A',
+                ];
+            }
+
+            // Cargar detalles de productos con imágenes y especificaciones
+            $productos = $cotizacion->detallesProductos->map(function ($detalle) {
+                $producto = $detalle->producto;
+                $imagen = null;
+                $especificaciones = [];
+
+                if ($producto) {
+                    // Obtener la primera imagen del producto
+                    if (is_array($producto->imagen) && count($producto->imagen) > 0) {
+                        $imagen = asset('storage/' . $producto->imagen[0]);
+                    } elseif (is_string($producto->imagen)) {
+                        $imagen = asset('storage/' . $producto->imagen);
+                    }
+
+                    // Obtener especificaciones técnicas
+                    if ($producto->especificaciones_tecnicas) {
+                        $especificaciones = is_string($producto->especificaciones_tecnicas)
+                            ? json_decode($producto->especificaciones_tecnicas, true)
+                            : $producto->especificaciones_tecnicas;
+                    }
+                }
+
+                return [
+                    'nombre' => $detalle->nombre,
+                    'descripcion' => $producto->descripcion ?? $detalle->descripcion,
+                    'cantidad' => $detalle->cantidad,
+                    'precio_unitario' => $detalle->precio_unitario,
+                    'subtotal' => $detalle->subtotal,
+                    'imagen' => $imagen,
+                    'especificaciones' => $especificaciones,
+                ];
+            });
+
+            // Preparar datos para el PDF
+            $data = [
+                'cotizacion' => $cotizacion,
+                'productos' => $productos,
+                'productos_adicionales' => $cotizacion->detallesAdicionales,
+                'empresa' => $cotizacion->miEmpresa,
+                'cliente' => $cotizacion->cliente,
+                'vendedor' => $cotizacion->vendedor,
+            ];
+
+            // Generar el PDF
+            $pdf = Pdf::loadView('pdf.cotizacion', $data);
+            $pdf->setPaper('a4', 'portrait');
+
+            // Nombre del archivo
+            $filename = 'Cotizacion_' . $cotizacion->numero . '.pdf';
+
+            return $pdf->download($filename);
+        } catch (\Exception $e) {
+            Log::error('Error al exportar cotización a PDF: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al exportar cotización',
                 'message' => $e->getMessage()
             ], 500);
         }
