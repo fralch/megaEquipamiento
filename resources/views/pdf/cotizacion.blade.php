@@ -77,7 +77,7 @@
             padding: 0 0;
         }
         .content {
-            padding: 86px 0 70px 0; /* deja espacio para header/footer fijos */
+            padding: 86px 10mm 70px 10mm; /* deja espacio para header/footer fijos y agrega margen lateral */
         }
 
         /* Título de cotización */
@@ -147,11 +147,18 @@
             width: 80px;
             vertical-align: top;
             padding-right: 10px;
+            text-align: center; /* centra el contenido dentro de la celda */
+            height: 70px; /* fija alto del contenedor para centrar */
         }
         .producto-imagen img {
-            width: 70px;
-            height: 70px;
-            object-fit: cover;
+            max-width: 70px;
+            max-height: 70px;
+            width: auto;
+            height: auto;
+            object-fit: contain; /* mantiene proporciones sin recortar */
+            background: #ffffff; /* mejora visibilidad en imágenes con transparencia */
+            display: block;
+            margin: 0 auto; /* centra la imagen */
             border: 1px solid #e5e7eb;
             border-radius: 4px;
         }
