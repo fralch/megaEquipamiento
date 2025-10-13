@@ -1,5 +1,5 @@
 import { Head, router } from "@inertiajs/react";
-import { FiBarChart, FiEdit, FiTrash2, FiPlus, FiEye, FiSearch, FiDownload, FiSend, FiClock, FiUser, FiCalendar } from "react-icons/fi";
+import { FiBarChart, FiEdit, FiTrash2, FiPlus, FiEye, FiSearch, FiDownload, FiSend, FiClock, FiUser, FiCalendar, FiRefreshCw, FiX } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import { useState, useEffect } from 'react';
 import CRMLayout from '../CRMLayout';
@@ -23,6 +23,9 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         aprobadas: 0,
     });
     const [loading, setLoading] = useState(false);
+    const [showEstadoModal, setShowEstadoModal] = useState(false);
+    const [cotizacionToChangeEstado, setCotizacionToChangeEstado] = useState(null);
+    const [newEstado, setNewEstado] = useState('');
 
     // Cargar estadísticas
     useEffect(() => {
@@ -130,6 +133,40 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         closeModal();
         fetchCotizaciones();
         fetchEstadisticas();
+    };
+
+    const handleChangeEstado = (cotizacion) => {
+        setCotizacionToChangeEstado(cotizacion);
+        setNewEstado(cotizacion.estado);
+        setShowEstadoModal(true);
+    };
+
+    const handleConfirmChangeEstado = async () => {
+        if (!cotizacionToChangeEstado || !newEstado) return;
+
+        try {
+            const response = await axios.post(`/crm/cotizaciones/${cotizacionToChangeEstado.id}/cambiar-estado`, {
+                estado: newEstado
+            });
+
+            if (response.data.success) {
+                fetchCotizaciones();
+                fetchEstadisticas();
+                setShowEstadoModal(false);
+                setCotizacionToChangeEstado(null);
+                setNewEstado('');
+                alert('Estado actualizado exitosamente');
+            }
+        } catch (error) {
+            console.error('Error al cambiar estado:', error);
+            alert('Error al cambiar estado de la cotización');
+        }
+    };
+
+    const handleCancelChangeEstado = () => {
+        setShowEstadoModal(false);
+        setCotizacionToChangeEstado(null);
+        setNewEstado('');
     };
 
     const getEstadoInfo = (estado) => {
@@ -394,6 +431,13 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                                                         <FiEdit className="w-4 h-4" />
                                                                     </button>
                                                                     <button
+                                                                        onClick={() => handleChangeEstado(cotizacion)}
+                                                                        className="p-1 rounded hover:bg-green-100 text-green-600 transition-colors duration-200"
+                                                                        title="Cambiar estado"
+                                                                    >
+                                                                        <FiRefreshCw className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
                                                                         onClick={() => handleDelete(cotizacion.id)}
                                                                         className="p-1 rounded hover:bg-red-100 text-red-600 transition-colors duration-200"
                                                                         title="Eliminar"
@@ -456,6 +500,82 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                         onClose={closeModal}
                         onSave={handleSaveSuccess}
                     />
+                )}
+
+                {/* Modal para cambiar estado */}
+                {showEstadoModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className={`w-full max-w-md rounded-xl shadow-2xl ${
+                            isDarkMode ? 'bg-gray-900 border border-gray-700' : 'bg-white border border-gray-200'
+                        }`}>
+                            {/* Header */}
+                            <div className={`px-6 py-4 border-b flex items-center justify-between ${
+                                isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                            }`}>
+                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Cambiar Estado
+                                </h3>
+                                <button
+                                    onClick={handleCancelChangeEstado}
+                                    className={`p-2 rounded-lg hover:bg-gray-100 ${
+                                        isDarkMode ? 'hover:bg-gray-800 text-gray-400' : 'text-gray-500'
+                                    }`}
+                                >
+                                    <FiX className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            {/* Content */}
+                            <div className="p-6">
+                                <p className={`text-sm mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    Cambiar estado de la cotización <strong>{cotizacionToChangeEstado?.numero}</strong>
+                                </p>
+
+                                <div className="mb-6">
+                                    <label className={`block text-sm font-medium mb-2 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        Nuevo Estado
+                                    </label>
+                                    <select
+                                        value={newEstado}
+                                        onChange={(e) => setNewEstado(e.target.value)}
+                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                            isDarkMode
+                                                ? 'bg-gray-800 border-gray-600 text-white'
+                                                : 'bg-white border-gray-300 text-gray-900'
+                                        }`}
+                                    >
+                                        <option value="pendiente">Pendiente</option>
+                                        <option value="enviada">Enviada</option>
+                                        <option value="aprobada">Aprobada</option>
+                                        <option value="rechazada">Rechazada</option>
+                                        <option value="negociacion">En Negociación</option>
+                                    </select>
+                                </div>
+
+                                {/* Actions */}
+                                <div className="flex gap-3 justify-end">
+                                    <button
+                                        onClick={handleCancelChangeEstado}
+                                        className={`px-4 py-2 rounded-lg border transition-colors duration-200 ${
+                                            isDarkMode
+                                                ? 'border-gray-600 text-gray-300 hover:bg-gray-800'
+                                                : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        onClick={handleConfirmChangeEstado}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                                    >
+                                        Confirmar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 )}
             </CRMLayout>
         </>
