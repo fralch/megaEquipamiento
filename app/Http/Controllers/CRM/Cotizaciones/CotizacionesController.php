@@ -663,12 +663,13 @@ class CotizacionesController extends Controller
                 ];
             }
 
-            // Cargar detalles de productos con especificaciones
+            // Cargar detalles de productos con especificaciones e imágenes
             $productos = $cotizacion->detallesProductos->map(function ($detalle) {
                 $producto = $detalle->producto;
                 $especificaciones = [];
                 $sku = null;
                 $descripcion = $detalle->descripcion;
+                $imagen = null;
 
                 if ($producto) {
                     // Obtener SKU del producto
@@ -676,6 +677,33 @@ class CotizacionesController extends Controller
 
                     // Usar descripción del producto si existe, sino la del detalle
                     $descripcion = $producto->descripcion ?? $detalle->descripcion;
+
+                    // Obtener imagen principal del producto
+                    if ($producto->imagen) {
+                        $imagenes = is_string($producto->imagen) 
+                            ? json_decode($producto->imagen, true) 
+                            : $producto->imagen;
+                        
+                        if (is_array($imagenes) && !empty($imagenes)) {
+                            // Tomar la primera imagen
+                            $primeraImagen = $imagenes[0];
+                            
+                            // Si la imagen es una URL completa, usarla directamente
+                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                                $imagen = $primeraImagen;
+                            } else {
+                                // Si es una ruta relativa, construir la URL completa
+                                $imagen = url($primeraImagen);
+                            }
+                        } elseif (is_string($imagenes) && !empty($imagenes)) {
+                            // Manejar caso donde imagen es un string simple
+                            if (filter_var($imagenes, FILTER_VALIDATE_URL)) {
+                                $imagen = $imagenes;
+                            } else {
+                                $imagen = url($imagenes);
+                            }
+                        }
+                    }
 
                     // Obtener especificaciones técnicas
                     if ($producto->especificaciones_tecnicas) {
@@ -707,6 +735,7 @@ class CotizacionesController extends Controller
                     'precio_unitario' => $detalle->precio_unitario,
                     'subtotal' => $detalle->subtotal,
                     'especificaciones' => $especificaciones,
+                    'imagen' => $imagen, // Agregar imagen del producto
                 ];
             });
 

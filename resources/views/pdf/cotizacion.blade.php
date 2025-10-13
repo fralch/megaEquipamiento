@@ -138,6 +138,26 @@
             margin-bottom: 10px;
             background: #ffffff;
             page-break-inside: avoid;
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+        .producto-imagen {
+            display: table-cell;
+            width: 80px;
+            vertical-align: top;
+            padding-right: 10px;
+        }
+        .producto-imagen img {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+        }
+        .producto-contenido {
+            display: table-cell;
+            vertical-align: top;
         }
         .producto-header { margin-bottom: 8px; }
         .producto-nombre { font-size: 12px; font-weight: bold; color: #111827; margin-bottom: 4px; }
@@ -396,53 +416,67 @@
 
                 @foreach($productos as $producto)
                     <div class="producto">
-                        <div class="producto-header">
-                            <div class="producto-nombre">
-                                {{ $producto['nombre'] }}
-                                @if(!empty($producto['sku']))
-                                    <span class="producto-sku"> (SKU: {{ $producto['sku'] }})</span>
-                                @endif
-                            </div>
-
-                            @if(!empty($producto['descripcion']))
-                                <div class="producto-desc">{{ $producto['descripcion'] }}</div>
+                        {{-- Imagen del producto --}}
+                        <div class="producto-imagen">
+                            @if(!empty($producto['imagen']))
+                                <img src="{{ $producto['imagen'] }}" alt="{{ $producto['nombre'] }}" onerror="this.style.display='none'">
+                            @else
+                                <div style="width: 70px; height: 70px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 8px; text-align: center;">
+                                    Sin imagen
+                                </div>
                             @endif
-
-                            <div class="producto-precios">
-                                <span class="precio-chip">
-                                    <span class="precio-label">Cantidad: </span>
-                                    <span class="precio-value">{{ $producto['cantidad'] }}</span>
-                                </span>
-                                <span class="precio-chip">
-                                    <span class="precio-label">Precio Unit.: </span>
-                                    <span class="precio-value">
-                                        {{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }}
-                                        {{ number_format((float) $producto['precio_unitario'], 2, '.', ',') }}
-                                    </span>
-                                </span>
-                                <span class="precio-chip">
-                                    <span class="precio-label">Subtotal: </span>
-                                    <span class="precio-value">
-                                        {{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }}
-                                        {{ number_format((float) $producto['subtotal'], 2, '.', ',') }}
-                                    </span>
-                                </span>
-                            </div>
                         </div>
 
-                        @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']))
-                            <div class="especificaciones">
-                                <h4>Especificaciones Técnicas</h4>
-                                <table class="spec-table">
-                                    @foreach($producto['especificaciones'] as $key => $value)
-                                        <tr>
-                                            <td>{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
-                                            <td>{{ $value }}</td>
-                                        </tr>
-                                    @endforeach
-                                </table>
+                        {{-- Contenido del producto --}}
+                        <div class="producto-contenido">
+                            <div class="producto-header">
+                                <div class="producto-nombre">
+                                    {{ $producto['nombre'] }}
+                                    @if(!empty($producto['sku']))
+                                        <span class="producto-sku"> (SKU: {{ $producto['sku'] }})</span>
+                                    @endif
+                                </div>
+
+                                @if(!empty($producto['descripcion']))
+                                    <div class="producto-desc">{{ $producto['descripcion'] }}</div>
+                                @endif
+
+                                <div class="producto-precios">
+                                    <span class="precio-chip">
+                                        <span class="precio-label">Cantidad: </span>
+                                        <span class="precio-value">{{ $producto['cantidad'] }}</span>
+                                    </span>
+                                    <span class="precio-chip">
+                                        <span class="precio-label">Precio Unit.: </span>
+                                        <span class="precio-value">
+                                            {{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }}
+                                            {{ number_format((float) $producto['precio_unitario'], 2, '.', ',') }}
+                                        </span>
+                                    </span>
+                                    <span class="precio-chip">
+                                        <span class="precio-label">Subtotal: </span>
+                                        <span class="precio-value">
+                                            {{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }}
+                                            {{ number_format((float) $producto['subtotal'], 2, '.', ',') }}
+                                        </span>
+                                    </span>
+                                </div>
                             </div>
-                        @endif
+
+                            @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']))
+                                <div class="especificaciones">
+                                    <h4>Especificaciones Técnicas</h4>
+                                    <table class="spec-table">
+                                        @foreach($producto['especificaciones'] as $key => $value)
+                                            <tr>
+                                                <td>{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
+                                                <td>{{ $value }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </table>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 @endforeach
             </div>
