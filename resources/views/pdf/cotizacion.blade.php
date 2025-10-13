@@ -369,15 +369,10 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header con Logo y Empresa -->
+        <!-- Header con Empresa (sin logo por compatibilidad) -->
         <div class="header">
             <div class="header-content">
-                <div class="logo-section">
-                    @if($empresa && $empresa->imagen_logo)
-                        <img src="{{ public_path($empresa->imagen_logo) }}" alt="Logo {{ $empresa->nombre }}">
-                    @endif
-                </div>
-                <div class="empresa-info">
+                <div class="empresa-info" style="width: 100%; text-align: center;">
                     <div class="empresa-nombre">{{ $empresa->nombre ?? 'N/A' }}</div>
                     <div class="empresa-datos">
                         @if($empresa)
@@ -465,11 +460,11 @@
                     <h3>VENDEDOR</h3>
                     <div class="info-row">
                         <span class="info-label">Nombre:</span>
-                        <span class="info-value">{{ $vendedor->nombre }} {{ $vendedor->apellido }}</span>
+                        <span class="info-value">{{ $vendedor->nombre ?? 'N/A' }}</span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Email:</span>
-                        <span class="info-value">{{ $vendedor->correo }}</span>
+                        <span class="info-value">{{ $vendedor->correo ?? 'N/A' }}</span>
                     </div>
                 </div>
             </div>
@@ -482,13 +477,13 @@
             @foreach($productos as $producto)
                 <div class="producto-item">
                     <div class="producto-header">
-                        @if($producto['imagen'])
-                            <div class="producto-imagen">
-                                <img src="{{ $producto['imagen'] }}" alt="{{ $producto['nombre'] }}">
+                        <div class="producto-info" style="width: 100%;">
+                            <div class="producto-nombre">
+                                {{ $producto['nombre'] }}
+                                @if($producto['sku'])
+                                    <span style="color: #6b7280; font-size: 11px; font-weight: normal;"> (SKU: {{ $producto['sku'] }})</span>
+                                @endif
                             </div>
-                        @endif
-                        <div class="producto-info">
-                            <div class="producto-nombre">{{ $producto['nombre'] }}</div>
                             @if($producto['descripcion'])
                                 <div class="producto-descripcion">{{ $producto['descripcion'] }}</div>
                             @endif
@@ -499,27 +494,25 @@
                                 </div>
                                 <div class="precio-item">
                                     <span class="precio-label">Precio Unit.:</span>
-                                    <span class="precio-value">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format($producto['precio_unitario'], 2) }}</span>
+                                    <span class="precio-value">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float)$producto['precio_unitario'], 2, '.', ',') }}</span>
                                 </div>
                                 <div class="precio-item">
                                     <span class="precio-label">Subtotal:</span>
-                                    <span class="precio-value">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format($producto['subtotal'], 2) }}</span>
+                                    <span class="precio-value">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float)$producto['subtotal'], 2, '.', ',') }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']))
+                    @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']) && count($producto['especificaciones']) > 0)
                         <div class="especificaciones">
                             <h4>Especificaciones Técnicas:</h4>
                             <table>
                                 @foreach($producto['especificaciones'] as $key => $value)
-                                    @if(!is_array($value))
-                                        <tr>
-                                            <td>{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
-                                            <td>{{ $value }}</td>
-                                        </tr>
-                                    @endif
+                                    <tr>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
+                                        <td>{{ $value }}</td>
+                                    </tr>
                                 @endforeach
                             </table>
                         </div>
@@ -546,8 +539,8 @@
                             <tr>
                                 <td>{{ $adicional->nombre }}</td>
                                 <td class="text-center">{{ $adicional->cantidad }}</td>
-                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format($adicional->precio_unitario, 2) }}</td>
-                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format($adicional->subtotal, 2) }}</td>
+                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float)$adicional->precio_unitario, 2, '.', ',') }}</td>
+                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float)$adicional->subtotal, 2, '.', ',') }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -562,17 +555,17 @@
                 <div class="totales-right">
                     <div class="total-row">
                         <div class="total-label">Subtotal Productos:</div>
-                        <div class="total-value">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format($cotizacion->total_monto_productos, 2) }}</div>
+                        <div class="total-value">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float)$cotizacion->total_monto_productos, 2, '.', ',') }}</div>
                     </div>
                     @if($cotizacion->total_adicionales_monto > 0)
                         <div class="total-row">
                             <div class="total-label">Subtotal Adicionales:</div>
-                            <div class="total-value">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format($cotizacion->total_adicionales_monto, 2) }}</div>
+                            <div class="total-value">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float)$cotizacion->total_adicionales_monto, 2, '.', ',') }}</div>
                         </div>
                     @endif
                     <div class="total-row total-final">
                         <div class="total-label">TOTAL:</div>
-                        <div class="total-value">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format($cotizacion->total, 2) }}</div>
+                        <div class="total-value">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float)$cotizacion->total, 2, '.', ',') }}</div>
                     </div>
                 </div>
             </div>
@@ -619,21 +612,12 @@
             </div>
         @endif
 
-        <!-- Firma -->
-        @if($empresa && $empresa->imagen_firma)
-            <div class="firma-section">
-                <img class="firma-imagen" src="{{ public_path($empresa->imagen_firma) }}" alt="Firma">
-                <div class="firma-linea"></div>
-                <div class="firma-nombre">{{ $vendedor->nombre }} {{ $vendedor->apellido }}</div>
-                <div class="firma-cargo">{{ $empresa->nombre }}</div>
-            </div>
-        @else
-            <div class="firma-section">
-                <div class="firma-linea"></div>
-                <div class="firma-nombre">{{ $vendedor->nombre }} {{ $vendedor->apellido }}</div>
-                <div class="firma-cargo">{{ $empresa->nombre ?? 'Vendedor' }}</div>
-            </div>
-        @endif
+        <!-- Firma (sin imagen por compatibilidad) -->
+        <div class="firma-section">
+            <div class="firma-linea"></div>
+            <div class="firma-nombre">{{ $vendedor->nombre ?? 'N/A' }}</div>
+            <div class="firma-cargo">{{ $empresa->nombre ?? 'Vendedor' }}</div>
+        </div>
 
         <!-- Footer -->
         <div class="footer">

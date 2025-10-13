@@ -38,19 +38,26 @@ Se ha implementado la funcionalidad de exportación de cotizaciones a PDF con la
 
 ## Requisitos de Sistema
 
-### Extensiones PHP Necesarias
+### ⚠️ IMPORTANTE: Extensiones PHP Necesarias
 
-Para que funcione correctamente, necesitas instalar las siguientes extensiones de PHP:
+Para que funcione correctamente, **DEBES** instalar las siguientes extensiones de PHP:
 
-#### En Ubuntu/Debian/WSL:
+#### 🐧 En Ubuntu/Debian/WSL (Recomendado):
 ```bash
+# Instalar todas las extensiones necesarias
 sudo apt-get update
-sudo apt-get install php8.2-xml php8.2-dom php8.2-simplexml php8.2-gd
+sudo apt-get install -y php8.2-xml php8.2-dom php8.2-simplexml php8.2-gd php8.2-mbstring
+
+# Reiniciar PHP-FPM (si usas Nginx)
+sudo service php8.2-fpm restart
+
+# O reiniciar Apache (si usas Apache)
+sudo service apache2 restart
 ```
 
-#### En Windows (XAMPP/WAMP):
-1. Abrir `php.ini`
-2. Descomentar (quitar `;` al inicio):
+#### 🪟 En Windows (XAMPP/WAMP/Laragon):
+1. Abrir el archivo `php.ini` (buscar en XAMPP: `C:\xampp\php\php.ini`)
+2. Buscar y descomentar (quitar `;` al inicio de estas líneas):
    ```ini
    extension=dom
    extension=xml
@@ -58,21 +65,38 @@ sudo apt-get install php8.2-xml php8.2-dom php8.2-simplexml php8.2-gd
    extension=xmlwriter
    extension=simplexml
    extension=gd
+   extension=mbstring
    ```
-3. Reiniciar servidor Apache
+3. Guardar el archivo
+4. Reiniciar el servidor Apache desde el panel de control de XAMPP
 
-#### Verificar extensiones instaladas:
+#### ✅ Verificar que las extensiones están instaladas:
 ```bash
-php -m | grep -E 'dom|xml|simplexml'
+php -m | grep -E 'dom|xml|simplexml|gd'
 ```
 
-### Librería Instalada
+Deberías ver algo como:
+```
+dom
+SimpleXML
+xml
+xmlreader
+xmlwriter
+gd
+```
+
+### 📦 Librería Instalada
 
 **barryvdh/laravel-dompdf** - Ya agregada al `composer.json`
 
-Para finalizar la instalación:
+#### Finalizar instalación:
 ```bash
+# Si aún no has instalado las dependencias
 composer install
+
+# Si ya las instalaste pero agregaste las extensiones después
+php artisan config:clear
+php artisan cache:clear
 ```
 
 ## Uso
@@ -142,27 +166,70 @@ Editar `/resources/views/pdf/cotizacion.blade.php` sección `<style>`
 ### Cambiar información mostrada:
 Modificar método `exportPdf()` en `CotizacionesController.php`
 
-## Solución de Problemas
+## 🚨 Solución de Problemas
 
-### Error: "Class 'DOMDocument' not found"
-**Solución**: Instalar extensión PHP dom
+### Error: "The PHP GD extension is required, but is not installed"
+**Este es el error más común**
+
+**Solución en WSL/Ubuntu:**
 ```bash
-sudo apt-get install php8.2-dom
+# Instalar la extensión GD
+sudo apt-get update
+sudo apt-get install -y php8.2-gd
+
+# Verificar instalación
+php -m | grep gd
+
+# Reiniciar servidor
+php artisan serve
 ```
 
-### Las imágenes no aparecen
-**Solución**:
+**Solución en Windows (XAMPP):**
+1. Abrir `C:\xampp\php\php.ini`
+2. Buscar `;extension=gd` (tiene punto y coma al inicio)
+3. Quitar el `;` para que quede: `extension=gd`
+4. Guardar y cerrar
+5. Reiniciar Apache desde el panel de XAMPP
+
+### Error: "Class 'DOMDocument' not found"
+**Solución**: Instalar extensiones PHP dom y xml
+```bash
+sudo apt-get install -y php8.2-dom php8.2-xml
+```
+
+### Las imágenes no aparecen en el PDF
+**Posibles soluciones**:
 1. Verificar que las rutas en BD sean correctas
 2. Verificar permisos de carpetas: `chmod 755 public/img/empresas/*`
-3. Usar `public_path()` en lugar de `asset()` en el template Blade
+3. Las imágenes deben estar en `public/storage/` (ejecutar `php artisan storage:link`)
 
 ### PDF se descarga corrupto
 **Solución**:
 1. Verificar que no haya salida antes de `return $pdf->download()`
 2. Revisar logs: `storage/logs/laravel.log`
+3. Limpiar cache: `php artisan cache:clear && php artisan config:clear`
 
-### Texto con caracteres extraños
-**Solución**: Asegurar que el template use `<meta charset="UTF-8">`
+### Texto con caracteres extraños (ñ, tildes, etc.)
+**Solución**: Ya está configurado con `<meta charset="UTF-8">` en el template
+
+### ⚡ Solución Rápida (Todo en uno para WSL/Ubuntu)
+```bash
+# Instalar TODAS las extensiones necesarias de una vez
+sudo apt-get update && sudo apt-get install -y \
+  php8.2-xml \
+  php8.2-dom \
+  php8.2-simplexml \
+  php8.2-gd \
+  php8.2-mbstring
+
+# Limpiar cache de Laravel
+php artisan config:clear
+php artisan cache:clear
+
+# Reiniciar servidor
+# Ctrl+C para detener el servidor actual, luego:
+php artisan serve
+```
 
 ## Mejoras Futuras (Opcionales)
 

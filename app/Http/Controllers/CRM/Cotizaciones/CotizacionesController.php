@@ -343,12 +343,14 @@ class CotizacionesController extends Controller
             }
 
             // Mapear nombre del vendedor
+            $vendedorData = null;
             if ($cotizacion->vendedor) {
-                $cotizacion->vendedor = (object)[
+                $vendedorData = (object)[
                     'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
                     'correo' => $cotizacion->vendedor->correo ?? '',
                 ];
             }
+            $cotizacion->vendedor_data = $vendedorData;
 
             // Mapear nombre de mi empresa
             if ($cotizacion->miEmpresa) {
@@ -661,38 +663,61 @@ class CotizacionesController extends Controller
                 ];
             }
 
-            // Cargar detalles de productos con imágenes y especificaciones
+            // Cargar detalles de productos con especificaciones
             $productos = $cotizacion->detallesProductos->map(function ($detalle) {
                 $producto = $detalle->producto;
-                $imagen = null;
                 $especificaciones = [];
+                $sku = null;
+                $descripcion = $detalle->descripcion;
 
                 if ($producto) {
-                    // Obtener la primera imagen del producto
-                    if (is_array($producto->imagen) && count($producto->imagen) > 0) {
-                        $imagen = asset('storage/' . $producto->imagen[0]);
-                    } elseif (is_string($producto->imagen)) {
-                        $imagen = asset('storage/' . $producto->imagen);
-                    }
+                    // Obtener SKU del producto
+                    $sku = $producto->sku ?? null;
+
+                    // Usar descripción del producto si existe, sino la del detalle
+                    $descripcion = $producto->descripcion ?? $detalle->descripcion;
 
                     // Obtener especificaciones técnicas
                     if ($producto->especificaciones_tecnicas) {
-                        $especificaciones = is_string($producto->especificaciones_tecnicas)
+                        $especificacionesRaw = is_string($producto->especificaciones_tecnicas)
                             ? json_decode($producto->especificaciones_tecnicas, true)
                             : $producto->especificaciones_tecnicas;
+
+                        // Filtrar solo valores simples (no arrays ni objetos)
+                        if (is_array($especificacionesRaw)) {
+                            foreach ($especificacionesRaw as $key => $value) {
+                                if (!is_array($value) && !is_object($value) && $value !== null && $value !== '') {
+                                    $especificaciones[$key] = $value;
+                                }
+                            }
+                        }
                     }
+                }
+
+                // Limitar longitud de descripción para PDF
+                if ($descripcion && strlen($descripcion) > 500) {
+                    $descripcion = substr($descripcion, 0, 500) . '...';
                 }
 
                 return [
                     'nombre' => $detalle->nombre,
-                    'descripcion' => $producto->descripcion ?? $detalle->descripcion,
+                    'sku' => $sku,
+                    'descripcion' => $descripcion,
                     'cantidad' => $detalle->cantidad,
                     'precio_unitario' => $detalle->precio_unitario,
                     'subtotal' => $detalle->subtotal,
-                    'imagen' => $imagen,
                     'especificaciones' => $especificaciones,
                 ];
             });
+
+            // Preparar vendedor
+            $vendedor = null;
+            if ($cotizacion->vendedor) {
+                $vendedor = (object)[
+                    'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
+                    'correo' => $cotizacion->vendedor->correo ?? '',
+                ];
+            }
 
             // Preparar datos para el PDF
             $data = [
@@ -701,7 +726,7 @@ class CotizacionesController extends Controller
                 'productos_adicionales' => $cotizacion->detallesAdicionales,
                 'empresa' => $cotizacion->miEmpresa,
                 'cliente' => $cotizacion->cliente,
-                'vendedor' => $cotizacion->vendedor,
+                'vendedor' => $vendedor,
             ];
 
             // Generar el PDF
