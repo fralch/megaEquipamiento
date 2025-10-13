@@ -5,29 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotización {{ $cotizacion->numero }}</title>
     <style>
+        /* Configuración para página A4 vertical */
+        @page {
+            size: A4 portrait;
+            margin: 15mm 10mm 15mm 10mm;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+        
         body {
             font-family: Arial, sans-serif;
-            font-size: 11px;
+            font-size: 10px;
             color: #333;
-            line-height: 1.4;
+            line-height: 1.3;
+            width: 210mm;
+            min-height: 297mm;
         }
+        
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 190mm; /* Ajustado para A4 con márgenes */
             margin: 0 auto;
-            padding: 20px;
+            padding: 5mm;
         }
 
         /* Header con logo y empresa */
         .header {
-            border-bottom: 3px solid #2563eb;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            border-bottom: 2px solid #2563eb;
+            padding-bottom: 10mm;
+            margin-bottom: 15mm;
         }
         .header-content {
             display: table;
@@ -39,8 +49,8 @@
             vertical-align: middle;
         }
         .logo-section img {
-            max-width: 150px;
-            max-height: 80px;
+            max-width: 120px;
+            max-height: 60px;
             object-fit: contain;
         }
         .empresa-info {
@@ -50,15 +60,15 @@
             vertical-align: middle;
         }
         .empresa-nombre {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #1f2937;
-            margin-bottom: 5px;
+            margin-bottom: 3mm;
         }
         .empresa-datos {
-            font-size: 10px;
+            font-size: 9px;
             color: #6b7280;
-            line-height: 1.6;
+            line-height: 1.4;
         }
 
         /* Título de cotización */
@@ -66,48 +76,48 @@
             text-align: center;
             background: #2563eb;
             color: white;
-            padding: 10px;
-            margin: 20px 0;
-            font-size: 16px;
+            padding: 8mm;
+            margin: 15mm 0;
+            font-size: 14px;
             font-weight: bold;
-            border-radius: 5px;
+            border-radius: 3px;
         }
 
         /* Información en dos columnas */
         .info-grid {
             display: table;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 15mm;
         }
         .info-column {
             display: table-cell;
             width: 50%;
             vertical-align: top;
-            padding: 0 10px;
+            padding: 0 5mm;
         }
         .info-box {
             background: #f3f4f6;
             border: 1px solid #e5e7eb;
-            border-radius: 5px;
-            padding: 12px;
-            margin-bottom: 10px;
+            border-radius: 3px;
+            padding: 8mm;
+            margin-bottom: 8mm;
         }
         .info-box h3 {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             color: #1f2937;
-            margin-bottom: 8px;
+            margin-bottom: 6mm;
             border-bottom: 1px solid #d1d5db;
-            padding-bottom: 4px;
+            padding-bottom: 3mm;
         }
         .info-row {
-            margin-bottom: 5px;
+            margin-bottom: 3mm;
         }
         .info-label {
             font-weight: bold;
             color: #4b5563;
             display: inline-block;
-            width: 100px;
+            width: 80px;
         }
         .info-value {
             color: #1f2937;
@@ -115,42 +125,42 @@
 
         /* Tabla de productos */
         .productos-section {
-            margin: 20px 0;
+            margin: 15mm 0;
         }
         .section-title {
             background: #3b82f6;
             color: white;
-            padding: 8px 12px;
-            font-size: 13px;
+            padding: 6mm 8mm;
+            font-size: 12px;
             font-weight: bold;
-            margin-bottom: 10px;
-            border-radius: 3px;
+            margin-bottom: 8mm;
+            border-radius: 2px;
         }
 
         .producto-item {
             border: 1px solid #e5e7eb;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 15px;
+            border-radius: 3px;
+            padding: 10mm;
+            margin-bottom: 10mm;
             background: white;
             page-break-inside: avoid;
         }
         .producto-header {
             display: table;
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 8mm;
         }
         .producto-imagen {
             display: table-cell;
-            width: 120px;
+            width: 100px;
             vertical-align: top;
-            padding-right: 15px;
+            padding-right: 10mm;
         }
         .producto-imagen img {
-            max-width: 100px;
-            max-height: 100px;
+            max-width: 80px;
+            max-height: 80px;
             border: 1px solid #e5e7eb;
-            border-radius: 5px;
+            border-radius: 3px;
             object-fit: contain;
         }
         .producto-info {
@@ -158,27 +168,27 @@
             vertical-align: top;
         }
         .producto-nombre {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
             color: #1f2937;
-            margin-bottom: 5px;
+            margin-bottom: 3mm;
         }
         .producto-descripcion {
-            font-size: 10px;
+            font-size: 9px;
             color: #6b7280;
-            margin-bottom: 8px;
-            line-height: 1.5;
+            margin-bottom: 6mm;
+            line-height: 1.4;
         }
         .producto-precios {
             background: #f9fafb;
-            padding: 8px;
-            border-radius: 3px;
-            margin-top: 8px;
+            padding: 6mm;
+            border-radius: 2px;
+            margin-top: 6mm;
         }
         .precio-item {
             display: inline-block;
-            margin-right: 15px;
-            font-size: 11px;
+            margin-right: 10mm;
+            font-size: 10px;
         }
         .precio-label {
             font-weight: bold;
@@ -190,22 +200,22 @@
 
         /* Especificaciones técnicas */
         .especificaciones {
-            margin-top: 10px;
+            margin-top: 8mm;
             border-top: 1px dashed #d1d5db;
-            padding-top: 10px;
+            padding-top: 8mm;
         }
         .especificaciones h4 {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             color: #374151;
-            margin-bottom: 5px;
+            margin-bottom: 4mm;
         }
         .especificaciones table {
             width: 100%;
-            font-size: 10px;
+            font-size: 9px;
         }
         .especificaciones td {
-            padding: 3px 8px;
+            padding: 2mm 6mm;
             border-bottom: 1px solid #f3f4f6;
         }
         .especificaciones td:first-child {
@@ -221,20 +231,20 @@
         .adicionales-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 8mm;
         }
         .adicionales-table th {
             background: #f3f4f6;
             color: #374151;
-            padding: 8px;
+            padding: 6mm;
             text-align: left;
-            font-size: 11px;
+            font-size: 10px;
             border: 1px solid #e5e7eb;
         }
         .adicionales-table td {
-            padding: 8px;
+            padding: 6mm;
             border: 1px solid #e5e7eb;
-            font-size: 10px;
+            font-size: 9px;
         }
         .text-right {
             text-align: right;
@@ -245,9 +255,10 @@
 
         /* Resumen de totales */
         .totales {
-            margin-top: 20px;
+            margin-top: 15mm;
             border-top: 2px solid #2563eb;
-            padding-top: 15px;
+            padding-top: 10mm;
+            page-break-inside: avoid;
         }
         .totales-grid {
             display: table;
@@ -266,48 +277,49 @@
         .total-row {
             display: table;
             width: 100%;
-            padding: 5px 0;
+            padding: 3mm 0;
         }
         .total-label {
             display: table-cell;
             text-align: right;
-            padding-right: 15px;
-            font-size: 11px;
+            padding-right: 10mm;
+            font-size: 10px;
             color: #4b5563;
         }
         .total-value {
             display: table-cell;
             text-align: right;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             color: #1f2937;
         }
         .total-final {
             background: #2563eb;
             color: white;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
+            padding: 8mm;
+            border-radius: 3px;
+            margin-top: 8mm;
         }
         .total-final .total-label,
         .total-final .total-value {
             color: white;
-            font-size: 14px;
+            font-size: 12px;
         }
 
         /* Condiciones comerciales */
         .condiciones {
-            margin-top: 20px;
+            margin-top: 15mm;
             background: #f9fafb;
             border: 1px solid #e5e7eb;
-            border-radius: 5px;
-            padding: 12px;
+            border-radius: 3px;
+            padding: 8mm;
+            page-break-inside: avoid;
         }
         .condiciones h3 {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             color: #1f2937;
-            margin-bottom: 8px;
+            margin-bottom: 6mm;
         }
         .condiciones-grid {
             display: table;
@@ -320,50 +332,51 @@
             display: table-cell;
             font-weight: bold;
             color: #4b5563;
-            padding: 4px 10px 4px 0;
+            padding: 3mm 8mm 3mm 0;
             width: 30%;
         }
         .condicion-value {
             display: table-cell;
             color: #1f2937;
-            padding: 4px 0;
+            padding: 3mm 0;
         }
 
         /* Firma */
         .firma-section {
-            margin-top: 40px;
+            margin-top: 30mm;
             text-align: center;
             page-break-inside: avoid;
         }
         .firma-imagen {
-            max-width: 200px;
-            max-height: 80px;
-            margin: 0 auto 10px;
+            max-width: 150px;
+            max-height: 60px;
+            margin: 0 auto 8mm;
             object-fit: contain;
         }
         .firma-linea {
             border-top: 2px solid #1f2937;
-            width: 250px;
-            margin: 30px auto 10px;
+            width: 200px;
+            margin: 20mm auto 8mm;
         }
         .firma-nombre {
             font-weight: bold;
             color: #1f2937;
-            margin-bottom: 3px;
+            margin-bottom: 2mm;
         }
         .firma-cargo {
-            font-size: 10px;
+            font-size: 9px;
             color: #6b7280;
         }
 
         /* Footer */
         .footer {
-            margin-top: 30px;
-            padding-top: 15px;
+            margin-top: 20mm;
+            padding-top: 10mm;
             border-top: 1px solid #e5e7eb;
             text-align: center;
-            font-size: 9px;
+            font-size: 8px;
             color: #9ca3af;
+            page-break-inside: avoid;
         }
     </style>
 </head>
