@@ -169,10 +169,20 @@
             display: table-cell;
             vertical-align: top;
         }
-        .producto-header { margin-bottom: 8px; }
+        .producto-header { margin-bottom: 10px; }
         .producto-nombre { font-size: 12px; font-weight: bold; color: #111827; margin-bottom: 4px; }
         .producto-sku { color: #6b7280; font-size: 10px; font-weight: normal; }
-        .producto-desc { font-size: 9px; color: #6b7280; margin-bottom: 8px; }
+        .producto-desc {
+            font-size: 10px;
+            color: #374151;
+            margin: 8px 0;
+            line-height: 1.5;
+            text-align: justify;
+            background: #f9fafb;
+            padding: 8px 10px;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
         .producto-precios {
             background: #f3f4f6;
             border: 1px solid #e5e7eb;
@@ -184,11 +194,44 @@
         .precio-value { color: #111827; }
 
         /* Especificaciones técnicas */
-        .especificaciones { margin-top: 8px; border-top: 1px dashed #d1d5db; padding-top: 8px; }
-        .especificaciones h4 { font-size: 10px; margin: 0 0 6px 0; color: #374151; }
-        .spec-table { width: 100%; border-collapse: collapse; font-size: 9px; }
-        .spec-table td { padding: 4px 6px; border-bottom: 1px solid #f3f4f6; }
-        .spec-table td:first-child { width: 40%; font-weight: bold; color: #4b5563; }
+        .especificaciones {
+            margin-top: 10px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        .especificaciones h4 {
+            font-size: 11px;
+            margin: 0 0 8px 0;
+            color: #111827;
+            font-weight: bold;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #3b82f6;
+        }
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9.5px;
+        }
+        .spec-table td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+        .spec-table tr:last-child td {
+            border-bottom: none;
+        }
+        .spec-table td:first-child {
+            width: 35%;
+            font-weight: bold;
+            color: #374151;
+            background: #f9fafb;
+        }
+        .spec-table td:last-child {
+            color: #1f2937;
+            line-height: 1.4;
+        }
 
         /* Tabla adicionales */
         table.table {
@@ -456,10 +499,6 @@
                                     @endif
                                 </div>
 
-                                @if(!empty($producto['descripcion']))
-                                    <div class="producto-desc">{{ $producto['descripcion'] }}</div>
-                                @endif
-
                                 <div class="producto-precios">
                                     <span class="precio-chip">
                                         <span class="precio-label">Cantidad: </span>
@@ -482,7 +521,16 @@
                                 </div>
                             </div>
 
-                            @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']))
+                            {{-- Descripción completa del producto --}}
+                            @if(!empty($producto['descripcion']))
+                                <div class="producto-desc">
+                                    <strong>Descripción:</strong><br>
+                                    {{ $producto['descripcion'] }}
+                                </div>
+                            @endif
+
+                            {{-- Especificaciones técnicas completas --}}
+                            @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']) && count($producto['especificaciones']) > 0)
                                 <div class="especificaciones">
                                     <h4>Especificaciones Técnicas</h4>
                                     <table class="spec-table">

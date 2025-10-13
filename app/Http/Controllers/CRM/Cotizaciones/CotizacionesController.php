@@ -722,11 +722,6 @@ class CotizacionesController extends Controller
                     }
                 }
 
-                // Limitar longitud de descripción para PDF
-                if ($descripcion && strlen($descripcion) > 500) {
-                    $descripcion = substr($descripcion, 0, 500) . '...';
-                }
-
                 return [
                     'nombre' => $detalle->nombre,
                     'sku' => $sku,
