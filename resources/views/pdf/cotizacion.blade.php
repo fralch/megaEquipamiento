@@ -36,8 +36,6 @@
         .brand-logo {
             display: inline-block;
             padding: 6px 10px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
             background: #ffffff;
         }
         .brand-logo img {
@@ -306,8 +304,6 @@
             width: 60%;
             margin-left: 40%; /* ancla a la derecha */
             text-align: center;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
             padding: 12px 10px 10px 10px;
             background: #ffffff;
         }
@@ -483,7 +479,7 @@
                             @if(!empty($producto['imagen']))
                                 <img src="{{ $producto['imagen'] }}" alt="{{ $producto['nombre'] }}" onerror="this.style.display='none'">
                             @else
-                                <div style="width: 70px; height: 70px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 8px; text-align: center;">
+                                <div style="width: 70px; height: 70px;  display: flex; align-items: center; justify-content: center; color: #9ca3af; font-size: 8px; text-align: center;">
                                     Sin imagen
                                 </div>
                             @endif
@@ -568,7 +564,7 @@
                                     <td class="text-center" style="width: 80px;">
                                         @if(!empty($adicional['imagen']))
                                             <img src="{{ $adicional['imagen'] }}" alt="{{ $adicional['nombre'] }}"
-                                                 style="max-width:70px; max-height:70px; width:auto; height:auto; object-fit:contain; background:#ffffff; border:1px solid #e5e7eb; border-radius:4px; display:block; margin:0 auto;" />
+                                                 style="max-width:70px; max-height:70px; width:auto; height:auto; object-fit:contain; display:block; margin:0 auto;" />
                                         @else
                                             <span style="color:#6b7280;">Sin imagen</span>
                                         @endif
