@@ -8,7 +8,7 @@
         /* Configuración página A4 vertical */
         @page {
             size: A4 portrait;
-            margin: 22mm 14mm 24mm 14mm; /* espacio adicional para header/footer fijos */
+            margin: 25mm 14mm 24mm 14mm; /* espacio adicional para header/footer fijos */
         }
 
         /* Reset básico compatible con motores PDF */
@@ -21,14 +21,11 @@
             line-height: 1.4;
         }
 
-        /* Header fijo (logo destacado) */
+        /* Header (solo primera página) */
         .pdf-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
             height: 70px; /* ~ 18mm */
             padding: 8px 14mm 0 14mm;
+            margin-bottom: 20px;
         }
         .pdf-header .h-wrap { width: 100%; display: table; border-bottom: 2px solid #2563eb; padding-bottom: 8px; }
         .pdf-header .h-left { display: table-cell; width: 45%; vertical-align: middle; }
@@ -77,7 +74,7 @@
             padding: 0 0;
         }
         .content {
-            padding: 86px 10mm 70px 10mm; /* deja espacio para header/footer fijos y agrega margen lateral */
+            padding: 120px 10mm 70px 10mm; /* margen superior más grande, espacio para footer fijo */
         }
 
         /* Título de cotización */
