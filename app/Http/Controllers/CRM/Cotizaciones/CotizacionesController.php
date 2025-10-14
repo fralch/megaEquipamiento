@@ -705,20 +705,37 @@ class CotizacionesController extends Controller
                         }
                     }
 
-                    // Obtener especificaciones técnicas
+                    // Obtener especificaciones técnicas - todos los productos tienen especificaciones
                     if ($producto->especificaciones_tecnicas) {
                         $especificacionesRaw = is_string($producto->especificaciones_tecnicas)
                             ? json_decode($producto->especificaciones_tecnicas, true)
                             : $producto->especificaciones_tecnicas;
 
-                        // Filtrar solo valores simples (no arrays ni objetos)
+                        // Procesar especificaciones técnicas
                         if (is_array($especificacionesRaw)) {
                             foreach ($especificacionesRaw as $key => $value) {
+                                // Incluir todos los valores válidos (strings, números, booleanos)
                                 if (!is_array($value) && !is_object($value) && $value !== null && $value !== '') {
                                     $especificaciones[$key] = $value;
                                 }
                             }
+                        } elseif (is_string($especificacionesRaw) && !empty($especificacionesRaw)) {
+                            // Si es un string simple, intentar parsearlo como JSON
+                            $parsedSpecs = json_decode($especificacionesRaw, true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($parsedSpecs)) {
+                                foreach ($parsedSpecs as $key => $value) {
+                                    if (!is_array($value) && !is_object($value) && $value !== null && $value !== '') {
+                                        $especificaciones[$key] = $value;
+                                    }
+                                }
+                            } else {
+                                // Si no es JSON válido, usar el string como especificación general
+                                $especificaciones['descripcion_tecnica'] = $especificacionesRaw;
+                            }
                         }
+                    } else {
+                        // Si no hay especificaciones técnicas, crear un array vacío para mantener consistencia
+                        $especificaciones = [];
                     }
                 }
 
