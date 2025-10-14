@@ -778,10 +778,83 @@ class CotizacionesController extends Controller
             }
 
             // Preparar datos para el PDF
+            // Enriquecer productos adicionales con imagen y descripción
+            $adicionales = $cotizacion->detallesAdicionales->map(function ($adicional) {
+                $imagen = null;
+                $descripcion = $adicional->descripcion;
+
+                // 1) Si está vinculado a un producto del catálogo, usar su imagen
+                if ($adicional->producto) {
+                    $producto = $adicional->producto;
+
+                    if ($producto && $producto->imagen) {
+                        $imagenes = is_string($producto->imagen)
+                            ? json_decode($producto->imagen, true)
+                            : $producto->imagen;
+
+                        if (is_array($imagenes) && !empty($imagenes)) {
+                            $primeraImagen = $imagenes[0];
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
+                        } elseif (is_string($imagenes) && !empty($imagenes)) {
+                            $imagen = filter_var($imagenes, FILTER_VALIDATE_URL) ? $imagenes : url($imagenes);
+                        }
+                    }
+
+                    // Usar descripción del producto si existe
+                    if ($producto && !empty($producto->descripcion)) {
+                        $descripcion = $producto->descripcion;
+                    }
+                }
+
+                // 2) Si no tiene producto vinculado o no se obtuvo imagen, intentar buscar por nombre en productos
+                if (!$imagen) {
+                    $productoMatch = \App\Models\Producto::where('nombre', 'like', '%' . $adicional->nombre . '%')->first();
+                    if ($productoMatch && $productoMatch->imagen) {
+                        $imagenes = is_string($productoMatch->imagen)
+                            ? json_decode($productoMatch->imagen, true)
+                            : $productoMatch->imagen;
+
+                        if (is_array($imagenes) && !empty($imagenes)) {
+                            $primeraImagen = $imagenes[0];
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
+                        } elseif (is_string($imagenes) && !empty($imagenes)) {
+                            $imagen = filter_var($imagenes, FILTER_VALIDATE_URL) ? $imagenes : url($imagenes);
+                        }
+
+                        // Usar descripción del producto coincidente si existe
+                        if (!$descripcion && !empty($productoMatch->descripcion)) {
+                            $descripcion = $productoMatch->descripcion;
+                        }
+                    }
+                }
+
+                // 3) Si aún no hay imagen, buscar en banco de imágenes (Spatie Media)
+                if (!$imagen) {
+                    try {
+                        $media = \App\Models\Media::buscarImagenes($adicional->nombre)->first();
+                        if ($media) {
+                            $url = $media->getUrl();
+                            $imagen = filter_var($url, FILTER_VALIDATE_URL) ? $url : url($url);
+                        }
+                    } catch (\Throwable $e) {
+                        // Ignorar errores de media y continuar sin imagen
+                    }
+                }
+
+                return [
+                    'nombre' => $adicional->nombre,
+                    'descripcion' => $descripcion,
+                    'cantidad' => $adicional->cantidad,
+                    'precio_unitario' => $adicional->precio_unitario,
+                    'subtotal' => $adicional->subtotal,
+                    'imagen' => $imagen,
+                ];
+            });
+
             $data = [
                 'cotizacion' => $cotizacion,
                 'productos' => $productos,
-                'productos_adicionales' => $cotizacion->detallesAdicionales,
+                'productos_adicionales' => $adicionales,
                 'empresa' => $empresa,
                 'cliente' => $cotizacion->cliente,
                 'vendedor' => $vendedor,

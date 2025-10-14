@@ -555,24 +555,41 @@
                     <table class="table">
                         <thead>
                             <tr>
+                                <th style="width: 14%;" class="text-center">Imagen</th>
                                 <th>Descripción</th>
-                                <th class="text-center" style="width: 14%;">Cantidad</th>
-                                <th class="text-right" style="width: 20%;">Precio Unit.</th>
-                                <th class="text-right" style="width: 20%;">Subtotal</th>
+                                <th class="text-center" style="width: 12%;">Cantidad</th>
+                                <th class="text-right" style="width: 18%;">Precio Unit.</th>
+                                <th class="text-right" style="width: 18%;">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($productos_adicionales as $adicional)
                                 <tr>
-                                    <td>{{ $adicional->nombre }}</td>
-                                    <td class="text-center">{{ $adicional->cantidad }}</td>
+                                    <td class="text-center" style="width: 80px;">
+                                        @if(!empty($adicional['imagen']))
+                                            <img src="{{ $adicional['imagen'] }}" alt="{{ $adicional['nombre'] }}"
+                                                 style="max-width:70px; max-height:70px; width:auto; height:auto; object-fit:contain; background:#ffffff; border:1px solid #e5e7eb; border-radius:4px; display:block; margin:0 auto;" />
+                                        @else
+                                            <span style="color:#6b7280;">Sin imagen</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div style="font-weight:bold; color:#111827;">{{ $adicional['nombre'] }}</div>
+                                        @if(!empty($adicional['descripcion']))
+                                            <div class="producto-desc" style="margin-top:6px;">
+                                                <strong>Descripción:</strong><br>
+                                                {{ $adicional['descripcion'] }}
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="text-center">{{ $adicional['cantidad'] }}</td>
                                     <td class="text-right">
                                         {{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }}
-                                        {{ number_format((float) $adicional->precio_unitario, 2, '.', ',') }}
+                                        {{ number_format((float) $adicional['precio_unitario'], 2, '.', ',') }}
                                     </td>
                                     <td class="text-right">
                                         {{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }}
-                                        {{ number_format((float) $adicional->subtotal, 2, '.', ',') }}
+                                        {{ number_format((float) $adicional['subtotal'], 2, '.', ',') }}
                                     </td>
                                 </tr>
                             @endforeach
