@@ -89,6 +89,25 @@ const Menu = ({ toggleMenu }) => {
                             </Link>
                         </li>
                     )}
+                    {auth.user && (
+                        <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0">
+                            <Link
+                                href="/crm"
+                                className={`mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:no-underline ${
+                                    isDarkMode 
+                                        ? 'text-gray-200 hover:bg-gray-700' 
+                                        : 'text-black hover:bg-gray-100'
+                                }`}
+                            >
+                                <span className="mr-3 text-xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                        <path d={mdiPlus} />
+                                    </svg>
+                                </span>
+                                <span>CRM</span>
+                            </Link>
+                        </li>
+                    )}
                     <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0">
                         <a
                             href="/contacto"
@@ -106,6 +125,7 @@ const Menu = ({ toggleMenu }) => {
                             <span>Contactenos</span>
                         </a>
                     </li>
+                    
                 </ul>
                 <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto mt-5 md:mt-0">
                     {/* Redes Sociales */}

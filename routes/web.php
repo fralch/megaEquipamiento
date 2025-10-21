@@ -16,6 +16,13 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\TagParentController;
 use App\Http\Controllers\ProductoTagController;
 use App\Http\Controllers\SectorController;
+use App\Http\Controllers\CRM\UsuariosRoles\UsuariosGestionController;
+use App\Http\Controllers\CRM\UsuariosRoles\RolesUsuariosController;
+use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
+use App\Http\Controllers\CRM\Clientes\ClientesParticularesController;
+use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
+use App\Http\Controllers\CRM\Productos\ProductoGestionController;
+use App\Http\Controllers\CRM\Cotizaciones\CotizacionesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -39,6 +46,107 @@ Route::get('/sectores', [SectorController::class, 'index'])->name('sectores.inde
 Route::get('/contacto', function () { return Inertia::render('Contacto'); })->name('contacto.view');
 Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
+
+// Rutas del CRM agrupadas por prefijo
+Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
+    Route::get('/', fn () => Inertia::render('CRM/Dashboard'))->name('dashboard');
+
+    Route::prefix('clientes')->name('clientes.')->group(function () {
+                // Rutas principales que cargan las vistas con datos
+                Route::get('/empresas', [EmpresasClientesController::class, 'index'])->name('empresas.index');
+                Route::get('/particulares', [ClientesParticularesController::class, 'index'])->name('particulares.index');
+                Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');
+
+        // API routes para clientes particulares
+        Route::prefix('particulares')->name('particulares.')->group(function () {
+            Route::get('/data', [ClientesParticularesController::class, 'index'])->name('data');
+            Route::post('/store', [ClientesParticularesController::class, 'store'])->name('store');
+            Route::get('/vendedores', [ClientesParticularesController::class, 'getVendedores'])->name('vendedores');
+            Route::post('/bulk-delete', [ClientesParticularesController::class, 'bulkDelete'])->name('bulk-delete');
+            Route::get('/{id}', [ClientesParticularesController::class, 'show'])->name('show');
+            Route::match(['put', 'post'], '/{id}', [ClientesParticularesController::class, 'update'])->name('update');
+            Route::match(['delete', 'post'], '/{id}/delete', [ClientesParticularesController::class, 'destroy'])->name('destroy');
+        });
+
+        // API routes para empresas clientes
+        Route::prefix('empresas')->name('empresas.')->group(function () {
+            Route::get('/data', [EmpresasClientesController::class, 'index'])->name('data');
+            Route::post('/store', [EmpresasClientesController::class, 'store'])->name('store');
+            Route::get('/vendedores', [EmpresasClientesController::class, 'getVendedores'])->name('vendedores');
+            Route::post('/bulk-delete', [EmpresasClientesController::class, 'bulkDelete'])->name('bulk-delete');
+            Route::post('/{id}/toggle-activo', [EmpresasClientesController::class, 'toggleActivo'])->name('toggle-activo');
+            Route::get('/{id}', [EmpresasClientesController::class, 'show'])->name('show');
+            Route::match(['put', 'post'], '/{id}', [EmpresasClientesController::class, 'update'])->name('update');
+            Route::match(['delete', 'post'], '/{id}/delete', [EmpresasClientesController::class, 'destroy'])->name('destroy');
+        });
+    });
+
+    // Rutas para cotizaciones
+    Route::prefix('cotizaciones')->name('cotizaciones.')->group(function () {
+        Route::get('/', [CotizacionesController::class, 'index'])->name('index');
+        Route::get('/create-data', [CotizacionesController::class, 'create'])->name('create-data');
+        Route::post('/store', [CotizacionesController::class, 'store'])->name('store');
+        Route::get('/estadisticas', [CotizacionesController::class, 'estadisticas'])->name('estadisticas');
+        Route::get('/{id}/export-pdf', [CotizacionesController::class, 'exportPdf'])->name('export-pdf');
+        Route::get('/{id}', [CotizacionesController::class, 'show'])->name('show');
+        Route::match(['put', 'post'], '/{id}', [CotizacionesController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [CotizacionesController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/cambiar-estado', [CotizacionesController::class, 'cambiarEstado'])->name('cambiar-estado');
+    });
+
+    Route::prefix('empresas')->name('empresas.')->group(function () {
+        Route::get('/', fn () => Inertia::render('CRM/Empresas/VerEmpresas'))->name('index');
+        
+        // API routes for empresas CRUD operations
+        Route::get('/data', [NuestrasEmpresasController::class, 'index'])->name('data');
+        Route::post('/store', [NuestrasEmpresasController::class, 'store'])->name('store');
+        Route::get('/usuarios', [NuestrasEmpresasController::class, 'getUsuarios'])->name('usuarios');
+        Route::get('/search', [NuestrasEmpresasController::class, 'search'])->name('search');
+        Route::post('/bulk-delete', [NuestrasEmpresasController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::get('/{id}', [NuestrasEmpresasController::class, 'show'])->name('show');
+        Route::match(['put', 'post'], '/{id}', [NuestrasEmpresasController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [NuestrasEmpresasController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::prefix('productos')->name('productos.')->group(function () {
+        Route::get('/', [ProductoGestionController::class, 'index'])->name('index');
+        
+        // API routes for CRM product management
+        Route::get('/marcas', [ProductoGestionController::class, 'getMarcas'])->name('marcas');
+        Route::get('/subcategorias', [ProductoGestionController::class, 'getSubcategorias'])->name('subcategorias');
+        Route::get('/{id}', [ProductoGestionController::class, 'show'])->name('show');
+        Route::post('/store', [ProductoGestionController::class, 'store'])->name('store');
+        Route::match(['put', 'post'], '/{id}', [ProductoGestionController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [ProductoGestionController::class, 'destroy'])->name('destroy');
+    });
+
+    // Rutas de roles (deben ir antes de las rutas de usuarios para evitar conflictos)
+    Route::prefix('usuarios/roles')->name('usuarios.roles.')->group(function () {
+        Route::get('/', [RolesUsuariosController::class, 'index'])->name('index');
+        Route::post('/', [RolesUsuariosController::class, 'store'])->name('store');
+        Route::get('/users-count', [RolesUsuariosController::class, 'getUsersCount'])->name('users-count');
+        Route::post('/assign-role', [RolesUsuariosController::class, 'assignRole'])->name('assign');
+        Route::post('/bulk-assign', [RolesUsuariosController::class, 'bulkAssignRole'])->name('bulk-assign');
+        Route::get('/{id}', [RolesUsuariosController::class, 'show'])->name('show');
+        Route::match(['put', 'post'], '/{id}', [RolesUsuariosController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [RolesUsuariosController::class, 'destroy'])->name('destroy');
+        Route::post('/{userId}/remove-role', [RolesUsuariosController::class, 'removeRole'])->name('remove');
+    });
+
+    // Rutas de usuarios
+    Route::prefix('usuarios')->name('usuarios.')->group(function () {
+        Route::get('/', [UsuariosGestionController::class, 'index'])->name('index');
+        Route::post('/', [UsuariosGestionController::class, 'store'])->name('store');
+        Route::post('/bulk-delete', [UsuariosGestionController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::get('/export', [UsuariosGestionController::class, 'export'])->name('export');
+        Route::get('/{id}', [UsuariosGestionController::class, 'show'])->name('show');
+        Route::match(['put', 'post'], '/{id}', [UsuariosGestionController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [UsuariosGestionController::class, 'destroy'])->name('destroy');
+        Route::post('/{id}/toggle-status', [UsuariosGestionController::class, 'toggleStatus'])->name('toggle-status');
+        Route::post('/{id}/change-password', [UsuariosGestionController::class, 'changePassword'])->name('change-password');
+        Route::post('/{id}/reset-password', [UsuariosGestionController::class, 'resetPassword'])->name('reset-password');
+    });
+});
 
 
 // Rutas para crear y mostrar productos
@@ -166,6 +274,17 @@ Route::get('/tags/{id}/productos', [ProductoTagController::class, 'getProductsBy
 
 // Rutas públicas para sectores
 Route::get('/api/tag-parents', [TagParentController::class, 'getPublicTagParents'])->name('api.tag-parents');
+
+// API routes for CRM products (used by frontend components)
+Route::get('/api/productos/crm', [ProductoGestionController::class, 'getProductosCRM'])->name('api.productos.crm');
+Route::get('/api/productos/excluye-servicios', [ProductoGestionController::class, 'getProductosExcluyeServicios'])->name('api.productos.excluye-servicios');
+Route::get('/api/productos/crm/buscar', [ProductoGestionController::class, 'buscarProductos'])->name('api.productos.crm.buscar');
+Route::get('/api/productos/crm/marcas', [ProductoGestionController::class, 'getMarcas'])->name('api.productos.crm.marcas');
+Route::get('/api/productos/crm/subcategorias', [ProductoGestionController::class, 'getSubcategorias'])->name('api.productos.crm.subcategorias');
+Route::get('/api/productos/crm/categorias', [ProductoGestionController::class, 'getCategorias'])->name('api.productos.crm.categorias');
+Route::get('/api/productos/crm/subcategorias/{categoria_id}', [ProductoGestionController::class, 'getSubcategoriasByCategoria'])->name('api.productos.crm.subcategorias.by-categoria');
+Route::match(['put', 'post'], '/api/productos/crm/{id}', [ProductoGestionController::class, 'update'])->name('api.productos.crm.update');
+
 Route::get('/sector/{id_tag_parent}/products/{id_tag}', [SectorController::class, 'getProductsByTag'])->name('sector.products-by-tag');
 Route::get('/sector/{id_tag_parent}/search', [SectorController::class, 'searchProducts'])->name('sector.search');
 Route::get('/sector/{id_tag_parent}/stats', [SectorController::class, 'getStats'])->name('sector.stats');
