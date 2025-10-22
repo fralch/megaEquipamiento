@@ -9,7 +9,7 @@
         }
         body {
             font-family: Arial, sans-serif;
-            font-size: 10px;
+            font-size: 14px;
             color: #333;
             margin: 0;
             padding: 0;
@@ -96,7 +96,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            font-size: 8px;
+            font-size: 12px;
             margin-top: 3px;
         }
         
@@ -158,7 +158,7 @@
         .spec-table td {
             border: 1px solid #ccc;
             padding: 3px;
-            font-size: 8px;
+            font-size: 12px;
         }
         .spec-table td:first-child {
             font-weight: bold;
@@ -189,7 +189,7 @@
             padding: 6px;
             text-align: center;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 16px;
             border-radius: 3px;
         }
         
@@ -214,7 +214,7 @@
                         </div>
                     @endif
                    
-                    <div class="company-ruc" style="display: flex; justify-content: space-between; font-size: 8px;">
+                    <div class="company-ruc" style="display: flex; justify-content: space-between; font-size: 12px;">
                         <span><span class="font-bold">RUC:</span> {{ $empresa['ruc'] ?? '—' }}</span>
                         <span style="color: red;"><span class="font-bold">NUMERO DE COTIZACIÓN:</span> {{ $cotizacion->numero }}</span>
                     </div>
@@ -247,7 +247,7 @@
 
     <!-- Footer fijo - SE REPITE en todas las páginas -->
     <div class="footer">
-        <div style="text-align:left; font-size:7px; border-top: 1px solid #ccc; padding-top: 2px;">
+        <div style="text-align:left; font-size:12px; border-top: 1px solid #ccc; padding-top: 2px;">
             <p class="font-bold" style="margin: 0.5px 0;">Marcas:</p>
             <p class="font-bold" style="margin: 0.5px 0;">Modelos:</p>
             <p class="font-bold" style="margin: 0.5px 0;">Procedencias:</p>
