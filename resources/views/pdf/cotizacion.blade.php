@@ -275,6 +275,42 @@
             @endif
         @endforeach
 
+        {{-- Sección de productos adicionales --}}
+        @if(isset($productos_adicionales) && count($productos_adicionales) > 0)
+            @foreach($productos_adicionales as $producto_adicional)
+                <div class="product-container">
+                    <div class="product-title">
+                        {{ $producto_adicional['nombre'] }}
+                    </div>
+                    <div class="product-content">
+                        <div class="product-image">
+                             @if(!empty($producto_adicional['imagen']))
+                                <img src="{{ $producto_adicional['imagen'] }}" alt="{{ $producto_adicional['nombre'] }}">
+                            @endif
+                        </div>
+
+                        <div class="section-title">Descripcion:</div>
+                        <p style="font-size: 9px; line-height: 1.4; text-align: justify;">{{ $producto_adicional['descripcion'] }}</p>
+
+                        @if(!empty($producto_adicional['especificaciones']) && is_array($producto_adicional['especificaciones']) && count($producto_adicional['especificaciones']) > 0)
+                            <div class="section-title">Datos tecnicos:</div>
+                            <table class="spec-table">
+                                @foreach($producto_adicional['especificaciones'] as $key => $value)
+                                    <tr>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
+                                        <td>{{ $value }}</td>
+                                    </tr>
+                                @endforeach
+                            </table>
+                        @endif
+                    </div>
+                </div>
+                @if(!$loop->last)
+                    <div style="page-break-after: always;"></div>
+                @endif
+            @endforeach
+        @endif
+
         <div class="page-break">
             <div class="bg-red text-center font-bold" style="padding: 6px; border-radius: 3px;">
                 RESUMEN Y TOTALES
@@ -299,6 +335,17 @@
                         <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['subtotal'], 2) }}</td>
                     </tr>
                     @endforeach
+                    {{-- Agregar productos adicionales al resumen --}}
+                    @if(isset($productos_adicionales) && count($productos_adicionales) > 0)
+                        @foreach($productos_adicionales as $producto_adicional)
+                        <tr>
+                            <td>{{ $producto_adicional['nombre'] }}</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['precio_unitario'], 2) }}</td>
+                            <td class="text-center">{{ $producto_adicional['cantidad'] }}</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['subtotal'], 2) }}</td>
+                        </tr>
+                        @endforeach
+                    @endif
                     <tr>
                         <td colspan="3" class="text-right font-bold">Total productos</td>
                         <td class="text-right font-bold">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
