@@ -255,7 +255,7 @@
                     </div>
 
                     <div class="section-title">Descripcion:</div>
-                    <p style="font-size: 9px; line-height: 1.4; text-align: justify;">{{ $producto['descripcion'] }}</p>
+                    <p style="font-size: 12px; line-height: 1.4; text-align: justify;">{{ $producto['descripcion'] }}</p>
 
                     @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']) && count($producto['especificaciones']) > 0)
                         <div class="section-title">Datos tecnicos:</div>
@@ -290,7 +290,7 @@
                         </div>
 
                         <div class="section-title">Descripcion:</div>
-                        <p style="font-size: 9px; line-height: 1.4; text-align: justify;">{{ $producto_adicional['descripcion'] }}</p>
+                        <p style="font-size: 12px; line-height: 1.4; text-align: justify;">{{ $producto_adicional['descripcion'] }}</p>
 
                         @if(!empty($producto_adicional['especificaciones']) && is_array($producto_adicional['especificaciones']) && count($producto_adicional['especificaciones']) > 0)
                             <div class="section-title">Datos tecnicos:</div>
