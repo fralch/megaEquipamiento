@@ -254,19 +254,79 @@
                         @endif
                     </div>
 
-                    <div class="section-title">Descripcion:</div>
-                    <p style="font-size: 12px; line-height: 1.4; text-align: justify;">{{ $producto['descripcion'] }}</p>
+                    @if(!empty($producto['descripcion']))
+                        <div class="section-title">Descripcion:</div>
+                        <p style="font-size: 12px; line-height: 1.4; text-align: justify;">{{ $producto['descripcion'] }}</p>
+                    @endif
 
-                    @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']) && count($producto['especificaciones']) > 0)
+                    @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']))
                         <div class="section-title">Datos tecnicos:</div>
-                        <table class="spec-table">
-                            @foreach($producto['especificaciones'] as $key => $value)
-                                <tr>
-                                    <td>{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
-                                    <td>{{ $value }}</td>
-                                </tr>
+
+                        @php
+                            // Verificar si es formato con secciones o formato legacy
+                            $tieneSecciones = isset($producto['especificaciones']['secciones']) && is_array($producto['especificaciones']['secciones']);
+                            $esArrayDirecto = !$tieneSecciones && isset($producto['especificaciones'][0]) && is_array($producto['especificaciones'][0]);
+                        @endphp
+
+                        @if($tieneSecciones)
+                            {{-- Formato nuevo con secciones --}}
+                            @foreach($producto['especificaciones']['secciones'] as $seccion)
+                                @if($seccion['tipo'] === 'tabla' && !empty($seccion['datos']))
+                                    <table class="spec-table" style="margin-bottom: 8px;">
+                                        <thead>
+                                            <tr>
+                                                @foreach($seccion['datos'][0] as $header)
+                                                    <th style="background-color: #2c3e50; color: white; padding: 4px; border: 1px solid #ccc; font-size: 11px;">
+                                                        {{ $header }}
+                                                    </th>
+                                                @endforeach
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach(array_slice($seccion['datos'], 1) as $rowIndex => $row)
+                                                <tr style="{{ $rowIndex % 2 === 0 ? 'background-color: #f8f9fa;' : '' }}">
+                                                    @foreach($row as $cell)
+                                                        <td style="border: 1px solid #ccc; padding: 3px; font-size: 11px;">
+                                                            {{ is_array($cell) ? implode(', ', $cell) : $cell }}
+                                                        </td>
+                                                    @endforeach
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @elseif($seccion['tipo'] === 'texto' && !empty($seccion['datos']))
+                                    <div style="background-color: #f8f9fa; padding: 8px; border-radius: 4px; margin-bottom: 8px;">
+                                        @foreach($seccion['datos'] as $texto)
+                                            <p style="margin: 2px 0; font-size: 11px;">{{ $texto }}</p>
+                                        @endforeach
+                                    </div>
+                                @endif
                             @endforeach
-                        </table>
+                        @elseif($esArrayDirecto)
+                            {{-- Formato legacy (array directo) --}}
+                            <table class="spec-table">
+                                <thead>
+                                    <tr>
+                                        @foreach($producto['especificaciones'][0] as $header)
+                                            <th style="background-color: #2c3e50; color: white; padding: 4px; border: 1px solid #ccc; font-size: 11px;">
+                                                {{ $header }}
+                                            </th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(array_slice($producto['especificaciones'], 1) as $rowIndex => $row)
+                                        <tr style="{{ $rowIndex % 2 === 0 ? 'background-color: #f8f9fa;' : '' }}">
+                                            @foreach($row as $cell)
+                                                <td style="border: 1px solid #ccc; padding: 3px; font-size: 11px;">
+                                                    {{ is_array($cell) ? implode(', ', $cell) : $cell }}
+                                                </td>
+                                            @endforeach
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -289,19 +349,79 @@
                             @endif
                         </div>
 
-                        <div class="section-title">Descripcion:</div>
-                        <p style="font-size: 12px; line-height: 1.4; text-align: justify;">{{ $producto_adicional['descripcion'] }}</p>
+                        @if(!empty($producto_adicional['descripcion']))
+                            <div class="section-title">Descripcion:</div>
+                            <p style="font-size: 12px; line-height: 1.4; text-align: justify;">{{ $producto_adicional['descripcion'] }}</p>
+                        @endif
 
-                        @if(!empty($producto_adicional['especificaciones']) && is_array($producto_adicional['especificaciones']) && count($producto_adicional['especificaciones']) > 0)
+                        @if(!empty($producto_adicional['especificaciones']) && is_array($producto_adicional['especificaciones']))
                             <div class="section-title">Datos tecnicos:</div>
-                            <table class="spec-table">
-                                @foreach($producto_adicional['especificaciones'] as $key => $value)
-                                    <tr>
-                                        <td>{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
-                                        <td>{{ $value }}</td>
-                                    </tr>
+
+                            @php
+                                // Verificar si es formato con secciones o formato legacy
+                                $tieneSecciones = isset($producto_adicional['especificaciones']['secciones']) && is_array($producto_adicional['especificaciones']['secciones']);
+                                $esArrayDirecto = !$tieneSecciones && isset($producto_adicional['especificaciones'][0]) && is_array($producto_adicional['especificaciones'][0]);
+                            @endphp
+
+                            @if($tieneSecciones)
+                                {{-- Formato nuevo con secciones --}}
+                                @foreach($producto_adicional['especificaciones']['secciones'] as $seccion)
+                                    @if($seccion['tipo'] === 'tabla' && !empty($seccion['datos']))
+                                        <table class="spec-table" style="margin-bottom: 8px;">
+                                            <thead>
+                                                <tr>
+                                                    @foreach($seccion['datos'][0] as $header)
+                                                        <th style="background-color: #2c3e50; color: white; padding: 4px; border: 1px solid #ccc; font-size: 11px;">
+                                                            {{ $header }}
+                                                        </th>
+                                                    @endforeach
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach(array_slice($seccion['datos'], 1) as $rowIndex => $row)
+                                                    <tr style="{{ $rowIndex % 2 === 0 ? 'background-color: #f8f9fa;' : '' }}">
+                                                        @foreach($row as $cell)
+                                                            <td style="border: 1px solid #ccc; padding: 3px; font-size: 11px;">
+                                                                {{ is_array($cell) ? implode(', ', $cell) : $cell }}
+                                                            </td>
+                                                        @endforeach
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    @elseif($seccion['tipo'] === 'texto' && !empty($seccion['datos']))
+                                        <div style="background-color: #f8f9fa; padding: 8px; border-radius: 4px; margin-bottom: 8px;">
+                                            @foreach($seccion['datos'] as $texto)
+                                                <p style="margin: 2px 0; font-size: 11px;">{{ $texto }}</p>
+                                            @endforeach
+                                        </div>
+                                    @endif
                                 @endforeach
-                            </table>
+                            @elseif($esArrayDirecto)
+                                {{-- Formato legacy (array directo) --}}
+                                <table class="spec-table">
+                                    <thead>
+                                        <tr>
+                                            @foreach($producto_adicional['especificaciones'][0] as $header)
+                                                <th style="background-color: #2c3e50; color: white; padding: 4px; border: 1px solid #ccc; font-size: 11px;">
+                                                    {{ $header }}
+                                                </th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach(array_slice($producto_adicional['especificaciones'], 1) as $rowIndex => $row)
+                                            <tr style="{{ $rowIndex % 2 === 0 ? 'background-color: #f8f9fa;' : '' }}">
+                                                @foreach($row as $cell)
+                                                    <td style="border: 1px solid #ccc; padding: 3px; font-size: 11px;">
+                                                        {{ is_array($cell) ? implode(', ', $cell) : $cell }}
+                                                    </td>
+                                                @endforeach
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @endif
                         @endif
                     </div>
                 </div>

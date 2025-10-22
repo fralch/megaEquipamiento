@@ -46,6 +46,7 @@ class Producto extends Model implements HasMedia
         'caracteristicas' => 'array',
         'imagen' => 'array',
         'archivos_adicionales' => 'array',
+        'especificaciones_tecnicas' => 'array',
         'created_at' => 'datetime:Y-m-d\TH:i:sP',
         'updated_at' => 'datetime:Y-m-d\TH:i:sP',
     ];
