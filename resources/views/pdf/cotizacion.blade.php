@@ -37,22 +37,17 @@
             z-index: 1;
         }
         
-        /* Footer FIJO - Se repite en todas las páginas */
+        /* Footer - Solo al final del documento */
         .footer {
-            position: fixed;
-            bottom: 3mm;
-            left: 8mm;
-            right: 8mm;
-            text-align: center;
+            text-align: left;
             background: white;
-            z-index: 1000;
-            padding: 3px;
+            padding: 3px 8px;
+            margin-top: 20px;
         }
         
         /* Content con padding reducido */
         .content {
             padding: 3px 8px;
-            margin-bottom: 100px;
             position: relative;
             z-index: 1;
         }
@@ -245,24 +240,6 @@
         </div>
     </div>
 
-    <!-- Footer fijo - SE REPITE en todas las páginas -->
-    <div class="footer">
-        <div style="text-align:left; font-size:12px; border-top: 1px solid #ccc; padding-top: 2px;">
-            <p class="font-bold" style="margin: 0.5px 0;">Marcas:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Modelos:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Procedencias:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Entrega: {{ $cotizacion->entrega }}</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Lugar de entrega: {{ $cotizacion->lugar_entrega }}</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Garantia: {{ $cotizacion->garantia }}</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Forma de pago: {{ $cotizacion->forma_pago }}</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Despacho:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA SOLES:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DOLARES:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DETRACCIÓN:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">PROVEEDOR DEL ESTADO PERUANO:</p>
-        </div>
-    </div>
-
     <!-- Contenido principal -->
     <div class="content">
         @foreach($productos as $producto)
@@ -346,6 +323,24 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Footer - Solo al final del documento -->
+        <div class="footer">
+            <div style="text-align:left; font-size:12px; border-top: 1px solid #ccc; padding-top: 12px;">
+                <p class="font-bold" style="margin: 0.5px 0;">Marcas:</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Modelos:</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Procedencias:</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Entrega: {{ $cotizacion->entrega }}</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Lugar de entrega: {{ $cotizacion->lugar_entrega }}</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Garantia: {{ $cotizacion->garantia }}</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Forma de pago: {{ $cotizacion->forma_pago }}</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Despacho:</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA SOLES:</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DOLARES:</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DETRACCIÓN:</p>
+                <p class="font-bold" style="margin: 0.5px 0;">PROVEEDOR DEL ESTADO PERUANO:</p>
+            </div>
         </div>
     </div>
 
