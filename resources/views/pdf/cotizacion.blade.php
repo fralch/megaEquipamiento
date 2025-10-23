@@ -494,19 +494,24 @@
 
         <!-- Footer - Solo al final del documento -->
         <div class="footer">
+             @if($empresa && !empty($empresa['imagen_firma']))
+                    <div style="text-align: center; margin-top: 20px;">
+                        <img src="{{ public_path($empresa['imagen_firma']) }}" alt="Firma" style="max-width: 300px; max-height: 120px; width: auto; height: auto;">
+                    </div>
+                @endif
+            
             <div style="text-align:left; font-size:12px; border-top: 1px solid #ccc; padding-top: 12px;">
-                <p class="font-bold" style="margin: 0.5px 0;">Marcas:</p>
-                <p class="font-bold" style="margin: 0.5px 0;">Modelos:</p>
-                <p class="font-bold" style="margin: 0.5px 0;">Procedencias:</p>
                 <p class="font-bold" style="margin: 0.5px 0;">Entrega: {{ $cotizacion->entrega }}</p>
                 <p class="font-bold" style="margin: 0.5px 0;">Lugar de entrega: {{ $cotizacion->lugar_entrega }}</p>
                 <p class="font-bold" style="margin: 0.5px 0;">Garantia: {{ $cotizacion->garantia }}</p>
                 <p class="font-bold" style="margin: 0.5px 0;">Forma de pago: {{ $cotizacion->forma_pago }}</p>
-                <p class="font-bold" style="margin: 0.5px 0;">Despacho:</p>
-                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA SOLES:</p>
-                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DOLARES:</p>
-                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DETRACCIÓN:</p>
-                <p class="font-bold" style="margin: 0.5px 0;">PROVEEDOR DEL ESTADO PERUANO:</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Despacho: A TODO EL PERU Y LATINOAMERICA</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA SOLES: BCP 193-9939241-0-72 CCI: 00219300993924107218</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DOLARES: BCP 193-9918677-1-64 CCI: 00219300991867716410</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DETRACCIÓN: 00-059-167324</p>
+                <p class="font-bold" style="margin: 0.5px 0;">PROVEEDOR DEL ESTADO PERUANO: REGISTRO VENTAS Y SERVICIOS EN LA OSCE</p>
+
+               
             </div>
         </div>
     </div>
