@@ -42,7 +42,33 @@
             text-align: left;
             background: white;
             padding: 3px 8px;
-            margin-top: 20px;
+            margin-top: 60px; /* Aumentado para evitar superposición */
+            clear: both;
+            page-break-inside: avoid; /* Evita que se corte el footer */
+        }
+        
+        /* Sección de totales mejorada */
+        .totals-section {
+            margin-bottom: 40px; /* Espacio reservado antes del footer */
+            clear: both;
+        }
+        
+        /* Contenedor de firma centrado */
+        .signature-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px 0;
+            min-height: 140px; /* Altura mínima reservada para la firma */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .signature-container img {
+            display: block;
+            margin: 0 auto;
+            max-width: 300px;
+            max-height: 120px;
         }
         
         /* Content con padding reducido */
@@ -108,62 +134,80 @@
             border-top: 1px solid #333;
         }
         
-        /* Tablas solo para datos tabulares */
+        /* Mejoras en tablas para mejor legibilidad */
         .table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 8px;
+            margin-bottom: 8px; /* Espacio después de las tablas */
         }
         .table, .table th, .table td {
             border: 1px solid #ccc;
         }
         .table th, .table td {
-            padding: 4px;
+            padding: 6px; /* Aumentado para mejor legibilidad */
             text-align: left;
+            vertical-align: top; /* Alineación vertical mejorada */
         }
         
-        /* Clases de utilidad */
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .font-bold { font-weight: bold; }
-        .bg-dark { background-color: #2c3e50; color: #fff; }
-        .bg-red { background-color: #ff0000; color: #fff; }
-        
-        .product-image {
-            text-align: center;
-            padding: 12px 0;
-        }
-        .product-image img {
-            max-width: 280px;
-            max-height: 280px;
-        }
-        .section-title {
-            font-weight: bold;
-            color: red;
-            margin-top: 12px;
-            margin-bottom: 6px;
-        }
-        
-        /* Tabla para especificaciones técnicas */
+        /* Tabla para especificaciones técnicas mejorada */
         .spec-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 8px;
+            margin-bottom: 12px; /* Espacio después de especificaciones */
         }
         .spec-table td {
             border: 1px solid #ccc;
-            padding: 3px;
+            padding: 4px; /* Ligeramente aumentado */
             font-size: 12px;
+            vertical-align: top;
         }
         .spec-table td:first-child {
             font-weight: bold;
             width: 30%;
             background-color: #f8f9fa;
         }
+        
+        /* Clases de utilidad mejoradas */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+        .bg-dark { background-color: #2c3e50; color: #fff; }
+        .bg-red { background-color: #ff0000; color: #fff; }
+        
+        /* Imágenes de productos con mejor espaciado */
+        .product-image {
+            text-align: center;
+            padding: 15px 0; /* Aumentado para mejor separación */
+            margin: 10px 0; /* Margen adicional */
+        }
+        .product-image img {
+            max-width: 280px;
+            max-height: 280px;
+            border-radius: 5px; /* Bordes redondeados sutiles */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra sutil */
+        }
+        
+        /* Títulos de sección mejorados */
+        .section-title {
+            font-weight: bold;
+            color: red;
+            margin-top: 15px; /* Aumentado para mejor separación */
+            margin-bottom: 8px; /* Aumentado para mejor separación */
+            padding: 3px 0; /* Padding adicional */
+            border-bottom: 1px solid #ddd; /* Línea sutil de separación */
+        }
 
         /* Para evitar que el contenido se solape en saltos de página */
         .page-break {
             page-break-before: always;
+        }
+        
+        /* Salto de página suave para productos */
+        .page-break-soft {
+            page-break-after: auto;
+            page-break-inside: avoid;
         }
 
         /* Estilos para párrafos y texto */
@@ -172,24 +216,28 @@
             line-height: 1.3;
         }
         
-        /* Contenedor de producto */
+        /* Contenedor de producto mejorado */
         .product-container {
             page-break-inside: avoid;
-            margin-bottom: 15px;
+            margin-bottom: 20px; /* Aumentado para mejor separación */
+            padding: 5px 0; /* Padding adicional */
         }
         
         .product-title {
             background-color: #2c3e50;
             color: white;
-            padding: 6px;
+            padding: 8px; /* Aumentado para mejor apariencia */
             text-align: center;
             font-weight: bold;
             font-size: 16px;
             border-radius: 3px;
+            margin-bottom: 5px; /* Separación del contenido */
         }
         
         .product-content {
-            padding: 8px 4px;
+            padding: 10px 4px; /* Aumentado padding vertical */
+            background-color: #fafafa; /* Fondo sutil para mejor legibilidad */
+            border-radius: 3px;
         }
     </style>
 </head>
@@ -431,74 +479,77 @@
             @endforeach
         @endif
 
-        <div class="page-break">
-            <div class="bg-red text-center font-bold" style="padding: 6px; border-radius: 3px;">
-                RESUMEN Y TOTALES
-            </div>
-            <br>
-            <div class="font-bold" style="padding: 4px; background-color: #f2f2f2;">PRODUCTOS</div>
-            <table class="table">
-                <thead>
-                    <tr class="bg-dark">
-                        <th>Producto</th>
-                        <th class="text-right">Precio</th>
-                        <th class="text-center">Cantidad</th>
-                        <th class="text-right">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($productos as $producto)
-                    <tr>
-                        <td>{{ $producto['nombre'] }}</td>
-                        <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['precio_unitario'], 2) }}</td>
-                        <td class="text-center">{{ $producto['cantidad'] }}</td>
-                        <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['subtotal'], 2) }}</td>
-                    </tr>
-                    @endforeach
-                    {{-- Agregar productos adicionales al resumen --}}
-                    @if(isset($productos_adicionales) && count($productos_adicionales) > 0)
-                        @foreach($productos_adicionales as $producto_adicional)
+        <div class="totals-section">
+            <div class="page-break">
+                <div class="bg-red text-center font-bold" style="padding: 6px; border-radius: 3px;">
+                    RESUMEN Y TOTALES
+                </div>
+                <br>
+                <div class="font-bold" style="padding: 4px; background-color: #f2f2f2;">PRODUCTOS</div>
+                <table class="table">
+                    <thead>
+                        <tr class="bg-dark">
+                            <th>Producto</th>
+                            <th class="text-right">Precio</th>
+                            <th class="text-center">Cantidad</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($productos as $producto)
                         <tr>
-                            <td>{{ $producto_adicional['nombre'] }}</td>
-                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['precio_unitario'], 2) }}</td>
-                            <td class="text-center">{{ $producto_adicional['cantidad'] }}</td>
-                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['subtotal'], 2) }}</td>
+                            <td>{{ $producto['nombre'] }}</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['precio_unitario'], 2) }}</td>
+                            <td class="text-center">{{ $producto['cantidad'] }}</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['subtotal'], 2) }}</td>
                         </tr>
                         @endforeach
-                    @endif
-                    <tr>
-                        <td colspan="3" class="text-right font-bold">Total productos</td>
-                        <td class="text-right font-bold">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <br>
-            <div class="font-bold" style="padding: 4px; background-color: #f2f2f2;">TOTALES</div>
-            <table class="table" style="width: 50%; float: right;">
-                <tbody>
-                    <tr>
-                        <td class="font-bold">SUBTOTAL</td>
-                        <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td class="font-bold">IGV (18%)</td>
-                        <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 0.18, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td class="font-bold bg-dark">TOTAL</td>
-                        <td class="text-right font-bold bg-dark">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 1.18, 2) }}</td>
-                    </tr>
-                </tbody>
-            </table>
+                        {{-- Agregar productos adicionales al resumen --}}
+                        @if(isset($productos_adicionales) && count($productos_adicionales) > 0)
+                            @foreach($productos_adicionales as $producto_adicional)
+                            <tr>
+                                <td>{{ $producto_adicional['nombre'] }}</td>
+                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['precio_unitario'], 2) }}</td>
+                                <td class="text-center">{{ $producto_adicional['cantidad'] }}</td>
+                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['subtotal'], 2) }}</td>
+                            </tr>
+                            @endforeach
+                        @endif
+                        <tr>
+                            <td colspan="3" class="text-right font-bold">Total productos</td>
+                            <td class="text-right font-bold">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <div class="font-bold" style="padding: 4px; background-color: #f2f2f2;">TOTALES</div>
+                <table class="table" style="width: 50%; float: right; margin-bottom: 20px;">
+                    <tbody>
+                        <tr>
+                            <td class="font-bold">SUBTOTAL</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold">IGV (18%)</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 0.18, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold bg-dark">TOTAL</td>
+                            <td class="text-right font-bold bg-dark">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 1.18, 2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="clear: both;"></div> <!-- Limpia el float para evitar superposiciones -->
+            </div>
         </div>
 
         <!-- Footer - Solo al final del documento -->
         <div class="footer">
-             @if($empresa && !empty($empresa['imagen_firma']))
-                    <div style="text-align: center; margin-top: 20px;">
-                        <img src="{{ public_path($empresa['imagen_firma']) }}" alt="Firma" style="max-width: 300px; max-height: 120px; width: auto; height: auto;">
-                    </div>
-                @endif
+            @if($empresa && !empty($empresa['imagen_firma']))
+                <div class="signature-container">
+                    <img src="{{ public_path($empresa['imagen_firma']) }}" alt="Firma">
+                </div>
+            @endif
             
             <div style="text-align:left; font-size:12px; border-top: 1px solid #ccc; padding-top: 12px;">
                 <p class="font-bold" style="margin: 0.5px 0;">Entrega: {{ $cotizacion->entrega }}</p>
@@ -510,8 +561,6 @@
                 <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DOLARES: BCP 193-9918677-1-64 CCI: 00219300991867716410</p>
                 <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DETRACCIÓN: 00-059-167324</p>
                 <p class="font-bold" style="margin: 0.5px 0;">PROVEEDOR DEL ESTADO PERUANO: REGISTRO VENTAS Y SERVICIOS EN LA OSCE</p>
-
-               
             </div>
         </div>
     </div>
