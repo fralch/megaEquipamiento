@@ -9,7 +9,7 @@
         }
         body {
             font-family: Arial, sans-serif;
-            font-size: 10px;
+            font-size: 14px;
             color: #333;
             margin: 0;
             padding: 0;
@@ -37,22 +37,43 @@
             z-index: 1;
         }
         
-        /* Footer FIJO - Se repite en todas las páginas */
+        /* Footer - Solo al final del documento */
         .footer {
-            position: fixed;
-            bottom: 3mm;
-            left: 8mm;
-            right: 8mm;
-            text-align: center;
+            text-align: left;
             background: white;
-            z-index: 1000;
-            padding: 3px;
+            padding: 3px 8px;
+            margin-top: 60px; /* Aumentado para evitar superposición */
+            clear: both;
+            page-break-inside: avoid; /* Evita que se corte el footer */
+        }
+        
+        /* Sección de totales mejorada */
+        .totals-section {
+            margin-bottom: 40px; /* Espacio reservado antes del footer */
+            clear: both;
+        }
+        
+        /* Contenedor de firma centrado */
+        .signature-container {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px 0;
+            min-height: 140px; /* Altura mínima reservada para la firma */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .signature-container img {
+            display: block;
+            margin: 0 auto;
+            max-width: 300px;
+            max-height: 120px;
         }
         
         /* Content con padding reducido */
         .content {
             padding: 3px 8px;
-            margin-bottom: 100px;
             position: relative;
             z-index: 1;
         }
@@ -96,7 +117,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            font-size: 8px;
+            font-size: 12px;
             margin-top: 3px;
         }
         
@@ -113,62 +134,80 @@
             border-top: 1px solid #333;
         }
         
-        /* Tablas solo para datos tabulares */
+        /* Mejoras en tablas para mejor legibilidad */
         .table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 8px;
+            margin-bottom: 8px; /* Espacio después de las tablas */
         }
         .table, .table th, .table td {
             border: 1px solid #ccc;
         }
         .table th, .table td {
-            padding: 4px;
+            padding: 6px; /* Aumentado para mejor legibilidad */
             text-align: left;
+            vertical-align: top; /* Alineación vertical mejorada */
         }
         
-        /* Clases de utilidad */
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .font-bold { font-weight: bold; }
-        .bg-dark { background-color: #2c3e50; color: #fff; }
-        .bg-red { background-color: #ff0000; color: #fff; }
-        
-        .product-image {
-            text-align: center;
-            padding: 12px 0;
-        }
-        .product-image img {
-            max-width: 280px;
-            max-height: 280px;
-        }
-        .section-title {
-            font-weight: bold;
-            color: red;
-            margin-top: 12px;
-            margin-bottom: 6px;
-        }
-        
-        /* Tabla para especificaciones técnicas */
+        /* Tabla para especificaciones técnicas mejorada */
         .spec-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 8px;
+            margin-bottom: 12px; /* Espacio después de especificaciones */
         }
         .spec-table td {
             border: 1px solid #ccc;
-            padding: 3px;
-            font-size: 8px;
+            padding: 4px; /* Ligeramente aumentado */
+            font-size: 12px;
+            vertical-align: top;
         }
         .spec-table td:first-child {
             font-weight: bold;
             width: 30%;
             background-color: #f8f9fa;
         }
+        
+        /* Clases de utilidad mejoradas */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+        .bg-dark { background-color: #2c3e50; color: #fff; }
+        .bg-red { background-color: #ff0000; color: #fff; }
+        
+        /* Imágenes de productos con mejor espaciado */
+        .product-image {
+            text-align: center;
+            padding: 15px 0; /* Aumentado para mejor separación */
+            margin: 10px 0; /* Margen adicional */
+        }
+        .product-image img {
+            max-width: 280px;
+            max-height: 280px;
+            border-radius: 5px; /* Bordes redondeados sutiles */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Sombra sutil */
+        }
+        
+        /* Títulos de sección mejorados */
+        .section-title {
+            font-weight: bold;
+            color: red;
+            margin-top: 15px; /* Aumentado para mejor separación */
+            margin-bottom: 8px; /* Aumentado para mejor separación */
+            padding: 3px 0; /* Padding adicional */
+            border-bottom: 1px solid #ddd; /* Línea sutil de separación */
+        }
 
         /* Para evitar que el contenido se solape en saltos de página */
         .page-break {
             page-break-before: always;
+        }
+        
+        /* Salto de página suave para productos */
+        .page-break-soft {
+            page-break-after: auto;
+            page-break-inside: avoid;
         }
 
         /* Estilos para párrafos y texto */
@@ -177,24 +216,28 @@
             line-height: 1.3;
         }
         
-        /* Contenedor de producto */
+        /* Contenedor de producto mejorado */
         .product-container {
             page-break-inside: avoid;
-            margin-bottom: 15px;
+            margin-bottom: 20px; /* Aumentado para mejor separación */
+            padding: 5px 0; /* Padding adicional */
         }
         
         .product-title {
             background-color: #2c3e50;
             color: white;
-            padding: 6px;
+            padding: 8px; /* Aumentado para mejor apariencia */
             text-align: center;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 16px;
             border-radius: 3px;
+            margin-bottom: 5px; /* Separación del contenido */
         }
         
         .product-content {
-            padding: 8px 4px;
+            padding: 10px 4px; /* Aumentado padding vertical */
+            background-color: #fafafa; /* Fondo sutil para mejor legibilidad */
+            border-radius: 3px;
         }
     </style>
 </head>
@@ -214,7 +257,7 @@
                         </div>
                     @endif
                    
-                    <div class="company-ruc" style="display: flex; justify-content: space-between; font-size: 8px;">
+                    <div class="company-ruc" style="display: flex; justify-content: space-between; font-size: 12px;">
                         <span><span class="font-bold">RUC:</span> {{ $empresa['ruc'] ?? '—' }}</span>
                         <span style="color: red;"><span class="font-bold">NUMERO DE COTIZACIÓN:</span> {{ $cotizacion->numero }}</span>
                     </div>
@@ -245,24 +288,6 @@
         </div>
     </div>
 
-    <!-- Footer fijo - SE REPITE en todas las páginas -->
-    <div class="footer">
-        <div style="text-align:left; font-size:7px; border-top: 1px solid #ccc; padding-top: 2px;">
-            <p class="font-bold" style="margin: 0.5px 0;">Marcas:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Modelos:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Procedencias:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Entrega: {{ $cotizacion->entrega }}</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Lugar de entrega: {{ $cotizacion->lugar_entrega }}</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Garantia: {{ $cotizacion->garantia }}</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Forma de pago: {{ $cotizacion->forma_pago }}</p>
-            <p class="font-bold" style="margin: 0.5px 0;">Despacho:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA SOLES:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DOLARES:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DETRACCIÓN:</p>
-            <p class="font-bold" style="margin: 0.5px 0;">PROVEEDOR DEL ESTADO PERUANO:</p>
-        </div>
-    </div>
-
     <!-- Contenido principal -->
     <div class="content">
         @foreach($productos as $producto)
@@ -277,19 +302,79 @@
                         @endif
                     </div>
 
-                    <div class="section-title">Descripcion:</div>
-                    <p style="font-size: 9px; line-height: 1.4; text-align: justify;">{{ $producto['descripcion'] }}</p>
+                    @if(!empty($producto['descripcion']))
+                        <div class="section-title">Descripcion:</div>
+                        <p style="font-size: 12px; line-height: 1.4; text-align: justify;">{{ $producto['descripcion'] }}</p>
+                    @endif
 
-                    @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']) && count($producto['especificaciones']) > 0)
+                    @if(!empty($producto['especificaciones']) && is_array($producto['especificaciones']))
                         <div class="section-title">Datos tecnicos:</div>
-                        <table class="spec-table">
-                            @foreach($producto['especificaciones'] as $key => $value)
-                                <tr>
-                                    <td>{{ ucfirst(str_replace('_', ' ', $key)) }}</td>
-                                    <td>{{ $value }}</td>
-                                </tr>
+
+                        @php
+                            // Verificar si es formato con secciones o formato legacy
+                            $tieneSecciones = isset($producto['especificaciones']['secciones']) && is_array($producto['especificaciones']['secciones']);
+                            $esArrayDirecto = !$tieneSecciones && isset($producto['especificaciones'][0]) && is_array($producto['especificaciones'][0]);
+                        @endphp
+
+                        @if($tieneSecciones)
+                            {{-- Formato nuevo con secciones --}}
+                            @foreach($producto['especificaciones']['secciones'] as $seccion)
+                                @if($seccion['tipo'] === 'tabla' && !empty($seccion['datos']))
+                                    <table class="spec-table" style="margin-bottom: 8px;">
+                                        <thead>
+                                            <tr>
+                                                @foreach($seccion['datos'][0] as $header)
+                                                    <th style="background-color: #2c3e50; color: white; padding: 4px; border: 1px solid #ccc; font-size: 11px;">
+                                                        {{ $header }}
+                                                    </th>
+                                                @endforeach
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach(array_slice($seccion['datos'], 1) as $rowIndex => $row)
+                                                <tr style="{{ $rowIndex % 2 === 0 ? 'background-color: #f8f9fa;' : '' }}">
+                                                    @foreach($row as $cell)
+                                                        <td style="border: 1px solid #ccc; padding: 3px; font-size: 11px;">
+                                                            {{ is_array($cell) ? implode(', ', $cell) : $cell }}
+                                                        </td>
+                                                    @endforeach
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                @elseif($seccion['tipo'] === 'texto' && !empty($seccion['datos']))
+                                    <div style="background-color: #f8f9fa; padding: 8px; border-radius: 4px; margin-bottom: 8px;">
+                                        @foreach($seccion['datos'] as $texto)
+                                            <p style="margin: 2px 0; font-size: 11px;">{{ $texto }}</p>
+                                        @endforeach
+                                    </div>
+                                @endif
                             @endforeach
-                        </table>
+                        @elseif($esArrayDirecto)
+                            {{-- Formato legacy (array directo) --}}
+                            <table class="spec-table">
+                                <thead>
+                                    <tr>
+                                        @foreach($producto['especificaciones'][0] as $header)
+                                            <th style="background-color: #2c3e50; color: white; padding: 4px; border: 1px solid #ccc; font-size: 11px;">
+                                                {{ $header }}
+                                            </th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(array_slice($producto['especificaciones'], 1) as $rowIndex => $row)
+                                        <tr style="{{ $rowIndex % 2 === 0 ? 'background-color: #f8f9fa;' : '' }}">
+                                            @foreach($row as $cell)
+                                                <td style="border: 1px solid #ccc; padding: 3px; font-size: 11px;">
+                                                    {{ is_array($cell) ? implode(', ', $cell) : $cell }}
+                                                </td>
+                                            @endforeach
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -298,54 +383,185 @@
             @endif
         @endforeach
 
-        <div class="page-break">
-            <div class="bg-red text-center font-bold" style="padding: 6px; border-radius: 3px;">
-                RESUMEN Y TOTALES
+        {{-- Sección de productos adicionales --}}
+        @if(isset($productos_adicionales) && count($productos_adicionales) > 0)
+            @foreach($productos_adicionales as $producto_adicional)
+                <div class="product-container">
+                    <div class="product-title">
+                        {{ $producto_adicional['nombre'] }}
+                    </div>
+                    <div class="product-content">
+                        <div class="product-image">
+                             @if(!empty($producto_adicional['imagen']))
+                                <img src="{{ $producto_adicional['imagen'] }}" alt="{{ $producto_adicional['nombre'] }}">
+                            @endif
+                        </div>
+
+                        @if(!empty($producto_adicional['descripcion']))
+                            <div class="section-title">Descripcion:</div>
+                            <p style="font-size: 12px; line-height: 1.4; text-align: justify;">{{ $producto_adicional['descripcion'] }}</p>
+                        @endif
+
+                        @if(!empty($producto_adicional['especificaciones']) && is_array($producto_adicional['especificaciones']))
+                            <div class="section-title">Datos tecnicos:</div>
+
+                            @php
+                                // Verificar si es formato con secciones o formato legacy
+                                $tieneSecciones = isset($producto_adicional['especificaciones']['secciones']) && is_array($producto_adicional['especificaciones']['secciones']);
+                                $esArrayDirecto = !$tieneSecciones && isset($producto_adicional['especificaciones'][0]) && is_array($producto_adicional['especificaciones'][0]);
+                            @endphp
+
+                            @if($tieneSecciones)
+                                {{-- Formato nuevo con secciones --}}
+                                @foreach($producto_adicional['especificaciones']['secciones'] as $seccion)
+                                    @if($seccion['tipo'] === 'tabla' && !empty($seccion['datos']))
+                                        <table class="spec-table" style="margin-bottom: 8px;">
+                                            <thead>
+                                                <tr>
+                                                    @foreach($seccion['datos'][0] as $header)
+                                                        <th style="background-color: #2c3e50; color: white; padding: 4px; border: 1px solid #ccc; font-size: 11px;">
+                                                            {{ $header }}
+                                                        </th>
+                                                    @endforeach
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach(array_slice($seccion['datos'], 1) as $rowIndex => $row)
+                                                    <tr style="{{ $rowIndex % 2 === 0 ? 'background-color: #f8f9fa;' : '' }}">
+                                                        @foreach($row as $cell)
+                                                            <td style="border: 1px solid #ccc; padding: 3px; font-size: 11px;">
+                                                                {{ is_array($cell) ? implode(', ', $cell) : $cell }}
+                                                            </td>
+                                                        @endforeach
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    @elseif($seccion['tipo'] === 'texto' && !empty($seccion['datos']))
+                                        <div style="background-color: #f8f9fa; padding: 8px; border-radius: 4px; margin-bottom: 8px;">
+                                            @foreach($seccion['datos'] as $texto)
+                                                <p style="margin: 2px 0; font-size: 11px;">{{ $texto }}</p>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                @endforeach
+                            @elseif($esArrayDirecto)
+                                {{-- Formato legacy (array directo) --}}
+                                <table class="spec-table">
+                                    <thead>
+                                        <tr>
+                                            @foreach($producto_adicional['especificaciones'][0] as $header)
+                                                <th style="background-color: #2c3e50; color: white; padding: 4px; border: 1px solid #ccc; font-size: 11px;">
+                                                    {{ $header }}
+                                                </th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach(array_slice($producto_adicional['especificaciones'], 1) as $rowIndex => $row)
+                                            <tr style="{{ $rowIndex % 2 === 0 ? 'background-color: #f8f9fa;' : '' }}">
+                                                @foreach($row as $cell)
+                                                    <td style="border: 1px solid #ccc; padding: 3px; font-size: 11px;">
+                                                        {{ is_array($cell) ? implode(', ', $cell) : $cell }}
+                                                    </td>
+                                                @endforeach
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+                @if(!$loop->last)
+                    <div style="page-break-after: always;"></div>
+                @endif
+            @endforeach
+        @endif
+
+        <div class="totals-section">
+            <div class="page-break">
+                <div class="bg-red text-center font-bold" style="padding: 6px; border-radius: 3px;">
+                    RESUMEN Y TOTALES
+                </div>
+                <br>
+                <div class="font-bold" style="padding: 4px; background-color: #f2f2f2;">PRODUCTOS</div>
+                <table class="table">
+                    <thead>
+                        <tr class="bg-dark">
+                            <th>Producto</th>
+                            <th class="text-right">Precio</th>
+                            <th class="text-center">Cantidad</th>
+                            <th class="text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($productos as $producto)
+                        <tr>
+                            <td>{{ $producto['nombre'] }}</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['precio_unitario'], 2) }}</td>
+                            <td class="text-center">{{ $producto['cantidad'] }}</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['subtotal'], 2) }}</td>
+                        </tr>
+                        @endforeach
+                        {{-- Agregar productos adicionales al resumen --}}
+                        @if(isset($productos_adicionales) && count($productos_adicionales) > 0)
+                            @foreach($productos_adicionales as $producto_adicional)
+                            <tr>
+                                <td>{{ $producto_adicional['nombre'] }}</td>
+                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['precio_unitario'], 2) }}</td>
+                                <td class="text-center">{{ $producto_adicional['cantidad'] }}</td>
+                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['subtotal'], 2) }}</td>
+                            </tr>
+                            @endforeach
+                        @endif
+                        <tr>
+                            <td colspan="3" class="text-right font-bold">Total productos</td>
+                            <td class="text-right font-bold">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <div class="font-bold" style="padding: 4px; background-color: #f2f2f2;">TOTALES</div>
+                <table class="table" style="width: 50%; float: right; margin-bottom: 20px;">
+                    <tbody>
+                        <tr>
+                            <td class="font-bold">SUBTOTAL</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold">IGV (18%)</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 0.18, 2) }}</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold bg-dark">TOTAL</td>
+                            <td class="text-right font-bold bg-dark">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 1.18, 2) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div style="clear: both;"></div> <!-- Limpia el float para evitar superposiciones -->
             </div>
-            <br>
-            <div class="font-bold" style="padding: 4px; background-color: #f2f2f2;">PRODUCTOS</div>
-            <table class="table">
-                <thead>
-                    <tr class="bg-dark">
-                        <th>Producto</th>
-                        <th class="text-right">Precio</th>
-                        <th class="text-center">Cantidad</th>
-                        <th class="text-right">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($productos as $producto)
-                    <tr>
-                        <td>{{ $producto['nombre'] }}</td>
-                        <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['precio_unitario'], 2) }}</td>
-                        <td class="text-center">{{ $producto['cantidad'] }}</td>
-                        <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['subtotal'], 2) }}</td>
-                    </tr>
-                    @endforeach
-                    <tr>
-                        <td colspan="3" class="text-right font-bold">Total productos</td>
-                        <td class="text-right font-bold">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <br>
-            <div class="font-bold" style="padding: 4px; background-color: #f2f2f2;">TOTALES</div>
-            <table class="table" style="width: 50%; float: right;">
-                <tbody>
-                    <tr>
-                        <td class="font-bold">SUBTOTAL</td>
-                        <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td class="font-bold">IGV (18%)</td>
-                        <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 0.18, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td class="font-bold bg-dark">TOTAL</td>
-                        <td class="text-right font-bold bg-dark">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 1.18, 2) }}</td>
-                    </tr>
-                </tbody>
-            </table>
+        </div>
+
+        <!-- Footer - Solo al final del documento -->
+        <div class="footer">
+            @if($empresa && !empty($empresa['imagen_firma']))
+                <div class="signature-container">
+                    <img src="{{ public_path($empresa['imagen_firma']) }}" alt="Firma">
+                </div>
+            @endif
+            
+            <div style="text-align:left; font-size:12px; border-top: 1px solid #ccc; padding-top: 12px;">
+                <p class="font-bold" style="margin: 0.5px 0;">Entrega: {{ $cotizacion->entrega }}</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Lugar de entrega: {{ $cotizacion->lugar_entrega }}</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Garantia: {{ $cotizacion->garantia }}</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Forma de pago: {{ $cotizacion->forma_pago }}</p>
+                <p class="font-bold" style="margin: 0.5px 0;">Despacho: A TODO EL PERU Y LATINOAMERICA</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA SOLES: BCP 193-9939241-0-72 CCI: 00219300993924107218</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DOLARES: BCP 193-9918677-1-64 CCI: 00219300991867716410</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DETRACCIÓN: 00-059-167324</p>
+                <p class="font-bold" style="margin: 0.5px 0;">PROVEEDOR DEL ESTADO PERUANO: REGISTRO VENTAS Y SERVICIOS EN LA OSCE</p>
+            </div>
         </div>
     </div>
 

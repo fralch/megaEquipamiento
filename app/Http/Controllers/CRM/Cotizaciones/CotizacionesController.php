@@ -626,15 +626,80 @@ class CotizacionesController extends Controller
     }
 
     /**
+     * Debug de datos para PDF - Ruta temporal
+     */
+    public function debugPdf($id)
+    {
+        try {
+            // Cargar cotización con relaciones básicas
+            $cotizacion = Cotizacion::with([
+                'vendedor:id_usuario,nombre,apellido,correo',
+                'miEmpresa',
+                'detallesProductos',
+                'detallesAdicionales'
+            ])->findOrFail($id);
+
+            // Obtener IDs de productos de los detalles
+            $productosIds = $cotizacion->detallesProductos
+                ->filter(function($detalle) {
+                    return !is_null($detalle->producto_id);
+                })
+                ->pluck('producto_id')
+                ->unique()
+                ->toArray();
+
+            // Cargar productos completos directamente desde la base de datos
+            $productosCompletos = Producto::whereIn('id_producto', $productosIds)->get();
+
+            $debug = [
+                'cotizacion_id' => $cotizacion->id,
+                'cotizacion_numero' => $cotizacion->numero,
+                'productos_ids' => $productosIds,
+                'productos_count' => $productosCompletos->count(),
+                'productos_completos' => $productosCompletos->map(function($p) {
+                    return [
+                        'id' => $p->id_producto,
+                        'nombre' => $p->nombre,
+                        'sku' => $p->sku,
+                        'descripcion' => $p->descripcion ? substr($p->descripcion, 0, 100) . '...' : 'NULL',
+                        'tiene_especificaciones' => !empty($p->especificaciones_tecnicas),
+                        'especificaciones_type' => gettype($p->especificaciones_tecnicas),
+                        'especificaciones_raw' => $p->especificaciones_tecnicas,
+                        'especificaciones_count' => is_array($p->especificaciones_tecnicas) ? count($p->especificaciones_tecnicas) : 0,
+                        'imagen_type' => gettype($p->imagen),
+                        'imagen_count' => is_array($p->imagen) ? count($p->imagen) : 0,
+                    ];
+                }),
+                'detalles' => $cotizacion->detallesProductos->map(function($d) {
+                    return [
+                        'id' => $d->id,
+                        'producto_id' => $d->producto_id,
+                        'nombre' => $d->nombre,
+                        'descripcion' => $d->descripcion ? substr($d->descripcion, 0, 50) . '...' : 'NULL',
+                    ];
+                })
+            ];
+
+            return response()->json($debug, 200, [], JSON_PRETTY_PRINT);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ], 500);
+        }
+    }
+
+    /**
      * Exportar cotización a PDF
      */
     public function exportPdf($id)
     {
         try {
+            // Cargar cotización con relaciones básicas
             $cotizacion = Cotizacion::with([
                 'vendedor:id_usuario,nombre,apellido,correo',
-                'miEmpresa', // Cargar todos los campos de NuestraEmpresa
-                'detallesProductos.producto',
+                'miEmpresa',
+                'detallesProductos',
                 'detallesAdicionales'
             ])->findOrFail($id);
 
@@ -663,79 +728,66 @@ class CotizacionesController extends Controller
                 ];
             }
 
-            // Cargar detalles de productos con especificaciones e imágenes
-            $productos = $cotizacion->detallesProductos->map(function ($detalle) {
-                $producto = $detalle->producto;
-                $especificaciones = [];
-                $sku = null;
-                $descripcion = $detalle->descripcion;
+            // Obtener IDs de productos de los detalles
+            $productosIds = $cotizacion->detallesProductos
+                ->filter(function($detalle) {
+                    return !is_null($detalle->producto_id);
+                })
+                ->pluck('producto_id')
+                ->unique()
+                ->toArray();
+
+            // Cargar productos completos directamente desde la base de datos
+            $productosCompletos = Producto::whereIn('id_producto', $productosIds)->get()->keyBy('id_producto');
+
+            Log::info("=== DEBUG COTIZACION PDF ===");
+            Log::info("Productos IDs: " . json_encode($productosIds));
+            Log::info("Productos completos count: " . $productosCompletos->count());
+
+            // Log de cada producto para ver sus especificaciones
+            foreach ($productosCompletos as $p) {
+                Log::info("Producto ID: {$p->id_producto}, Nombre: {$p->nombre}");
+                Log::info("  - Tiene especificaciones: " . (!empty($p->especificaciones_tecnicas) ? 'SI' : 'NO'));
+                Log::info("  - Tipo especificaciones: " . gettype($p->especificaciones_tecnicas));
+                if (!empty($p->especificaciones_tecnicas)) {
+                    Log::info("  - Especificaciones RAW: " . json_encode($p->especificaciones_tecnicas));
+                    Log::info("  - Count: " . (is_array($p->especificaciones_tecnicas) ? count($p->especificaciones_tecnicas) : 0));
+                }
+            }
+
+            // Mapear detalles de productos con información completa
+            $productos = $cotizacion->detallesProductos->map(function ($detalle) use ($productosCompletos) {
                 $imagen = null;
+                $descripcion = $detalle->descripcion ?? '';
+                $sku = null;
+                $especificaciones = [];
 
-                if ($producto) {
-                    // Obtener SKU del producto
-                    $sku = $producto->sku ?? null;
+                // Si el detalle tiene un producto asociado, obtener sus datos
+                if ($detalle->producto_id && isset($productosCompletos[$detalle->producto_id])) {
+                    $producto = $productosCompletos[$detalle->producto_id];
 
-                    // Usar descripción del producto si existe, sino la del detalle
-                    $descripcion = $producto->descripcion ?? $detalle->descripcion;
+                    // SKU
+                    $sku = $producto->sku;
 
-                    // Obtener imagen principal del producto
-                    if ($producto->imagen) {
-                        $imagenes = is_string($producto->imagen) 
-                            ? json_decode($producto->imagen, true) 
-                            : $producto->imagen;
-                        
-                        if (is_array($imagenes) && !empty($imagenes)) {
-                            // Tomar la primera imagen
+                    // Descripción - usar la del producto si existe
+                    if (!empty($producto->descripcion)) {
+                        $descripcion = $producto->descripcion;
+                    }
+
+                    // Imagen - obtener la primera imagen del producto
+                    if (!empty($producto->imagen)) {
+                        $imagenes = $producto->imagen; // Ya es array gracias al cast
+                        if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
-                            
-                            // Si la imagen es una URL completa, usarla directamente
-                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
-                                $imagen = $primeraImagen;
-                            } else {
-                                // Si es una ruta relativa, construir la URL completa
-                                $imagen = url($primeraImagen);
-                            }
-                        } elseif (is_string($imagenes) && !empty($imagenes)) {
-                            // Manejar caso donde imagen es un string simple
-                            if (filter_var($imagenes, FILTER_VALIDATE_URL)) {
-                                $imagen = $imagenes;
-                            } else {
-                                $imagen = url($imagenes);
-                            }
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
+                                ? $primeraImagen
+                                : url($primeraImagen);
                         }
                     }
 
-                    // Obtener especificaciones técnicas - todos los productos tienen especificaciones
-                    if ($producto->especificaciones_tecnicas) {
-                        $especificacionesRaw = is_string($producto->especificaciones_tecnicas)
-                            ? json_decode($producto->especificaciones_tecnicas, true)
-                            : $producto->especificaciones_tecnicas;
-
-                        // Procesar especificaciones técnicas
-                        if (is_array($especificacionesRaw)) {
-                            foreach ($especificacionesRaw as $key => $value) {
-                                // Incluir todos los valores válidos (strings, números, booleanos)
-                                if (!is_array($value) && !is_object($value) && $value !== null && $value !== '') {
-                                    $especificaciones[$key] = $value;
-                                }
-                            }
-                        } elseif (is_string($especificacionesRaw) && !empty($especificacionesRaw)) {
-                            // Si es un string simple, intentar parsearlo como JSON
-                            $parsedSpecs = json_decode($especificacionesRaw, true);
-                            if (json_last_error() === JSON_ERROR_NONE && is_array($parsedSpecs)) {
-                                foreach ($parsedSpecs as $key => $value) {
-                                    if (!is_array($value) && !is_object($value) && $value !== null && $value !== '') {
-                                        $especificaciones[$key] = $value;
-                                    }
-                                }
-                            } else {
-                                // Si no es JSON válido, usar el string como especificación general
-                                $especificaciones['descripcion_tecnica'] = $especificacionesRaw;
-                            }
-                        }
-                    } else {
-                        // Si no hay especificaciones técnicas, crear un array vacío para mantener consistencia
-                        $especificaciones = [];
+                    // Especificaciones técnicas - pasarlas tal cual están (array de arrays o con secciones)
+                    if (!empty($producto->especificaciones_tecnicas)) {
+                        $especificaciones = $producto->especificaciones_tecnicas;
                     }
                 }
 
@@ -747,7 +799,100 @@ class CotizacionesController extends Controller
                     'precio_unitario' => $detalle->precio_unitario,
                     'subtotal' => $detalle->subtotal,
                     'especificaciones' => $especificaciones,
-                    'imagen' => $imagen, // Agregar imagen del producto
+                    'imagen' => $imagen,
+                ];
+            });
+
+            // Log de productos mapeados
+            Log::info("=== PRODUCTOS MAPEADOS PARA PDF ===");
+            foreach ($productos as $index => $prod) {
+                Log::info("Producto #{$index}: {$prod['nombre']}");
+                Log::info("  - SKU: " . ($prod['sku'] ?? 'NULL'));
+                Log::info("  - Tiene especificaciones: " . (!empty($prod['especificaciones']) ? 'SI' : 'NO'));
+                Log::info("  - Count especificaciones: " . count($prod['especificaciones']));
+                if (!empty($prod['especificaciones'])) {
+                    Log::info("  - Especificaciones: " . json_encode($prod['especificaciones']));
+                }
+            }
+
+            // Obtener IDs de productos adicionales
+            $adicionalesIds = $cotizacion->detallesAdicionales
+                ->filter(function($detalle) {
+                    return !is_null($detalle->producto_id);
+                })
+                ->pluck('producto_id')
+                ->unique()
+                ->toArray();
+
+            // Cargar productos adicionales completos
+            $adicionalesCompletos = Producto::whereIn('id_producto', $adicionalesIds)->get()->keyBy('id_producto');
+
+            // Mapear productos adicionales con información completa
+            $adicionales = $cotizacion->detallesAdicionales->map(function ($detalle) use ($adicionalesCompletos) {
+                $imagen = null;
+                $descripcion = $detalle->descripcion ?? '';
+                $especificaciones = [];
+
+                // Si el detalle tiene un producto asociado
+                if ($detalle->producto_id && isset($adicionalesCompletos[$detalle->producto_id])) {
+                    $producto = $adicionalesCompletos[$detalle->producto_id];
+
+                    // Descripción
+                    if (!empty($producto->descripcion)) {
+                        $descripcion = $producto->descripcion;
+                    }
+
+                    // Imagen
+                    if (!empty($producto->imagen)) {
+                        $imagenes = $producto->imagen;
+                        if (is_array($imagenes) && count($imagenes) > 0) {
+                            $primeraImagen = $imagenes[0];
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
+                                ? $primeraImagen
+                                : url($primeraImagen);
+                        }
+                    }
+
+                    // Especificaciones técnicas - pasarlas tal cual están
+                    if (!empty($producto->especificaciones_tecnicas)) {
+                        $especificaciones = $producto->especificaciones_tecnicas;
+                    }
+                } else {
+                    // Si no tiene producto vinculado, intentar buscar por nombre
+                    $productoMatch = Producto::where('nombre', 'like', '%' . $detalle->nombre . '%')->first();
+
+                    if ($productoMatch) {
+                        // Descripción
+                        if (!empty($productoMatch->descripcion)) {
+                            $descripcion = $productoMatch->descripcion;
+                        }
+
+                        // Imagen
+                        if (!empty($productoMatch->imagen)) {
+                            $imagenes = $productoMatch->imagen;
+                            if (is_array($imagenes) && count($imagenes) > 0) {
+                                $primeraImagen = $imagenes[0];
+                                $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
+                                    ? $primeraImagen
+                                    : url($primeraImagen);
+                            }
+                        }
+
+                        // Especificaciones técnicas - pasarlas tal cual están
+                        if (!empty($productoMatch->especificaciones_tecnicas)) {
+                            $especificaciones = $productoMatch->especificaciones_tecnicas;
+                        }
+                    }
+                }
+
+                return [
+                    'nombre' => $detalle->nombre,
+                    'descripcion' => $descripcion,
+                    'cantidad' => $detalle->cantidad,
+                    'precio_unitario' => $detalle->precio_unitario,
+                    'subtotal' => $detalle->subtotal,
+                    'imagen' => $imagen,
+                    'especificaciones' => $especificaciones,
                 ];
             });
 
@@ -760,7 +905,7 @@ class CotizacionesController extends Controller
                 ];
             }
 
-            // Preparar datos de nuestra empresa como array independiente
+            // Preparar datos de nuestra empresa
             $empresa = null;
             if ($cotizacion->miEmpresa) {
                 $empresa = [
@@ -771,86 +916,10 @@ class CotizacionesController extends Controller
                     'ruc' => $cotizacion->miEmpresa->ruc,
                     'imagen_logo' => $cotizacion->miEmpresa->imagen_logo,
                     'imagen_firma' => $cotizacion->miEmpresa->imagen_firma,
-                    'id_usuario' => $cotizacion->miEmpresa->id_usuario,
-                    'created_at' => $cotizacion->miEmpresa->created_at,
-                    'updated_at' => $cotizacion->miEmpresa->updated_at,
                 ];
             }
 
             // Preparar datos para el PDF
-            // Enriquecer productos adicionales con imagen y descripción
-            $adicionales = $cotizacion->detallesAdicionales->map(function ($adicional) {
-                $imagen = null;
-                $descripcion = $adicional->descripcion;
-
-                // 1) Si está vinculado a un producto del catálogo, usar su imagen
-                if ($adicional->producto) {
-                    $producto = $adicional->producto;
-
-                    if ($producto && $producto->imagen) {
-                        $imagenes = is_string($producto->imagen)
-                            ? json_decode($producto->imagen, true)
-                            : $producto->imagen;
-
-                        if (is_array($imagenes) && !empty($imagenes)) {
-                            $primeraImagen = $imagenes[0];
-                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
-                        } elseif (is_string($imagenes) && !empty($imagenes)) {
-                            $imagen = filter_var($imagenes, FILTER_VALIDATE_URL) ? $imagenes : url($imagenes);
-                        }
-                    }
-
-                    // Usar descripción del producto si existe
-                    if ($producto && !empty($producto->descripcion)) {
-                        $descripcion = $producto->descripcion;
-                    }
-                }
-
-                // 2) Si no tiene producto vinculado o no se obtuvo imagen, intentar buscar por nombre en productos
-                if (!$imagen) {
-                    $productoMatch = \App\Models\Producto::where('nombre', 'like', '%' . $adicional->nombre . '%')->first();
-                    if ($productoMatch && $productoMatch->imagen) {
-                        $imagenes = is_string($productoMatch->imagen)
-                            ? json_decode($productoMatch->imagen, true)
-                            : $productoMatch->imagen;
-
-                        if (is_array($imagenes) && !empty($imagenes)) {
-                            $primeraImagen = $imagenes[0];
-                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
-                        } elseif (is_string($imagenes) && !empty($imagenes)) {
-                            $imagen = filter_var($imagenes, FILTER_VALIDATE_URL) ? $imagenes : url($imagenes);
-                        }
-
-                        // Usar descripción del producto coincidente si existe
-                        if (!$descripcion && !empty($productoMatch->descripcion)) {
-                            $descripcion = $productoMatch->descripcion;
-                        }
-                    }
-                }
-
-                // 3) Si aún no hay imagen, buscar en banco de imágenes (Spatie Media)
-                if (!$imagen) {
-                    try {
-                        $media = \App\Models\Media::buscarImagenes($adicional->nombre)->first();
-                        if ($media) {
-                            $url = $media->getUrl();
-                            $imagen = filter_var($url, FILTER_VALIDATE_URL) ? $url : url($url);
-                        }
-                    } catch (\Throwable $e) {
-                        // Ignorar errores de media y continuar sin imagen
-                    }
-                }
-
-                return [
-                    'nombre' => $adicional->nombre,
-                    'descripcion' => $descripcion,
-                    'cantidad' => $adicional->cantidad,
-                    'precio_unitario' => $adicional->precio_unitario,
-                    'subtotal' => $adicional->subtotal,
-                    'imagen' => $imagen,
-                ];
-            });
-
             $data = [
                 'cotizacion' => $cotizacion,
                 'productos' => $productos,
@@ -870,6 +939,7 @@ class CotizacionesController extends Controller
             return $pdf->download($filename);
         } catch (\Exception $e) {
             Log::error('Error al exportar cotización a PDF: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
                 'error' => 'Error al exportar cotización',
