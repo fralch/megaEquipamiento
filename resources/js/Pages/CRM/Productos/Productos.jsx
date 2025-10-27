@@ -5,16 +5,11 @@ import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../CRMLayout';
 import ProductModal from './components/ProductModal';
 import EditProductModal from './components/EditProductModal';
-import TemporalProductModal from './components/TemporalProductModal';
-import EditTemporalProductModal from './components/EditTemporalProductModal';
-import ViewTemporalProductModal from './components/ViewTemporalProductModal';
 import axios from 'axios';
 
 export default function Productos() {
     const { isDarkMode } = useTheme();
-    const [activeTab, setActiveTab] = useState('productos'); // 'productos' o 'temporales'
     const [productos, setProductos] = useState([]);
-    const [productosTemporales, setProductosTemporales] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -23,12 +18,7 @@ export default function Productos() {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isTemporalModalOpen, setIsTemporalModalOpen] = useState(false);
-    const [isEditTemporalModalOpen, setIsEditTemporalModalOpen] = useState(false);
-    const [isViewTemporalModalOpen, setIsViewTemporalModalOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState(null);
-    const [temporalProductToEdit, setTemporalProductToEdit] = useState(null);
-    const [temporalProductToView, setTemporalProductToView] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearching, setIsSearching] = useState(false);
 
@@ -113,53 +103,6 @@ export default function Productos() {
         }
     };
 
-    const fetchProductosTemporales = async (page = 1, itemsPerPage = 20, search = '', marcaId = '') => {
-        try {
-            setLoading(true);
-            const endpoint = '/crm/productos-temporales';
-            console.log('Fetching productos temporales from:', endpoint);
-            console.log('Params:', { page, per_page: itemsPerPage, search, marca_id: marcaId });
-
-            const response = await axios.get(endpoint, {
-                params: {
-                    page: page,
-                    per_page: itemsPerPage,
-                    ...(search && { search: search }),
-                    ...(marcaId && { marca_id: marcaId })
-                },
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-
-            console.log('Response data:', response.data);
-            const data = response.data;
-
-            // El controlador puede devolver la estructura en dos formatos diferentes
-            // Formato 1: Con paginación de Laravel (data.data, data.current_page, etc.)
-            // Formato 2: Con estructura personalizada (data.productos, data.pagination)
-            const productos = data.productos || data.data || [];
-            const currentPageNum = data.pagination?.current_page || data.current_page || 1;
-            const lastPageNum = data.pagination?.last_page || data.last_page || 1;
-            const totalNum = data.pagination?.total || data.total || 0;
-            const perPageNum = data.pagination?.per_page || data.per_page || 20;
-
-            console.log('Productos temporales:', productos);
-            console.log('Current page:', currentPageNum, 'Total:', totalNum);
-
-            setProductosTemporales(productos);
-            setCurrentPage(currentPageNum);
-            setTotalPages(lastPageNum);
-            setTotal(totalNum);
-            setPerPage(perPageNum);
-        } catch (error) {
-            console.error('Error fetching productos temporales:', error);
-            console.error('Error details:', error.response?.data);
-            setProductosTemporales([]);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // Cargar datos de filtros al montar el componente
     useEffect(() => {
@@ -171,55 +114,25 @@ export default function Productos() {
         }
     }, []);
 
-    // Efecto para cambiar de tab
+    // Actualizar productos cuando cambian los filtros
     useEffect(() => {
-        console.log('Tab changed to:', activeTab);
-        setCurrentPage(1);
-        if (activeTab === 'productos') {
-            console.log('Loading regular products...');
-            fetchProductos(1, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
-        } else {
-            console.log('Loading temporary products...');
-            fetchProductosTemporales(1, perPage, searchTerm, selectedMarca);
-        }
-    }, [activeTab]);
-
-    // Actualizar productos cuando cambian los filtros (solo para productos normales)
-    useEffect(() => {
-        if (currentPage > 0 && activeTab === 'productos') {
+        if (currentPage > 0) {
             fetchProductos(currentPage, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
         }
     }, [selectedMarca, selectedCategoria, selectedSubcategoria]);
 
     // Efecto para manejar la paginación
     useEffect(() => {
-        if (activeTab === 'productos') {
-            fetchProductos(currentPage, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
-        } else {
-            fetchProductosTemporales(currentPage, perPage, searchTerm, selectedMarca);
-        }
+        fetchProductos(currentPage, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
     }, [currentPage, perPage]);
-
-    // Efecto para cuando cambia marca en productos temporales
-    useEffect(() => {
-        if (activeTab === 'temporales') {
-            fetchProductosTemporales(1, perPage, searchTerm, selectedMarca);
-        }
-    }, [selectedMarca]);
 
     // Efecto para la búsqueda con debounce
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setIsSearching(true);
-            if (activeTab === 'productos') {
-                fetchProductos(1, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria).finally(() => {
-                    setIsSearching(false);
-                });
-            } else {
-                fetchProductosTemporales(1, perPage, searchTerm, selectedMarca).finally(() => {
-                    setIsSearching(false);
-                });
-            }
+            fetchProductos(1, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria).finally(() => {
+                setIsSearching(false);
+            });
         }, 500); // Debounce de 500ms
 
         return () => clearTimeout(timeoutId);
@@ -288,105 +201,12 @@ export default function Productos() {
         return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
     };
 
-    const handleOpenTemporalModal = () => {
-        setIsTemporalModalOpen(true);
-    };
-
-    const handleCloseTemporalModal = () => {
-        setIsTemporalModalOpen(false);
-    };
-
-    const handleSaveTemporalProduct = (newProduct) => {
-        // Mostrar mensaje de éxito
-        alert('Producto temporal creado exitosamente. Ahora puedes usarlo en tus cotizaciones.');
-        handleCloseTemporalModal();
-        // Recargar productos temporales
-        if (activeTab === 'temporales') {
-            fetchProductosTemporales(currentPage, perPage, searchTerm, selectedMarca);
-        }
-    };
-
-    const handleDeleteTemporalProduct = async (id) => {
-        if (!confirm('¿Estás seguro de que quieres eliminar este producto temporal?')) {
-            return;
-        }
-
-        try {
-            await axios.delete(`/crm/productos-temporales/${id}/delete`);
-            alert('Producto temporal eliminado exitosamente');
-            fetchProductosTemporales(currentPage, perPage, searchTerm, selectedMarca);
-        } catch (error) {
-            console.error('Error deleting temporal product:', error);
-            alert('Error al eliminar el producto temporal');
-        }
-    };
-
-    const handleViewTemporalProduct = (producto) => {
-        setTemporalProductToView(producto);
-        setIsViewTemporalModalOpen(true);
-    };
-
-    const handleCloseViewTemporalModal = () => {
-        setIsViewTemporalModalOpen(false);
-        setTemporalProductToView(null);
-    };
-
-    const handleEditTemporalProduct = (producto) => {
-        setTemporalProductToEdit(producto);
-        setIsEditTemporalModalOpen(true);
-    };
-
-    const handleCloseEditTemporalModal = () => {
-        setIsEditTemporalModalOpen(false);
-        setTemporalProductToEdit(null);
-    };
-
-    const handleSaveEditedTemporalProduct = (updatedProduct) => {
-        // Actualizar la lista de productos temporales
-        setProductosTemporales(prevProductos =>
-            prevProductos.map(p =>
-                p.id === updatedProduct.id ? updatedProduct : p
-            )
-        );
-        alert('Producto temporal actualizado exitosamente');
-        handleCloseEditTemporalModal();
-    };
 
     return (
         <>
             <Head title="Productos" />
             <CRMLayout title="Gestión de Productos">
                 <div className="p-6">
-                    {/* Tabs */}
-                    <div className="mb-6">
-                        <div className="border-b border-gray-200 dark:border-gray-700">
-                            <nav className="-mb-px flex space-x-8">
-                                <button
-                                    onClick={() => setActiveTab('productos')}
-                                    className={`${
-                                        activeTab === 'productos'
-                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
-                                >
-                                    <FiPackage className="w-5 h-5" />
-                                    Productos
-                                </button>
-                                <button
-                                    onClick={() => setActiveTab('temporales')}
-                                    className={`${
-                                        activeTab === 'temporales'
-                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
-                                >
-                                    <FiPlus className="w-5 h-5" />
-                                    Productos Temporales
-                                </button>
-                            </nav>
-                        </div>
-                    </div>
-
                     {/* Barra de búsqueda */}
                     <div className="mb-6">
                         <div className="relative max-w-md">
@@ -425,35 +245,7 @@ export default function Productos() {
                         )}
                     </div>
 
-                    {/* Filtro de Marca para productos temporales */}
-                    {activeTab === 'temporales' && (
-                        <div className="mb-6">
-                            <label className={`block text-sm font-medium mb-2 ${
-                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                            }`}>
-                                Filtrar por Marca
-                            </label>
-                            <select
-                                value={selectedMarca}
-                                onChange={(e) => setSelectedMarca(e.target.value)}
-                                className={`w-full max-w-xs px-3 py-2 border rounded-lg text-sm ${
-                                    isDarkMode
-                                        ? 'bg-gray-700 border-gray-600 text-white'
-                                        : 'bg-white border-gray-300 text-gray-900'
-                                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-                            >
-                                <option value="">Todas las marcas</option>
-                                {marcas.map((marca) => (
-                                    <option key={marca.id_marca} value={marca.id_marca}>
-                                        {marca.nombre}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-
-                    {/* Sección de Filtros - Solo para productos normales */}
-                    {activeTab === 'productos' && (
+                    {/* Sección de Filtros */}
                     <div className="mb-6">
                         <div className="flex items-center justify-between mb-4">
                             <button
@@ -608,40 +400,28 @@ export default function Productos() {
                             </div>
                         )}
                     </div>
-                    )}
 
                     <div className="mb-6 flex justify-between items-center">
-                        <div className="flex items-center gap-4">
-                            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                {activeTab === 'productos'
-                                    ? (searchTerm ? `Resultados de búsqueda: ${productos.length} de ${total}` : `Mostrando ${productos.length} de ${total} productos`)
-                                    : (searchTerm ? `Resultados de búsqueda: ${productosTemporales.length} de ${total}` : `Mostrando ${productosTemporales.length} de ${total} productos temporales`)
-                                }
-                            </span>
-                            <select
-                                value={perPage}
-                                onChange={(e) => setPerPage(parseInt(e.target.value))}
-                                className={`px-3 py-1 rounded border text-sm ${
-                                    isDarkMode
-                                        ? 'bg-gray-800 border-gray-700 text-white'
-                                        : 'bg-white border-gray-300 text-gray-900'
-                                }`}
-                            >
-                                <option value={10}>10 por página</option>
-                                <option value={20}>20 por página</option>
-                                <option value={50}>50 por página</option>
-                                <option value={100}>100 por página</option>
-                            </select>
-                        </div>
-                        {activeTab === 'temporales' && (
-                            <button
-                                onClick={handleOpenTemporalModal}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                            >
-                                <FiPlus className="w-4 h-4" />
-                                Agregar Producto Temporal
-                            </button>
-                        )}
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            {searchTerm
+                                ? `Resultados de búsqueda: ${productos.length} de ${total}`
+                                : `Mostrando ${productos.length} de ${total} productos`
+                            }
+                        </span>
+                        <select
+                            value={perPage}
+                            onChange={(e) => setPerPage(parseInt(e.target.value))}
+                            className={`px-3 py-1 rounded border text-sm ${
+                                isDarkMode
+                                    ? 'bg-gray-800 border-gray-700 text-white'
+                                    : 'bg-white border-gray-300 text-gray-900'
+                            }`}
+                        >
+                            <option value={10}>10 por página</option>
+                            <option value={20}>20 por página</option>
+                            <option value={50}>50 por página</option>
+                            <option value={100}>100 por página</option>
+                        </select>
                     </div>
 
                     {loading ? (
@@ -686,13 +466,13 @@ export default function Productos() {
                                         </tr>
                                     </thead>
                                     <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
-                                        {(activeTab === 'productos' ? productos : productosTemporales).length > 0 ? (activeTab === 'productos' ? productos : productosTemporales).map((producto) => {
-                                            const primeraImagen = activeTab === 'productos'
-                                                ? (producto.imagen && Array.isArray(producto.imagen) && producto.imagen.length > 0 ? producto.imagen[0] : null)
-                                                : (producto.imagenes && Array.isArray(producto.imagenes) && producto.imagenes.length > 0 ? producto.imagenes[0] : null);
+                                        {productos.length > 0 ? productos.map((producto) => {
+                                            const primeraImagen = producto.imagen && Array.isArray(producto.imagen) && producto.imagen.length > 0
+                                                ? producto.imagen[0]
+                                                : null;
 
                                             return (
-                                                <tr key={activeTab === 'productos' ? producto.id_producto : producto.id} className={`${
+                                                <tr key={producto.id_producto} className={`${
                                                     isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                                 }`}>
                                                     {/* Imagen */}
@@ -719,8 +499,8 @@ export default function Productos() {
                                                     <td className={`px-4 py-4 text-sm ${
                                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                                     }`}>
-                                                        <div className="font-medium" title={activeTab === 'productos' ? producto.nombre : producto.titulo}>
-                                                            {truncateText(activeTab === 'productos' ? producto.nombre : producto.titulo, 40)}
+                                                        <div className="font-medium" title={producto.nombre}>
+                                                            {truncateText(producto.nombre, 40)}
                                                         </div>
                                                         {producto.descripcion && (
                                                             <div className={`text-xs mt-1 ${
@@ -735,7 +515,7 @@ export default function Productos() {
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm font-mono ${
                                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                     }`}>
-                                                        {activeTab === 'productos' ? (producto.sku || 'N/A') : (producto.procedencia || 'N/A')}
+                                                        {producto.sku || 'N/A'}
                                                     </td>
 
                                                     {/* Marca */}
@@ -745,110 +525,59 @@ export default function Productos() {
                                                         {producto.marca?.nombre || 'Sin marca'}
                                                     </td>
 
-                                                    {/* Precio Base (sin ganancia) - Solo para productos normales */}
+                                                    {/* Precio Base (sin ganancia) */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm ${
                                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                     }`}>
-                                                        {activeTab === 'productos' ? (
-                                                            <>
-                                                                <div className="font-medium">
-                                                                    {producto.precio_sin_ganancia ? `S/ ${parseFloat(producto.precio_sin_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
-                                                                </div>
-                                                                <div className="text-xs text-gray-400">Base</div>
-                                                            </>
-                                                        ) : (
-                                                            <span className="text-gray-400">-</span>
-                                                        )}
+                                                        <div className="font-medium">
+                                                            {producto.precio_sin_ganancia ? `S/ ${parseFloat(producto.precio_sin_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                        </div>
+                                                        <div className="text-xs text-gray-400">Base</div>
                                                     </td>
 
-                                                    {/* Precio con Ganancia (sin IGV) - Para productos normales, o precio para temporales */}
+                                                    {/* Precio con Ganancia (sin IGV) */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm font-semibold ${
                                                         isDarkMode ? 'text-blue-400' : 'text-blue-600'
                                                     }`}>
-                                                        {activeTab === 'productos' ? (
-                                                            <>
-                                                                <div className="font-medium">
-                                                                    {producto.precio_ganancia ? `S/ ${parseFloat(producto.precio_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
-                                                                </div>
-                                                                <div className="text-xs text-gray-400">Sin IGV</div>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <div className="font-medium">
-                                                                    {producto.precio ? `S/ ${parseFloat(producto.precio).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
-                                                                </div>
-                                                                <div className="text-xs text-gray-400">Precio</div>
-                                                            </>
-                                                        )}
+                                                        <div className="font-medium">
+                                                            {producto.precio_ganancia ? `S/ ${parseFloat(producto.precio_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                        </div>
+                                                        <div className="text-xs text-gray-400">Sin IGV</div>
                                                     </td>
 
-                                                    {/* Precio con IGV - Solo para productos normales */}
+                                                    {/* Precio con IGV */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm font-semibold ${
                                                         isDarkMode ? 'text-green-400' : 'text-green-600'
                                                     }`}>
-                                                        {activeTab === 'productos' ? (
-                                                            <>
-                                                                <div className="font-medium">
-                                                                    {producto.precio_igv ? `S/ ${parseFloat(producto.precio_igv).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
-                                                                </div>
-                                                                <div className="text-xs text-gray-400">Con IGV</div>
-                                                            </>
-                                                        ) : (
-                                                            <span className="text-gray-400">-</span>
-                                                        )}
+                                                        <div className="font-medium">
+                                                            {producto.precio_igv ? `S/ ${parseFloat(producto.precio_igv).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                        </div>
+                                                        <div className="text-xs text-gray-400">Con IGV</div>
                                                     </td>
                                                     
                                                     {/* Acciones */}
                                                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                                                         <div className="flex gap-2">
-                                                            {activeTab === 'productos' ? (
-                                                                <>
-                                                                    <button
-                                                                        onClick={() => handleViewProduct(producto)}
-                                                                        className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
-                                                                        title="Ver detalles"
-                                                                    >
-                                                                        <FiEye className="w-4 h-4" />
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleEditProduct(producto)}
-                                                                        className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
-                                                                        title="Editar"
-                                                                    >
-                                                                        <FiEdit className="w-4 h-4" />
-                                                                    </button>
-                                                                    <button
-                                                                        className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
-                                                                        title="Eliminar"
-                                                                    >
-                                                                        <FiTrash className="w-4 h-4" />
-                                                                    </button>
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <button
-                                                                        onClick={() => handleViewTemporalProduct(producto)}
-                                                                        className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
-                                                                        title="Ver detalles"
-                                                                    >
-                                                                        <FiEye className="w-4 h-4" />
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleEditTemporalProduct(producto)}
-                                                                        className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
-                                                                        title="Editar"
-                                                                    >
-                                                                        <FiEdit className="w-4 h-4" />
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleDeleteTemporalProduct(producto.id)}
-                                                                        className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
-                                                                        title="Eliminar"
-                                                                    >
-                                                                        <FiTrash className="w-4 h-4" />
-                                                                    </button>
-                                                                </>
-                                                            )}
+                                                            <button
+                                                                onClick={() => handleViewProduct(producto)}
+                                                                className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                                                                title="Ver detalles"
+                                                            >
+                                                                <FiEye className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleEditProduct(producto)}
+                                                                className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
+                                                                title="Editar"
+                                                            >
+                                                                <FiEdit className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                                                                title="Eliminar"
+                                                            >
+                                                                <FiTrash className="w-4 h-4" />
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -860,18 +589,9 @@ export default function Productos() {
                                             }`}>
                                                     <div className="flex flex-col items-center gap-4">
                                                         <FiPackage className="w-12 h-12" />
-                                                        <div>
-                                                            <p className="font-medium text-lg mb-2">
-                                                                {activeTab === 'productos'
-                                                                    ? 'No se encontraron productos'
-                                                                    : 'No hay productos temporales'}
-                                                            </p>
-                                                            {activeTab === 'temporales' && (
-                                                                <p className="text-sm">
-                                                                    Haz clic en "Agregar Producto Temporal" para crear uno
-                                                                </p>
-                                                            )}
-                                                        </div>
+                                                        <p className="font-medium text-lg">
+                                                            No se encontraron productos
+                                                        </p>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -968,28 +688,6 @@ export default function Productos() {
                     isOpen={isEditModalOpen}
                     onClose={handleCloseEditModal}
                     onSave={handleSaveProduct}
-                />
-
-                {/* Modal de Producto Temporal */}
-                <TemporalProductModal
-                    isOpen={isTemporalModalOpen}
-                    onClose={handleCloseTemporalModal}
-                    onSave={handleSaveTemporalProduct}
-                />
-
-                {/* Modal de Editar Producto Temporal */}
-                <EditTemporalProductModal
-                    isOpen={isEditTemporalModalOpen}
-                    onClose={handleCloseEditTemporalModal}
-                    onSave={handleSaveEditedTemporalProduct}
-                    producto={temporalProductToEdit}
-                />
-
-                {/* Modal de Ver Producto Temporal */}
-                <ViewTemporalProductModal
-                    isOpen={isViewTemporalModalOpen}
-                    onClose={handleCloseViewTemporalModal}
-                    producto={temporalProductToView}
                 />
             </CRMLayout>
         </>
