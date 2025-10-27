@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FiX, FiPackage, FiDollarSign, FiTag, FiMapPin, FiCalendar } from 'react-icons/fi';
 import { useTheme } from '../../../../storage/ThemeContext';
+import TemporalProductSpecifications from './TemporalProductSpecifications';
 
 export default function ViewTemporalProductModal({ isOpen, onClose, producto }) {
     const { isDarkMode } = useTheme();
@@ -72,7 +73,7 @@ export default function ViewTemporalProductModal({ isOpen, onClose, producto }) 
                                 <div className={`rounded-lg overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
                                     <div className="relative">
                                         <img
-                                            src={`/storage/${imagenes[currentImageIndex]}`}
+                                            src={`/${imagenes[currentImageIndex]}`}
                                             alt={producto.titulo}
                                             className="w-full h-96 object-contain"
                                         />
@@ -101,7 +102,7 @@ export default function ViewTemporalProductModal({ isOpen, onClose, producto }) 
                                             {imagenes.map((imagen, index) => (
                                                 <img
                                                     key={index}
-                                                    src={`/storage/${imagen}`}
+                                                    src={`/${imagen}`}
                                                     alt={`Miniatura ${index + 1}`}
                                                     onClick={() => setCurrentImageIndex(index)}
                                                     className={`w-20 h-20 object-cover rounded cursor-pointer ${
@@ -192,27 +193,16 @@ export default function ViewTemporalProductModal({ isOpen, onClose, producto }) 
                             )}
 
                             {/* Especificaciones Técnicas */}
-                            {Object.keys(especificaciones).length > 0 && (
+                            {especificaciones && (typeof especificaciones === 'object' && Object.keys(especificaciones).length > 0) && (
                                 <div>
                                     <h3 className={`text-lg font-medium mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                         Especificaciones Técnicas
                                     </h3>
-                                    <div className={`rounded-lg overflow-hidden border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                                        <table className="w-full">
-                                            <tbody className={`divide-y ${isDarkMode ? 'divide-gray-700' : 'divide-gray-200'}`}>
-                                                {Object.entries(especificaciones).map(([clave, valor], index) => (
-                                                    <tr key={index} className={isDarkMode ? 'bg-gray-700' : 'bg-white'}>
-                                                        <td className={`px-4 py-3 text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                                            {clave}
-                                                        </td>
-                                                        <td className={`px-4 py-3 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                                            {valor}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                    <TemporalProductSpecifications
+                                        specifications={especificaciones}
+                                        editMode={false}
+                                        readOnly={true}
+                                    />
                                 </div>
                             )}
 

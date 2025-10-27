@@ -350,7 +350,7 @@ export default function ProductosTemporales() {
                                                         <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
                                                             {primeraImagen ? (
                                                                 <img
-                                                                    src={`/storage/${primeraImagen}`}
+                                                                    src={`/${primeraImagen}`}
                                                                     alt={producto.titulo}
                                                                     className="w-full h-full object-cover"
                                                                     onError={(e) => {

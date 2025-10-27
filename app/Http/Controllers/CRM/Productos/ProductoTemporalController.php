@@ -73,6 +73,64 @@ class ProductoTemporalController extends Controller
     }
 
     /**
+     * Parse technical specifications from text format to structured array
+     */
+    private function parseEspecificaciones($text)
+    {
+        if (empty($text)) {
+            return null;
+        }
+
+        $lines = array_filter(explode("\n", $text), fn($line) => !empty(trim($line)));
+
+        if (empty($lines)) {
+            return null;
+        }
+
+        // Check if it's a table format (contains tabs or multiple spaces)
+        $isTable = false;
+        foreach ($lines as $line) {
+            if (strpos($line, "\t") !== false || preg_match('/\s{2,}/', $line)) {
+                $isTable = true;
+                break;
+            }
+        }
+
+        if ($isTable) {
+            // Process as table - convert to key-value object
+            $result = [];
+            $isFirstLine = true;
+
+            foreach ($lines as $line) {
+                // Skip header line if it looks like a header
+                if ($isFirstLine && (stripos($line, 'especificación') !== false || stripos($line, 'specification') !== false)) {
+                    $isFirstLine = false;
+                    continue;
+                }
+
+                // Split by tab or multiple spaces
+                $parts = preg_split('/\t|\s{2,}/', $line, 2);
+                $parts = array_map('trim', $parts);
+                $parts = array_filter($parts, fn($p) => !empty($p));
+
+                if (count($parts) >= 2) {
+                    $result[$parts[0]] = $parts[1];
+                } elseif (count($parts) === 1 && !$isFirstLine) {
+                    // Single value without key
+                    $result['Info'] = $parts[0];
+                }
+
+                $isFirstLine = false;
+            }
+
+            return empty($result) ? null : $result;
+        }
+
+        // If not a table, return as simple text array (for future text format support)
+        return ['descripcion' => implode("\n", $lines)];
+    }
+
+    /**
      * Get all temporary products for quotations (without pagination)
      */
     public function getAllForQuotation(Request $request)
@@ -139,17 +197,33 @@ class ProductoTemporalController extends Controller
                 'titulo',
                 'marca_id',
                 'descripcion',
-                'especificaciones_tecnicas',
                 'procedencia',
                 'precio'
             ]);
 
-            // Handle image uploads
+            // Process technical specifications
+            if ($request->has('especificaciones_tecnicas') && !empty($request->especificaciones_tecnicas)) {
+                $especificacionesText = $request->especificaciones_tecnicas;
+
+                // Parse the text to create a structured format
+                $especificaciones = $this->parseEspecificaciones($especificacionesText);
+                $data['especificaciones_tecnicas'] = $especificaciones;
+            }
+
+            // Handle image uploads - save to public/img/productos_temporales
             if ($request->hasFile('imagenes')) {
                 $imagenes = [];
+                $uploadPath = public_path('img/productos_temporales');
+
+                // Create directory if it doesn't exist
+                if (!file_exists($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
+
                 foreach ($request->file('imagenes') as $imagen) {
-                    $path = $imagen->store('productos_temporales', 'public');
-                    $imagenes[] = $path;
+                    $filename = time() . '_' . uniqid() . '.' . $imagen->getClientOriginalExtension();
+                    $imagen->move($uploadPath, $filename);
+                    $imagenes[] = 'img/productos_temporales/' . $filename;
                 }
                 $data['imagenes'] = $imagenes;
             }
@@ -225,29 +299,52 @@ class ProductoTemporalController extends Controller
                 'titulo',
                 'marca_id',
                 'descripcion',
-                'especificaciones_tecnicas',
                 'procedencia',
                 'precio'
             ]);
 
-            // Handle deleted images
-            if ($request->has('imagenes_eliminadas')) {
-                $imagenesActuales = $producto->imagenes ?? [];
-                foreach ($request->imagenes_eliminadas as $imagenEliminada) {
-                    if (($key = array_search($imagenEliminada, $imagenesActuales)) !== false) {
-                        Storage::disk('public')->delete($imagenEliminada);
-                        unset($imagenesActuales[$key]);
-                    }
-                }
-                $data['imagenes'] = array_values($imagenesActuales);
+            // Process technical specifications
+            if ($request->has('especificaciones_tecnicas') && !empty($request->especificaciones_tecnicas)) {
+                $especificacionesText = $request->especificaciones_tecnicas;
+
+                // Parse the text to create a structured format
+                $especificaciones = $this->parseEspecificaciones($especificacionesText);
+                $data['especificaciones_tecnicas'] = $especificaciones;
             }
 
-            // Handle new image uploads
+            // Handle deleted images
+            if ($request->has('imagenes_eliminadas')) {
+                $imagenesEliminadas = json_decode($request->imagenes_eliminadas, true);
+                if (is_array($imagenesEliminadas)) {
+                    $imagenesActuales = $producto->imagenes ?? [];
+                    foreach ($imagenesEliminadas as $imagenEliminada) {
+                        if (($key = array_search($imagenEliminada, $imagenesActuales)) !== false) {
+                            // Delete from public/img
+                            $fullPath = public_path($imagenEliminada);
+                            if (file_exists($fullPath)) {
+                                unlink($fullPath);
+                            }
+                            unset($imagenesActuales[$key]);
+                        }
+                    }
+                    $data['imagenes'] = array_values($imagenesActuales);
+                }
+            }
+
+            // Handle new image uploads - save to public/img/productos_temporales
             if ($request->hasFile('imagenes')) {
                 $imagenesActuales = $data['imagenes'] ?? $producto->imagenes ?? [];
+                $uploadPath = public_path('img/productos_temporales');
+
+                // Create directory if it doesn't exist
+                if (!file_exists($uploadPath)) {
+                    mkdir($uploadPath, 0755, true);
+                }
+
                 foreach ($request->file('imagenes') as $imagen) {
-                    $path = $imagen->store('productos_temporales', 'public');
-                    $imagenesActuales[] = $path;
+                    $filename = time() . '_' . uniqid() . '.' . $imagen->getClientOriginalExtension();
+                    $imagen->move($uploadPath, $filename);
+                    $imagenesActuales[] = 'img/productos_temporales/' . $filename;
                 }
                 $data['imagenes'] = $imagenesActuales;
             }
@@ -278,10 +375,13 @@ class ProductoTemporalController extends Controller
         try {
             $producto = ProductoTemporal::findOrFail($id);
 
-            // Delete associated images
+            // Delete associated images from public/img
             if ($producto->imagenes) {
                 foreach ($producto->imagenes as $imagen) {
-                    Storage::disk('public')->delete($imagen);
+                    $fullPath = public_path($imagen);
+                    if (file_exists($fullPath)) {
+                        unlink($fullPath);
+                    }
                 }
             }
 

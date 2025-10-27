@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiX, FiSave, FiImage, FiTrash2 } from 'react-icons/fi';
 import { useTheme } from '../../../../storage/ThemeContext';
+import TemporalProductSpecifications from './TemporalProductSpecifications';
 import axios from 'axios';
 
 export default function TemporalProductModal({ isOpen, onClose, onSave }) {
@@ -13,7 +14,7 @@ export default function TemporalProductModal({ isOpen, onClose, onSave }) {
         precio: '',
         marca_id: '',
         procedencia: '',
-        especificaciones_tecnicas: [{ clave: '', valor: '' }],
+        especificaciones_tecnicas: '',
         imagenes: []
     });
     const [previewImages, setPreviewImages] = useState([]);
@@ -49,30 +50,11 @@ export default function TemporalProductModal({ isOpen, onClose, onSave }) {
         }
     };
 
-    const handleEspecificacionChange = (index, field, value) => {
-        const newEspecificaciones = [...formData.especificaciones_tecnicas];
-        newEspecificaciones[index][field] = value;
+    const handleEspecificacionesChange = (value) => {
         setFormData(prev => ({
             ...prev,
-            especificaciones_tecnicas: newEspecificaciones
+            especificaciones_tecnicas: value
         }));
-    };
-
-    const addEspecificacion = () => {
-        setFormData(prev => ({
-            ...prev,
-            especificaciones_tecnicas: [...prev.especificaciones_tecnicas, { clave: '', valor: '' }]
-        }));
-    };
-
-    const removeEspecificacion = (index) => {
-        if (formData.especificaciones_tecnicas.length > 1) {
-            const newEspecificaciones = formData.especificaciones_tecnicas.filter((_, i) => i !== index);
-            setFormData(prev => ({
-                ...prev,
-                especificaciones_tecnicas: newEspecificaciones
-            }));
-        }
     };
 
     const handleImageChange = (e) => {
@@ -138,16 +120,9 @@ export default function TemporalProductModal({ isOpen, onClose, onSave }) {
                 formDataToSend.append('procedencia', formData.procedencia);
             }
 
-            // Filtrar especificaciones vacías y enviar como JSON
-            const especificacionesValidas = formData.especificaciones_tecnicas
-                .filter(e => e.clave.trim() && e.valor.trim())
-                .reduce((acc, e) => {
-                    acc[e.clave] = e.valor;
-                    return acc;
-                }, {});
-
-            if (Object.keys(especificacionesValidas).length > 0) {
-                formDataToSend.append('especificaciones_tecnicas', JSON.stringify(especificacionesValidas));
+            // Enviar especificaciones técnicas si hay contenido
+            if (formData.especificaciones_tecnicas && formData.especificaciones_tecnicas.trim()) {
+                formDataToSend.append('especificaciones_tecnicas', formData.especificaciones_tecnicas);
             }
 
             // Agregar imágenes
@@ -185,7 +160,7 @@ export default function TemporalProductModal({ isOpen, onClose, onSave }) {
             precio: '',
             marca_id: '',
             procedencia: '',
-            especificaciones_tecnicas: [{ clave: '', valor: '' }],
+            especificaciones_tecnicas: '',
             imagenes: []
         });
         setPreviewImages([]);
@@ -349,57 +324,11 @@ export default function TemporalProductModal({ isOpen, onClose, onSave }) {
                                 </div>
 
                                 {/* Especificaciones Técnicas */}
-                                <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <label className={`block text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                            Especificaciones Técnicas
-                                        </label>
-                                        <button
-                                            type="button"
-                                            onClick={addEspecificacion}
-                                            className="text-sm text-blue-600 hover:text-blue-700"
-                                        >
-                                            + Agregar
-                                        </button>
-                                    </div>
-                                    <div className="space-y-2">
-                                        {formData.especificaciones_tecnicas.map((esp, index) => (
-                                            <div key={index} className="flex gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={esp.clave}
-                                                    onChange={(e) => handleEspecificacionChange(index, 'clave', e.target.value)}
-                                                    placeholder="Clave (ej: Voltaje)"
-                                                    className={`flex-1 px-3 py-2 border rounded-lg text-sm ${
-                                                        isDarkMode
-                                                            ? 'bg-gray-700 border-gray-600 text-white'
-                                                            : 'bg-white border-gray-300 text-gray-900'
-                                                    } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                                />
-                                                <input
-                                                    type="text"
-                                                    value={esp.valor}
-                                                    onChange={(e) => handleEspecificacionChange(index, 'valor', e.target.value)}
-                                                    placeholder="Valor (ej: 220V)"
-                                                    className={`flex-1 px-3 py-2 border rounded-lg text-sm ${
-                                                        isDarkMode
-                                                            ? 'bg-gray-700 border-gray-600 text-white'
-                                                            : 'bg-white border-gray-300 text-gray-900'
-                                                    } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                                />
-                                                {formData.especificaciones_tecnicas.length > 1 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeEspecificacion(index)}
-                                                        className="text-red-600 hover:text-red-700 p-2"
-                                                    >
-                                                        <FiTrash2 className="w-4 h-4" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
+                                <TemporalProductSpecifications
+                                    editMode={true}
+                                    value={formData.especificaciones_tecnicas}
+                                    onChange={handleEspecificacionesChange}
+                                />
 
                                 {/* Imágenes */}
                                 <div>
