@@ -107,14 +107,32 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
         setLoadingSearch(true);
         try {
-            const response = await axios.get('/api/productos/crm/buscar', {
-                params: { q: termino, limit: 20 }
-            });
+            // Buscar en productos normales y temporales en paralelo
+            const [productosResponse, productosTemporalesResponse] = await Promise.all([
+                axios.get('/api/productos/crm/buscar', {
+                    params: { q: termino, limit: 20 }
+                }),
+                axios.get('/crm/productos-temporales/search', {
+                    params: { search: termino, limit: 20 }
+                })
+            ]);
 
-            if (response.data.success) {
-                setProductosResultados(response.data.data || []);
-                setShowProductoDropdown(true);
-            }
+            const productosNormales = productosResponse.data.success ? (productosResponse.data.data || []) : [];
+            const productosTemporales = productosTemporalesResponse.data.success ? (productosTemporalesResponse.data.productos || []) : [];
+
+            // Marcar los productos temporales para distinguirlos
+            const temporalesConMarca = productosTemporales.map(p => ({
+                ...p,
+                nombre: p.titulo || p.nombre,
+                es_temporal: true,
+                precio: p.precio
+            }));
+
+            // Combinar ambos resultados
+            const todosProductos = [...productosNormales, ...temporalesConMarca];
+
+            setProductosResultados(todosProductos);
+            setShowProductoDropdown(todosProductos.length > 0);
         } catch (error) {
             console.error('Error al buscar productos:', error);
         } finally {
@@ -139,18 +157,20 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const selectProducto = (producto) => {
         // Los productos siempre vienen en dólares por defecto
         let precioFinal = producto.precio || 0;
-        
+
         // Si la moneda actual es soles, convertir el precio
         if (formData.moneda === 'soles') {
             precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
         }
-        
+
         const newProducto = {
             id: producto.id,
             nombre: producto.nombre,
             cantidad: 1,
             precio_unitario: precioFinal,
-            subtotal: precioFinal
+            subtotal: precioFinal,
+            es_temporal: producto.es_temporal || false,
+            ...(producto.es_temporal && { producto_temporal_id: producto.id })
         };
 
         setFormData(prev => ({
@@ -433,14 +453,32 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
         setLoadingSearchAdicional(true);
         try {
-            const response = await axios.get('/api/productos/crm/buscar', {
-                params: { q: termino, limit: 20 }
-            });
+            // Buscar en productos normales y temporales en paralelo
+            const [productosResponse, productosTemporalesResponse] = await Promise.all([
+                axios.get('/api/productos/crm/buscar', {
+                    params: { q: termino, limit: 20 }
+                }),
+                axios.get('/crm/productos-temporales/search', {
+                    params: { search: termino, limit: 20 }
+                })
+            ]);
 
-            if (response.data.success) {
-                setProductosAdicionalesResultados(response.data.data || []);
-                setShowProductoAdicionalDropdown(true);
-            }
+            const productosNormales = productosResponse.data.success ? (productosResponse.data.data || []) : [];
+            const productosTemporales = productosTemporalesResponse.data.success ? (productosTemporalesResponse.data.productos || []) : [];
+
+            // Marcar los productos temporales para distinguirlos
+            const temporalesConMarca = productosTemporales.map(p => ({
+                ...p,
+                nombre: p.titulo || p.nombre,
+                es_temporal: true,
+                precio: p.precio
+            }));
+
+            // Combinar ambos resultados
+            const todosProductos = [...productosNormales, ...temporalesConMarca];
+
+            setProductosAdicionalesResultados(todosProductos);
+            setShowProductoAdicionalDropdown(todosProductos.length > 0);
         } catch (error) {
             console.error('Error al buscar productos adicionales:', error);
         } finally {
@@ -465,18 +503,20 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const selectProductoAdicional = (producto) => {
         // Los productos siempre vienen en dólares por defecto
         let precioFinal = producto.precio || 0;
-        
+
         // Si la moneda actual es soles, convertir el precio
         if (formData.moneda === 'soles') {
             precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
         }
-        
+
         const newProducto = {
             id: producto.id,
             nombre: producto.nombre,
             cantidad: 1,
             precio_unitario: precioFinal,
-            subtotal: precioFinal
+            subtotal: precioFinal,
+            es_temporal: producto.es_temporal || false,
+            ...(producto.es_temporal && { producto_temporal_id: producto.id })
         };
 
         setFormData(prev => ({
@@ -868,26 +908,38 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                     }`}>
                                         {productosResultados.map((producto) => (
                                             <div
-                                                key={producto.id}
+                                                key={`${producto.es_temporal ? 'temp-' : ''}${producto.id}`}
                                                 onClick={() => selectProducto(producto)}
                                                 className={`px-3 py-2 cursor-pointer hover:${isDarkMode ? 'bg-gray-600' : 'bg-gray-100'} ${
                                                     isDarkMode ? 'text-white' : 'text-gray-900'
                                                 } border-b last:border-b-0 ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}
                                             >
-                                                <div className="font-medium">{producto.nombre}</div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-medium">{producto.nombre}</span>
+                                                    {producto.es_temporal && (
+                                                        <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                                            Temporal
+                                                        </span>
+                                                    )}
+                                                </div>
                                                 <div className="flex items-center gap-4 text-sm">
-                                                    {producto.sku && (
+                                                    {producto.sku && !producto.es_temporal && (
                                                         <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                                             SKU: {producto.sku}
                                                         </span>
                                                     )}
+                                                    {producto.procedencia && producto.es_temporal && (
+                                                        <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                            Procedencia: {producto.procedencia}
+                                                        </span>
+                                                    )}
                                                     {producto.marca && (
                                                         <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                            Marca: {producto.marca}
+                                                            Marca: {typeof producto.marca === 'object' ? producto.marca.nombre : producto.marca}
                                                         </span>
                                                     )}
                                                     <span className={`font-medium ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
-                                                        S/ {parseFloat(producto.precio || 0).toFixed(2)}
+                                                        ${parseFloat(producto.precio || 0).toFixed(2)}
                                                     </span>
                                                 </div>
                                             </div>
@@ -1024,7 +1076,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                 }`}>
                                     {productosAdicionalesResultados.map((producto) => (
                                         <div
-                                            key={producto.id}
+                                            key={`${producto.es_temporal ? 'temp-' : ''}${producto.id}`}
                                             onClick={() => selectProductoAdicional(producto)}
                                             className={`p-3 cursor-pointer border-b last:border-b-0 hover:bg-opacity-50 ${
                                                 isDarkMode
@@ -1034,11 +1086,25 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                         >
                                             <div className="flex justify-between items-start">
                                                 <div className="flex-1">
-                                                    <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                        {producto.nombre}
-                                                    </h4>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <h4 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                            {producto.nombre}
+                                                        </h4>
+                                                        {producto.es_temporal && (
+                                                            <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                                                Temporal
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                                        SKU: {producto.sku} | Marca: {producto.marca}
+                                                        {producto.es_temporal ? (
+                                                            <>
+                                                                {producto.procedencia && `Procedencia: ${producto.procedencia}`}
+                                                                {producto.marca && ` | Marca: ${typeof producto.marca === 'object' ? producto.marca.nombre : producto.marca}`}
+                                                            </>
+                                                        ) : (
+                                                            <>SKU: {producto.sku} | Marca: {producto.marca}</>
+                                                        )}
                                                     </p>
                                                 </div>
                                                 <div className="text-right">
