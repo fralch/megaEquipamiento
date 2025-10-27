@@ -10,7 +10,9 @@ import axios from 'axios';
 
 export default function Productos() {
     const { isDarkMode } = useTheme();
+    const [activeTab, setActiveTab] = useState('productos'); // 'productos' o 'temporales'
     const [productos, setProductos] = useState([]);
+    const [productosTemporales, setProductosTemporales] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -90,7 +92,7 @@ export default function Productos() {
                     ...(subcategoriaId && { subcategoria_id: subcategoriaId })
                 }
             });
-            
+
             const data = response.data;
             setProductos(data.data || []);
             setCurrentPage(data.current_page || 1);
@@ -100,6 +102,54 @@ export default function Productos() {
         } catch (error) {
             console.error('Error fetching productos:', error);
             setProductos([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchProductosTemporales = async (page = 1, itemsPerPage = 20, search = '', marcaId = '') => {
+        try {
+            setLoading(true);
+            const endpoint = '/crm/productos-temporales';
+            console.log('Fetching productos temporales from:', endpoint);
+            console.log('Params:', { page, per_page: itemsPerPage, search, marca_id: marcaId });
+
+            const response = await axios.get(endpoint, {
+                params: {
+                    page: page,
+                    per_page: itemsPerPage,
+                    ...(search && { search: search }),
+                    ...(marcaId && { marca_id: marcaId })
+                },
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            console.log('Response data:', response.data);
+            const data = response.data;
+
+            // El controlador puede devolver la estructura en dos formatos diferentes
+            // Formato 1: Con paginación de Laravel (data.data, data.current_page, etc.)
+            // Formato 2: Con estructura personalizada (data.productos, data.pagination)
+            const productos = data.productos || data.data || [];
+            const currentPageNum = data.pagination?.current_page || data.current_page || 1;
+            const lastPageNum = data.pagination?.last_page || data.last_page || 1;
+            const totalNum = data.pagination?.total || data.total || 0;
+            const perPageNum = data.pagination?.per_page || data.per_page || 20;
+
+            console.log('Productos temporales:', productos);
+            console.log('Current page:', currentPageNum, 'Total:', totalNum);
+
+            setProductosTemporales(productos);
+            setCurrentPage(currentPageNum);
+            setTotalPages(lastPageNum);
+            setTotal(totalNum);
+            setPerPage(perPageNum);
+        } catch (error) {
+            console.error('Error fetching productos temporales:', error);
+            console.error('Error details:', error.response?.data);
+            setProductosTemporales([]);
         } finally {
             setLoading(false);
         }
@@ -115,29 +165,59 @@ export default function Productos() {
         }
     }, []);
 
-    // Actualizar productos cuando cambian los filtros
+    // Efecto para cambiar de tab
     useEffect(() => {
-        if (currentPage > 0) {
+        console.log('Tab changed to:', activeTab);
+        setCurrentPage(1);
+        if (activeTab === 'productos') {
+            console.log('Loading regular products...');
+            fetchProductos(1, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
+        } else {
+            console.log('Loading temporary products...');
+            fetchProductosTemporales(1, perPage, searchTerm, selectedMarca);
+        }
+    }, [activeTab]);
+
+    // Actualizar productos cuando cambian los filtros (solo para productos normales)
+    useEffect(() => {
+        if (currentPage > 0 && activeTab === 'productos') {
             fetchProductos(currentPage, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
         }
     }, [selectedMarca, selectedCategoria, selectedSubcategoria]);
 
     // Efecto para manejar la paginación
     useEffect(() => {
-        fetchProductos(currentPage, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
+        if (activeTab === 'productos') {
+            fetchProductos(currentPage, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
+        } else {
+            fetchProductosTemporales(currentPage, perPage, searchTerm, selectedMarca);
+        }
     }, [currentPage, perPage]);
 
-    // Efecto para la búsqueda y filtros con debounce
+    // Efecto para cuando cambia marca en productos temporales
+    useEffect(() => {
+        if (activeTab === 'temporales') {
+            fetchProductosTemporales(1, perPage, searchTerm, selectedMarca);
+        }
+    }, [selectedMarca]);
+
+    // Efecto para la búsqueda con debounce
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setIsSearching(true);
-            fetchProductos(1, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria).finally(() => {
-                setIsSearching(false);
-            });
+            if (activeTab === 'productos') {
+                fetchProductos(1, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria).finally(() => {
+                    setIsSearching(false);
+                });
+            } else {
+                fetchProductosTemporales(1, perPage, searchTerm, selectedMarca).finally(() => {
+                    setIsSearching(false);
+                });
+            }
         }, 500); // Debounce de 500ms
 
         return () => clearTimeout(timeoutId);
-    }, [searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria, perPage]);
+    }, [searchTerm]);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -214,6 +294,25 @@ export default function Productos() {
         // Mostrar mensaje de éxito
         alert('Producto temporal creado exitosamente. Ahora puedes usarlo en tus cotizaciones.');
         handleCloseTemporalModal();
+        // Recargar productos temporales
+        if (activeTab === 'temporales') {
+            fetchProductosTemporales(currentPage, perPage, searchTerm, selectedMarca);
+        }
+    };
+
+    const handleDeleteTemporalProduct = async (id) => {
+        if (!confirm('¿Estás seguro de que quieres eliminar este producto temporal?')) {
+            return;
+        }
+
+        try {
+            await axios.delete(`/crm/productos-temporales/${id}/delete`);
+            alert('Producto temporal eliminado exitosamente');
+            fetchProductosTemporales(currentPage, perPage, searchTerm, selectedMarca);
+        } catch (error) {
+            console.error('Error deleting temporal product:', error);
+            alert('Error al eliminar el producto temporal');
+        }
     };
 
     return (
@@ -221,6 +320,36 @@ export default function Productos() {
             <Head title="Productos" />
             <CRMLayout title="Gestión de Productos">
                 <div className="p-6">
+                    {/* Tabs */}
+                    <div className="mb-6">
+                        <div className="border-b border-gray-200 dark:border-gray-700">
+                            <nav className="-mb-px flex space-x-8">
+                                <button
+                                    onClick={() => setActiveTab('productos')}
+                                    className={`${
+                                        activeTab === 'productos'
+                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+                                >
+                                    <FiPackage className="w-5 h-5" />
+                                    Productos
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('temporales')}
+                                    className={`${
+                                        activeTab === 'temporales'
+                                            ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                                    } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+                                >
+                                    <FiPlus className="w-5 h-5" />
+                                    Productos Temporales
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
+
                     {/* Barra de búsqueda */}
                     <div className="mb-6">
                         <div className="relative max-w-md">
@@ -259,14 +388,42 @@ export default function Productos() {
                         )}
                     </div>
 
-                    {/* Sección de Filtros */}
+                    {/* Filtro de Marca para productos temporales */}
+                    {activeTab === 'temporales' && (
+                        <div className="mb-6">
+                            <label className={`block text-sm font-medium mb-2 ${
+                                isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                            }`}>
+                                Filtrar por Marca
+                            </label>
+                            <select
+                                value={selectedMarca}
+                                onChange={(e) => setSelectedMarca(e.target.value)}
+                                className={`w-full max-w-xs px-3 py-2 border rounded-lg text-sm ${
+                                    isDarkMode
+                                        ? 'bg-gray-700 border-gray-600 text-white'
+                                        : 'bg-white border-gray-300 text-gray-900'
+                                } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                            >
+                                <option value="">Todas las marcas</option>
+                                {marcas.map((marca) => (
+                                    <option key={marca.id_marca} value={marca.id_marca}>
+                                        {marca.nombre}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    {/* Sección de Filtros - Solo para productos normales */}
+                    {activeTab === 'productos' && (
                     <div className="mb-6">
                         <div className="flex items-center justify-between mb-4">
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
-                                    isDarkMode 
-                                        ? 'bg-gray-800 border-gray-700 text-white hover:bg-gray-700' 
+                                    isDarkMode
+                                        ? 'bg-gray-800 border-gray-700 text-white hover:bg-gray-700'
                                         : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
                                 }`}
                             >
@@ -414,18 +571,22 @@ export default function Productos() {
                             </div>
                         )}
                     </div>
+                    )}
 
                     <div className="mb-6 flex justify-between items-center">
                         <div className="flex items-center gap-4">
                             <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                {searchTerm ? `Resultados de búsqueda: ${productos.length} de ${total}` : `Mostrando ${productos.length} de ${total} productos`}
+                                {activeTab === 'productos'
+                                    ? (searchTerm ? `Resultados de búsqueda: ${productos.length} de ${total}` : `Mostrando ${productos.length} de ${total} productos`)
+                                    : (searchTerm ? `Resultados de búsqueda: ${productosTemporales.length} de ${total}` : `Mostrando ${productosTemporales.length} de ${total} productos temporales`)
+                                }
                             </span>
-                            <select 
-                                value={perPage} 
+                            <select
+                                value={perPage}
                                 onChange={(e) => setPerPage(parseInt(e.target.value))}
                                 className={`px-3 py-1 rounded border text-sm ${
-                                    isDarkMode 
-                                        ? 'bg-gray-800 border-gray-700 text-white' 
+                                    isDarkMode
+                                        ? 'bg-gray-800 border-gray-700 text-white'
                                         : 'bg-white border-gray-300 text-gray-900'
                                 }`}
                             >
@@ -435,13 +596,15 @@ export default function Productos() {
                                 <option value={100}>100 por página</option>
                             </select>
                         </div>
-                        <button
-                            onClick={handleOpenTemporalModal}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        >
-                            <FiPlus className="w-4 h-4" />
-                            Agregar Producto Temporal
-                        </button>
+                        {activeTab === 'temporales' && (
+                            <button
+                                onClick={handleOpenTemporalModal}
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            >
+                                <FiPlus className="w-4 h-4" />
+                                Agregar Producto Temporal
+                            </button>
+                        )}
                     </div>
 
                     {loading ? (
@@ -486,13 +649,13 @@ export default function Productos() {
                                         </tr>
                                     </thead>
                                     <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
-                                        {productos.length > 0 ? productos.map((producto) => {
-                                            const primeraImagen = producto.imagen && Array.isArray(producto.imagen) && producto.imagen.length > 0 
-                                                ? producto.imagen[0] 
-                                                : null;
-                                            
+                                        {(activeTab === 'productos' ? productos : productosTemporales).length > 0 ? (activeTab === 'productos' ? productos : productosTemporales).map((producto) => {
+                                            const primeraImagen = activeTab === 'productos'
+                                                ? (producto.imagen && Array.isArray(producto.imagen) && producto.imagen.length > 0 ? producto.imagen[0] : null)
+                                                : (producto.imagenes && Array.isArray(producto.imagenes) && producto.imagenes.length > 0 ? producto.imagenes[0] : null);
+
                                             return (
-                                                <tr key={producto.id} className={`${
+                                                <tr key={activeTab === 'productos' ? producto.id_producto : producto.id} className={`${
                                                     isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                                 }`}>
                                                     {/* Imagen */}
@@ -519,8 +682,8 @@ export default function Productos() {
                                                     <td className={`px-4 py-4 text-sm ${
                                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                                     }`}>
-                                                        <div className="font-medium" title={producto.nombre}>
-                                                            {truncateText(producto.nombre, 40)}
+                                                        <div className="font-medium" title={activeTab === 'productos' ? producto.nombre : producto.titulo}>
+                                                            {truncateText(activeTab === 'productos' ? producto.nombre : producto.titulo, 40)}
                                                         </div>
                                                         {producto.descripcion && (
                                                             <div className={`text-xs mt-1 ${
@@ -530,83 +693,141 @@ export default function Productos() {
                                                             </div>
                                                         )}
                                                     </td>
-                                                    
+
                                                     {/* SKU */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm font-mono ${
                                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                     }`}>
-                                                        {producto.sku || 'N/A'}
+                                                        {activeTab === 'productos' ? (producto.sku || 'N/A') : (producto.procedencia || 'N/A')}
                                                     </td>
-                                                    
+
                                                     {/* Marca */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm ${
                                                         isDarkMode ? 'text-gray-300' : 'text-gray-500'
                                                     }`}>
                                                         {producto.marca?.nombre || 'Sin marca'}
                                                     </td>
-                                                    
-                                                    {/* Precio Base (sin ganancia) */}
+
+                                                    {/* Precio Base (sin ganancia) - Solo para productos normales */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm ${
                                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                     }`}>
-                                                        <div className="font-medium">
-                                                            {producto.precio_sin_ganancia ? `S/ ${parseFloat(producto.precio_sin_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
-                                                        </div>
-                                                        <div className="text-xs text-gray-400">Base</div>
+                                                        {activeTab === 'productos' ? (
+                                                            <>
+                                                                <div className="font-medium">
+                                                                    {producto.precio_sin_ganancia ? `S/ ${parseFloat(producto.precio_sin_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                                </div>
+                                                                <div className="text-xs text-gray-400">Base</div>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-gray-400">-</span>
+                                                        )}
                                                     </td>
-                                                    
-                                                    {/* Precio con Ganancia (sin IGV) */}
+
+                                                    {/* Precio con Ganancia (sin IGV) - Para productos normales, o precio para temporales */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm font-semibold ${
                                                         isDarkMode ? 'text-blue-400' : 'text-blue-600'
                                                     }`}>
-                                                        <div className="font-medium">
-                                                            {producto.precio_ganancia ? `S/ ${parseFloat(producto.precio_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
-                                                        </div>
-                                                        <div className="text-xs text-gray-400">Sin IGV</div>
+                                                        {activeTab === 'productos' ? (
+                                                            <>
+                                                                <div className="font-medium">
+                                                                    {producto.precio_ganancia ? `S/ ${parseFloat(producto.precio_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                                </div>
+                                                                <div className="text-xs text-gray-400">Sin IGV</div>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <div className="font-medium">
+                                                                    {producto.precio ? `S/ ${parseFloat(producto.precio).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                                </div>
+                                                                <div className="text-xs text-gray-400">Precio</div>
+                                                            </>
+                                                        )}
                                                     </td>
-                                                    
-                                                    {/* Precio con IGV */}
+
+                                                    {/* Precio con IGV - Solo para productos normales */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm font-semibold ${
                                                         isDarkMode ? 'text-green-400' : 'text-green-600'
                                                     }`}>
-                                                        <div className="font-medium">
-                                                            {producto.precio_igv ? `S/ ${parseFloat(producto.precio_igv).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
-                                                        </div>
-                                                        <div className="text-xs text-gray-400">Con IGV</div>
+                                                        {activeTab === 'productos' ? (
+                                                            <>
+                                                                <div className="font-medium">
+                                                                    {producto.precio_igv ? `S/ ${parseFloat(producto.precio_igv).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                                </div>
+                                                                <div className="text-xs text-gray-400">Con IGV</div>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-gray-400">-</span>
+                                                        )}
                                                     </td>
                                                     
                                                     {/* Acciones */}
                                                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                                                         <div className="flex gap-2">
-                                                            <button
-                                                                onClick={() => handleViewProduct(producto)}
-                                                                className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
-                                                                title="Ver detalles"
-                                                            >
-                                                                <FiEye className="w-4 h-4" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleEditProduct(producto)}
-                                                                className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
-                                                                title="Editar"
-                                                            >
-                                                                <FiEdit className="w-4 h-4" />
-                                                            </button>
-                                                            <button className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50" title="Eliminar">
-                                                                <FiTrash className="w-4 h-4" />
-                                                            </button>
+                                                            {activeTab === 'productos' ? (
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => handleViewProduct(producto)}
+                                                                        className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                                                                        title="Ver detalles"
+                                                                    >
+                                                                        <FiEye className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleEditProduct(producto)}
+                                                                        className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
+                                                                        title="Editar"
+                                                                    >
+                                                                        <FiEdit className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                                                                        title="Eliminar"
+                                                                    >
+                                                                        <FiTrash className="w-4 h-4" />
+                                                                    </button>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => handleViewProduct(producto)}
+                                                                        className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                                                                        title="Ver detalles"
+                                                                    >
+                                                                        <FiEye className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleDeleteTemporalProduct(producto.id)}
+                                                                        className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                                                                        title="Eliminar"
+                                                                    >
+                                                                        <FiTrash className="w-4 h-4" />
+                                                                    </button>
+                                                                </>
+                                                            )}
                                                         </div>
                                                     </td>
                                                 </tr>
                                             );
                                         }) : (
                                             <tr>
-                                                <td colSpan="7" className={`px-4 py-8 text-center text-sm ${
+                                                <td colSpan="8" className={`px-4 py-8 text-center text-sm ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                             }`}>
-                                                    <div className="flex flex-col items-center gap-2">
-                                                        <FiPackage className="w-8 h-8" />
-                                                        <span>No se encontraron productos</span>
+                                                    <div className="flex flex-col items-center gap-4">
+                                                        <FiPackage className="w-12 h-12" />
+                                                        <div>
+                                                            <p className="font-medium text-lg mb-2">
+                                                                {activeTab === 'productos'
+                                                                    ? 'No se encontraron productos'
+                                                                    : 'No hay productos temporales'}
+                                                            </p>
+                                                            {activeTab === 'temporales' && (
+                                                                <p className="text-sm">
+                                                                    Haz clic en "Agregar Producto Temporal" para crear uno
+                                                                </p>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
