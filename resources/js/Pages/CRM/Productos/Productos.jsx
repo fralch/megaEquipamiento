@@ -5,6 +5,7 @@ import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../CRMLayout';
 import ProductModal from './components/ProductModal';
 import EditProductModal from './components/EditProductModal';
+import TemporalProductModal from './components/TemporalProductModal';
 import axios from 'axios';
 
 export default function Productos() {
@@ -18,6 +19,7 @@ export default function Productos() {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isTemporalModalOpen, setIsTemporalModalOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearching, setIsSearching] = useState(false);
@@ -198,6 +200,20 @@ export default function Productos() {
     const truncateText = (text, maxLength = 30) => {
         if (!text) return '';
         return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+    };
+
+    const handleOpenTemporalModal = () => {
+        setIsTemporalModalOpen(true);
+    };
+
+    const handleCloseTemporalModal = () => {
+        setIsTemporalModalOpen(false);
+    };
+
+    const handleSaveTemporalProduct = (newProduct) => {
+        // Mostrar mensaje de éxito
+        alert('Producto temporal creado exitosamente. Ahora puedes usarlo en tus cotizaciones.');
+        handleCloseTemporalModal();
     };
 
     return (
@@ -419,9 +435,12 @@ export default function Productos() {
                                 <option value={100}>100 por página</option>
                             </select>
                         </div>
-                        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        <button
+                            onClick={handleOpenTemporalModal}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        >
                             <FiPlus className="w-4 h-4" />
-                            Agregar Producto
+                            Agregar Producto Temporal
                         </button>
                     </div>
 
@@ -684,6 +703,13 @@ export default function Productos() {
                     isOpen={isEditModalOpen}
                     onClose={handleCloseEditModal}
                     onSave={handleSaveProduct}
+                />
+
+                {/* Modal de Producto Temporal */}
+                <TemporalProductModal
+                    isOpen={isTemporalModalOpen}
+                    onClose={handleCloseTemporalModal}
+                    onSave={handleSaveTemporalProduct}
                 />
             </CRMLayout>
         </>

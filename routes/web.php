@@ -22,6 +22,7 @@ use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
 use App\Http\Controllers\CRM\Clientes\ClientesParticularesController;
 use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
 use App\Http\Controllers\CRM\Productos\ProductoGestionController;
+use App\Http\Controllers\CRM\Productos\ProductoTemporalController;
 use App\Http\Controllers\CRM\Cotizaciones\CotizacionesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -111,7 +112,7 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
 
     Route::prefix('productos')->name('productos.')->group(function () {
         Route::get('/', [ProductoGestionController::class, 'index'])->name('index');
-        
+
         // API routes for CRM product management
         Route::get('/marcas', [ProductoGestionController::class, 'getMarcas'])->name('marcas');
         Route::get('/subcategorias', [ProductoGestionController::class, 'getSubcategorias'])->name('subcategorias');
@@ -119,6 +120,19 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
         Route::post('/store', [ProductoGestionController::class, 'store'])->name('store');
         Route::match(['put', 'post'], '/{id}', [ProductoGestionController::class, 'update'])->name('update');
         Route::match(['delete', 'post'], '/{id}/delete', [ProductoGestionController::class, 'destroy'])->name('destroy');
+    });
+
+    // Rutas para productos temporales
+    Route::prefix('productos-temporales')->name('productos-temporales.')->group(function () {
+        Route::get('/', [ProductoTemporalController::class, 'index'])->name('index');
+        Route::get('/all', [ProductoTemporalController::class, 'getAllForQuotation'])->name('all');
+        Route::get('/marcas', [ProductoTemporalController::class, 'getMarcas'])->name('marcas');
+        Route::get('/search', [ProductoTemporalController::class, 'search'])->name('search');
+        Route::post('/store', [ProductoTemporalController::class, 'store'])->name('store');
+        Route::post('/bulk-delete', [ProductoTemporalController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::get('/{id}', [ProductoTemporalController::class, 'show'])->name('show');
+        Route::match(['put', 'post'], '/{id}', [ProductoTemporalController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [ProductoTemporalController::class, 'destroy'])->name('destroy');
     });
 
     // Rutas de roles (deben ir antes de las rutas de usuarios para evitar conflictos)
