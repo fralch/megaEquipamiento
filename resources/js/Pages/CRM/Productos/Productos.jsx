@@ -6,6 +6,8 @@ import CRMLayout from '../CRMLayout';
 import ProductModal from './components/ProductModal';
 import EditProductModal from './components/EditProductModal';
 import TemporalProductModal from './components/TemporalProductModal';
+import EditTemporalProductModal from './components/EditTemporalProductModal';
+import ViewTemporalProductModal from './components/ViewTemporalProductModal';
 import axios from 'axios';
 
 export default function Productos() {
@@ -22,7 +24,11 @@ export default function Productos() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isTemporalModalOpen, setIsTemporalModalOpen] = useState(false);
+    const [isEditTemporalModalOpen, setIsEditTemporalModalOpen] = useState(false);
+    const [isViewTemporalModalOpen, setIsViewTemporalModalOpen] = useState(false);
     const [productToEdit, setProductToEdit] = useState(null);
+    const [temporalProductToEdit, setTemporalProductToEdit] = useState(null);
+    const [temporalProductToView, setTemporalProductToView] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isSearching, setIsSearching] = useState(false);
 
@@ -313,6 +319,37 @@ export default function Productos() {
             console.error('Error deleting temporal product:', error);
             alert('Error al eliminar el producto temporal');
         }
+    };
+
+    const handleViewTemporalProduct = (producto) => {
+        setTemporalProductToView(producto);
+        setIsViewTemporalModalOpen(true);
+    };
+
+    const handleCloseViewTemporalModal = () => {
+        setIsViewTemporalModalOpen(false);
+        setTemporalProductToView(null);
+    };
+
+    const handleEditTemporalProduct = (producto) => {
+        setTemporalProductToEdit(producto);
+        setIsEditTemporalModalOpen(true);
+    };
+
+    const handleCloseEditTemporalModal = () => {
+        setIsEditTemporalModalOpen(false);
+        setTemporalProductToEdit(null);
+    };
+
+    const handleSaveEditedTemporalProduct = (updatedProduct) => {
+        // Actualizar la lista de productos temporales
+        setProductosTemporales(prevProductos =>
+            prevProductos.map(p =>
+                p.id === updatedProduct.id ? updatedProduct : p
+            )
+        );
+        alert('Producto temporal actualizado exitosamente');
+        handleCloseEditTemporalModal();
     };
 
     return (
@@ -790,11 +827,18 @@ export default function Productos() {
                                                             ) : (
                                                                 <>
                                                                     <button
-                                                                        onClick={() => handleViewProduct(producto)}
+                                                                        onClick={() => handleViewTemporalProduct(producto)}
                                                                         className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
                                                                         title="Ver detalles"
                                                                     >
                                                                         <FiEye className="w-4 h-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleEditTemporalProduct(producto)}
+                                                                        className="text-green-600 hover:text-green-900 p-1 rounded hover:bg-green-50"
+                                                                        title="Editar"
+                                                                    >
+                                                                        <FiEdit className="w-4 h-4" />
                                                                     </button>
                                                                     <button
                                                                         onClick={() => handleDeleteTemporalProduct(producto.id)}
@@ -931,6 +975,21 @@ export default function Productos() {
                     isOpen={isTemporalModalOpen}
                     onClose={handleCloseTemporalModal}
                     onSave={handleSaveTemporalProduct}
+                />
+
+                {/* Modal de Editar Producto Temporal */}
+                <EditTemporalProductModal
+                    isOpen={isEditTemporalModalOpen}
+                    onClose={handleCloseEditTemporalModal}
+                    onSave={handleSaveEditedTemporalProduct}
+                    producto={temporalProductToEdit}
+                />
+
+                {/* Modal de Ver Producto Temporal */}
+                <ViewTemporalProductModal
+                    isOpen={isViewTemporalModalOpen}
+                    onClose={handleCloseViewTemporalModal}
+                    producto={temporalProductToView}
                 />
             </CRMLayout>
         </>
