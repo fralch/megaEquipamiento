@@ -690,11 +690,12 @@ const ProductPage = ({ producto }) => {
         }));
     };
 
-    const sendTableToServer = async () => {
+    const sendTableToServer = async (contenidoOverride = null) => {
         try {
+            const contenidoFinal = contenidoOverride || contenidoTabla;
             const response = await axios.post('/product/update', {
                 id_producto: producto.id_producto,
-                especificaciones_tecnicas: JSON.stringify(contenidoTabla)
+                especificaciones_tecnicas: JSON.stringify(contenidoFinal)
             }, {
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -703,14 +704,14 @@ const ProductPage = ({ producto }) => {
                 }
             });
 
-            console.log("Especificaciones de tecnicas enviadas a servidor:", response.data);
+            console.log("Especificaciones técnicas enviadas al servidor:", response.data);
             setProductData(response.data);
             setEditMode(prev => ({
                 ...prev,
                 especificaciones_tecnicas: false
             }));
         } catch (error) {
-            console.error("Error enviando especificaciones de tecnicas al servidor:", error);
+            console.error("Error enviando especificaciones técnicas al servidor:", error);
         }
     };
 
@@ -842,106 +843,19 @@ const ProductPage = ({ producto }) => {
             case 'especificaciones':
                 return (
                     <div className="p-4">
-                        {editMode.especificaciones_tecnicas ? (
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Especificaciones Técnicas
-                                </label>
-                                <div className="mt-1 w-full">
-                                    <div className="mb-2 text-sm text-gray-500">
-                                        Pega una tabla desde Excel, PDF, o de cualquier página web.
-                                        También puedes ingresar texto simple y combinar múltiples tablas y textos.
-                                    </div>
-
-                                    <div className="mb-2">
-                                        <textarea
-                                            onPaste={handleTablaPaste}
-                                            onChange={handleTablaTextChange}
-                                            value={contenidoTabla.textoActual}
-                                            placeholder="Pega el contenido aquí (tabla o texto)"
-                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                            style={{ minHeight: '100px' }}
-                                        />
-
-                                        <div className="flex justify-between mt-2">
-                                            <button
-                                                type="button"
-                                                onClick={saveText}
-                                                disabled={!contenidoTabla.textoActual?.trim()}
-                                                className="px-3 py-1 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                Agregar como texto
-                                            </button>
-
-                                            {contenidoTabla.secciones.length > 0 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={limpiarTabla}
-                                                    className="px-3 py-1 text-sm text-red-600 hover:text-red-800 focus:outline-none"
-                                                >
-                                                    Limpiar todo
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {contenidoTabla.secciones.length > 0 && (
-                                        <div className="mb-4">
-                                            <h3 className="text-sm font-medium text-gray-700 mb-2">Contenido actual:</h3>
-
-                                            {contenidoTabla.secciones.map((seccion, index) => (
-                                                <div key={index} style={{ marginBottom: '1rem' }} className="mb-6 border-b pb-4 pt-2">
-                                                    <div className="flex justify-between items-center mb-2">
-                                                        <h4 className="text-sm font-medium text-gray-700">
-                                                            Sección {index + 1}: {seccion.tipo === 'tabla' ? 'Tabla' : 'Texto'}
-                                                        </h4>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => eliminarSeccion(index)}
-                                                            className="text-red-600 hover:text-red-800 text-sm"
-                                                        >
-                                                            Eliminar
-                                                        </button>
-                                                    </div>
-
-                                                    {seccion.tipo === 'tabla'
-                                                        ? renderTabla(seccion)
-                                                        : renderTexto(seccion)
-                                                    }
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="mt-4 flex space-x-2">
-                                    <button
-                                        onClick={() => sendTableToServer('especificaciones_tecnicas')}
-                                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-                                    >
-                                        Guardar
-                                    </button>
-                                    <button
-                                        onClick={() => toggleEditMode('especificaciones_tecnicas')}
-                                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-                                    >
-                                        Cancelar
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div>
-                                <ProductSpecifications
-                                    specifications={especificacionesData}
-                                />
-                                {auth.user && (
-                                    <button
-                                        onClick={() => toggleEditMode('especificaciones_tecnicas')}
-                                        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                        {productData.especificaciones_tecnicas ? 'Editar' : 'Agregar'} especificaciones técnicas
-                                    </button>
-                                )}
-                            </div>
+                        <ProductSpecifications
+                            specifications={especificacionesData}
+                            editMode={editMode.especificaciones_tecnicas}
+                            handleSave={(nuevoContenido) => sendTableToServer(nuevoContenido)}
+                            toggleEditMode={() => toggleEditMode('especificaciones_tecnicas')}
+                        />
+                        {!editMode.especificaciones_tecnicas && auth.user && productData.especificaciones_tecnicas && (
+                            <button
+                                onClick={() => toggleEditMode('especificaciones_tecnicas')}
+                                className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            >
+                                Editar especificaciones técnicas
+                            </button>
                         )}
                     </div>
                 );
