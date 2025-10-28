@@ -240,7 +240,11 @@ Route::get('/tipos-relacion-productos', [TiposRelacionProductosController::class
 Route::post('/tipos-relacion-productos', [TiposRelacionProductosController::class, 'store'])->name('tipos-relacion-productos.store');
 
 // Rutas para relación marca-categoría
+Route::get('/marca-categoria/all', [MarcaCategoriaController::class, 'index'])->name('marca-categoria.all');
+Route::get('/marca-categoria/marcas', [MarcaCategoriaController::class, 'getMarcas'])->name('marca-categoria.marcas');
+Route::get('/marca-categoria/categorias', [MarcaCategoriaController::class, 'getCategorias'])->name('marca-categoria.categorias');
 Route::post('/marca-categoria/create', [MarcaCategoriaController::class, 'store'])->name('marca-categoria.create');
+Route::post('/marca-categoria/delete/{marca_id}/{categoria_id}', [MarcaCategoriaController::class, 'destroy'])->name('marca-categoria.delete');
 
 // Rutas para pedidos
 Route::post('/pedido/confirmar', [PedidoController::class, 'confirmarPedido'])->name('pedido.confirmar');

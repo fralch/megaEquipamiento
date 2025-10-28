@@ -8,6 +8,7 @@ import Productos from "../Components/create/createProductos";
 import Categorias from "../Components/create/createCategoria";
 import Subcategorias from "../Components/create/createSubcategoria";
 import Marcas from "../Components/create/createMarca";
+import MarcaCategoria from "../Components/create/createMarcaCategoria";
 import Tags from "../Components/create/createTags";
 import TagParents from "../Components/create/createTagParents";
 import MoveSubcategories from "../Components/create/MoveSubcategories";
@@ -19,6 +20,7 @@ const CrearProducto = () => {
     const [crearCategoria, setCrearCategoria] = useState(false);
     const [crearSubcategoria, setCrearSubcategoria] = useState(false);
     const [crearMarca, setCrearMarca] = useState(false);
+    const [crearMarcaCategoria, setCrearMarcaCategoria] = useState(false);
     const [crearTags, setCrearTags] = useState(false);
     const [crearTagParents, setCrearTagParents] = useState(false);
     const [moverSubcategorias, setMoverSubcategorias] = useState(false);
@@ -104,6 +106,7 @@ const CrearProducto = () => {
         setCrearCategoria(false);
         setCrearSubcategoria(false);
         setCrearMarca(false);
+        setCrearMarcaCategoria(false);
         setCrearTags(false);
         setCrearTagParents(false);
         setMoverSubcategorias(false);
@@ -116,6 +119,7 @@ const CrearProducto = () => {
         setCrearCategoria(true);
         setCrearSubcategoria(false);
         setCrearMarca(false);
+        setCrearMarcaCategoria(false);
         setCrearTags(false);
         setCrearTagParents(false);
         setMoverSubcategorias(false);
@@ -128,6 +132,7 @@ const CrearProducto = () => {
         setCrearCategoria(false);
         setCrearSubcategoria(true);
         setCrearMarca(false);
+        setCrearMarcaCategoria(false);
         setCrearTags(false);
         setCrearTagParents(false);
         setMoverSubcategorias(false);
@@ -140,6 +145,7 @@ const CrearProducto = () => {
         setCrearCategoria(false);
         setCrearSubcategoria(false);
         setCrearMarca(true);
+        setCrearMarcaCategoria(false);
         setCrearTags(false);
         setCrearTagParents(false);
         setMoverSubcategorias(false);
@@ -147,11 +153,25 @@ const CrearProducto = () => {
         setActiveButton('marca');
     };
 
+    const handleCrearMarcaCategoriaClick = () => {
+        setCrearProducto(false);
+        setCrearCategoria(false);
+        setCrearSubcategoria(false);
+        setCrearMarca(false);
+        setCrearMarcaCategoria(true);
+        setCrearTags(false);
+        setCrearTagParents(false);
+        setMoverSubcategorias(false);
+        setProductoTagsManagement(false);
+        setActiveButton('marca-categoria');
+    };
+
     const handleCrearTagsClick = () => {
         setCrearProducto(false);
         setCrearCategoria(false);
         setCrearSubcategoria(false);
         setCrearMarca(false);
+        setCrearMarcaCategoria(false);
         setCrearTags(true);
         setCrearTagParents(false);
         setMoverSubcategorias(false);
@@ -164,6 +184,7 @@ const CrearProducto = () => {
         setCrearCategoria(false);
         setCrearSubcategoria(false);
         setCrearMarca(false);
+        setCrearMarcaCategoria(false);
         setCrearTags(false);
         setCrearTagParents(true);
         setMoverSubcategorias(false);
@@ -176,6 +197,7 @@ const CrearProducto = () => {
         setCrearCategoria(false);
         setCrearSubcategoria(false);
         setCrearMarca(false);
+        setCrearMarcaCategoria(false);
         setCrearTags(false);
         setCrearTagParents(false);
         setMoverSubcategorias(true);
@@ -188,6 +210,7 @@ const CrearProducto = () => {
         setCrearCategoria(false);
         setCrearSubcategoria(false);
         setCrearMarca(false);
+        setCrearMarcaCategoria(false);
         setCrearTags(false);
         setCrearTagParents(false);
         setMoverSubcategorias(false);
@@ -321,7 +344,17 @@ const CrearProducto = () => {
                         >
                             Crear Marca
                         </button>
-                        
+                        <button
+                            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                                activeButton === 'marca-categoria'
+                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
+                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
+                            }`}
+                            onClick={handleCrearMarcaCategoriaClick}
+                        >
+                            Marca - Categoría
+                        </button>
+
                         {/* Sección: Gestión de Tags */}
                         <div className={`text-xs font-semibold uppercase tracking-wider pb-2 border-b mt-6 ${
                             isDarkMode ? 'text-green-400 border-gray-600' : 'text-green-600 border-green-200'
@@ -412,6 +445,9 @@ const CrearProducto = () => {
                     </div>
                     <div className={crearMarca ? "block" : "hidden"}>
                         <Marcas onSubmit={handleSubmit} />
+                    </div>
+                    <div className={crearMarcaCategoria ? "block" : "hidden"}>
+                        <MarcaCategoria onSubmit={handleSubmit} />
                     </div>
                     <div className={crearTags ? "block" : "hidden"}>
                         <Tags 
