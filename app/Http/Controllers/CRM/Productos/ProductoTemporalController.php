@@ -198,7 +198,8 @@ class ProductoTemporalController extends Controller
                 'marca_id',
                 'descripcion',
                 'procedencia',
-                'precio'
+                'precio',
+                'especificaciones_tecnicas'
             ]);
 
             // Process technical specifications
@@ -208,6 +209,9 @@ class ProductoTemporalController extends Controller
                 // Parse the text to create a structured format
                 $especificaciones = $this->parseEspecificaciones($especificacionesText);
                 $data['especificaciones_tecnicas'] = $especificaciones;
+            } else {
+                // Si no hay especificaciones técnicas, asegurar que se guarde como null
+                $data['especificaciones_tecnicas'] = null;
             }
 
             // Handle image uploads - save to public/img/productos_temporales
@@ -282,7 +286,7 @@ class ProductoTemporalController extends Controller
                 'precio' => 'sometimes|required|numeric|min:0',
                 'marca_id' => 'nullable|exists:marcas,id_marca',
                 'procedencia' => 'nullable|string|max:255',
-                'especificaciones_tecnicas' => 'nullable|array',
+                'especificaciones_tecnicas' => 'nullable|string',
                 'imagenes' => 'nullable|array',
                 'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
                 'imagenes_eliminadas' => 'nullable|array'
