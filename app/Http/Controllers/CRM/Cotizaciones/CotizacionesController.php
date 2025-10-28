@@ -10,6 +10,7 @@ use App\Models\EmpresaCliente;
 use App\Models\Usuario;
 use App\Models\NuestraEmpresa;
 use App\Models\Producto;
+use App\Models\ProductoTemporal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -728,7 +729,7 @@ class CotizacionesController extends Controller
                 ];
             }
 
-            // Obtener IDs de productos de los detalles
+            // Obtener IDs de productos regulares de los detalles
             $productosIds = $cotizacion->detallesProductos
                 ->filter(function($detalle) {
                     return !is_null($detalle->producto_id);
@@ -737,12 +738,26 @@ class CotizacionesController extends Controller
                 ->unique()
                 ->toArray();
 
+            // Obtener IDs de productos temporales de los detalles
+            $productosTemporalesIds = $cotizacion->detallesProductos
+                ->filter(function($detalle) {
+                    return !is_null($detalle->producto_temporal_id);
+                })
+                ->pluck('producto_temporal_id')
+                ->unique()
+                ->toArray();
+
             // Cargar productos completos directamente desde la base de datos
             $productosCompletos = Producto::whereIn('id_producto', $productosIds)->get()->keyBy('id_producto');
+
+            // Cargar productos temporales completos
+            $productosTemporalesCompletos = ProductoTemporal::whereIn('id', $productosTemporalesIds)->get()->keyBy('id');
 
             Log::info("=== DEBUG COTIZACION PDF ===");
             Log::info("Productos IDs: " . json_encode($productosIds));
             Log::info("Productos completos count: " . $productosCompletos->count());
+            Log::info("Productos temporales IDs: " . json_encode($productosTemporalesIds));
+            Log::info("Productos temporales completos count: " . $productosTemporalesCompletos->count());
 
             // Log de cada producto para ver sus especificaciones
             foreach ($productosCompletos as $p) {
@@ -756,14 +771,40 @@ class CotizacionesController extends Controller
             }
 
             // Mapear detalles de productos con información completa
-            $productos = $cotizacion->detallesProductos->map(function ($detalle) use ($productosCompletos) {
+            $productos = $cotizacion->detallesProductos->map(function ($detalle) use ($productosCompletos, $productosTemporalesCompletos) {
                 $imagen = null;
                 $descripcion = $detalle->descripcion ?? '';
                 $sku = null;
                 $especificaciones = [];
 
-                // Si el detalle tiene un producto asociado, obtener sus datos
-                if ($detalle->producto_id && isset($productosCompletos[$detalle->producto_id])) {
+                // Si el detalle tiene un producto temporal asociado
+                if ($detalle->producto_temporal_id && isset($productosTemporalesCompletos[$detalle->producto_temporal_id])) {
+                    $productoTemporal = $productosTemporalesCompletos[$detalle->producto_temporal_id];
+
+                    // Descripción - usar la del producto temporal si existe
+                    if (!empty($productoTemporal->descripcion)) {
+                        $descripcion = $productoTemporal->descripcion;
+                    }
+
+                    // Imagen - obtener la primera imagen del producto temporal
+                    if (!empty($productoTemporal->imagenes)) {
+                        $imagenes = $productoTemporal->imagenes; // Ya es array gracias al cast
+                        if (is_array($imagenes) && count($imagenes) > 0) {
+                            $primeraImagen = $imagenes[0];
+                            // Las imágenes de productos temporales están en public/img/productos_temporales
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
+                                ? $primeraImagen
+                                : url($primeraImagen);
+                        }
+                    }
+
+                    // Especificaciones técnicas - pasarlas tal cual están
+                    if (!empty($productoTemporal->especificaciones_tecnicas)) {
+                        $especificaciones = $productoTemporal->especificaciones_tecnicas;
+                    }
+                }
+                // Si el detalle tiene un producto regular asociado, obtener sus datos
+                elseif ($detalle->producto_id && isset($productosCompletos[$detalle->producto_id])) {
                     $producto = $productosCompletos[$detalle->producto_id];
 
                     // SKU
@@ -815,7 +856,7 @@ class CotizacionesController extends Controller
                 }
             }
 
-            // Obtener IDs de productos adicionales
+            // Obtener IDs de productos adicionales regulares
             $adicionalesIds = $cotizacion->detallesAdicionales
                 ->filter(function($detalle) {
                     return !is_null($detalle->producto_id);
@@ -824,17 +865,54 @@ class CotizacionesController extends Controller
                 ->unique()
                 ->toArray();
 
+            // Obtener IDs de productos adicionales temporales
+            $adicionalesTemporalesIds = $cotizacion->detallesAdicionales
+                ->filter(function($detalle) {
+                    return !is_null($detalle->producto_temporal_id);
+                })
+                ->pluck('producto_temporal_id')
+                ->unique()
+                ->toArray();
+
             // Cargar productos adicionales completos
             $adicionalesCompletos = Producto::whereIn('id_producto', $adicionalesIds)->get()->keyBy('id_producto');
 
+            // Cargar productos adicionales temporales completos
+            $adicionalesTemporalesCompletos = ProductoTemporal::whereIn('id', $adicionalesTemporalesIds)->get()->keyBy('id');
+
             // Mapear productos adicionales con información completa
-            $adicionales = $cotizacion->detallesAdicionales->map(function ($detalle) use ($adicionalesCompletos) {
+            $adicionales = $cotizacion->detallesAdicionales->map(function ($detalle) use ($adicionalesCompletos, $adicionalesTemporalesCompletos) {
                 $imagen = null;
                 $descripcion = $detalle->descripcion ?? '';
                 $especificaciones = [];
 
-                // Si el detalle tiene un producto asociado
-                if ($detalle->producto_id && isset($adicionalesCompletos[$detalle->producto_id])) {
+                // Si el detalle tiene un producto temporal asociado
+                if ($detalle->producto_temporal_id && isset($adicionalesTemporalesCompletos[$detalle->producto_temporal_id])) {
+                    $productoTemporal = $adicionalesTemporalesCompletos[$detalle->producto_temporal_id];
+
+                    // Descripción
+                    if (!empty($productoTemporal->descripcion)) {
+                        $descripcion = $productoTemporal->descripcion;
+                    }
+
+                    // Imagen
+                    if (!empty($productoTemporal->imagenes)) {
+                        $imagenes = $productoTemporal->imagenes;
+                        if (is_array($imagenes) && count($imagenes) > 0) {
+                            $primeraImagen = $imagenes[0];
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
+                                ? $primeraImagen
+                                : url($primeraImagen);
+                        }
+                    }
+
+                    // Especificaciones técnicas - pasarlas tal cual están
+                    if (!empty($productoTemporal->especificaciones_tecnicas)) {
+                        $especificaciones = $productoTemporal->especificaciones_tecnicas;
+                    }
+                }
+                // Si el detalle tiene un producto regular asociado
+                elseif ($detalle->producto_id && isset($adicionalesCompletos[$detalle->producto_id])) {
                     $producto = $adicionalesCompletos[$detalle->producto_id];
 
                     // Descripción
@@ -858,7 +936,7 @@ class CotizacionesController extends Controller
                         $especificaciones = $producto->especificaciones_tecnicas;
                     }
                 } else {
-                    // Si no tiene producto vinculado, intentar buscar por nombre
+                    // Si no tiene producto vinculado, intentar buscar por nombre en productos regulares
                     $productoMatch = Producto::where('nombre', 'like', '%' . $detalle->nombre . '%')->first();
 
                     if ($productoMatch) {
@@ -881,6 +959,32 @@ class CotizacionesController extends Controller
                         // Especificaciones técnicas - pasarlas tal cual están
                         if (!empty($productoMatch->especificaciones_tecnicas)) {
                             $especificaciones = $productoMatch->especificaciones_tecnicas;
+                        }
+                    } else {
+                        // Si tampoco se encuentra, intentar buscar en productos temporales
+                        $productoTemporalMatch = ProductoTemporal::where('titulo', 'like', '%' . $detalle->nombre . '%')->first();
+
+                        if ($productoTemporalMatch) {
+                            // Descripción
+                            if (!empty($productoTemporalMatch->descripcion)) {
+                                $descripcion = $productoTemporalMatch->descripcion;
+                            }
+
+                            // Imagen
+                            if (!empty($productoTemporalMatch->imagenes)) {
+                                $imagenes = $productoTemporalMatch->imagenes;
+                                if (is_array($imagenes) && count($imagenes) > 0) {
+                                    $primeraImagen = $imagenes[0];
+                                    $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
+                                        ? $primeraImagen
+                                        : url($primeraImagen);
+                                }
+                            }
+
+                            // Especificaciones técnicas - pasarlas tal cual están
+                            if (!empty($productoTemporalMatch->especificaciones_tecnicas)) {
+                                $especificaciones = $productoTemporalMatch->especificaciones_tecnicas;
+                            }
                         }
                     }
                 }

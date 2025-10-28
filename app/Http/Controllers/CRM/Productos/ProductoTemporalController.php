@@ -81,13 +81,22 @@ class ProductoTemporalController extends Controller
             return null;
         }
 
-        $lines = array_filter(explode("\n", $text), fn($line) => !empty(trim($line)));
+        // Si viene como JSON desde el front (TemporalProductSpecifications), decodificar directamente
+        if (is_string($text)) {
+            $jsonDecoded = json_decode($text, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                // Aceptar estructuras { secciones: [...] } o arrays legados
+                return $jsonDecoded;
+            }
+        }
+
+        $lines = array_filter(explode("\n", (string)$text), fn($line) => !empty(trim($line)));
 
         if (empty($lines)) {
             return null;
         }
 
-        // Check if it's a table format (contains tabs or multiple spaces)
+        // Detectar formato de tabla (tabs o múltiples espacios)
         $isTable = false;
         foreach ($lines as $line) {
             if (strpos($line, "\t") !== false || preg_match('/\s{2,}/', $line)) {
@@ -97,18 +106,18 @@ class ProductoTemporalController extends Controller
         }
 
         if ($isTable) {
-            // Process as table - convert to key-value object
+            // Convertir a objeto clave-valor (compatibilidad legacy)
             $result = [];
             $isFirstLine = true;
 
             foreach ($lines as $line) {
-                // Skip header line if it looks like a header
+                // Saltar posible cabecera
                 if ($isFirstLine && (stripos($line, 'especificación') !== false || stripos($line, 'specification') !== false)) {
                     $isFirstLine = false;
                     continue;
                 }
 
-                // Split by tab or multiple spaces
+                // Dividir por tab o múltiples espacios
                 $parts = preg_split('/\t|\s{2,}/', $line, 2);
                 $parts = array_map('trim', $parts);
                 $parts = array_filter($parts, fn($p) => !empty($p));
@@ -116,7 +125,6 @@ class ProductoTemporalController extends Controller
                 if (count($parts) >= 2) {
                     $result[$parts[0]] = $parts[1];
                 } elseif (count($parts) === 1 && !$isFirstLine) {
-                    // Single value without key
                     $result['Info'] = $parts[0];
                 }
 
@@ -126,7 +134,7 @@ class ProductoTemporalController extends Controller
             return empty($result) ? null : $result;
         }
 
-        // If not a table, return as simple text array (for future text format support)
+        // Texto simple
         return ['descripcion' => implode("\n", $lines)];
     }
 
@@ -181,7 +189,7 @@ class ProductoTemporalController extends Controller
                 'precio' => 'required|numeric|min:0',
                 'marca_id' => 'nullable|exists:marcas,id_marca',
                 'procedencia' => 'nullable|string|max:255',
-                'especificaciones_tecnicas' => 'nullable|array',
+                'especificaciones_tecnicas' => 'nullable|string',
                 'imagenes' => 'nullable|array',
                 'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
             ]);
@@ -289,7 +297,7 @@ class ProductoTemporalController extends Controller
                 'especificaciones_tecnicas' => 'nullable|string',
                 'imagenes' => 'nullable|array',
                 'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-                'imagenes_eliminadas' => 'nullable|array'
+                'imagenes_eliminadas' => 'nullable|string'
             ]);
 
             if ($validator->fails()) {
@@ -429,7 +437,10 @@ class ProductoTemporalController extends Controller
             foreach ($productos as $producto) {
                 if ($producto->imagenes) {
                     foreach ($producto->imagenes as $imagen) {
-                        Storage::disk('public')->delete($imagen);
+                        $fullPath = public_path($imagen);
+                        if (file_exists($fullPath)) {
+                            unlink($fullPath);
+                        }
                     }
                 }
             }
