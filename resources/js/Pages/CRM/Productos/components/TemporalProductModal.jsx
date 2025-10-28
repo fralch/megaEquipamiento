@@ -324,11 +324,13 @@ export default function TemporalProductModal({ isOpen, onClose, onSave }) {
                                 </div>
 
                                 {/* Especificaciones Técnicas */}
-                                <TemporalProductSpecifications
-                                    editMode={true}
-                                    value={formData.especificaciones_tecnicas}
-                                    onChange={handleEspecificacionesChange}
-                                />
+                                <div>
+                                    <TemporalProductSpecifications
+                                        editMode={true}
+                                        value={formData.especificaciones_tecnicas}
+                                        onChange={handleEspecificacionesChange}
+                                    />
+                                </div>
 
                                 {/* Imágenes */}
                                 <div>

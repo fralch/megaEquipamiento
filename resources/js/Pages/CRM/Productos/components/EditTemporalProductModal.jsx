@@ -44,15 +44,16 @@ export default function EditTemporalProductModal({ isOpen, onClose, onSave, prod
     const loadProductoData = () => {
         if (!producto) return;
 
-        // Convertir especificaciones de objeto a texto de tabla
-        let especificacionesText = '';
-        if (producto.especificaciones_tecnicas && typeof producto.especificaciones_tecnicas === 'object') {
-            const entries = Object.entries(producto.especificaciones_tecnicas);
-            if (entries.length > 0) {
-                especificacionesText = 'Especificación\tValor\n';
-                entries.forEach(([key, value]) => {
-                    especificacionesText += `${key}\t${value}\n`;
-                });
+        // Las especificaciones técnicas ya vienen en el formato correcto del backend
+        let especificacionesValue = '';
+        if (producto.especificaciones_tecnicas) {
+            // Si es un string JSON, usarlo directamente
+            if (typeof producto.especificaciones_tecnicas === 'string') {
+                especificacionesValue = producto.especificaciones_tecnicas;
+            }
+            // Si es un objeto, convertirlo a JSON
+            else if (typeof producto.especificaciones_tecnicas === 'object') {
+                especificacionesValue = JSON.stringify(producto.especificaciones_tecnicas);
             }
         }
 
@@ -62,7 +63,7 @@ export default function EditTemporalProductModal({ isOpen, onClose, onSave, prod
             precio: producto.precio || '',
             marca_id: producto.marca_id || '',
             procedencia: producto.procedencia || '',
-            especificaciones_tecnicas: especificacionesText,
+            especificaciones_tecnicas: especificacionesValue,
             imagenes_existentes: producto.imagenes || [],
             imagenes_nuevas: []
         });
@@ -352,11 +353,13 @@ export default function EditTemporalProductModal({ isOpen, onClose, onSave, prod
                                 </div>
 
                                 {/* Especificaciones Técnicas */}
-                                <TemporalProductSpecifications
-                                    editMode={true}
-                                    value={formData.especificaciones_tecnicas}
-                                    onChange={handleEspecificacionesChange}
-                                />
+                                <div>
+                                    <TemporalProductSpecifications
+                                        editMode={true}
+                                        value={formData.especificaciones_tecnicas}
+                                        onChange={handleEspecificacionesChange}
+                                    />
+                                </div>
 
                                 {/* Imágenes */}
                                 <div>
