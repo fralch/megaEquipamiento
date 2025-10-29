@@ -126,12 +126,12 @@ class Cotizacion extends Model
     }
 
     /**
-     * Relación con DetalleCotizacion (productos)
+     * Relación con DetalleCotizacion (productos regulares y temporales)
      */
     public function detallesProductos()
     {
         return $this->hasMany(DetalleCotizacion::class, 'cotizacion_id', 'id')
-            ->where('tipo', 'producto');
+            ->whereIn('tipo', ['producto', 'temporal']);
     }
 
     /**
@@ -149,6 +149,15 @@ class Cotizacion extends Model
     public function detalles()
     {
         return $this->hasMany(DetalleCotizacion::class, 'cotizacion_id', 'id');
+    }
+
+    /**
+     * Relación con DetalleCotizacion (solo productos temporales)
+     */
+    public function detallesTemporales()
+    {
+        return $this->hasMany(DetalleCotizacion::class, 'cotizacion_id', 'id')
+            ->where('tipo', 'temporal');
     }
 
     /**

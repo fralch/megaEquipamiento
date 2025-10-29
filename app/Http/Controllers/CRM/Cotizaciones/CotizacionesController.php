@@ -791,10 +791,13 @@ class CotizacionesController extends Controller
                         $imagenes = $productoTemporal->imagenes; // Ya es array gracias al cast
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
-                            // Las imágenes de productos temporales están en public/img/productos_temporales
-                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
-                                ? $primeraImagen
-                                : url($primeraImagen);
+                            // Para PDF, necesitamos rutas físicas, no URLs
+                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                                $imagen = $primeraImagen;
+                            } else {
+                                // Convertir ruta relativa a ruta física
+                                $imagen = public_path($primeraImagen);
+                            }
                         }
                     }
 
@@ -820,9 +823,13 @@ class CotizacionesController extends Controller
                         $imagenes = $producto->imagen; // Ya es array gracias al cast
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
-                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
-                                ? $primeraImagen
-                                : url($primeraImagen);
+                            // Para PDF, necesitamos rutas físicas, no URLs
+                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                                $imagen = $primeraImagen;
+                            } else {
+                                // Convertir ruta relativa a ruta física
+                                $imagen = public_path($primeraImagen);
+                            }
                         }
                     }
 
@@ -900,9 +907,12 @@ class CotizacionesController extends Controller
                         $imagenes = $productoTemporal->imagenes;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
-                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
-                                ? $primeraImagen
-                                : url($primeraImagen);
+                            // Para PDF, necesitamos rutas físicas, no URLs
+                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                                $imagen = $primeraImagen;
+                            } else {
+                                $imagen = public_path($primeraImagen);
+                            }
                         }
                     }
 
@@ -925,9 +935,12 @@ class CotizacionesController extends Controller
                         $imagenes = $producto->imagen;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
-                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
-                                ? $primeraImagen
-                                : url($primeraImagen);
+                            // Para PDF, necesitamos rutas físicas, no URLs
+                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                                $imagen = $primeraImagen;
+                            } else {
+                                $imagen = public_path($primeraImagen);
+                            }
                         }
                     }
 
@@ -1125,7 +1138,8 @@ class CotizacionesController extends Controller
                         $imagenes = $productoTemporal->imagenes;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
-                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
+                            // Para PDF, necesitamos rutas físicas, no URLs
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : public_path($primeraImagen);
                         }
                     }
                     if (!empty($productoTemporal->especificaciones_tecnicas)) {
@@ -1141,7 +1155,8 @@ class CotizacionesController extends Controller
                         $imagenes = $producto->imagen;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
-                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
+                            // Para PDF, necesitamos rutas físicas, no URLs
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : public_path($primeraImagen);
                         }
                     }
                     if (!empty($producto->especificaciones_tecnicas)) {
@@ -1191,7 +1206,8 @@ class CotizacionesController extends Controller
                         $imagenes = $productoTemporal->imagenes;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
-                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
+                            // Para PDF, necesitamos rutas físicas, no URLs
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : public_path($primeraImagen);
                         }
                     }
                     if (!empty($productoTemporal->especificaciones_tecnicas)) {
@@ -1206,7 +1222,8 @@ class CotizacionesController extends Controller
                         $imagenes = $producto->imagen;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
-                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
+                            // Para PDF, necesitamos rutas físicas, no URLs
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : public_path($primeraImagen);
                         }
                     }
                     if (!empty($producto->especificaciones_tecnicas)) {

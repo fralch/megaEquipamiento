@@ -23,37 +23,42 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
     };
 
     const handleExportPdf = async () => {
+        setIsExporting(true);
+        // Agrega cancelación y timeout para evitar que el botón quede bloqueado si el servidor se demora
+        const controller = new AbortController();
+        const TIMEOUT_MS = 30000; // 30s: suficiente para la mayoría de respuestas; ajusta según necesidad
+        const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
         try {
-            setIsExporting(true);
+            const response = await fetch(`/crm/cotizaciones/${cotizacion.id}/export-pdf`, {
+                signal: controller.signal,
+            });
+            if (!response.ok) throw new Error('Error al generar el PDF');
 
-            // Hacer la petición fetch para descargar el PDF
-            const response = await fetch(`/crm/cotizaciones/${cotizacion.id}/export-pdf`);
-
-            if (!response.ok) {
-                throw new Error('Error al generar el PDF');
-            }
-
-            // Obtener el blob del PDF
             const blob = await response.blob();
-
-            // Crear URL del blob
             const url = window.URL.createObjectURL(blob);
 
-            // Crear enlace temporal y descargar
             const link = document.createElement('a');
             link.href = url;
             link.download = `Cotizacion_${cotizacion.numero || cotizacion.id}.pdf`;
             document.body.appendChild(link);
             link.click();
 
-            // Limpiar
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-
-            setIsExporting(false);
+            // Limpieza con leve retraso para mayor compatibilidad en algunos navegadores
+            setTimeout(() => {
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+            }, 0);
         } catch (error) {
-            console.error('Error al exportar PDF:', error);
-            alert('Error al generar el PDF. Por favor, intente nuevamente.');
+            const aborted = error?.name === 'AbortError' || String(error?.message || '').toLowerCase().includes('aborted');
+            if (aborted) {
+                alert('La generación del PDF está tardando más de lo esperado. Intente nuevamente o verifique el servidor.');
+            } else {
+                console.error('Error al exportar PDF:', error);
+                alert('Error al generar el PDF. Por favor, intente nuevamente.');
+            }
+        } finally {
+            clearTimeout(timeoutId);
             setIsExporting(false);
         }
     };
