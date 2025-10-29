@@ -1,11 +1,14 @@
 import { router, usePage } from "@inertiajs/react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     FiHome, FiUsers, FiDollarSign, FiActivity, FiChevronDown,
     FiSettings, FiShoppingBag, FiBarChart, FiBell, FiSearch,
-    FiTrendingUp, FiCalendar, FiMail, FiPhone, FiPackage, FiSun, FiMoon
+    FiTrendingUp, FiCalendar, FiMail, FiPhone, FiPackage, FiSun, FiMoon,
+    FiAlertTriangle, FiAlertCircle
 } from "react-icons/fi";
 import { useTheme } from '../../storage/ThemeContext';
 import { useCRM } from '../../storage/CRMContext';
+import NotificacionesCotizaciones from '../../Components/CRM/Notificaciones/NotificacionesCotizaciones';
 
 export default function CRMLayout({ children, title }) {
     const { auth } = usePage().props;
@@ -224,15 +227,8 @@ export default function CRMLayout({ children, title }) {
                                     />
                                 </div>
 
-                                {/* Notifications */}
-                                <div className="relative">
-                                    <button className={`p-2 rounded-lg transition-colors duration-200 ${
-                                        isDarkMode ? 'hover:bg-gray-800 text-gray-400' : 'hover:bg-gray-100 text-gray-600'
-                                    }`}>
-                                        <FiBell className="w-5 h-5" />
-                                    </button>
-                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-                                </div>
+                                {/* Notifications - Componente mejorado */}
+                                <NotificacionesCotizaciones isDarkMode={isDarkMode} />
                             </div>
                         </div>
                     </div>

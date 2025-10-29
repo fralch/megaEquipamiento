@@ -24,6 +24,7 @@ use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
 use App\Http\Controllers\CRM\Productos\ProductoGestionController;
 use App\Http\Controllers\CRM\Productos\ProductoTemporalController;
 use App\Http\Controllers\CRM\Cotizaciones\CotizacionesController;
+use App\Http\Controllers\NotificacionCotizacionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -97,6 +98,16 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
         Route::match(['put', 'post'], '/{id}', [CotizacionesController::class, 'update'])->name('update');
         Route::match(['delete', 'post'], '/{id}/delete', [CotizacionesController::class, 'destroy'])->name('destroy');
         Route::post('/{id}/cambiar-estado', [CotizacionesController::class, 'cambiarEstado'])->name('cambiar-estado');
+    });
+
+    // Rutas para notificaciones de cotizaciones
+    Route::prefix('notificaciones-cotizaciones')->name('notificaciones-cotizaciones.')->group(function () {
+        Route::get('/', [NotificacionCotizacionController::class, 'index'])->name('index');
+        Route::get('/conteo', [NotificacionCotizacionController::class, 'conteoNoVisualizadas'])->name('conteo');
+        Route::get('/por-urgencia', [NotificacionCotizacionController::class, 'porUrgencia'])->name('por-urgencia');
+        Route::post('/marcar-todas', [NotificacionCotizacionController::class, 'marcarTodasComoVisualizadas'])->name('marcar-todas');
+        Route::post('/{id}/marcar-visualizada', [NotificacionCotizacionController::class, 'marcarComoVisualizada'])->name('marcar-visualizada');
+        Route::delete('/{id}', [NotificacionCotizacionController::class, 'destroy'])->name('destroy');
     });
 
     Route::prefix('empresas')->name('empresas.')->group(function () {

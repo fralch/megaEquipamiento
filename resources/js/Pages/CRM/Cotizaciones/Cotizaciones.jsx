@@ -1,7 +1,9 @@
 import { Head, router } from "@inertiajs/react";
-import { FiBarChart, FiEdit, FiTrash2, FiPlus, FiEye, FiSearch, FiDownload, FiSend, FiClock, FiUser, FiCalendar, FiRefreshCw, FiX } from "react-icons/fi";
+import { FiBarChart, FiEdit, FiTrash2, FiPlus, FiEye, FiSearch, FiDownload, FiSend, FiClock, FiUser, FiCalendar, FiRefreshCw, FiX, FiAlertTriangle, FiAlertCircle, FiBell } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import { useState, useEffect } from 'react';
+import { differenceInDays, parseISO, format } from 'date-fns';
+import { es } from 'date-fns/locale';
 import CRMLayout from '../CRMLayout';
 import ShowCotizaciones from './components/ShowCotizaciones';
 import CreateCotizaciones from './components/CreateCotizaciones';
@@ -190,6 +192,81 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         return new Date(dateString).toLocaleDateString('es-PE');
     };
 
+    const getNotificationInfo = (cotizacion) => {
+        if (!cotizacion.fecha_vencimiento) return null;
+
+        const fechaVencimiento = parseISO(cotizacion.fecha_vencimiento);
+        const hoy = new Date();
+        const diasVencidos = differenceInDays(hoy, fechaVencimiento);
+
+        if (diasVencidos < 3) {
+            return null; // No mostrar notificación
+        } else if (diasVencidos >= 3 && diasVencidos < 5) {
+            return {
+                nivel: 'warning',
+                mensaje: `Vencida hace ${diasVencidos} días`,
+                icon: FiAlertTriangle,
+                bgColor: 'bg-yellow-50',
+                borderColor: 'border-yellow-200',
+                textColor: 'text-yellow-800',
+                iconColor: 'text-yellow-600',
+                darkBgColor: 'dark:bg-yellow-900/20',
+                darkBorderColor: 'dark:border-yellow-800',
+                darkTextColor: 'dark:text-yellow-200',
+                diasVencidos
+            };
+        } else {
+            return {
+                nivel: 'danger',
+                mensaje: `Vencida hace ${diasVencidos} días`,
+                icon: FiAlertCircle,
+                bgColor: 'bg-red-50',
+                borderColor: 'border-red-200',
+                textColor: 'text-red-800',
+                iconColor: 'text-red-600',
+                darkBgColor: 'dark:bg-red-900/20',
+                darkBorderColor: 'dark:border-red-800',
+                darkTextColor: 'dark:text-red-200',
+                diasVencidos
+            };
+        }
+    };
+
+    // Calcular notificaciones
+    const cotizacionesConNotificacion = cotizaciones.filter(c => {
+        const notif = getNotificationInfo(c);
+        return notif !== null;
+    });
+
+    const notificacionesWarning = cotizacionesConNotificacion.filter(c => {
+        const notif = getNotificationInfo(c);
+        return notif?.nivel === 'warning';
+    }).length;
+
+    const notificacionesDanger = cotizacionesConNotificacion.filter(c => {
+        const notif = getNotificationInfo(c);
+        return notif?.nivel === 'danger';
+    }).length;
+
+    // Resumen para el header de CRMLayout
+    const notificationsSummary = {
+        warningCount: notificacionesWarning,
+        dangerCount: notificacionesDanger,
+        totalCount: notificacionesWarning + notificacionesDanger,
+        items: cotizacionesConNotificacion.slice(0, 6).map((c) => {
+            const info = getNotificationInfo(c);
+            return {
+                id: c.id,
+                numero: c.numero,
+                vendedor: c.vendedor_nombre || 'N/A',
+                vence: formatDate(c.fecha_vencimiento),
+                dias: info?.diasVencidos ?? null,
+                nivel: info?.nivel ?? null,
+                enlace: '/crm/cotizaciones'
+            };
+        })
+    };
+
     const estadisticasDisplay = [
         {
             titulo: "Total Cotizaciones",
@@ -216,7 +293,7 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     return (
         <>
             <Head title="Cotizaciones" />
-            <CRMLayout title="Gestión de Cotizaciones">
+            <CRMLayout title="Gestión de Cotizaciones" notifications={notificationsSummary}>
                 <div className="p-6">
 
                     {/* Estadísticas */}
@@ -250,6 +327,48 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                             </div>
                         ))}
                     </div>
+
+                    {/* Banner de Notificaciones */}
+                    {(notificacionesWarning > 0 || notificacionesDanger > 0) && (
+                        <div className={`rounded-xl shadow-sm border p-4 mb-6 ${
+                            isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+                        }`}>
+                            <div className="flex items-center gap-4">
+                                <FiBell className={`w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                                <div className="flex-1">
+                                    <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        Notificaciones de Vencimiento
+                                    </h3>
+                                    <div className="flex flex-wrap gap-3">
+                                        {notificacionesWarning > 0 && (
+                                            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${
+                                                isDarkMode
+                                                    ? 'bg-yellow-900/20 border-yellow-800 text-yellow-200'
+                                                    : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                                            }`}>
+                                                <FiAlertTriangle className="w-4 h-4" />
+                                                <span className="text-sm font-medium">
+                                                    {notificacionesWarning} cotización{notificacionesWarning > 1 ? 'es' : ''} vencida{notificacionesWarning > 1 ? 's' : ''} hace 3-4 días
+                                                </span>
+                                            </div>
+                                        )}
+                                        {notificacionesDanger > 0 && (
+                                            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${
+                                                isDarkMode
+                                                    ? 'bg-red-900/20 border-red-800 text-red-200'
+                                                    : 'bg-red-50 border-red-200 text-red-800'
+                                            }`}>
+                                                <FiAlertCircle className="w-4 h-4" />
+                                                <span className="text-sm font-medium">
+                                                    {notificacionesDanger} cotización{notificacionesDanger > 1 ? 'es' : ''} vencida{notificacionesDanger > 1 ? 's' : ''} hace 5+ días
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Controles */}
                     <div className={`rounded-xl shadow-sm border p-6 mb-6 ${
@@ -355,12 +474,28 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                                 cotizaciones.map((cotizacion) => {
                                                     const estadoInfo = getEstadoInfo(cotizacion.estado);
                                                     const EstadoIcon = estadoInfo.icon;
+                                                    const notificationInfo = getNotificationInfo(cotizacion);
+                                                    const NotifIcon = notificationInfo?.icon;
                                                     return (
-                                                        <tr key={cotizacion.id} className={`hover:${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-colors duration-200`}>
+                                                        <tr key={cotizacion.id} className={`hover:${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'} transition-colors duration-200 ${
+                                                            notificationInfo ? (isDarkMode ? 'bg-gray-800/50' : 'bg-gray-50/50') : ''
+                                                        }`}>
                                                             <td className="px-6 py-4 whitespace-nowrap">
                                                                 <div>
-                                                                    <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                                        {cotizacion.numero}
+                                                                    <div className="flex items-center gap-2">
+                                                                        <div className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                                                            {cotizacion.numero}
+                                                                        </div>
+                                                                        {notificationInfo && (
+                                                                            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${
+                                                                                isDarkMode
+                                                                                    ? notificationInfo.darkBgColor + ' ' + notificationInfo.darkBorderColor + ' ' + notificationInfo.darkTextColor
+                                                                                    : notificationInfo.bgColor + ' ' + notificationInfo.borderColor + ' ' + notificationInfo.textColor
+                                                                            }`}>
+                                                                                <NotifIcon className="w-3 h-3" />
+                                                                                <span>{notificationInfo.diasVencidos}d</span>
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                     <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                                                         Vendedor: {cotizacion.vendedor_nombre || 'N/A'}
@@ -401,9 +536,25 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                                                             {formatDate(cotizacion.fecha_cotizacion)}
                                                                         </span>
                                                                     </div>
-                                                                    <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                    <div className={`text-xs flex items-center gap-1 ${
+                                                                        notificationInfo
+                                                                            ? (notificationInfo.nivel === 'warning'
+                                                                                ? (isDarkMode ? 'text-yellow-400 font-medium' : 'text-yellow-700 font-medium')
+                                                                                : (isDarkMode ? 'text-red-400 font-medium' : 'text-red-700 font-medium'))
+                                                                            : (isDarkMode ? 'text-gray-400' : 'text-gray-500')
+                                                                    }`}>
+                                                                        {notificationInfo && <FiClock className="w-3 h-3" />}
                                                                         Vence: {formatDate(cotizacion.fecha_vencimiento)}
                                                                     </div>
+                                                                    {notificationInfo && (
+                                                                        <div className={`text-xs mt-1 ${
+                                                                            notificationInfo.nivel === 'warning'
+                                                                                ? (isDarkMode ? 'text-yellow-300' : 'text-yellow-600')
+                                                                                : (isDarkMode ? 'text-red-300' : 'text-red-600')
+                                                                        }`}>
+                                                                            {notificationInfo.mensaje}
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap">
