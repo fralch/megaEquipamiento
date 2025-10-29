@@ -20,7 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
-        //
+        // Ejecutar el comando de notificaciones cada hora
+        $schedule->command('cotizaciones:generar-notificaciones')
+                 ->hourly()
+                 ->withoutOverlapping()
+                 ->runInBackground();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
