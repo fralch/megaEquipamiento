@@ -48,6 +48,9 @@ Route::get('/contacto', function () { return Inertia::render('Contacto'); })->na
 Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
 
+// Ruta pública para previsualizar la vista HTML de cotización (solo entorno local)
+Route::get('/preview/pdf/cotizacion/{id?}', [CotizacionesController::class, 'previewPdfHtml'])->name('preview.pdf.cotizacion');
+
 // Rutas del CRM agrupadas por prefijo
 Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
     Route::get('/', fn () => Inertia::render('CRM/Dashboard'))->name('dashboard');

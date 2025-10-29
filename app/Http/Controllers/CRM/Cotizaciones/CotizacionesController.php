@@ -1051,4 +1051,220 @@ class CotizacionesController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Vista HTML de la cotización para previsualización (solo entorno local)
+     */
+    public function previewPdfHtml($id = null)
+    {
+        try {
+            // Obtener cotización; si no se pasa id, usar la primera disponible
+            $cotizacionQuery = Cotizacion::with([
+                'vendedor:id_usuario,nombre,apellido,correo',
+                'miEmpresa',
+                'detallesProductos',
+                'detallesAdicionales'
+            ]);
+
+            $cotizacion = $id ? $cotizacionQuery->findOrFail($id) : $cotizacionQuery->firstOrFail();
+
+            // Cargar información del cliente
+            if ($cotizacion->cliente_tipo === 'empresa') {
+                $cliente = EmpresaCliente::find($cotizacion->cliente_id);
+                $cotizacion->cliente = (object)[
+                    'tipo' => 'empresa',
+                    'nombre' => $cliente->razon_social ?? 'N/A',
+                    'contacto' => $cliente->contacto_principal ?? 'N/A',
+                    'email' => $cliente->email ?? 'N/A',
+                    'telefono' => $cliente->telefono ?? 'N/A',
+                    'direccion' => $cliente->direccion ?? 'N/A',
+                    'ruc' => $cliente->ruc ?? 'N/A',
+                ];
+            } else {
+                $cliente = Cliente::find($cotizacion->cliente_id);
+                $cotizacion->cliente = (object)[
+                    'tipo' => 'particular',
+                    'nombre' => $cliente->nombrecompleto ?? 'N/A',
+                    'contacto' => $cliente->nombrecompleto ?? 'N/A',
+                    'email' => $cliente->email ?? 'N/A',
+                    'telefono' => $cliente->telefono ?? 'N/A',
+                    'direccion' => $cliente->direccion ?? 'N/A',
+                    'ruc_dni' => $cliente->ruc_dni ?? 'N/A',
+                ];
+            }
+
+            // IDs productos y temporales
+            $productosIds = $cotizacion->detallesProductos
+                ->filter(fn($detalle) => !is_null($detalle->producto_id))
+                ->pluck('producto_id')
+                ->unique()
+                ->toArray();
+
+            $productosTemporalesIds = $cotizacion->detallesProductos
+                ->filter(fn($detalle) => !is_null($detalle->producto_temporal_id))
+                ->pluck('producto_temporal_id')
+                ->unique()
+                ->toArray();
+
+            $productosCompletos = Producto::whereIn('id_producto', $productosIds)->get()->keyBy('id_producto');
+            $productosTemporalesCompletos = ProductoTemporal::whereIn('id', $productosTemporalesIds)->get()->keyBy('id');
+
+            // Mapear detalles de productos con información completa
+            $productos = $cotizacion->detallesProductos->map(function ($detalle) use ($productosCompletos, $productosTemporalesCompletos) {
+                $imagen = null;
+                $descripcion = $detalle->descripcion ?? '';
+                $sku = null;
+                $especificaciones = [];
+
+                if ($detalle->producto_temporal_id && isset($productosTemporalesCompletos[$detalle->producto_temporal_id])) {
+                    $productoTemporal = $productosTemporalesCompletos[$detalle->producto_temporal_id];
+                    if (!empty($productoTemporal->descripcion)) {
+                        $descripcion = $productoTemporal->descripcion;
+                    }
+                    if (!empty($productoTemporal->imagenes)) {
+                        $imagenes = $productoTemporal->imagenes;
+                        if (is_array($imagenes) && count($imagenes) > 0) {
+                            $primeraImagen = $imagenes[0];
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
+                        }
+                    }
+                    if (!empty($productoTemporal->especificaciones_tecnicas)) {
+                        $especificaciones = $productoTemporal->especificaciones_tecnicas;
+                    }
+                } elseif ($detalle->producto_id && isset($productosCompletos[$detalle->producto_id])) {
+                    $producto = $productosCompletos[$detalle->producto_id];
+                    $sku = $producto->sku;
+                    if (!empty($producto->descripcion)) {
+                        $descripcion = $producto->descripcion;
+                    }
+                    if (!empty($producto->imagen)) {
+                        $imagenes = $producto->imagen;
+                        if (is_array($imagenes) && count($imagenes) > 0) {
+                            $primeraImagen = $imagenes[0];
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
+                        }
+                    }
+                    if (!empty($producto->especificaciones_tecnicas)) {
+                        $especificaciones = $producto->especificaciones_tecnicas;
+                    }
+                }
+
+                return [
+                    'nombre' => $detalle->nombre,
+                    'sku' => $sku,
+                    'descripcion' => $descripcion,
+                    'cantidad' => $detalle->cantidad,
+                    'precio_unitario' => $detalle->precio_unitario,
+                    'subtotal' => $detalle->subtotal,
+                    'especificaciones' => $especificaciones,
+                    'imagen' => $imagen,
+                ];
+            });
+
+            // Productos adicionales
+            $adicionalesIds = $cotizacion->detallesAdicionales
+                ->filter(fn($detalle) => !is_null($detalle->producto_id))
+                ->pluck('producto_id')
+                ->unique()
+                ->toArray();
+
+            $adicionalesTemporalesIds = $cotizacion->detallesAdicionales
+                ->filter(fn($detalle) => !is_null($detalle->producto_temporal_id))
+                ->pluck('producto_temporal_id')
+                ->unique()
+                ->toArray();
+
+            $adicionalesCompletos = Producto::whereIn('id_producto', $adicionalesIds)->get()->keyBy('id_producto');
+            $adicionalesTemporalesCompletos = ProductoTemporal::whereIn('id', $adicionalesTemporalesIds)->get()->keyBy('id');
+
+            $adicionales = $cotizacion->detallesAdicionales->map(function ($detalle) use ($adicionalesCompletos, $adicionalesTemporalesCompletos) {
+                $imagen = null;
+                $descripcion = $detalle->descripcion ?? '';
+                $especificaciones = [];
+
+                if ($detalle->producto_temporal_id && isset($adicionalesTemporalesCompletos[$detalle->producto_temporal_id])) {
+                    $productoTemporal = $adicionalesTemporalesCompletos[$detalle->producto_temporal_id];
+                    if (!empty($productoTemporal->descripcion)) {
+                        $descripcion = $productoTemporal->descripcion;
+                    }
+                    if (!empty($productoTemporal->imagenes)) {
+                        $imagenes = $productoTemporal->imagenes;
+                        if (is_array($imagenes) && count($imagenes) > 0) {
+                            $primeraImagen = $imagenes[0];
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
+                        }
+                    }
+                    if (!empty($productoTemporal->especificaciones_tecnicas)) {
+                        $especificaciones = $productoTemporal->especificaciones_tecnicas;
+                    }
+                } elseif ($detalle->producto_id && isset($adicionalesCompletos[$detalle->producto_id])) {
+                    $producto = $adicionalesCompletos[$detalle->producto_id];
+                    if (!empty($producto->descripcion)) {
+                        $descripcion = $producto->descripcion;
+                    }
+                    if (!empty($producto->imagen)) {
+                        $imagenes = $producto->imagen;
+                        if (is_array($imagenes) && count($imagenes) > 0) {
+                            $primeraImagen = $imagenes[0];
+                            $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : url($primeraImagen);
+                        }
+                    }
+                    if (!empty($producto->especificaciones_tecnicas)) {
+                        $especificaciones = $producto->especificaciones_tecnicas;
+                    }
+                }
+
+                return [
+                    'nombre' => $detalle->nombre,
+                    'descripcion' => $descripcion,
+                    'cantidad' => $detalle->cantidad,
+                    'precio_unitario' => $detalle->precio_unitario,
+                    'subtotal' => $detalle->subtotal,
+                    'imagen' => $imagen,
+                    'especificaciones' => $especificaciones,
+                ];
+            });
+
+            // Vendedor
+            $vendedor = null;
+            if ($cotizacion->vendedor) {
+                $vendedor = (object)[
+                    'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
+                    'correo' => $cotizacion->vendedor->correo ?? '',
+                ];
+            }
+
+            // Nuestra empresa
+            $empresa = null;
+            if ($cotizacion->miEmpresa) {
+                $empresa = [
+                    'id' => $cotizacion->miEmpresa->id,
+                    'nombre' => $cotizacion->miEmpresa->nombre,
+                    'email' => $cotizacion->miEmpresa->email,
+                    'telefono' => $cotizacion->miEmpresa->telefono,
+                    'ruc' => $cotizacion->miEmpresa->ruc,
+                    'imagen_logo' => $cotizacion->miEmpresa->imagen_logo,
+                    'imagen_firma' => $cotizacion->miEmpresa->imagen_firma,
+                ];
+            }
+
+            // Datos para la vista
+            $data = [
+                'cotizacion' => $cotizacion,
+                'productos' => $productos,
+                'productos_adicionales' => $adicionales,
+                'empresa' => $empresa,
+                'cliente' => $cotizacion->cliente,
+                'vendedor' => $vendedor,
+            ];
+
+            return view('pdf.cotizacion', $data);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al previsualizar cotización',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
