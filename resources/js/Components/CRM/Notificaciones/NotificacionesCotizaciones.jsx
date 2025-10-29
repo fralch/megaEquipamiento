@@ -325,7 +325,7 @@ export default function NotificacionesCotizaciones({ isDarkMode = false }) {
                                                         title="Marcar como leída"
                                                     >
                                                         <FiCheck className="w-3 h-3" />
-                                                        Leída
+                                                        Marcar como notificacion leída
                                                     </button>
                                                 </div>
                                             </div>
