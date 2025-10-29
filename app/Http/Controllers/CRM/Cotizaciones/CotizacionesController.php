@@ -320,7 +320,7 @@ class CotizacionesController extends Controller
                 'detallesAdicionales'
             ])->findOrFail($id);
 
-            // Cargar información del cliente
+            // Cargar información del cliente y mapear a objeto
             if ($cotizacion->cliente_tipo === 'empresa') {
                 $cliente = EmpresaCliente::find($cotizacion->cliente_id);
                 $cotizacion->cliente = (object)[
