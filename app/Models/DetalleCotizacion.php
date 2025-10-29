@@ -16,7 +16,7 @@ class DetalleCotizacion extends Model
         'cotizacion_id',
         'producto_id',
         'producto_temporal_id',
-        'tipo', // 'producto', 'adicional', o 'temporal'
+        'tipo', // 'producto' o 'adicional'
         'nombre',
         'descripcion',
         'cantidad',
@@ -92,11 +92,5 @@ class DetalleCotizacion extends Model
         return $query->where('tipo', 'adicional');
     }
 
-    /**
-     * Scope para productos temporales
-     */
-    public function scopeTemporales($query)
-    {
-        return $query->where('tipo', 'temporal')->whereNotNull('producto_temporal_id');
-    }
+
 }

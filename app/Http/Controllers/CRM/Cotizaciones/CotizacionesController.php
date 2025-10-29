@@ -249,6 +249,7 @@ class CotizacionesController extends Controller
                 DetalleCotizacion::create([
                     'cotizacion_id' => $cotizacion->id,
                     'producto_id' => $producto['producto_id'] ?? null,
+                    'producto_temporal_id' => $producto['producto_temporal_id'] ?? null,
                     'tipo' => 'producto',
                     'nombre' => $producto['nombre'],
                     'descripcion' => $producto['descripcion'] ?? null,
@@ -267,7 +268,8 @@ class CotizacionesController extends Controller
 
                     DetalleCotizacion::create([
                         'cotizacion_id' => $cotizacion->id,
-                        'producto_id' => null,
+                        'producto_id' => $adicional['producto_id'] ?? null,
+                        'producto_temporal_id' => $adicional['producto_temporal_id'] ?? null,
                         'tipo' => 'adicional',
                         'nombre' => $adicional['nombre'],
                         'descripcion' => $adicional['descripcion'] ?? null,
@@ -458,6 +460,7 @@ class CotizacionesController extends Controller
                     DetalleCotizacion::create([
                         'cotizacion_id' => $cotizacion->id,
                         'producto_id' => $producto['producto_id'] ?? null,
+                        'producto_temporal_id' => $producto['producto_temporal_id'] ?? null,
                         'tipo' => 'producto',
                         'nombre' => $producto['nombre'],
                         'descripcion' => $producto['descripcion'] ?? null,
@@ -484,7 +487,8 @@ class CotizacionesController extends Controller
 
                         DetalleCotizacion::create([
                             'cotizacion_id' => $cotizacion->id,
-                            'producto_id' => null,
+                            'producto_id' => $adicional['producto_id'] ?? null,
+                            'producto_temporal_id' => $adicional['producto_temporal_id'] ?? null,
                             'tipo' => 'adicional',
                             'nombre' => $adicional['nombre'],
                             'descripcion' => $adicional['descripcion'] ?? null,

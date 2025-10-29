@@ -337,17 +337,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         });
     };
 
-    const addProductoAdicional = () => {
-        setFormData(prev => ({
-            ...prev,
-            productos_adicionales: [...prev.productos_adicionales, {
-                nombre: '',
-                cantidad: 1,
-                precio_unitario: 0,
-                subtotal: 0
-            }]
-        }));
-    };
+
 
     const removeProductoAdicional = (index) => {
         setFormData(prev => ({
@@ -405,13 +395,16 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                 moneda: formData.moneda,
                 tipo_cambio: parseFloat(formData.tipo_cambio),
                 productos: formData.productos.map(p => ({
-                    producto_id: p.id || null,
+                    producto_id: !p.es_temporal ? p.id : null,
+                    producto_temporal_id: p.es_temporal ? p.id : null,
                     nombre: p.nombre,
                     cantidad: parseInt(p.cantidad),
                     precio_unitario: parseFloat(p.precio_unitario),
                     descripcion: p.descripcion || null
                 })),
                 productos_adicionales: formData.productos_adicionales.map(p => ({
+                    producto_id: !p.es_temporal ? p.id : null,
+                    producto_temporal_id: p.es_temporal ? p.id : null,
                     nombre: p.nombre,
                     cantidad: parseInt(p.cantidad),
                     precio_unitario: parseFloat(p.precio_unitario),
@@ -1259,69 +1252,4 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     );
 }
 
-// Buscar productos adicionales con debounce
-const buscarProductosAdicionales = async (termino) => {
-    if (termino.trim().length < 2) {
-        setProductosAdicionalesResultados([]);
-        setShowProductoAdicionalDropdown(false);
-        return;
-    }
 
-    setLoadingSearchAdicional(true);
-    try {
-        const response = await axios.get('/api/productos/crm/buscar', {
-            params: { q: termino, limit: 20 }
-        });
-
-        if (response.data.success) {
-            setProductosAdicionalesResultados(response.data.data || []);
-            setShowProductoAdicionalDropdown(true);
-        }
-    } catch (error) {
-        console.error('Error al buscar productos adicionales:', error);
-    } finally {
-        setLoadingSearchAdicional(false);
-    }
-};
-
-// Handler para búsqueda de productos adicionales con debounce
-const handleSearchAdicionalChange = (value) => {
-    setSearchProductoAdicional(value);
-
-    if (searchAdicionalTimeoutRef.current) {
-        clearTimeout(searchAdicionalTimeoutRef.current);
-    }
-
-    searchAdicionalTimeoutRef.current = setTimeout(() => {
-        buscarProductosAdicionales(value);
-    }, 300);
-};
-
-// Seleccionar producto adicional del dropdown
-const selectProductoAdicional = (producto) => {
-    // Los productos siempre vienen en dólares por defecto
-    let precioFinal = producto.precio || 0;
-    
-    // Si la moneda actual es soles, convertir el precio
-    if (formData.moneda === 'soles') {
-        precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
-    }
-    
-    const newProducto = {
-        id: producto.id,
-        nombre: producto.nombre,
-        cantidad: 1,
-        precio_unitario: precioFinal,
-        subtotal: precioFinal
-    };
-
-    setFormData(prev => ({
-        ...prev,
-        productos_adicionales: [...prev.productos_adicionales, newProducto]
-    }));
-
-    // Limpiar búsqueda
-    setSearchProductoAdicional('');
-    setProductosAdicionalesResultados([]);
-    setShowProductoAdicionalDropdown(false);
-};
