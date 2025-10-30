@@ -17,7 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SeoMiddleware::class,
         ]);
 
-        //
+        // Registrar alias de middleware personalizado
+        $middleware->alias([
+            'generar.notificaciones.cotizaciones' => \App\Http\Middleware\GenerarNotificacionesCotizaciones::class,
+        ]);
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         // Ejecutar el comando de notificaciones cada hora

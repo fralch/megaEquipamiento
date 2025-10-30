@@ -54,7 +54,9 @@ Route::get('/preview/pdf/cotizacion/{id?}', [CotizacionesController::class, 'pre
 
 // Rutas del CRM agrupadas por prefijo
 Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
-    Route::get('/', fn () => Inertia::render('CRM/Dashboard'))->name('dashboard');
+    Route::get('/', fn () => Inertia::render('CRM/Dashboard'))
+        ->middleware('generar.notificaciones.cotizaciones')
+        ->name('dashboard');
 
     Route::prefix('clientes')->name('clientes.')->group(function () {
                 // Rutas principales que cargan las vistas con datos
