@@ -195,37 +195,46 @@ export default function CrmDashboard() {
                             Acciones Rápidas
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <button className={`flex items-center gap-3 p-4 rounded-lg transition-colors duration-200 ${
-                                isDarkMode 
-                                    ? 'bg-blue-900/30 hover:bg-blue-900/50 text-blue-300 border border-blue-800/50' 
-                                    : 'bg-blue-50 hover:bg-blue-100 text-blue-700'
-                            }`}>
+                            <button
+                                onClick={() => router.visit('/crm/clientes/particulares')}
+                                className={`flex items-center gap-3 p-4 rounded-lg transition-colors duration-200 ${
+                                    isDarkMode
+                                        ? 'bg-blue-900/30 hover:bg-blue-900/50 text-blue-300 border border-blue-800/50'
+                                        : 'bg-blue-50 hover:bg-blue-100 text-blue-700'
+                                }`}
+                            >
                                 <FiUsers className="w-5 h-5" />
                                 <div className="text-left">
-                                    <div className="font-medium">Agregar Cliente</div>
-                                    <div className="text-sm opacity-70">Registrar nuevo cliente</div>
+                                    <div className="font-medium">Ver Clientes</div>
+                                    <div className="text-sm opacity-70">Gestionar clientes</div>
                                 </div>
                             </button>
-                            <button className={`flex items-center gap-3 p-4 rounded-lg transition-colors duration-200 ${
-                                isDarkMode 
-                                    ? 'bg-green-900/30 hover:bg-green-900/50 text-green-300 border border-green-800/50' 
-                                    : 'bg-green-50 hover:bg-green-100 text-green-700'
-                            }`}>
+                            <button
+                                onClick={() => router.visit('/crm/cotizaciones')}
+                                className={`flex items-center gap-3 p-4 rounded-lg transition-colors duration-200 ${
+                                    isDarkMode
+                                        ? 'bg-green-900/30 hover:bg-green-900/50 text-green-300 border border-green-800/50'
+                                        : 'bg-green-50 hover:bg-green-100 text-green-700'
+                                }`}
+                            >
                                 <FiBarChart className="w-5 h-5" />
                                 <div className="text-left">
-                                    <div className="font-medium">Nueva Cotización</div>
-                                    <div className="text-sm opacity-70">Crear cotización</div>
+                                    <div className="font-medium">Cotizaciones</div>
+                                    <div className="text-sm opacity-70">Ver y crear cotizaciones</div>
                                 </div>
                             </button>
-                            <button className={`flex items-center gap-3 p-4 rounded-lg transition-colors duration-200 ${
-                                isDarkMode 
-                                    ? 'bg-purple-900/30 hover:bg-purple-900/50 text-purple-300 border border-purple-800/50' 
-                                    : 'bg-purple-50 hover:bg-purple-100 text-purple-700'
-                            }`}>
-                                <FiDollarSign className="w-5 h-5" />
+                            <button
+                                onClick={() => router.visit('/crm/productos')}
+                                className={`flex items-center gap-3 p-4 rounded-lg transition-colors duration-200 ${
+                                    isDarkMode
+                                        ? 'bg-purple-900/30 hover:bg-purple-900/50 text-purple-300 border border-purple-800/50'
+                                        : 'bg-purple-50 hover:bg-purple-100 text-purple-700'
+                                }`}
+                            >
+                                <FiPackage className="w-5 h-5" />
                                 <div className="text-left">
-                                    <div className="font-medium">Agregar Producto</div>
-                                    <div className="text-sm opacity-70">Nuevo producto/servicio</div>
+                                    <div className="font-medium">Ver Productos</div>
+                                    <div className="text-sm opacity-70">Gestionar productos</div>
                                 </div>
                             </button>
                         </div>
