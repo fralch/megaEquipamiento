@@ -33,6 +33,12 @@ class CotizacionesController extends Controller
                 'detallesAdicionales'
             ]);
 
+            // Limitar resultados a las cotizaciones del usuario autenticado
+            $usuario = auth()->user();
+            if ($usuario && ($usuario->nombre_usuario !== 'Admin')) {
+                $query->where('usuario_id', $usuario->id_usuario);
+            }
+
             // Filtro por búsqueda
             if ($request->has('search') && $request->search) {
                 $search = $request->search;
