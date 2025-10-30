@@ -24,6 +24,7 @@ use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
 use App\Http\Controllers\CRM\Productos\ProductoGestionController;
 use App\Http\Controllers\CRM\Productos\ProductoTemporalController;
 use App\Http\Controllers\CRM\Cotizaciones\CotizacionesController;
+use App\Http\Controllers\CRM\DashboardController;
 use App\Http\Controllers\NotificacionCotizacionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +58,10 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
     Route::get('/', fn () => Inertia::render('CRM/Dashboard'))
         ->middleware('generar.notificaciones.cotizaciones')
         ->name('dashboard');
+
+    // Dashboard statistics
+    Route::get('/dashboard/estadisticas', [DashboardController::class, 'getEstadisticas'])->name('dashboard.estadisticas');
+    Route::get('/dashboard/graficos', [DashboardController::class, 'getGraficos'])->name('dashboard.graficos');
 
     Route::prefix('clientes')->name('clientes.')->group(function () {
                 // Rutas principales que cargan las vistas con datos
