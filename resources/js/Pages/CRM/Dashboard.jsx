@@ -258,7 +258,7 @@ export default function CrmDashboard() {
                                     </div>
                                 ) : actividadReciente.length > 0 ? (
                                     actividadReciente.map((activity, index) => (
-                                        <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                                        <div key={index} className="flex items-center gap-3 p-3 rounded-lg">
                                             <div className={`p-2 rounded-full ${
                                                 isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-600'
                                             }`}>
@@ -298,7 +298,7 @@ export default function CrmDashboard() {
                                     </div>
                                 ) : tareasProximas.length > 0 ? (
                                     tareasProximas.map((task, index) => (
-                                        <div key={index} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                                        <div key={index} className="flex items-center gap-3 p-3 rounded-lg">
                                             <div className={`p-2 rounded-full ${
                                                 task.priority === 'high' ? 'bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-300' :
                                                 task.priority === 'medium' ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/50 dark:text-yellow-300' :
