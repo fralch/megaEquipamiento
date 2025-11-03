@@ -99,7 +99,7 @@ class MarcaController extends Controller
             'nombre' => 'required|max:100',
             'descripcion' => 'nullable|string|max:255',
             // Añadido 'webp' a la lista de mimes permitidos
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
+            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'video_url' => 'nullable|url|max:500',
         ]);
 

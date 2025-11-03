@@ -254,8 +254,7 @@ const Marcas = ({ onSubmit }) => {
         formData,
         {
           headers: {
-            'X-CSRF-TOKEN': csrfToken,
-            'Content-Type': 'multipart/form-data'
+            'X-CSRF-TOKEN': csrfToken
           }
         }
       );
