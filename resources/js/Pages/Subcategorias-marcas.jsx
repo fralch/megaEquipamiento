@@ -26,9 +26,22 @@ export default function SubcategoriaMarcas({ productos: productosIniciales, marc
     useEffect(() => {
         setIsLoading(true);
         
-        // Obtener el ID de la subcategoría desde la URL
-        const urlParts = window.location.pathname.split('/');
-        const subcategoriaId = urlParts[urlParts.length - 1];
+        // Obtener el ID de la subcategoría desde la URL de forma robusta.
+        // Soporta rutas: /subcategoria/:subcategoriaId y /subcategoria/:subcategoriaId/:marcaId
+        const urlParts = window.location.pathname.split('/').filter(Boolean);
+        let subcategoriaId = null;
+        const subIndex = urlParts.indexOf('subcategoria');
+        if (subIndex !== -1 && urlParts[subIndex + 1]) {
+            subcategoriaId = urlParts[subIndex + 1];
+        } else {
+            // Fallback: primer número en la ruta que no sea el último si hay dos
+            const numericParts = urlParts.filter(p => /^\d+$/.test(p));
+            if (numericParts.length > 1) {
+                subcategoriaId = numericParts[0];
+            } else if (numericParts.length === 1) {
+                subcategoriaId = numericParts[0];
+            }
+        }
 
         console.log("Productos:", productos);
         console.log("Marca ID:", marcaId);
@@ -71,7 +84,7 @@ export default function SubcategoriaMarcas({ productos: productosIniciales, marc
         // Función para cargar información de subcategoría (código existente)
         const cargarInfoSubcategoria = async () => {
             try {
-                if (subcategoriaId && !isNaN(subcategoriaId)) {
+                if (subcategoriaId && !isNaN(Number(subcategoriaId))) {
                     console.log('Cargando info de subcategoría:', subcategoriaId);
                     
                     const subcategoriaResponse = await fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`);
