@@ -49,6 +49,9 @@ class MarcaController extends Controller
             } else {
                 return response()->json(['error' => 'Error al mover el archivo.'], 500);
             }
+        } elseif ($request->filled('imagen_url')) {
+            // Si viene del banco de imágenes, guardar la URL directamente
+            $data['imagen'] = $request->input('imagen_url');
         }
 
         $creado = Marca::create($data);
@@ -102,12 +105,39 @@ class MarcaController extends Controller
 
         $marca = Marca::findOrFail($id);
 
+        // Si se actualiza la imagen, eliminar la anterior si es local
+        $nuevaImagen = null;
         if ($request->hasFile('imagen')) {
-            $imagePath = $request->file('imagen')->store('marcas', 'public');
-            $request->merge(['imagen' => $imagePath]);
+            $image = $request->file('imagen');
+            $nombreSanitizado = preg_replace('/[^a-z0-9]+/', '_', strtolower($request->nombre));
+            $extension = $image->getClientOriginalExtension();
+            $imagePath = $nombreSanitizado . '.' . $extension;
+            $destino = public_path('img/marcas');
+            if (!file_exists($destino)) {
+                mkdir($destino, 0755, true);
+            }
+            $image->move($destino, $imagePath);
+            $nuevaImagen = '/img/marcas/' . $imagePath;
+        } elseif ($request->filled('imagen_url')) {
+            $nuevaImagen = $request->input('imagen_url');
         }
 
-        $marca->update($request->all());
+        // Si hay nueva imagen y la anterior era local, eliminarla
+        if ($nuevaImagen) {
+            if ($marca->imagen && !str_starts_with($marca->imagen, 'http')) {
+                $rutaAnterior = public_path(ltrim($marca->imagen, '/'));
+                if (file_exists($rutaAnterior)) {
+                    @unlink($rutaAnterior);
+                }
+            }
+            $marca->imagen = $nuevaImagen;
+        }
+
+        // Actualizar otros campos
+        $marca->nombre = $request->input('nombre', $marca->nombre);
+        $marca->descripcion = $request->input('descripcion', $marca->descripcion);
+        $marca->video_url = $request->input('video_url', $marca->video_url);
+        $marca->save();
 
         // Invalidar cache de categorías
         Cache::forget('todas_categorias');

@@ -38,6 +38,11 @@ class Marca extends Model
         'updated_at',
     ];
 
+    // Añadir atributo calculado para la URL completa de la imagen
+    protected $appends = [
+        'imagen_url',
+    ];
+
     // Relación many-to-many con categorías
     public function categorias()
     {
@@ -48,5 +53,30 @@ class Marca extends Model
     public function productos()
     {
         return $this->hasMany(Producto::class, 'marca_id', 'id_marca');
+    }
+
+    // Accesor para obtener la URL completa de la imagen sin afectar el valor bruto
+    public function getImagenUrlAttribute()
+    {
+        $value = $this->attributes['imagen'] ?? null;
+        if (!$value) {
+            return null;
+        }
+
+        // Si ya es una URL absoluta
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+
+        // Normalizar sin barra inicial
+        $path = ltrim($value, '/');
+
+        // Si el valor proviene de storage (antiguo formato 'marcas/...'), apuntar a 'storage/marcas/...'
+        if (str_starts_with($path, 'marcas/')) {
+            return asset('storage/' . $path);
+        }
+
+        // Para rutas en 'img/marcas/...'
+        return asset($path);
     }
 }

@@ -21,6 +21,19 @@ const Marcas = ({ onSubmit }) => {
     imagen: null,
     video_url: "",
   });
+  // Estados para edición
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    id_marca: null,
+    nombre: "",
+    descripcion: "",
+    imagen: null,
+    video_url: "",
+  });
+  const [editPreviewImage, setEditPreviewImage] = useState(null);
+  const [editVideoPreview, setEditVideoPreview] = useState(null);
+  const [editShowImageBank, setEditShowImageBank] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   // Nuevos estados
   const [deleteLoading, setDeleteLoading] = useState(null); // Para saber qué ID se está eliminando
   const [message, setMessage] = useState({ type: '', text: '' }); // Para mensajes de éxito/error
@@ -32,6 +45,15 @@ const Marcas = ({ onSubmit }) => {
     // Si es el campo video_url, actualizar la previsualización
     if (name === 'video_url') {
       setVideoPreview(getYouTubeEmbedUrl(value));
+    }
+  };
+
+  // Manejar cambios de edición
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm({ ...editForm, [name]: value });
+    if (name === 'video_url') {
+      setEditVideoPreview(getYouTubeEmbedUrl(value));
     }
   };
 
@@ -69,6 +91,19 @@ const Marcas = ({ onSubmit }) => {
     }
   };
 
+  // Manejo de imagen en edición
+  const handleEditImageChange = (e) => {
+    const file = e.target.files[0];
+    setEditForm({ ...editForm, imagen: file });
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   // Función para manejar la selección de imágenes del banco
   const handleImageBankSelect = (bankImages) => {
     if (bankImages.length > 0) {
@@ -80,6 +115,22 @@ const Marcas = ({ onSubmit }) => {
       // Actualizar el formulario con la información de la imagen del banco
       setForm(prev => ({ 
         ...prev, 
+        imagen: {
+          url: selectedImage.url,
+          name: selectedImage.name,
+          isFromBank: true
+        }
+      }));
+    }
+  };
+
+  // Selección de imagen del banco en edición
+  const handleEditImageBankSelect = (bankImages) => {
+    if (bankImages.length > 0) {
+      const selectedImage = bankImages[0];
+      setEditPreviewImage(selectedImage.url);
+      setEditForm(prev => ({
+        ...prev,
         imagen: {
           url: selectedImage.url,
           name: selectedImage.name,
@@ -160,6 +211,70 @@ const Marcas = ({ onSubmit }) => {
       // alert('Marca created successfully!'); // Reemplazado por el estado message
     } catch (error) {
       console.error('Error:', error);
+    }
+  };
+
+  // Abrir modal de edición
+  const openEditModal = (marca) => {
+    setEditForm({
+      id_marca: marca.id_marca,
+      nombre: marca.nombre || "",
+      descripcion: marca.descripcion || "",
+      imagen: null, // no establecer archivo inicialmente
+      video_url: marca.video_url || "",
+    });
+    setEditPreviewImage(marca.imagen || null);
+    setEditVideoPreview(getYouTubeEmbedUrl(marca.video_url || ""));
+    setEditModalOpen(true);
+  };
+
+  // Enviar actualización de marca
+  const handleUpdateMarca = async (e) => {
+    e.preventDefault();
+    if (!editForm.id_marca) return;
+    setUpdateLoading(true);
+
+    const formData = new FormData();
+    formData.append('nombre', editForm.nombre);
+    formData.append('descripcion', editForm.descripcion || "");
+    formData.append('video_url', editForm.video_url || "");
+
+    if (editForm.imagen) {
+      if (editForm.imagen.isFromBank) {
+        formData.append('imagen_url', editForm.imagen.url);
+        formData.append('imagen_name', editForm.imagen.name);
+      } else {
+        formData.append('imagen', editForm.imagen);
+      }
+    }
+
+    try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      const response = await axios.post(`/marca/update/${editForm.id_marca}`,
+        formData,
+        {
+          headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        setMessage({ type: 'success', text: 'Marca actualizada correctamente.' });
+        setEditModalOpen(false);
+        setEditForm({ id_marca: null, nombre: '', descripcion: '', imagen: null, video_url: '' });
+        setEditPreviewImage(null);
+        setEditVideoPreview(null);
+        await fetchMarcas();
+      } else {
+        throw new Error(response.data?.message || 'Error al actualizar la marca');
+      }
+    } catch (error) {
+      console.error('Error updating marca:', error);
+      setMessage({ type: 'error', text: error.response?.data?.message || error.message || 'Error al actualizar la marca.' });
+    } finally {
+      setUpdateLoading(false);
     }
   };
 
@@ -511,8 +626,17 @@ const Marcas = ({ onSubmit }) => {
                     >
                       {deleteLoading === marca.id_marca ? 'Eliminando...' : 'Eliminar'}
                     </button>
-                    {/* Aquí podrías añadir un botón de Editar en el futuro */}
-                    {/* <button className="text-indigo-600 hover:text-indigo-900 ml-4">Editar</button> */}
+                    {/* Botón Editar */}
+                    <button
+                      onClick={() => openEditModal(marca)}
+                      className={`ml-3 py-1 px-2 rounded min-h-[32px] transition-colors duration-200 ${
+                        isDarkMode 
+                          ? 'text-indigo-300 hover:text-indigo-200' 
+                          : 'text-indigo-600 hover:text-indigo-900'
+                      }`}
+                    >
+                      Editar
+                    </button>
                   </td>
                 </tr>
               )) : (
@@ -554,6 +678,156 @@ const Marcas = ({ onSubmit }) => {
           onClose={() => setShowImageBank(false)}
           onSelectImages={handleImageBankSelect}
         />
+      )}
+
+      {/* Modal de edición de Marca */}
+      {editModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-2 sm:p-4">
+          <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-4 rounded-t-xl sm:rounded-lg max-w-full sm:max-w-2xl max-h-[90vh] w-full sm:w-auto overflow-auto transition-colors duration-200`}>
+            <div className="flex justify-between items-center mb-2">
+              <h2 className={`${isDarkMode ? 'text-white' : 'text-gray-900'} text-lg font-bold`}>Editar Marca</h2>
+              <button
+                onClick={() => setEditModalOpen(false)}
+                className={`${isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'} transition-colors duration-200`}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleUpdateMarca}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor="edit_nombre" className={`block text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-200`}>
+                    Nombre
+                  </label>
+                  <input
+                    type="text"
+                    id="edit_nombre"
+                    name="nombre"
+                    value={editForm.nombre}
+                    onChange={handleEditChange}
+                    className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-200 ${
+                      isDarkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                    }`}
+                    required
+                  />
+                </div>
+
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor="edit_descripcion" className={`block text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-200`}>
+                    Descripción
+                  </label>
+                  <textarea
+                    id="edit_descripcion"
+                    name="descripcion"
+                    value={editForm.descripcion}
+                    onChange={handleEditChange}
+                    className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-200 ${
+                      isDarkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                    }`}
+                  />
+                </div>
+
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor="edit_imagen" className={`block text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-200`}>
+                    Imagen
+                  </label>
+                  <div className="mt-1 flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="file"
+                      id="edit_imagen"
+                      name="imagen"
+                      accept="image/*"
+                      onChange={handleEditImageChange}
+                      className={`flex-1 rounded-md shadow-sm transition-colors duration-200 ${
+                        isDarkMode 
+                          ? 'bg-gray-700 border-gray-600 text-white file:bg-gray-600 file:text-white file:border-gray-500 focus:border-indigo-400 focus:ring-indigo-400' 
+                          : 'bg-white border-gray-300 text-gray-900 file:bg-gray-50 file:text-gray-700 file:border-gray-300 focus:border-indigo-500 focus:ring-indigo-500'
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setEditShowImageBank(true)}
+                      className={`px-4 py-3 rounded-md shadow-sm text-sm font-medium transition duration-150 ease-in-out min-h-[44px] flex items-center justify-center whitespace-nowrap ${
+                        isDarkMode 
+                          ? 'bg-green-600 text-white hover:bg-green-700 border border-green-600' 
+                          : 'bg-green-500 text-white hover:bg-green-600 border border-green-500'
+                      }`}
+                    >
+                      Banco de Imágenes
+                    </button>
+                  </div>
+                  {editPreviewImage && (
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Vista previa:</span>
+                      </div>
+                      <img
+                        src={editPreviewImage}
+                        alt="Vista previa"
+                        className="w-full h-24 sm:h-32 object-cover rounded-md border"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="mb-3 sm:mb-4">
+                  <label htmlFor="edit_video_url" className={`block text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-200`}>
+                    URL del Video
+                  </label>
+                  <input
+                    type="url"
+                    id="edit_video_url"
+                    name="video_url"
+                    value={editForm.video_url}
+                    onChange={handleEditChange}
+                    placeholder="https://www.youtube.com/watch?v=example"
+                    className={`mt-1 block w-full rounded-md shadow-sm transition-colors duration-200 ${
+                      isDarkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-indigo-400 focus:ring-indigo-400' 
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500 focus:ring-indigo-500'
+                    }`}
+                  />
+                 
+                </div>
+              </div>
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditModalOpen(false)}
+                  className={`px-6 py-3 font-bold rounded-lg min-h-[44px] transition-colors duration-200 ${isDarkMode ? 'bg-gray-700 text-white hover:bg-gray-600' : 'bg-gray-200 text-gray-900 hover:bg-gray-300'}`}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={updateLoading}
+                  className={`px-6 py-3 font-bold rounded-lg min-h-[44px] transition-colors duration-200 ${
+                    isDarkMode 
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  } ${updateLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {updateLoading ? 'Guardando...' : 'Guardar Cambios'}
+                </button>
+              </div>
+            </form>
+
+            {/* Banco de imágenes en edición */}
+            {editShowImageBank && (
+              <ImageBankModal
+                isOpen={editShowImageBank}
+                onClose={() => setEditShowImageBank(false)}
+                onSelectImages={handleEditImageBankSelect}
+              />
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
