@@ -22,7 +22,10 @@ use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
 use App\Http\Controllers\CRM\Clientes\ClientesParticularesController;
 use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
 use App\Http\Controllers\CRM\Productos\ProductoGestionController;
+use App\Http\Controllers\CRM\Productos\ProductoTemporalController;
 use App\Http\Controllers\CRM\Cotizaciones\CotizacionesController;
+use App\Http\Controllers\CRM\DashboardController;
+use App\Http\Controllers\NotificacionCotizacionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -47,9 +50,18 @@ Route::get('/contacto', function () { return Inertia::render('Contacto'); })->na
 Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
 
+// Ruta pública para previsualizar la vista HTML de cotización (solo entorno local)
+Route::get('/preview/pdf/cotizacion/{id?}', [CotizacionesController::class, 'previewPdfHtml'])->name('preview.pdf.cotizacion');
+
 // Rutas del CRM agrupadas por prefijo
 Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
-    Route::get('/', fn () => Inertia::render('CRM/Dashboard'))->name('dashboard');
+    Route::get('/', fn () => Inertia::render('CRM/Dashboard'))
+        ->middleware('generar.notificaciones.cotizaciones')
+        ->name('dashboard');
+
+    // Dashboard statistics
+    Route::get('/dashboard/estadisticas', [DashboardController::class, 'getEstadisticas'])->name('dashboard.estadisticas');
+    Route::get('/dashboard/graficos', [DashboardController::class, 'getGraficos'])->name('dashboard.graficos');
 
     Route::prefix('clientes')->name('clientes.')->group(function () {
                 // Rutas principales que cargan las vistas con datos
@@ -95,6 +107,16 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
         Route::post('/{id}/cambiar-estado', [CotizacionesController::class, 'cambiarEstado'])->name('cambiar-estado');
     });
 
+    // Rutas para notificaciones de cotizaciones
+    Route::prefix('notificaciones-cotizaciones')->name('notificaciones-cotizaciones.')->group(function () {
+        Route::get('/', [NotificacionCotizacionController::class, 'index'])->name('index');
+        Route::get('/conteo', [NotificacionCotizacionController::class, 'conteoNoVisualizadas'])->name('conteo');
+        Route::get('/por-urgencia', [NotificacionCotizacionController::class, 'porUrgencia'])->name('por-urgencia');
+        Route::post('/marcar-todas', [NotificacionCotizacionController::class, 'marcarTodasComoVisualizadas'])->name('marcar-todas');
+        Route::post('/{id}/marcar-visualizada', [NotificacionCotizacionController::class, 'marcarComoVisualizada'])->name('marcar-visualizada');
+        Route::delete('/{id}', [NotificacionCotizacionController::class, 'destroy'])->name('destroy');
+    });
+
     Route::prefix('empresas')->name('empresas.')->group(function () {
         Route::get('/', fn () => Inertia::render('CRM/Empresas/VerEmpresas'))->name('index');
         
@@ -111,7 +133,7 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
 
     Route::prefix('productos')->name('productos.')->group(function () {
         Route::get('/', [ProductoGestionController::class, 'index'])->name('index');
-        
+
         // API routes for CRM product management
         Route::get('/marcas', [ProductoGestionController::class, 'getMarcas'])->name('marcas');
         Route::get('/subcategorias', [ProductoGestionController::class, 'getSubcategorias'])->name('subcategorias');
@@ -119,6 +141,19 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
         Route::post('/store', [ProductoGestionController::class, 'store'])->name('store');
         Route::match(['put', 'post'], '/{id}', [ProductoGestionController::class, 'update'])->name('update');
         Route::match(['delete', 'post'], '/{id}/delete', [ProductoGestionController::class, 'destroy'])->name('destroy');
+    });
+
+    // Rutas para productos temporales
+    Route::prefix('productos-temporales')->name('productos-temporales.')->group(function () {
+        Route::get('/', [ProductoTemporalController::class, 'index'])->name('index');
+        Route::get('/all', [ProductoTemporalController::class, 'getAllForQuotation'])->name('all');
+        Route::get('/marcas', [ProductoTemporalController::class, 'getMarcas'])->name('marcas');
+        Route::get('/search', [ProductoTemporalController::class, 'search'])->name('search');
+        Route::post('/store', [ProductoTemporalController::class, 'store'])->name('store');
+        Route::post('/bulk-delete', [ProductoTemporalController::class, 'bulkDelete'])->name('bulk-delete');
+        Route::get('/{id}', [ProductoTemporalController::class, 'show'])->name('show');
+        Route::match(['put', 'post'], '/{id}', [ProductoTemporalController::class, 'update'])->name('update');
+        Route::match(['delete', 'post'], '/{id}/delete', [ProductoTemporalController::class, 'destroy'])->name('destroy');
     });
 
     // Rutas de roles (deben ir antes de las rutas de usuarios para evitar conflictos)

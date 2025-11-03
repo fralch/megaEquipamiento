@@ -218,9 +218,14 @@
         
         /* Contenedor de producto mejorado */
         .product-container {
-            page-break-inside: avoid;
+            /* Permitir que el contenido se divida entre páginas para evitar espacios en blanco grandes */
+            page-break-inside: auto;
             margin-bottom: 20px; /* Aumentado para mejor separación */
             padding: 5px 0; /* Padding adicional */
+        }
+        /* Mantener título con el primer bloque de contenido */
+        .product-title {
+            page-break-after: avoid;
         }
         
         .product-title {
@@ -378,9 +383,7 @@
                     @endif
                 </div>
             </div>
-            @if(!$loop->last)
-                <div style="page-break-after: always;"></div>
-            @endif
+            {{-- Eliminar salto de página forzado entre productos para permitir flujo natural --}}
         @endforeach
 
         {{-- Sección de productos adicionales --}}
@@ -473,9 +476,7 @@
                         @endif
                     </div>
                 </div>
-                @if(!$loop->last)
-                    <div style="page-break-after: always;"></div>
-                @endif
+                {{-- Eliminar salto de página forzado entre productos adicionales para permitir flujo natural --}}
             @endforeach
         @endif
 

@@ -44,6 +44,12 @@ class Cotizacion extends Model
         'updated_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'dias_vencimiento',
+        'nivel_urgencia',
+        'necesita_notificacion',
+    ];
+
     /**
      * Boot method para generar número de cotización
      */
@@ -126,12 +132,12 @@ class Cotizacion extends Model
     }
 
     /**
-     * Relación con DetalleCotizacion (productos)
+     * Relación con DetalleCotizacion (productos regulares y temporales)
      */
     public function detallesProductos()
     {
         return $this->hasMany(DetalleCotizacion::class, 'cotizacion_id', 'id')
-            ->where('tipo', 'producto');
+            ->whereIn('tipo', ['producto', 'temporal']);
     }
 
     /**
@@ -149,6 +155,23 @@ class Cotizacion extends Model
     public function detalles()
     {
         return $this->hasMany(DetalleCotizacion::class, 'cotizacion_id', 'id');
+    }
+
+    /**
+     * Relación con NotificacionCotizacion
+     */
+    public function notificaciones()
+    {
+        return $this->hasMany(NotificacionCotizacion::class, 'cotizacion_id', 'id');
+    }
+
+    /**
+     * Relación con DetalleCotizacion (solo productos temporales)
+     */
+    public function detallesTemporales()
+    {
+        return $this->hasMany(DetalleCotizacion::class, 'cotizacion_id', 'id')
+            ->where('tipo', 'temporal');
     }
 
     /**
@@ -173,6 +196,57 @@ class Cotizacion extends Model
     public function scopeVigentes($query)
     {
         return $query->where('fecha_vencimiento', '>=', now());
+    }
+
+    /**
+     * Scope para cotizaciones vencidas
+     */
+    public function scopeVencidas($query)
+    {
+        return $query->where('fecha_vencimiento', '<', now());
+    }
+
+    /**
+     * Calcula los días de vencimiento (negativo si aún no vence, positivo si ya venció)
+     */
+    public function getDiasVencimientoAttribute()
+    {
+        if (!$this->fecha_vencimiento) {
+            return null;
+        }
+
+        $fechaVencimiento = \Carbon\Carbon::parse($this->fecha_vencimiento);
+        $hoy = \Carbon\Carbon::now();
+
+        // Retorna días positivos si ya venció, negativos si aún no vence
+        return $hoy->diffInDays($fechaVencimiento, false) * -1;
+    }
+
+    /**
+     * Determina el nivel de urgencia de la notificación
+     * null: no vencida o recién vencida (menos de 3 días)
+     * 'warning': vencida hace 3-4 días
+     * 'danger': vencida hace 5 o más días
+     */
+    public function getNivelUrgenciaAttribute()
+    {
+        $diasVencimiento = $this->dias_vencimiento;
+
+        if ($diasVencimiento === null || $diasVencimiento < 3) {
+            return null;
+        } elseif ($diasVencimiento >= 3 && $diasVencimiento < 5) {
+            return 'warning';
+        } else {
+            return 'danger';
+        }
+    }
+
+    /**
+     * Verifica si la cotización necesita notificación
+     */
+    public function getNecesitaNotificacionAttribute()
+    {
+        return $this->nivel_urgencia !== null;
     }
 
     /**

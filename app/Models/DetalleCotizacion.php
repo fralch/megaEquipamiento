@@ -15,6 +15,7 @@ class DetalleCotizacion extends Model
     protected $fillable = [
         'cotizacion_id',
         'producto_id',
+        'producto_temporal_id',
         'tipo', // 'producto' o 'adicional'
         'nombre',
         'descripcion',
@@ -60,6 +61,14 @@ class DetalleCotizacion extends Model
     }
 
     /**
+     * Relación con ProductoTemporal
+     */
+    public function productoTemporal()
+    {
+        return $this->belongsTo(ProductoTemporal::class, 'producto_temporal_id', 'id');
+    }
+
+    /**
      * Scope para filtrar por tipo
      */
     public function scopeTipo($query, $tipo)
@@ -82,4 +91,6 @@ class DetalleCotizacion extends Model
     {
         return $query->where('tipo', 'adicional');
     }
+
+
 }

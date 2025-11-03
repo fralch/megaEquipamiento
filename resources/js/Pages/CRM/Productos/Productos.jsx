@@ -88,7 +88,7 @@ export default function Productos() {
                     ...(subcategoriaId && { subcategoria_id: subcategoriaId })
                 }
             });
-            
+
             const data = response.data;
             setProductos(data.data || []);
             setCurrentPage(data.current_page || 1);
@@ -102,6 +102,7 @@ export default function Productos() {
             setLoading(false);
         }
     };
+
 
     // Cargar datos de filtros al montar el componente
     useEffect(() => {
@@ -125,7 +126,7 @@ export default function Productos() {
         fetchProductos(currentPage, perPage, searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria);
     }, [currentPage, perPage]);
 
-    // Efecto para la búsqueda y filtros con debounce
+    // Efecto para la búsqueda con debounce
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setIsSearching(true);
@@ -135,7 +136,7 @@ export default function Productos() {
         }, 500); // Debounce de 500ms
 
         return () => clearTimeout(timeoutId);
-    }, [searchTerm, selectedMarca, selectedCategoria, selectedSubcategoria, perPage]);
+    }, [searchTerm]);
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -200,6 +201,7 @@ export default function Productos() {
         return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
     };
 
+
     return (
         <>
             <Head title="Productos" />
@@ -249,8 +251,8 @@ export default function Productos() {
                             <button
                                 onClick={() => setShowFilters(!showFilters)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
-                                    isDarkMode 
-                                        ? 'bg-gray-800 border-gray-700 text-white hover:bg-gray-700' 
+                                    isDarkMode
+                                        ? 'bg-gray-800 border-gray-700 text-white hover:bg-gray-700'
                                         : 'bg-white border-gray-300 text-gray-900 hover:bg-gray-50'
                                 }`}
                             >
@@ -400,29 +402,26 @@ export default function Productos() {
                     </div>
 
                     <div className="mb-6 flex justify-between items-center">
-                        <div className="flex items-center gap-4">
-                            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                                {searchTerm ? `Resultados de búsqueda: ${productos.length} de ${total}` : `Mostrando ${productos.length} de ${total} productos`}
-                            </span>
-                            <select 
-                                value={perPage} 
-                                onChange={(e) => setPerPage(parseInt(e.target.value))}
-                                className={`px-3 py-1 rounded border text-sm ${
-                                    isDarkMode 
-                                        ? 'bg-gray-800 border-gray-700 text-white' 
-                                        : 'bg-white border-gray-300 text-gray-900'
-                                }`}
-                            >
-                                <option value={10}>10 por página</option>
-                                <option value={20}>20 por página</option>
-                                <option value={50}>50 por página</option>
-                                <option value={100}>100 por página</option>
-                            </select>
-                        </div>
-                        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                            <FiPlus className="w-4 h-4" />
-                            Agregar Producto
-                        </button>
+                        <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            {searchTerm
+                                ? `Resultados de búsqueda: ${productos.length} de ${total}`
+                                : `Mostrando ${productos.length} de ${total} productos`
+                            }
+                        </span>
+                        <select
+                            value={perPage}
+                            onChange={(e) => setPerPage(parseInt(e.target.value))}
+                            className={`px-3 py-1 rounded border text-sm ${
+                                isDarkMode
+                                    ? 'bg-gray-800 border-gray-700 text-white'
+                                    : 'bg-white border-gray-300 text-gray-900'
+                            }`}
+                        >
+                            <option value={10}>10 por página</option>
+                            <option value={20}>20 por página</option>
+                            <option value={50}>50 por página</option>
+                            <option value={100}>100 por página</option>
+                        </select>
                     </div>
 
                     {loading ? (
@@ -468,12 +467,12 @@ export default function Productos() {
                                     </thead>
                                     <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-gray-200'}`}>
                                         {productos.length > 0 ? productos.map((producto) => {
-                                            const primeraImagen = producto.imagen && Array.isArray(producto.imagen) && producto.imagen.length > 0 
-                                                ? producto.imagen[0] 
+                                            const primeraImagen = producto.imagen && Array.isArray(producto.imagen) && producto.imagen.length > 0
+                                                ? producto.imagen[0]
                                                 : null;
-                                            
+
                                             return (
-                                                <tr key={producto.id} className={`${
+                                                <tr key={producto.id_producto} className={`${
                                                     isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
                                                 }`}>
                                                     {/* Imagen */}
@@ -511,21 +510,21 @@ export default function Productos() {
                                                             </div>
                                                         )}
                                                     </td>
-                                                    
+
                                                     {/* SKU */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm font-mono ${
                                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                     }`}>
                                                         {producto.sku || 'N/A'}
                                                     </td>
-                                                    
+
                                                     {/* Marca */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm ${
                                                         isDarkMode ? 'text-gray-300' : 'text-gray-500'
                                                     }`}>
                                                         {producto.marca?.nombre || 'Sin marca'}
                                                     </td>
-                                                    
+
                                                     {/* Precio Base (sin ganancia) */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm ${
                                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
@@ -535,7 +534,7 @@ export default function Productos() {
                                                         </div>
                                                         <div className="text-xs text-gray-400">Base</div>
                                                     </td>
-                                                    
+
                                                     {/* Precio con Ganancia (sin IGV) */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm font-semibold ${
                                                         isDarkMode ? 'text-blue-400' : 'text-blue-600'
@@ -545,7 +544,7 @@ export default function Productos() {
                                                         </div>
                                                         <div className="text-xs text-gray-400">Sin IGV</div>
                                                     </td>
-                                                    
+
                                                     {/* Precio con IGV */}
                                                     <td className={`px-4 py-4 whitespace-nowrap text-sm font-semibold ${
                                                         isDarkMode ? 'text-green-400' : 'text-green-600'
@@ -573,7 +572,10 @@ export default function Productos() {
                                                             >
                                                                 <FiEdit className="w-4 h-4" />
                                                             </button>
-                                                            <button className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50" title="Eliminar">
+                                                            <button
+                                                                className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                                                                title="Eliminar"
+                                                            >
                                                                 <FiTrash className="w-4 h-4" />
                                                             </button>
                                                         </div>
@@ -582,12 +584,14 @@ export default function Productos() {
                                             );
                                         }) : (
                                             <tr>
-                                                <td colSpan="7" className={`px-4 py-8 text-center text-sm ${
+                                                <td colSpan="8" className={`px-4 py-8 text-center text-sm ${
                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
                                             }`}>
-                                                    <div className="flex flex-col items-center gap-2">
-                                                        <FiPackage className="w-8 h-8" />
-                                                        <span>No se encontraron productos</span>
+                                                    <div className="flex flex-col items-center gap-4">
+                                                        <FiPackage className="w-12 h-12" />
+                                                        <p className="font-medium text-lg">
+                                                            No se encontraron productos
+                                                        </p>
                                                     </div>
                                                 </td>
                                             </tr>
