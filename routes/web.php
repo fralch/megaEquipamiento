@@ -69,6 +69,8 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
                 Route::get('/empresas', [EmpresasClientesController::class, 'index'])->name('empresas.index');
                 Route::get('/particulares', [ClientesParticularesController::class, 'index'])->name('particulares.index');
                 Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');
+                // Vista de gestión de sectores (Inertia)
+                Route::get('/sectores/gestionar', fn () => Inertia::render('CRM/Clientes/Sectores'))->name('sectores.gestionar');
 
         // API routes para clientes particulares
         Route::prefix('particulares')->name('particulares.')->group(function () {

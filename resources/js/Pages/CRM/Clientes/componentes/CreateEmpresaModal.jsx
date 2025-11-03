@@ -25,7 +25,7 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
   useEffect(() => {
     const fetchSectores = async () => {
       try {
-        const response = await axios.get('/crm/sectores/activos');
+        const response = await axios.get('/crm/clientes/sectores/activos');
         setSectores(response.data);
       } catch (error) {
         console.error('Error al cargar sectores:', error);
