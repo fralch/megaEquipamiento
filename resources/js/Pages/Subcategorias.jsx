@@ -532,14 +532,13 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
     const buscarProductosFiltrados = async () => {
         const subcategoriaId = getSubcategoriaId();
-        
-        console.log('=== FRONTEND DEBUG ===');
+
+        console.log('=== INICIO FILTRADO DE PRODUCTOS ===');
+        console.log('Total de productos originales:', productosOriginales.length);
         console.log('Subcategoria ID:', subcategoriaId);
-        console.log('Filtros seleccionados:', filtrosSeleccionados);
-        console.log('Datos a enviar:', {
-            subcategoria_id: subcategoriaId,
-            filtros: filtrosSeleccionados
-        });
+        console.log('Filtros dinámicos seleccionados:', filtrosSeleccionados);
+        console.log('Marca seleccionada:', selectedBrand);
+        console.log('País seleccionado:', paisSeleccionado);
 
         try {
             if (Object.keys(filtrosSeleccionados).length > 0) {
@@ -551,11 +550,12 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                     })
                 });
                 
-                console.log('Respuesta del backend:', productosFiltrados);
+                console.log('Productos filtrados del backend:', productosFiltrados.length);
 
                 setMostrarProductos(true);
 
                 let resultado = productosFiltrados;
+                console.log('Aplicando filtros adicionales (marca, país, precio)...');
                 
                 // Aplicar filtro de marca si existe
                 if (selectedBrand) {
@@ -570,8 +570,14 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                         product.pais === paisSeleccionado
                     );
                 }
+
+                console.log('Total de productos después de todos los filtros:', resultado.length);
                 setProductos(resultado); // Si resultado es [], se muestra vacío
-                setProductosOriginales(productosFiltrados); // Opcional, según tu lógica
+                // NO sobrescribir productosOriginales - debe mantener TODOS los productos sin filtrar
+
+                // Scroll a la parte superior para mostrar resultados
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                console.log('=== FIN FILTRADO DE PRODUCTOS ===');
             } else {
                 // Si no hay filtros seleccionados, aplica filtros de marca y/o país si corresponde
                 let productosFiltrados = productosOriginales;
@@ -588,14 +594,18 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                     );
                 }
                 
-                if (selectedBrand || paisSeleccionado) {
-                    setProductos(productosFiltrados);
-                    setMostrarProductos(true);
-                } else {
-                    // No recargues todos los productos aquí, solo muestra vacío si no hay productos
-                    setProductos([]);
-                    setMostrarProductos(true);
+                // Si hay algún filtro de precio, aplicarlo
+                const precioMin = parseFloat(document.getElementById('min-price')?.value) || 0;
+                const precioMax = parseFloat(document.getElementById('max-price')?.value) || Infinity;
+                if (precioMin > 0 || precioMax < Infinity) {
+                    productosFiltrados = productosFiltrados.filter(product => {
+                        const precio = parseFloat(product.precio_ganancia);
+                        return precio >= precioMin && precio <= precioMax;
+                    });
                 }
+
+                setProductos(productosFiltrados);
+                setMostrarProductos(true);
             }
         } catch (error) {
             console.error('Error:', error);
@@ -641,7 +651,8 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
 
                 if (productosIniciales && productosIniciales.length > 0) {
                     setProductosOriginales(productosIniciales);
-                     console.log('Productos iniciales:', productosIniciales);
+                    setProductos(productosIniciales);
+                    console.log('Productos iniciales cargados:', productosIniciales.length);
                 }
 
             } catch (error) {
