@@ -21,6 +21,7 @@ use App\Http\Controllers\CRM\UsuariosRoles\RolesUsuariosController;
 use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
 use App\Http\Controllers\CRM\Clientes\ClientesParticularesController;
 use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
+use App\Http\Controllers\CRM\SectorController as CRMSectorController;
 use App\Http\Controllers\CRM\Productos\ProductoGestionController;
 use App\Http\Controllers\CRM\Productos\ProductoTemporalController;
 use App\Http\Controllers\CRM\Cotizaciones\CotizacionesController;
@@ -68,6 +69,8 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
                 Route::get('/empresas', [EmpresasClientesController::class, 'index'])->name('empresas.index');
                 Route::get('/particulares', [ClientesParticularesController::class, 'index'])->name('particulares.index');
                 Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');
+                // Vista de gestión de sectores (Inertia)
+                Route::get('/sectores/gestionar', fn () => Inertia::render('CRM/Clientes/Sectores'))->name('sectores.gestionar');
 
         // API routes para clientes particulares
         Route::prefix('particulares')->name('particulares.')->group(function () {
@@ -90,6 +93,17 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
             Route::get('/{id}', [EmpresasClientesController::class, 'show'])->name('show');
             Route::match(['put', 'post'], '/{id}', [EmpresasClientesController::class, 'update'])->name('update');
             Route::match(['delete', 'post'], '/{id}/delete', [EmpresasClientesController::class, 'destroy'])->name('destroy');
+        });
+
+        // API routes para sectores
+        Route::prefix('sectores')->name('sectores.')->group(function () {
+            Route::get('/', [CRMSectorController::class, 'index'])->name('index');
+            Route::get('/activos', [CRMSectorController::class, 'getActivos'])->name('activos');
+            Route::post('/store', [CRMSectorController::class, 'store'])->name('store');
+            Route::get('/{id}', [CRMSectorController::class, 'show'])->name('show');
+            Route::match(['put', 'post'], '/{id}', [CRMSectorController::class, 'update'])->name('update');
+            Route::match(['delete', 'post'], '/{id}/delete', [CRMSectorController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/toggle-activo', [CRMSectorController::class, 'toggleActivo'])->name('toggle-activo');
         });
     });
 

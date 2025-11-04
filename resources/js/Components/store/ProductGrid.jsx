@@ -251,6 +251,8 @@ const ProductGrid = ({ products: initialProducts }) => {
             .filter(Boolean);
           setProducts(transformedProducts);
           setLoading(false);
+          // Resetear a página 1 cuando cambian los productos
+          setCurrentPage(1);
           return;
         } catch (error) {
           console.error('Error transforming initial products:', error);

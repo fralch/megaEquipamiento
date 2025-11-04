@@ -19,6 +19,7 @@ class Cliente extends Model
         'telefono',
         'direccion',
         'usuario_id',
+        'sector_id',
     ];
 
     protected $casts = [
@@ -32,5 +33,13 @@ class Cliente extends Model
     public function vendedor()
     {
         return $this->belongsTo(Usuario::class, 'usuario_id', 'id_usuario');
+    }
+
+    /**
+     * Relación con el modelo Sector
+     */
+    public function sector()
+    {
+        return $this->belongsTo(Sector::class, 'sector_id', 'id_sector');
     }
 }

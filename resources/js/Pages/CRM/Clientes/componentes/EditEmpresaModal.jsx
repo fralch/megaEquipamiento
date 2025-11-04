@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiSave, FiUser, FiHash } from "react-icons/fi";
+import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiSave, FiUser, FiHash, FiGrid } from "react-icons/fi";
 import { useTheme } from "../../../../storage/ThemeContext";
 import { router } from "@inertiajs/react";
+import axios from "axios";
 
 export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, clientes = [] }) {
   const { isDarkMode } = useTheme();
+  const [sectores, setSectores] = useState([]);
   const [formData, setFormData] = useState({
     razon_social: "",
     ruc: "",
-    sector: "",
+    sector_id: "",
     contacto_principal: "",
     email: "",
     telefono: "",
@@ -20,12 +22,28 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  // Fetch sectores activos
+  useEffect(() => {
+    const fetchSectores = async () => {
+      try {
+        const response = await axios.get('/crm/clientes/sectores/activos');
+        setSectores(response.data);
+      } catch (error) {
+        console.error('Error al cargar sectores:', error);
+      }
+    };
+
+    if (isOpen) {
+      fetchSectores();
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (empresa) {
       setFormData({
         razon_social: empresa.razon_social || "",
         ruc: empresa.ruc || "",
-        sector: empresa.sector || "",
+        sector_id: empresa.sector_id || "",
         contacto_principal: empresa.contacto_principal || "",
         email: empresa.email || "",
         telefono: empresa.telefono || "",
@@ -66,9 +84,6 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
       newErrors.ruc = "El RUC debe tener 11 dígitos";
     }
 
-    if (!formData.sector.trim()) {
-      newErrors.sector = "El sector es requerido";
-    }
 
     if (!formData.contacto_principal.trim()) {
       newErrors.contacto_principal = "El contacto principal es requerido";
@@ -225,30 +240,28 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
                 <label className={`block text-sm font-medium mb-2 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-700'
                 }`}>
-                  Sector *
+                  <FiGrid className="inline w-4 h-4 mr-1" />
+                  Sector
                 </label>
                 <select
-                  name="sector"
-                  value={formData.sector}
+                  name="sector_id"
+                  value={formData.sector_id}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     isDarkMode
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
-                  } ${errors.sector ? 'border-red-500' : ''}`}
+                  } ${errors.sector_id ? 'border-red-500' : ''}`}
                 >
                   <option value="">Seleccionar sector</option>
-                  <option value="salud">Salud</option>
-                  <option value="educacion">Educación</option>
-                  <option value="industria">Industria</option>
-                  <option value="gobierno">Gobierno</option>
-                  <option value="mineria">Minería</option>
-                  <option value="agricultura">Agricultura</option>
-                  <option value="tecnologia">Tecnología</option>
-                  <option value="construccion">Construcción</option>
+                  {sectores.map((sector) => (
+                    <option key={sector.id_sector} value={sector.id_sector}>
+                      {sector.nombre}
+                    </option>
+                  ))}
                 </select>
-                {errors.sector && (
-                  <p className="mt-1 text-sm text-red-600">{errors.sector}</p>
+                {errors.sector_id && (
+                  <p className="mt-1 text-sm text-red-600">{errors.sector_id}</p>
                 )}
               </div>
 

@@ -1,10 +1,12 @@
-import { useState } from "react";
-import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiSave, FiUser, FiHash } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiSave, FiUser, FiHash, FiGrid } from "react-icons/fi";
 import { useTheme } from "../../../../storage/ThemeContext";
 import { router } from "@inertiajs/react";
+import axios from "axios";
 
 export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes = [] }) {
   const { isDarkMode } = useTheme();
+  const [sectores, setSectores] = useState([]);
   const [formData, setFormData] = useState({
     razon_social: "",
     ruc: "",
@@ -13,10 +15,27 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
     telefono: "",
     direccion: "",
     usuario_id: "",
+    sector_id: "",
     activo: true
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Fetch sectores activos
+  useEffect(() => {
+    const fetchSectores = async () => {
+      try {
+        const response = await axios.get('/crm/clientes/sectores/activos');
+        setSectores(response.data);
+      } catch (error) {
+        console.error('Error al cargar sectores:', error);
+      }
+    };
+
+    if (isOpen) {
+      fetchSectores();
+    }
+  }, [isOpen]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -95,6 +114,7 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
             telefono: "",
             direccion: "",
             usuario_id: "",
+            sector_id: "",
             activo: true
           });
           setErrors({});
@@ -121,6 +141,7 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
       telefono: "",
       direccion: "",
       usuario_id: "",
+      sector_id: "",
       activo: true
     });
     setErrors({});
@@ -215,6 +236,35 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios, clientes
                 />
                 {errors.ruc && (
                   <p className="mt-1 text-sm text-red-600">{errors.ruc}</p>
+                )}
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  <FiGrid className="inline w-4 h-4 mr-1" />
+                  Sector
+                </label>
+                <select
+                  name="sector_id"
+                  value={formData.sector_id}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isDarkMode
+                      ? 'bg-gray-700 border-gray-600 text-white'
+                      : 'bg-white border-gray-300 text-gray-900'
+                  } ${errors.sector_id ? 'border-red-500' : ''}`}
+                >
+                  <option value="">Seleccionar sector</option>
+                  {sectores.map((sector) => (
+                    <option key={sector.id_sector} value={sector.id_sector}>
+                      {sector.nombre}
+                    </option>
+                  ))}
+                </select>
+                {errors.sector_id && (
+                  <p className="mt-1 text-sm text-red-600">{errors.sector_id}</p>
                 )}
               </div>
 
