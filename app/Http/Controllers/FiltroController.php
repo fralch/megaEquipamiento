@@ -248,12 +248,21 @@ class FiltroController extends Controller
         ]);
 
         $subcategoriaId = $request->subcategoria_id;
+
+        \Log::info('=== INICIO FILTRADO ===');
+        \Log::info('Subcategoria ID: ' . $subcategoriaId);
+        \Log::info('Filtros recibidos: ', $request->filtros ?? []);
+
+        // Contar productos totales en la subcategoría
+        $totalProductos = Producto::where('id_subcategoria', $subcategoriaId)->count();
+        \Log::info('Total productos en subcategoría: ' . $totalProductos);
+
         $query = Producto::where('id_subcategoria', $subcategoriaId);
 
         // Si hay filtros seleccionados, aplicarlos a la consulta con OR
         if ($request->has('filtros') && !empty($request->filtros)) {
             // Usar orWhere para combinar los filtros con OR en lugar de AND
-            $query->where(function($mainQuery) use ($request) {
+            $query->where(function($mainQuery) use ($request, $subcategoriaId) {
                 $isFirstFilter = true;
 
                 foreach ($request->filtros as $filtroId => $valorSeleccionado) {
@@ -267,21 +276,48 @@ class FiltroController extends Controller
                     $isFirstFilter = false;
 
                     // Aplicar el filtro según su tipo usando OR entre filtros diferentes
-                    $mainQuery->$whereMethod(function($subQuery) use ($filtro, $valorSeleccionado) {
+                    $mainQuery->$whereMethod(function($subQuery) use ($filtro, $valorSeleccionado, $subcategoriaId) {
                         switch ($filtro->tipo_input) {
                             case 'checkbox':
                                 // Para checkbox, valorSeleccionado es un array de IDs de opciones
                                 if (is_array($valorSeleccionado) && !empty($valorSeleccionado)) {
-                                    $subQuery->where(function($q) use ($filtro, $valorSeleccionado) {
+                                    $subQuery->where(function($q) use ($filtro, $valorSeleccionado, $subcategoriaId) {
                                         foreach ($valorSeleccionado as $opcionId) {
                                             $opcion = OpcionFiltro::find($opcionId);
                                             if ($opcion) {
-                                                // Normalizar el valor para búsqueda flexible
-                                                $valorNormalizado = trim(strtolower($opcion->valor));
-                                                // Búsqueda case-insensitive y flexible con espacios
-                                                $q->orWhere(function($subQ) use ($valorNormalizado) {
-                                                    $subQ->whereRaw('LOWER(REPLACE(caracteristicas, " ", "")) LIKE ?', ['%' . str_replace(' ', '', $valorNormalizado) . '%']);
-                                                });
+                                                $valorOriginal = trim($opcion->valor);
+
+                                                \Log::info("Checkbox - Opción ID: {$opcionId}, Valor: '{$valorOriginal}'");
+
+                                                // Test con diferentes formatos
+                                                $test1 = \App\Models\Producto::where('id_subcategoria', $subcategoriaId)
+                                                    ->whereRaw('caracteristicas LIKE ?', ['%Port%'])
+                                                    ->count();
+                                                \Log::info("Test 1 (solo 'Port'): {$test1} productos");
+
+                                                // Test 2: Con unicode escape
+                                                $test2 = \App\Models\Producto::where('id_subcategoria', $subcategoriaId)
+                                                    ->whereRaw('caracteristicas LIKE ?', ['%Port\\u00e1til%'])
+                                                    ->count();
+                                                \Log::info("Test 2 (unicode \\u00e1): {$test2} productos");
+
+                                                // Test 3: Usando JSON_SEARCH
+                                                $test3 = \App\Models\Producto::where('id_subcategoria', $subcategoriaId)
+                                                    ->whereRaw('JSON_SEARCH(caracteristicas, "one", ?) IS NOT NULL', ['Portátil'])
+                                                    ->count();
+                                                \Log::info("Test 3 (JSON_SEARCH): {$test3} productos");
+
+                                                // Test 4: Buscar en el valor decodificado usando JSON_EXTRACT
+                                                $test4 = \App\Models\Producto::where('id_subcategoria', $subcategoriaId)
+                                                    ->whereRaw('JSON_EXTRACT(caracteristicas, "$[*]") LIKE ?', ['%Portátil%'])
+                                                    ->count();
+                                                \Log::info("Test 4 (JSON_EXTRACT): {$test4} productos");
+
+                                                // Usar JSON_SEARCH para búsqueda correcta en JSON
+                                                $q->orWhereRaw(
+                                                    'JSON_SEARCH(caracteristicas, "one", ?) IS NOT NULL',
+                                                    [$valorOriginal]
+                                                );
                                             }
                                         }
                                     });
@@ -294,9 +330,15 @@ class FiltroController extends Controller
                                 if (!empty($valorSeleccionado)) {
                                     $opcion = OpcionFiltro::find($valorSeleccionado);
                                     if ($opcion) {
-                                        $valorNormalizado = trim(strtolower($opcion->valor));
-                                        // Búsqueda case-insensitive y flexible con espacios
-                                        $subQuery->whereRaw('LOWER(REPLACE(caracteristicas, " ", "")) LIKE ?', ['%' . str_replace(' ', '', $valorNormalizado) . '%']);
+                                        $valorOriginal = trim($opcion->valor);
+
+                                        \Log::info("Select/Radio - Buscando: '{$valorOriginal}'");
+
+                                        // Búsqueda insensible a acentos y case usando COLLATE
+                                        $subQuery->whereRaw(
+                                            'caracteristicas COLLATE utf8mb4_general_ci LIKE ?',
+                                            ['%' . $valorOriginal . '%']
+                                        );
                                     }
                                 }
                                 break;
@@ -339,7 +381,20 @@ class FiltroController extends Controller
             });
         }
 
+        // Logs para debugging
+        $sql = $query->toSql();
+        $bindings = $query->getBindings();
+        \Log::info('SQL Query: ' . $sql);
+        \Log::info('Bindings: ', $bindings);
+
         $productos = $query->with('marca')->get();
+
+        \Log::info('Total productos encontrados: ' . $productos->count());
+        if ($productos->count() > 0) {
+            \Log::info('Productos IDs: ', $productos->pluck('id_producto')->toArray());
+        }
+        \Log::info('=== FIN FILTRADO ===');
+
         return response()->json($productos);
     }
 }
