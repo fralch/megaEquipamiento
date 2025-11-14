@@ -107,9 +107,18 @@ export default function ProductosExternos({ productosExternos, filters }) {
 
     // Renderizar un producto completo
     const renderProduct = (producto) => {
-        const heading = Array.isArray(producto.heading) ? producto.heading : [];
-        const paragraphs = Array.isArray(producto.paragraphs) ? producto.paragraphs : [];
-        const images = Array.isArray(producto.images) ? producto.images : [];
+        const headingArray = Array.isArray(producto.heading)
+            ? producto.heading
+            : (typeof producto.heading === 'string' && producto.heading.trim() ? [producto.heading.trim()] : []);
+        const headingText = headingArray.length > 0 ? headingArray.join(' ') : '';
+
+        const paragraphsArray = Array.isArray(producto.paragraphs)
+            ? producto.paragraphs
+            : (typeof producto.paragraphs === 'string'
+                ? producto.paragraphs.split(/\r?\n/).filter(p => p && p.trim())
+                : []);
+
+        const imagesArray = Array.isArray(producto.images) ? producto.images : [];
         const tables = Array.isArray(producto.tables) ? producto.tables : [];
 
         return (
@@ -122,29 +131,29 @@ export default function ProductosExternos({ productosExternos, filters }) {
                 }`}
             >
                 {/* Título del producto */}
-                {heading.length > 0 && (
+                {headingText && (
                     <h2 className={`text-xl font-bold leading-tight ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
-                        {heading.join(' ')}
+                        {headingText}
                     </h2>
                 )}
 
                 {/* Headings como lista */}
-                {heading.length > 1 && (
+                {headingArray.length > 1 && (
                     <ul className={`list-disc list-inside space-y-1 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
                     }`}>
-                        {heading.slice(1).map((h, idx) => (
+                        {headingArray.slice(1).map((h, idx) => (
                             <li key={idx} className="text-sm">{h}</li>
                         ))}
                     </ul>
                 )}
 
                 {/* Párrafos */}
-                {paragraphs.length > 0 && (
+                {paragraphsArray.length > 0 && (
                     <div className="space-y-2">
-                        {paragraphs.map((paragraph, idx) => (
+                        {paragraphsArray.map((paragraph, idx) => (
                             <p
                                 key={idx}
                                 className={`text-sm leading-relaxed ${
@@ -158,9 +167,9 @@ export default function ProductosExternos({ productosExternos, filters }) {
                 )}
 
                 {/* Imágenes en grid */}
-                {images.length > 0 && (
+                {imagesArray.length > 0 && (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                        {images
+                        {imagesArray
                             .filter(img => {
                                 // Filtrar placeholders comunes
                                 if (typeof img === 'string') {
@@ -174,7 +183,12 @@ export default function ProductosExternos({ productosExternos, filters }) {
                                 return true;
                             })
                             .map((img, idx) => {
-                                const src = typeof img === 'string' ? img : img.src;
+                                const rawSrc = typeof img === 'string' ? img : img.src;
+                                const src = String(rawSrc || '')
+                                    .trim()
+                                    .replace(/^`+|`+$/g, '')
+                                    .replace(/^"+|"+$/g, '')
+                                    .replace(/^'+|'+$/g, '');
                                 const alt = typeof img === 'object' && img.alt ? img.alt : '';
 
                                 return (
