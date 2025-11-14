@@ -1,5 +1,5 @@
 import { Head, Link, router } from "@inertiajs/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useTheme } from "../storage/ThemeContext";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
@@ -11,14 +11,30 @@ export default function ProductosExternos({ productosExternos, filters }) {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [perPage, setPerPage] = useState(filters.per_page || 20);
+    const [isNavigating, setIsNavigating] = useState(false);
+    const searchInputRef = useRef(null);
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
 
+    useEffect(() => {
+        const handler = (e) => {
+            const target = e.target;
+            const isTyping = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
+            if (!isTyping && e.key === '/') {
+                e.preventDefault();
+                if (searchInputRef.current) searchInputRef.current.focus();
+            }
+        };
+        window.addEventListener('keydown', handler);
+        return () => window.removeEventListener('keydown', handler);
+    }, []);
+
     // Función para manejar la búsqueda
     const handleSearch = (e) => {
         e.preventDefault();
+        setIsNavigating(true);
         router.get('/productos-externos', {
             search: searchTerm,
             per_page: perPage,
@@ -31,6 +47,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
     // Función para cambiar de página
     const handlePageChange = (url) => {
         if (url) {
+            setIsNavigating(true);
             router.get(url, {}, {
                 preserveState: true,
                 preserveScroll: false,
@@ -41,6 +58,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
     // Función para cambiar items por página
     const handlePerPageChange = (newPerPage) => {
         setPerPage(newPerPage);
+        setIsNavigating(true);
         router.get('/productos-externos', {
             search: searchTerm,
             per_page: newPerPage,
@@ -59,9 +77,13 @@ export default function ProductosExternos({ productosExternos, filters }) {
 
         return (
             <div key={index} className="overflow-x-auto mb-4">
-                <table className={`w-full border-collapse text-sm ${
-                    isDarkMode ? 'border-gray-700' : 'border-gray-300'
-                }`}>
+                <table
+                    className={`w-full border-collapse text-sm ${
+                        isDarkMode ? 'border-gray-700' : 'border-gray-300'
+                    }`}
+                    role="table"
+                    aria-label="Tabla de datos"
+                >
                     {headers.length > 0 && (
                         <thead>
                             <tr className={isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}>
@@ -73,6 +95,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
                                                 ? 'border-gray-700 text-gray-200'
                                                 : 'border-gray-300 text-gray-900'
                                         }`}
+                                        scope="col"
                                     >
                                         {header}
                                     </th>
@@ -83,7 +106,14 @@ export default function ProductosExternos({ productosExternos, filters }) {
                     {rows.length > 0 && (
                         <tbody>
                             {rows.map((row, rowIdx) => (
-                                <tr key={rowIdx}>
+                                <tr
+                                    key={rowIdx}
+                                    className={`${
+                                        isDarkMode
+                                            ? 'odd:bg-gray-800/40 hover:bg-gray-800/60'
+                                            : 'odd:bg-gray-50 hover:bg-gray-100'
+                                    } transition-colors`}
+                                >
                                     {(Array.isArray(row) ? row : [row]).map((cell, cellIdx) => (
                                         <td
                                             key={cellIdx}
@@ -104,42 +134,70 @@ export default function ProductosExternos({ productosExternos, filters }) {
             </div>
         );
     };
+    const ProductCard = ({ producto }) => {
+        const cardRef = useRef(null);
+        const [inView, setInView] = useState(false);
 
-    // Renderizar un producto completo
-    const renderProduct = (producto) => {
-        const headingArray = Array.isArray(producto.heading)
-            ? producto.heading
-            : (typeof producto.heading === 'string' && producto.heading.trim() ? [producto.heading.trim()] : []);
-        const headingText = headingArray.length > 0 ? headingArray.join(' ') : '';
+        useEffect(() => {
+            const el = cardRef.current;
+            if (!el) return;
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    const entry = entries[0];
+                    if (entry && entry.isIntersecting) {
+                        setInView(true);
+                        observer.disconnect();
+                    }
+                },
+                { rootMargin: '200px' }
+            );
+            observer.observe(el);
+            return () => observer.disconnect();
+        }, []);
 
-        const paragraphsArray = Array.isArray(producto.paragraphs)
-            ? producto.paragraphs
-            : (typeof producto.paragraphs === 'string'
-                ? producto.paragraphs.split(/\r?\n/).filter(p => p && p.trim())
-                : []);
+        const headingArray = useMemo(() => (
+            Array.isArray(producto.heading)
+                ? producto.heading
+                : (typeof producto.heading === 'string' && producto.heading.trim() ? [producto.heading.trim()] : [])
+        ), [producto.heading]);
 
-        const imagesArray = Array.isArray(producto.images) ? producto.images : [];
-        const tables = Array.isArray(producto.tables) ? producto.tables : [];
+        const headingText = useMemo(() => (
+            headingArray.length > 0 ? headingArray.join(' ') : ''
+        ), [headingArray]);
+
+        const paragraphsArray = useMemo(() => (
+            Array.isArray(producto.paragraphs)
+                ? producto.paragraphs
+                : (typeof producto.paragraphs === 'string'
+                    ? producto.paragraphs.split(/\r?\n/).filter(p => p && p.trim())
+                    : [])
+        ), [producto.paragraphs]);
+
+        const imagesArray = useMemo(() => (
+            Array.isArray(producto.images) ? producto.images : []
+        ), [producto.images]);
+
+        const tables = useMemo(() => (
+            Array.isArray(producto.tables) ? producto.tables : []
+        ), [producto.tables]);
 
         return (
             <article
-                key={producto.id}
-                className={`border rounded-xl p-6 flex flex-col gap-4 transition-all duration-300 hover:shadow-xl ${
+                ref={cardRef}
+                className={`group border rounded-xl p-6 flex flex-col gap-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 ${
                     isDarkMode
                         ? 'border-gray-700 bg-gray-800'
                         : 'border-gray-300 bg-white'
                 }`}
             >
-                {/* Título del producto */}
                 {headingText && (
-                    <h2 className={`text-xl font-bold leading-tight ${
+                    <h2 className={`text-xl font-semibold tracking-tight ${
                         isDarkMode ? 'text-white' : 'text-gray-900'
                     }`}>
                         {headingText}
                     </h2>
                 )}
 
-                {/* Headings como lista */}
                 {headingArray.length > 1 && (
                     <ul className={`list-disc list-inside space-y-1 ${
                         isDarkMode ? 'text-gray-400' : 'text-gray-600'
@@ -150,7 +208,6 @@ export default function ProductosExternos({ productosExternos, filters }) {
                     </ul>
                 )}
 
-                {/* Párrafos */}
                 {paragraphsArray.length > 0 && (
                     <div className="space-y-2">
                         {paragraphsArray.map((paragraph, idx) => (
@@ -166,12 +223,10 @@ export default function ProductosExternos({ productosExternos, filters }) {
                     </div>
                 )}
 
-                {/* Imágenes en grid */}
-                {imagesArray.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                {inView && imagesArray.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                         {imagesArray
                             .filter(img => {
-                                // Filtrar placeholders comunes
                                 if (typeof img === 'string') {
                                     const lower = img.toLowerCase();
                                     return !lower.includes('nice.gif') && !lower.includes('imgdet.png');
@@ -198,16 +253,23 @@ export default function ProductosExternos({ productosExternos, filters }) {
                                             isDarkMode
                                                 ? 'border-gray-700 bg-gray-900'
                                                 : 'border-gray-300 bg-gray-100'
-                                        }`}
+                                        } focus-within:ring-2 focus-within:ring-blue-500/40`}
                                     >
                                         <img
                                             src={src}
                                             alt={alt}
-                                            className="w-full h-36 object-cover"
+                                            className="w-full aspect-[4/3] object-cover transform transition-transform duration-300 opacity-0 group-hover:scale-[1.02]"
                                             loading="lazy"
+                                            decoding="async"
+                                            sizes="(min-width:1280px) 20vw, (min-width:1024px) 25vw, (min-width:640px) 33vw, 50vw"
+                                            onLoad={(e) => {
+                                                e.currentTarget.classList.add('opacity-100');
+                                            }}
                                             onError={(e) => {
-                                                e.target.style.display = 'none';
-                                                e.target.parentElement.style.display = 'none';
+                                                e.currentTarget.style.display = 'none';
+                                                if (e.currentTarget.parentElement) {
+                                                    e.currentTarget.parentElement.style.display = 'none';
+                                                }
                                             }}
                                         />
                                         {alt && (
@@ -223,14 +285,12 @@ export default function ProductosExternos({ productosExternos, filters }) {
                     </div>
                 )}
 
-                {/* Tablas */}
-                {tables.length > 0 && (
+                {inView && tables.length > 0 && (
                     <div className="space-y-4">
                         {tables.map((table, idx) => renderTable(table, idx))}
                     </div>
                 )}
 
-                {/* Footer con fecha */}
                 <div className={`pt-3 border-t text-xs ${
                     isDarkMode
                         ? 'border-gray-700 text-gray-500'
@@ -257,7 +317,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
 
             <div className={`min-w-screen min-h-screen ${
                 isDarkMode ? 'bg-gray-900' : 'bg-gray-200'
-            } transition-colors duration-200`}>
+            } transition-colors duration-200 font-sans text-base`}>
 
                 {/* Header sticky con búsqueda */}
                 <div className={`sticky top-0 z-30 border-b backdrop-blur-sm ${
@@ -266,19 +326,25 @@ export default function ProductosExternos({ productosExternos, filters }) {
                         : 'bg-white/90 border-gray-300'
                 }`}>
                     <div className="container mx-auto px-4 py-5">
-                        <h1 className={`text-2xl font-bold mb-3 ${
+                        <h1 className={`text-2xl font-bold tracking-tight mb-3 ${
                             isDarkMode ? 'text-white' : 'text-gray-900'
                         }`}>
                             Visor de Productos Externos
                         </h1>
 
                         {/* Barra de búsqueda */}
-                        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 mb-3">
+                        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 mb-3" aria-label="Buscar productos">
+                            <label htmlFor="search" className="sr-only">Buscar productos</label>
                             <input
-                                type="text"
+                                id="search"
+                                type="search"
+                                inputMode="search"
+                                autoComplete="off"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder="Buscar en productos..."
+                                aria-label="Buscar productos"
+                                ref={searchInputRef}
                                 className={`flex-1 px-4 py-2 rounded-lg border transition-colors duration-200 text-sm ${
                                     isDarkMode
                                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500'
@@ -288,11 +354,12 @@ export default function ProductosExternos({ productosExternos, filters }) {
                             <div className="flex gap-2">
                                 <button
                                     type="submit"
-                                    className={`px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                                    className={`px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 ${
                                         isDarkMode
                                             ? 'bg-blue-600 hover:bg-blue-700 text-white'
                                             : 'bg-blue-500 hover:bg-blue-600 text-white'
                                     }`}
+                                    aria-label="Buscar"
                                 >
                                     Buscar
                                 </button>
@@ -303,11 +370,12 @@ export default function ProductosExternos({ productosExternos, filters }) {
                                             setSearchTerm('');
                                             router.get('/productos-externos', { per_page: perPage });
                                         }}
-                                        className={`px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                                        className={`px-5 py-2 rounded-lg font-medium text-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-red-500/50 focus-visible:ring-offset-2 ${
                                             isDarkMode
                                                 ? 'bg-red-600 hover:bg-red-700 text-white'
                                                 : 'bg-red-500 hover:bg-red-600 text-white'
                                         }`}
+                                        aria-label="Limpiar búsqueda"
                                     >
                                         Limpiar
                                     </button>
@@ -318,12 +386,13 @@ export default function ProductosExternos({ productosExternos, filters }) {
                         {/* Selector de items por página y stats */}
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <div className="flex items-center gap-2">
-                                <label className={`text-sm font-medium ${
+                                <label htmlFor="per-page" className={`text-sm font-medium ${
                                     isDarkMode ? 'text-gray-300' : 'text-gray-700'
                                 }`}>
                                     Mostrar:
                                 </label>
                                 <select
+                                    id="per-page"
                                     value={perPage}
                                     onChange={(e) => handlePerPageChange(parseInt(e.target.value))}
                                     className={`px-3 py-1.5 rounded-lg border text-sm transition-colors duration-200 ${
@@ -346,7 +415,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
 
                             <div className={`text-sm ${
                                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
+                            }`} aria-live="polite">
                                 Mostrando {productosExternos.from || 0} - {productosExternos.to || 0} de {productosExternos.total || 0} productos
                             </div>
                         </div>
@@ -354,10 +423,34 @@ export default function ProductosExternos({ productosExternos, filters }) {
                 </div>
 
                 {/* Grid de productos */}
-                <main className="container mx-auto px-4 py-6">
-                    {productosExternos.data && productosExternos.data.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-4">
-                            {productosExternos.data.map((producto) => renderProduct(producto))}
+                <main className="container mx-auto px-4 py-6" aria-busy={isNavigating} id="productos-grid">
+                    {isNavigating ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {Array.from({ length: Math.min(perPage || 12, 12) }).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className={`border rounded-xl p-6 ${
+                                        isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'
+                                    }`}
+                                >
+                                    <div className={`h-5 w-2/3 mb-4 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`} />
+                                    <div className="space-y-2">
+                                        <div className={`h-3 w-full rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
+                                        <div className={`h-3 w-11/12 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
+                                    </div>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+                                        <div className={`h-24 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
+                                        <div className={`h-24 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
+                                        <div className={`h-24 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : productosExternos.data && productosExternos.data.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {productosExternos.data.map((producto) => (
+                                <ProductCard key={producto.id} producto={producto} />
+                            ))}
                         </div>
                     ) : (
                         <div className={`text-center py-20 rounded-lg ${
@@ -378,16 +471,18 @@ export default function ProductosExternos({ productosExternos, filters }) {
                         <div className={`mt-6 p-4 rounded-lg ${
                             isDarkMode ? 'bg-gray-800' : 'bg-white'
                         }`}>
-                            <div className="flex flex-wrap justify-center items-center gap-2">
+                            <nav className="flex flex-wrap justify-center items-center gap-2" aria-label="Paginación">
                                 {/* Botón Anterior */}
                                 <button
                                     onClick={() => handlePageChange(productosExternos.prev_page_url)}
                                     disabled={!productosExternos.prev_page_url}
-                                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 ${
                                         !productosExternos.prev_page_url
                                             ? (isDarkMode ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed')
                                             : (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
                                     }`}
+                                    aria-disabled={!productosExternos.prev_page_url}
+                                    title="Página anterior"
                                 >
                                     Anterior
                                 </button>
@@ -400,11 +495,13 @@ export default function ProductosExternos({ productosExternos, filters }) {
                                             key={index}
                                             onClick={() => handlePageChange(link.url)}
                                             disabled={link.active || !link.url}
-                                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 ${
                                                 link.active
                                                     ? (isDarkMode ? 'bg-blue-700 text-white' : 'bg-blue-600 text-white')
                                                     : (isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-gray-200 hover:bg-gray-300 text-gray-700')
                                             }`}
+                                            aria-current={link.active ? 'page' : undefined}
+                                            aria-disabled={link.active || !link.url}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
                                     ))}
@@ -413,15 +510,17 @@ export default function ProductosExternos({ productosExternos, filters }) {
                                 <button
                                     onClick={() => handlePageChange(productosExternos.next_page_url)}
                                     disabled={!productosExternos.next_page_url}
-                                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 ${
+                                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 ${
                                         !productosExternos.next_page_url
                                             ? (isDarkMode ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed')
                                             : (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
                                     }`}
+                                    aria-disabled={!productosExternos.next_page_url}
+                                    title="Página siguiente"
                                 >
                                     Siguiente
                                 </button>
-                            </div>
+                            </nav>
 
                             {/* Información de página actual */}
                             <div className={`text-center mt-3 text-sm ${
