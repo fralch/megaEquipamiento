@@ -1,5 +1,10 @@
 import { Head, Link, router } from "@inertiajs/react";
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, A11y } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import { useTheme } from "../storage/ThemeContext";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
@@ -224,65 +229,136 @@ export default function ProductosExternos({ productosExternos, filters }) {
                 )}
 
                 {inView && imagesArray.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {imagesArray
-                            .filter(img => {
-                                if (typeof img === 'string') {
-                                    const lower = img.toLowerCase();
-                                    return !lower.includes('nice.gif') && !lower.includes('imgdet.png');
-                                }
-                                if (img && img.src) {
-                                    const lower = img.src.toLowerCase();
-                                    return !lower.includes('nice.gif') && !lower.includes('imgdet.png');
-                                }
-                                return true;
-                            })
-                            .map((img, idx) => {
-                                const rawSrc = typeof img === 'string' ? img : img.src;
-                                const src = String(rawSrc || '')
-                                    .trim()
-                                    .replace(/^`+|`+$/g, '')
-                                    .replace(/^"+|"+$/g, '')
-                                    .replace(/^'+|'+$/g, '');
-                                const alt = typeof img === 'object' && img.alt ? img.alt : '';
+                    imagesArray.length > 1 ? (
+                        <div className="w-full">
+                            <Swiper
+                                modules={[Navigation, Pagination, A11y]}
+                                navigation
+                                pagination={{ clickable: true }}
+                                slidesPerView={1}
+                                className="w-full"
+                            >
+                                {imagesArray
+                                    .filter(img => {
+                                        if (typeof img === 'string') {
+                                            const lower = img.toLowerCase();
+                                            return !lower.includes('nice.gif') && !lower.includes('imgdet.png');
+                                        }
+                                        if (img && img.src) {
+                                            const lower = img.src.toLowerCase();
+                                            return !lower.includes('nice.gif') && !lower.includes('imgdet.png');
+                                        }
+                                        return true;
+                                    })
+                                    .map((img, idx) => {
+                                        const rawSrc = typeof img === 'string' ? img : img.src;
+                                        const src = String(rawSrc || '')
+                                            .trim()
+                                            .replace(/^`+|`+$/g, '')
+                                            .replace(/^"+|"+$/g, '')
+                                            .replace(/^'+|'+$/g, '');
+                                        const alt = typeof img === 'object' && img.alt ? img.alt : '';
 
-                                return (
-                                    <figure
-                                        key={idx}
-                                        className={`border rounded-lg overflow-hidden ${
-                                            isDarkMode
-                                                ? 'border-gray-700 bg-gray-900'
-                                                : 'border-gray-300 bg-gray-100'
-                                        } focus-within:ring-2 focus-within:ring-blue-500/40`}
-                                    >
-                                        <img
-                                            src={src}
-                                            alt={alt}
-                                            className="w-full aspect-[4/3] object-cover transform transition-transform duration-300 opacity-0 group-hover:scale-[1.02]"
-                                            loading="lazy"
-                                            decoding="async"
-                                            sizes="(min-width:1280px) 20vw, (min-width:1024px) 25vw, (min-width:640px) 33vw, 50vw"
-                                            onLoad={(e) => {
-                                                e.currentTarget.classList.add('opacity-100');
-                                            }}
-                                            onError={(e) => {
-                                                e.currentTarget.style.display = 'none';
-                                                if (e.currentTarget.parentElement) {
-                                                    e.currentTarget.parentElement.style.display = 'none';
-                                                }
-                                            }}
-                                        />
-                                        {alt && (
-                                            <figcaption className={`px-2 py-1.5 text-xs ${
-                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                                            }`}>
-                                                {alt}
-                                            </figcaption>
-                                        )}
-                                    </figure>
-                                );
-                            })}
-                    </div>
+                                        return (
+                                            <SwiperSlide key={idx}>
+                                                <figure
+                                                    className={`border rounded-lg overflow-hidden ${
+                                                        isDarkMode
+                                                            ? 'border-gray-700 bg-gray-900'
+                                                            : 'border-gray-300 bg-gray-100'
+                                                    } focus-within:ring-2 focus-within:ring-blue-500/40`}
+                                                >
+                                                    <img
+                                                        src={src}
+                                                        alt={alt}
+                                                        className="w-full h-64 sm:h-80 lg:h-96 object-contain transition-opacity duration-300 opacity-0"
+                                                        loading="lazy"
+                                                        decoding="async"
+                                                        sizes="100vw"
+                                                        onLoad={(e) => {
+                                                            const imgEl = e.currentTarget;
+                                                            const { naturalWidth, naturalHeight } = imgEl;
+                                                            if (naturalWidth < 100 || naturalHeight < 100) {
+                                                                const fig = imgEl.parentElement;
+                                                                if (fig) fig.style.display = 'none';
+                                                            } else {
+                                                                imgEl.classList.add('opacity-100');
+                                                            }
+                                                        }}
+                                                        onError={(e) => {
+                                                            const imgEl = e.currentTarget;
+                                                            imgEl.style.display = 'none';
+                                                            const fig = imgEl.parentElement;
+                                                            if (fig) fig.style.display = 'none';
+                                                        }}
+                                                    />
+                                                    {alt && (
+                                                        <figcaption className={`px-2 py-1.5 text-xs ${
+                                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                                        }`}>
+                                                            {alt}
+                                                        </figcaption>
+                                                    )}
+                                                </figure>
+                                            </SwiperSlide>
+                                        );
+                                    })}
+                            </Swiper>
+                        </div>
+                    ) : (
+                        (() => {
+                            const rawSrc = typeof imagesArray[0] === 'string' ? imagesArray[0] : imagesArray[0]?.src;
+                            const src = String(rawSrc || '')
+                                .trim()
+                                .replace(/^`+|`+$/g, '')
+                                .replace(/^"+|"+$/g, '')
+                                .replace(/^'+|'+$/g, '');
+                            const lower = src.toLowerCase();
+                            if (!src || lower.includes('nice.gif') || lower.includes('imgdet.png')) return null;
+                            const alt = typeof imagesArray[0] === 'object' && imagesArray[0]?.alt ? imagesArray[0].alt : '';
+                            return (
+                                <figure
+                                    className={`border rounded-lg overflow-hidden ${
+                                        isDarkMode
+                                            ? 'border-gray-700 bg-gray-900'
+                                            : 'border-gray-300 bg-gray-100'
+                                    }`}
+                                >
+                                    <img
+                                        src={src}
+                                        alt={alt}
+                                        className="w-full h-72 sm:h-80 lg:h-[28rem] object-contain transition-opacity duration-300 opacity-0"
+                                        loading="lazy"
+                                        decoding="async"
+                                        sizes="100vw"
+                                        onLoad={(e) => {
+                                            const imgEl = e.currentTarget;
+                                            const { naturalWidth, naturalHeight } = imgEl;
+                                            if (naturalWidth < 100 || naturalHeight < 100) {
+                                                const fig = imgEl.parentElement;
+                                                if (fig) fig.style.display = 'none';
+                                            } else {
+                                                imgEl.classList.add('opacity-100');
+                                            }
+                                        }}
+                                        onError={(e) => {
+                                            const imgEl = e.currentTarget;
+                                            imgEl.style.display = 'none';
+                                            const fig = imgEl.parentElement;
+                                            if (fig) fig.style.display = 'none';
+                                        }}
+                                    />
+                                    {alt && (
+                                        <figcaption className={`px-2 py-1.5 text-xs ${
+                                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                        }`}>
+                                            {alt}
+                                        </figcaption>
+                                    )}
+                                </figure>
+                            );
+                        })()
+                    )
                 )}
 
                 {inView && tables.length > 0 && (
