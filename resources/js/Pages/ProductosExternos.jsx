@@ -77,8 +77,45 @@ export default function ProductosExternos({ productosExternos, filters }) {
     const renderTable = (table, index) => {
         if (!table) return null;
 
-        const headers = table.headers || [];
-        const rows = table.rows || [];
+        const rawHeaders = Array.isArray(table.headers) ? table.headers : [];
+        const rawRows = Array.isArray(table.rows) ? table.rows : [];
+
+        const headers = rawHeaders.map((h) => (typeof h === 'string' ? h.trim() : ''));
+        const allHeadersEmpty = headers.length > 0 && headers.every((h) => h === '');
+
+        const normalizeCell = (cell) => {
+            if (cell == null) return '';
+            if (typeof cell === 'string') return cell.trim();
+            try {
+                const s = JSON.stringify(cell);
+                return s === '{}' || s === '[]' || s === 'null' ? '' : s.trim();
+            } catch {
+                return '';
+            }
+        };
+
+        const isRowEmpty = (row) => {
+            const arr = Array.isArray(row) ? row : [row];
+            return arr.every((c) => normalizeCell(c) === '');
+        };
+
+        const rows = [];
+        let prevEmpty = false;
+        for (const r of rawRows) {
+            const empty = isRowEmpty(r);
+            if (empty) {
+                if (prevEmpty) {
+                    prevEmpty = true;
+                    continue;
+                }
+                prevEmpty = true;
+                continue;
+            }
+            prevEmpty = false;
+            rows.push(r);
+        }
+
+        if ((rows.length === 0) && (allHeadersEmpty || rawHeaders.length === 0)) return null;
 
         return (
             <div key={index} className="overflow-x-auto mb-4">
@@ -89,7 +126,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
                     role="table"
                     aria-label="Tabla de datos"
                 >
-                    {headers.length > 0 && (
+                    {!allHeadersEmpty && headers.length > 0 && (
                         <thead>
                             <tr className={isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}>
                                 {headers.map((header, idx) => (
@@ -128,7 +165,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
                                                     : 'border-gray-300 text-gray-700'
                                             }`}
                                         >
-                                            {typeof cell === 'string' ? cell : JSON.stringify(cell)}
+                                            {normalizeCell(cell)}
                                         </td>
                                     ))}
                                 </tr>
@@ -189,45 +226,21 @@ export default function ProductosExternos({ productosExternos, filters }) {
         return (
             <article
                 ref={cardRef}
-                className={`group border rounded-xl p-6 flex flex-col gap-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 ${
+                className={`group border rounded-xl p-0 overflow-hidden break-inside-avoid mb-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 ${
                     isDarkMode
                         ? 'border-gray-700 bg-gray-800'
                         : 'border-gray-300 bg-white'
                 }`}
             >
-                {headingText && (
-                    <h2 className={`text-xl font-semibold tracking-tight ${
-                        isDarkMode ? 'text-white' : 'text-gray-900'
-                    }`}>
-                        {headingText}
-                    </h2>
-                )}
-
-                {headingArray.length > 1 && (
-                    <ul className={`list-disc list-inside space-y-1 ${
-                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                    }`}>
-                        {headingArray.slice(1).map((h, idx) => (
-                            <li key={idx} className="text-sm">{h}</li>
-                        ))}
-                    </ul>
-                )}
-
-                {paragraphsArray.length > 0 && (
-                    <div className="space-y-2">
-                        {paragraphsArray.map((paragraph, idx) => (
-                            <p
-                                key={idx}
-                                className={`text-sm leading-relaxed ${
-                                    isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                                }`}
-                            >
-                                {paragraph}
-                            </p>
-                        ))}
-                    </div>
-                )}
-
+                <div className="p-6">
+                    {headingText && (
+                        <h2 className={`text-lg font-semibold tracking-tight ${
+                            isDarkMode ? 'text-white' : 'text-gray-900'
+                        }`}>
+                            {headingText}
+                        </h2>
+                    )}
+                </div>
                 {inView && imagesArray.length > 0 && (
                     imagesArray.length > 1 ? (
                         <div className="w-full">
@@ -262,16 +275,16 @@ export default function ProductosExternos({ productosExternos, filters }) {
                                         return (
                                             <SwiperSlide key={idx}>
                                                 <figure
-                                                    className={`border rounded-lg overflow-hidden ${
+                                                    className={`overflow-hidden ${
                                                         isDarkMode
-                                                            ? 'border-gray-700 bg-gray-900'
-                                                            : 'border-gray-300 bg-gray-100'
-                                                    } focus-within:ring-2 focus-within:ring-blue-500/40`}
+                                                            ? 'bg-gray-900'
+                                                            : 'bg-gray-100'
+                                                    }`}
                                                 >
                                                     <img
                                                         src={src}
                                                         alt={alt}
-                                                        className="w-full h-64 sm:h-80 lg:h-96 object-contain transition-opacity duration-300 opacity-0"
+                                                        className="w-full h-auto object-contain transition-opacity duration-300 opacity-0"
                                                         loading="lazy"
                                                         decoding="async"
                                                         sizes="100vw"
@@ -293,7 +306,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
                                                         }}
                                                     />
                                                     {alt && (
-                                                        <figcaption className={`px-2 py-1.5 text-xs ${
+                                                        <figcaption className={`px-4 py-2 text-xs ${
                                                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                                         }`}>
                                                             {alt}
@@ -317,17 +330,11 @@ export default function ProductosExternos({ productosExternos, filters }) {
                             if (!src || lower.includes('nice.gif') || lower.includes('imgdet.png')) return null;
                             const alt = typeof imagesArray[0] === 'object' && imagesArray[0]?.alt ? imagesArray[0].alt : '';
                             return (
-                                <figure
-                                    className={`border rounded-lg overflow-hidden ${
-                                        isDarkMode
-                                            ? 'border-gray-700 bg-gray-900'
-                                            : 'border-gray-300 bg-gray-100'
-                                    }`}
-                                >
+                                <figure className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
                                     <img
                                         src={src}
                                         alt={alt}
-                                        className="w-full h-72 sm:h-80 lg:h-[28rem] object-contain transition-opacity duration-300 opacity-0"
+                                        className="w-full h-auto object-contain transition-opacity duration-300 opacity-0"
                                         loading="lazy"
                                         decoding="async"
                                         sizes="100vw"
@@ -349,7 +356,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
                                         }}
                                     />
                                     {alt && (
-                                        <figcaption className={`px-2 py-1.5 text-xs ${
+                                        <figcaption className={`px-4 py-2 text-xs ${
                                             isDarkMode ? 'text-gray-400' : 'text-gray-600'
                                         }`}>
                                             {alt}
@@ -361,24 +368,52 @@ export default function ProductosExternos({ productosExternos, filters }) {
                     )
                 )}
 
-                {inView && tables.length > 0 && (
-                    <div className="space-y-4">
-                        {tables.map((table, idx) => renderTable(table, idx))}
-                    </div>
-                )}
+                <div className="p-6 flex flex-col gap-3">
 
-                <div className={`pt-3 border-t text-xs ${
-                    isDarkMode
-                        ? 'border-gray-700 text-gray-500'
-                        : 'border-gray-300 text-gray-500'
-                }`}>
-                    Creado: {new Date(producto.created_at).toLocaleDateString('es-ES', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    })}
+                    {headingArray.length > 1 && (
+                        <ul className={`list-disc list-inside space-y-1 ${
+                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                            {headingArray.slice(1).map((h, idx) => (
+                                <li key={idx} className="text-sm">{h}</li>
+                            ))}
+                        </ul>
+                    )}
+
+                    {paragraphsArray.length > 0 && (
+                        <div className="space-y-2">
+                            {paragraphsArray.map((paragraph, idx) => (
+                                <p
+                                    key={idx}
+                                    className={`text-sm leading-relaxed ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}
+                                >
+                                    {paragraph}
+                                </p>
+                            ))}
+                        </div>
+                    )}
+
+                    {inView && tables.length > 0 && (
+                        <div className="space-y-4">
+                            {tables.map((table, idx) => renderTable(table, idx))}
+                        </div>
+                    )}
+
+                    <div className={`pt-3 border-t text-xs ${
+                        isDarkMode
+                            ? 'border-gray-700 text-gray-500'
+                            : 'border-gray-300 text-gray-500'
+                    }`}>
+                        Creado: {new Date(producto.created_at).toLocaleDateString('es-ES', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </div>
                 </div>
             </article>
         );
@@ -501,29 +536,25 @@ export default function ProductosExternos({ productosExternos, filters }) {
                 {/* Grid de productos */}
                 <main className="container mx-auto px-4 py-6" aria-busy={isNavigating} id="productos-grid">
                     {isNavigating ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6">
                             {Array.from({ length: Math.min(perPage || 12, 12) }).map((_, i) => (
                                 <div
                                     key={i}
-                                    className={`border rounded-xl p-6 ${
+                                    className={`border rounded-xl overflow-hidden break-inside-avoid mb-6 ${
                                         isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'
                                     }`}
                                 >
-                                    <div className={`h-5 w-2/3 mb-4 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`} />
-                                    <div className="space-y-2">
+                                    <div className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} h-48 animate-pulse`} />
+                                    <div className="p-6 space-y-2">
+                                        <div className={`h-5 w-2/3 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-300'}`} />
                                         <div className={`h-3 w-full rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
                                         <div className={`h-3 w-11/12 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
-                                    </div>
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
-                                        <div className={`h-24 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
-                                        <div className={`h-24 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
-                                        <div className={`h-24 rounded animate-pulse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`} />
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : productosExternos.data && productosExternos.data.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6">
                             {productosExternos.data.map((producto) => (
                                 <ProductCard key={producto.id} producto={producto} />
                             ))}
