@@ -96,6 +96,10 @@ export default function ProductCard({ producto }) {
         headingArray.length > 0 ? headingArray.join(' ') : ''
     ), [headingArray]);
 
+    const productName = useMemo(() => (
+        (headingArray[0] ?? '').toString().trim()
+    ), [headingArray]);
+
     // Procesar párrafos (usar traducción si está disponible)
     const paragraphsArray = useMemo(() => {
         const paragraphs = translatedData?.paragraphs ?? producto.paragraphs;
@@ -305,9 +309,8 @@ export default function ProductCard({ producto }) {
                         </div>
                     )}
 
-                    {/* Botón Ver tablas */}
-                    {tables.length > 0 && (
-                        <div className="mt-2">
+                    <div className="mt-2 flex gap-2">
+                        {tables.length > 0 && (
                             <button
                                 type="button"
                                 onClick={() => setIsTablesOpen(true)}
@@ -320,8 +323,26 @@ export default function ProductCard({ producto }) {
                             >
                                 Ver tabla
                             </button>
-                        </div>
-                    )}
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => {
+                                const message = productName
+                                    ? `Estoy interesado en este producto ${productName}`
+                                    : 'Estoy interesado en este producto';
+                                const whatsappUrl = `https://wa.me/51939294882?text=${encodeURIComponent(message)}`;
+                                window.open(whatsappUrl, '_blank');
+                            }}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                isDarkMode
+                                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                                    : 'bg-green-500 hover:bg-green-600 text-white'
+                            } focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:ring-offset-2`}
+                            aria-label="Contactar por WhatsApp"
+                        >
+                            Contactar por WhatsApp
+                        </button>
+                    </div>
 
                     {/* Footer con fecha */}
                     <div className={`pt-3 border-t text-xs ${
