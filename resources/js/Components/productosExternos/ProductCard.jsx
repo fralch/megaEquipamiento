@@ -42,20 +42,43 @@ export default function ProductCard({ producto }) {
         const translateProduct = async () => {
             setIsTranslating(true);
             try {
+                console.log(`[Producto ${producto.id}] Iniciando traducción...`);
                 const response = await fetch(`/api/productos-externos/${producto.id}/translate?lang=es`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setTranslatedData(data);
+
+                if (!response.ok) {
+                    console.error(`[Producto ${producto.id}] Error HTTP: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error(`[Producto ${producto.id}] Error details:`, errorText);
+                    // Aún así, usar los datos originales si falla la traducción
+                    setTranslatedData({
+                        heading: producto.heading,
+                        paragraphs: producto.paragraphs,
+                        tables: producto.tables
+                    });
+                    return;
                 }
+
+                const data = await response.json();
+                console.log(`[Producto ${producto.id}] Traducción completada`, data);
+                setTranslatedData(data);
             } catch (error) {
-                console.error('Translation error:', error);
+                console.error(`[Producto ${producto.id}] Error de red o excepción:`, error);
+                // Usar datos originales en caso de error
+                setTranslatedData({
+                    heading: producto.heading,
+                    paragraphs: producto.paragraphs,
+                    tables: producto.tables
+                });
             } finally {
                 setIsTranslating(false);
             }
         };
 
-        translateProduct();
-    }, [inView, producto.id, isTranslating, translatedData]);
+        // Añadir un pequeño delay aleatorio para evitar sobrecarga
+        const delay = Math.random() * 500;
+        const timeoutId = setTimeout(translateProduct, delay);
+        return () => clearTimeout(timeoutId);
+    }, [inView, producto.id, isTranslating, translatedData, producto.heading, producto.paragraphs, producto.tables]);
 
     // Procesar headings (usar traducción si está disponible)
     const headingArray = useMemo(() => {
@@ -147,12 +170,25 @@ export default function ProductCard({ producto }) {
         <>
             <article
                 ref={cardRef}
-                className={`group border rounded-xl overflow-hidden break-inside-avoid mb-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 ${
+                className={`group border rounded-xl overflow-hidden break-inside-avoid mb-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 relative ${
                     isDarkMode
                         ? 'border-gray-700 bg-gray-800'
                         : 'border-gray-300 bg-white'
                 }`}
             >
+                {/* Indicador de traducción */}
+                {isTranslating && (
+                    <div className={`absolute top-2 right-2 z-10 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2 ${
+                        isDarkMode ? 'bg-blue-900/80 text-blue-200' : 'bg-blue-100/80 text-blue-800'
+                    }`}>
+                        <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Traduciendo...
+                    </div>
+                )}
+
                 {/* Header */}
                 {headingText && (
                     <div className="p-6 pb-4">

@@ -11,19 +11,34 @@ class TranslationService
     {
         $t = trim((string) $text);
         if ($t === '') return '';
+
+        // Si el texto es muy corto o parece ser código/números, no traducir
+        if (strlen($t) < 3 || preg_match('/^[\d\s\-\.\,]+$/', $t)) {
+            return $t;
+        }
+
         $cacheKey = 'translate:' . md5($from . '|' . $to . '|' . $t);
         $compute = function () use ($t, $to, $from) {
             try {
-                $resp = Http::timeout(8)->get('https://translate.googleapis.com/translate_a/single', [
+                $resp = Http::timeout(10)->retry(2, 100)->get('https://translate.googleapis.com/translate_a/single', [
                     'client' => 'gtx',
                     'sl' => $from,
                     'tl' => $to,
                     'dt' => 't',
                     'q' => $t,
                 ]);
-                if (!$resp->successful()) return $t;
+
+                if (!$resp->successful()) {
+                    \Log::warning("Translation API failed with status {$resp->status()} for text: " . substr($t, 0, 50));
+                    return $t;
+                }
+
                 $json = $resp->json();
-                if (!is_array($json) || !isset($json[0])) return $t;
+                if (!is_array($json) || !isset($json[0])) {
+                    \Log::warning("Translation API returned unexpected format for text: " . substr($t, 0, 50));
+                    return $t;
+                }
+
                 $segments = $json[0];
                 $out = '';
                 foreach ($segments as $seg) {
@@ -33,6 +48,7 @@ class TranslationService
                 }
                 return $out !== '' ? $out : $t;
             } catch (\Throwable $e) {
+                \Log::error("Translation exception: " . $e->getMessage() . " for text: " . substr($t, 0, 50));
                 return $t;
             }
         };
@@ -40,6 +56,7 @@ class TranslationService
         try {
             return Cache::store('file')->remember($cacheKey, now()->addDays(7), $compute);
         } catch (\Throwable $e) {
+            \Log::error("Cache error during translation: " . $e->getMessage());
             return $compute();
         }
     }
