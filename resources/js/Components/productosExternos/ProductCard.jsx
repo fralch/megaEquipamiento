@@ -12,6 +12,8 @@ export default function ProductCard({ producto }) {
     const cardRef = useRef(null);
     const [inView, setInView] = useState(false);
     const [isTablesOpen, setIsTablesOpen] = useState(false);
+    const [translatedData, setTranslatedData] = useState(null);
+    const [isTranslating, setIsTranslating] = useState(false);
 
     // Lazy loading con Intersection Observer
     useEffect(() => {
@@ -33,41 +35,66 @@ export default function ProductCard({ producto }) {
         return () => observer.disconnect();
     }, []);
 
-    // Procesar headings
+    // Lazy translation - translate when card becomes visible
+    useEffect(() => {
+        if (!inView || isTranslating || translatedData) return;
+
+        const translateProduct = async () => {
+            setIsTranslating(true);
+            try {
+                const response = await fetch(`/api/productos-externos/${producto.id}/translate?lang=es`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setTranslatedData(data);
+                }
+            } catch (error) {
+                console.error('Translation error:', error);
+            } finally {
+                setIsTranslating(false);
+            }
+        };
+
+        translateProduct();
+    }, [inView, producto.id, isTranslating, translatedData]);
+
+    // Procesar headings (usar traducción si está disponible)
     const headingArray = useMemo(() => {
-        if (Array.isArray(producto.heading)) {
-            return producto.heading;
+        const heading = translatedData?.heading ?? producto.heading;
+        if (Array.isArray(heading)) {
+            return heading;
         }
-        if (typeof producto.heading === 'string' && producto.heading.trim()) {
-            return [producto.heading.trim()];
+        if (typeof heading === 'string' && heading.trim()) {
+            return [heading.trim()];
         }
         return [];
-    }, [producto.heading]);
+    }, [producto.heading, translatedData]);
 
     const headingText = useMemo(() => (
         headingArray.length > 0 ? headingArray.join(' ') : ''
     ), [headingArray]);
 
-    // Procesar párrafos
+    // Procesar párrafos (usar traducción si está disponible)
     const paragraphsArray = useMemo(() => {
-        if (Array.isArray(producto.paragraphs)) {
-            return producto.paragraphs;
+        const paragraphs = translatedData?.paragraphs ?? producto.paragraphs;
+        if (Array.isArray(paragraphs)) {
+            return paragraphs;
         }
-        if (typeof producto.paragraphs === 'string') {
-            return producto.paragraphs.split(/\r?\n/).filter(p => p && p.trim());
+        if (typeof paragraphs === 'string') {
+            return paragraphs.split(/\r?\n/).filter(p => p && p.trim());
         }
         return [];
-    }, [producto.paragraphs]);
+    }, [producto.paragraphs, translatedData]);
 
     // Procesar imágenes
     const imagesArray = useMemo(() => (
         Array.isArray(producto.images) ? producto.images : []
     ), [producto.images]);
 
-    // Procesar tablas
-    const tables = useMemo(() => (
-        Array.isArray(producto.tables) ? producto.tables : []
-    ), [producto.tables]);
+    // Procesar tablas (usar traducción si está disponible)
+    const tables = useMemo(() => {
+        const tablesToUse = translatedData?.tables ?? producto.tables;
+        return Array.isArray(tablesToUse) ? tablesToUse : [];
+    }, [producto.tables, translatedData]);
 
     // Filtrar imágenes no deseadas
     const filterImage = (img) => {

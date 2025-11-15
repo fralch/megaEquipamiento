@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\ProductoExterno;
+use App\Services\TranslationService;
 use Illuminate\Support\Facades\Log;
 
 class ProductoExternoController extends Controller
@@ -60,7 +61,7 @@ class ProductoExternoController extends Controller
     /**
      * Display the specified producto externo.
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $productoExterno = ProductoExterno::find($id);
 
@@ -68,7 +69,39 @@ class ProductoExternoController extends Controller
             return response()->json(['error' => 'Producto externo no encontrado'], 404);
         }
 
+        $lang = $request->input('lang', 'es');
+        if ($lang === 'es') {
+            $productoExterno->heading = TranslationService::translateArray($productoExterno->heading, 'es', 'auto');
+            $productoExterno->paragraphs = TranslationService::translateArray($productoExterno->paragraphs, 'es', 'auto');
+            $productoExterno->tables = TranslationService::translateTables($productoExterno->tables, 'es', 'auto');
+        }
+
         return response()->json($productoExterno);
+    }
+
+    /**
+     * Translate a producto externo.
+     */
+    public function translate(Request $request, $id)
+    {
+        try {
+            $productoExterno = ProductoExterno::find($id);
+
+            if (!$productoExterno) {
+                return response()->json(['error' => 'Producto externo no encontrado'], 404);
+            }
+
+            $lang = $request->input('lang', 'es');
+
+            return response()->json([
+                'heading' => TranslationService::translateArray($productoExterno->heading, $lang, 'auto'),
+                'paragraphs' => TranslationService::translateArray($productoExterno->paragraphs, $lang, 'auto'),
+                'tables' => TranslationService::translateTables($productoExterno->tables, $lang, 'auto'),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error translating product: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al traducir el producto'], 500);
+        }
     }
 
     /**
