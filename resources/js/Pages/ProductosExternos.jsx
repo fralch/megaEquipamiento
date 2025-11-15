@@ -42,6 +42,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
         }, {
             preserveState: true,
             preserveScroll: true,
+            onFinish: () => setIsNavigating(false),
         });
     };
 
@@ -52,6 +53,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
             router.get(url, {}, {
                 preserveState: true,
                 preserveScroll: false,
+                onFinish: () => setIsNavigating(false),
             });
         }
     };
@@ -66,6 +68,7 @@ export default function ProductosExternos({ productosExternos, filters }) {
         }, {
             preserveState: true,
             preserveScroll: true,
+            onFinish: () => setIsNavigating(false),
         });
     };
 

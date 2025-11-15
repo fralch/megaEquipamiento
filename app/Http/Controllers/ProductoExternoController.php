@@ -21,7 +21,8 @@ class ProductoExternoController extends Controller
 
         // Paginar los productos externos
         $productosExternos = ProductoExterno::orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->withQueryString();
 
         return response()->json($productosExternos);
     }
@@ -47,7 +48,7 @@ class ProductoExternoController extends Controller
         }
 
         // Paginar los productos externos
-        $productosExternos = $query->paginate($perPage);
+        $productosExternos = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('ProductosExternos', [
             'productosExternos' => $productosExternos,
