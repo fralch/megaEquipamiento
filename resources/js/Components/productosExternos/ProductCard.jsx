@@ -344,20 +344,7 @@ export default function ProductCard({ producto }) {
                         </button>
                     </div>
 
-                    {/* Footer con fecha */}
-                    <div className={`pt-3 border-t text-xs ${
-                        isDarkMode
-                            ? 'border-gray-700 text-gray-500'
-                            : 'border-gray-300 text-gray-500'
-                    }`}>
-                        Creado: {new Date(producto.created_at).toLocaleDateString('es-ES', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })}
-                    </div>
+                    
                 </div>
             </article>
 
