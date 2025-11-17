@@ -604,7 +604,7 @@ chmod +x revertir-optimizaciones.sh
 ```bash
 # Lighthouse desde CLI
 npm install -g lighthouse
-lighthouse http://localhost --view
+lighthouse http://127.0.0.1:8000 --view
 ```
 
 2. **Tomar screenshots de las métricas:**
