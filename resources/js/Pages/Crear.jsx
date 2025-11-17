@@ -13,6 +13,7 @@ import Tags from "../Components/create/createTags";
 import TagParents from "../Components/create/createTagParents";
 import MoveSubcategories from "../Components/create/MoveSubcategories";
 import ProductoTagsManagement from "../Components/ProductoTagsManagement";
+import CacheCleaner from "../Components/admin/CacheCleaner";
 
 const CrearProducto = () => {
     const { isDarkMode, toggleDarkMode } = useTheme();
@@ -482,6 +483,9 @@ const CrearProducto = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Botón flotante para limpiar cache */}
+            <CacheCleaner isAdmin={true} />
         </div>
     );
 };

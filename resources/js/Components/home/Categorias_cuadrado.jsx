@@ -27,6 +27,11 @@ const CategoryCard = React.memo(({ title, items, categoryId, categoryImages }) =
   const [imageLoaded, setImageLoaded] = useState(false);
   const intervalRef = useRef(null);
 
+  // Memoizar items ordenados
+  const sortedItems = useMemo(() => {
+    return [...items].sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }, [items]);
+
   // Configurar imágenes de la base de datos
   useEffect(() => {
     if (isVisible) {
@@ -166,7 +171,7 @@ const CategoryCard = React.memo(({ title, items, categoryId, categoryImages }) =
 
             {/* Lista desplazable memoizada */}
             <div className={`space-y-2 h-40 overflow-y-auto scrollbar-thin ${isDarkMode ? 'scrollbar-thumb-gray-500 scrollbar-track-gray-700' : 'scrollbar-thumb-gray-600 scrollbar-track-gray-300'}`}>
-              {[...items].sort((a, b) => a.nombre.localeCompare(b.nombre)).map((item) => (
+              {sortedItems.map((item) => (
                 <SubcategoryLink
                   key={item.id_subcategoria}
                   item={item}

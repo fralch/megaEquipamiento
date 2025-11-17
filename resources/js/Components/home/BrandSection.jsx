@@ -1,9 +1,20 @@
 // BrandSection.jsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo, memo, useCallback } from "react";
 import axios from 'axios';
 import { useTheme } from '../../storage/ThemeContext';
 
-const BrandCard = ({ brand }) => {
+// Función helper para ordenar marcas alfabéticamente
+const sortBrands = (brandsData) => {
+  if (!Array.isArray(brandsData)) return brandsData;
+
+  return brandsData.sort((a, b) => {
+    const nameA = a.nombre?.toLowerCase() || '';
+    const nameB = b.nombre?.toLowerCase() || '';
+    return nameA.localeCompare(nameB);
+  });
+};
+
+const BrandCard = memo(({ brand }) => {
   const { isDarkMode } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -33,16 +44,16 @@ const BrandCard = ({ brand }) => {
     };
   }, []);
 
-  const handleBrandClick = (e) => {
+  const handleBrandClick = useCallback((e) => {
     e.preventDefault();
     if (isSearching) return;
-    
+
     setIsSearching(true);
     setTimeout(() => {
       window.location.href = `/marcas/${brand.id_marca}`;
       setIsSearching(false);
     }, 300);
-  };
+  }, [isSearching, brand.id_marca]);
 
   return (
     <div
@@ -130,7 +141,7 @@ const BrandCard = ({ brand }) => {
       </button>
     </div>
   );
-};
+});
 
 const BrandSection = () => {
   const { isDarkMode } = useTheme();
@@ -145,14 +156,8 @@ const BrandSection = () => {
         const response = await axios.get('/marca/all');
         const brandsData = response.data;
 
-        // Ordenar marcas alfabéticamente de A a Z
-        const sortedBrands = Array.isArray(brandsData)
-          ? brandsData.sort((a, b) => {
-              const nameA = a.nombre?.toLowerCase() || '';
-              const nameB = b.nombre?.toLowerCase() || '';
-              return nameA.localeCompare(nameB);
-            })
-          : brandsData;
+        // Ordenar marcas alfabéticamente de A a Z usando la función helper
+        const sortedBrands = sortBrands(brandsData);
 
         // Guardar en localStorage con timestamp para caché
         localStorage.setItem('brandsData', JSON.stringify(sortedBrands));
@@ -165,24 +170,18 @@ const BrandSection = () => {
         setLoading(false);
       }
     };
-    
+
     // Verificar si hay datos en caché
     const cachedBrands = localStorage.getItem('brandsData');
     const cachedTimestamp = localStorage.getItem('brandsDataTimestamp');
     const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
-    
+
     if (cachedBrands && cachedTimestamp && (Date.now() - parseInt(cachedTimestamp)) < oneHour) {
       // Usar datos en caché si son recientes (1 hora)
       const cachedBrandsData = JSON.parse(cachedBrands);
 
-      // Ordenar marcas del caché alfabéticamente de A a Z
-      const sortedCachedBrands = Array.isArray(cachedBrandsData)
-        ? cachedBrandsData.sort((a, b) => {
-            const nameA = a.nombre?.toLowerCase() || '';
-            const nameB = b.nombre?.toLowerCase() || '';
-            return nameA.localeCompare(nameB);
-          })
-        : cachedBrandsData;
+      // Ordenar marcas del caché alfabéticamente de A a Z usando la función helper
+      const sortedCachedBrands = sortBrands(cachedBrandsData);
 
       setBrands(sortedCachedBrands);
       setLoading(false);

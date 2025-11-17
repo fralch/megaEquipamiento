@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from "@inertiajs/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback, memo } from "react";
 import { useTheme } from "../storage/ThemeContext";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
@@ -8,6 +8,120 @@ import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
 import VideoPlayer from "../Components/VideoPlayer";
 const URL_API = import.meta.env.VITE_API_URL;
+
+// Componente memoizado de tarjeta de marca
+const CategoryBrandCard = memo(({ brand, selectedBrand, isDarkMode, onBrandFilter }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [isSearching, setIsSearching] = useState(false);
+    const isActive = String(selectedBrand) === String(brand.id_marca);
+
+    const handleBrandClick = useCallback((e) => {
+        e.preventDefault();
+        if (isSearching) return;
+
+        setIsSearching(true);
+
+        // Aplicar filtro por marca
+        setTimeout(() => {
+            onBrandFilter(brand.id_marca);
+            setIsSearching(false);
+        }, 300);
+    }, [isSearching, onBrandFilter, brand.id_marca]);
+
+    return (
+        <div
+            className={`relative flex flex-col items-center text-center p-4 group transition-all duration-300 rounded-lg ${
+                isActive
+                    ? (isDarkMode ? 'bg-blue-900/50 border-2 border-blue-400' : 'bg-blue-100/70 border-2 border-blue-500')
+                    : (isDarkMode ? 'hover:bg-gray-700/30' : 'hover:bg-gray-100/50')
+            } ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+        >
+            <div className={`w-36 h-36 flex items-center justify-center rounded-full border-2 overflow-hidden transition-all duration-300 bg-white ${
+                isActive
+                    ? (isDarkMode ? 'border-blue-300 shadow-lg' : 'border-blue-600 shadow-lg')
+                    : (isDarkMode ? 'border-blue-400' : 'border-blue-500')
+            }`}>
+
+                {/* Imagen de la marca */}
+                <img
+                    src={brand.imagen}
+                    alt={brand.nombre}
+                    className={`object-contain w-32 h-32 transition-opacity duration-300 ${
+                        imageLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    loading="lazy"
+                    onLoad={() => setImageLoaded(true)}
+                    onError={(e) => {
+                        e.target.style.display = 'none';
+                    }}
+                />
+
+                {/* Fallback si no hay imagen */}
+                {!imageLoaded && (
+                    <div className={`w-32 h-32 flex items-center justify-center text-4xl font-bold ${
+                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                        {brand.nombre.charAt(0).toUpperCase()}
+                    </div>
+                )}
+            </div>
+
+            {/* Nombre de la marca */}
+            <h3 className={`mt-4 text-lg font-semibold transition-colors duration-300 ${
+                isActive
+                    ? (isDarkMode ? 'text-blue-300' : 'text-blue-700')
+                    : (isDarkMode ? 'text-white' : 'text-gray-900')
+            }`}>
+                {brand.nombre}
+            </h3>
+
+            {/* Descripción */}
+            {brand.descripcion && (
+                <p className={`mt-1 text-sm transition-colors duration-300 ${
+                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                }`}>
+                    {brand.descripcion}
+                </p>
+            )}
+
+            {/* Indicador de filtro activo */}
+            {isActive && (
+                <div className={`mt-2 px-2 py-1 rounded-full text-xs font-medium ${
+                    isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+                }`}>
+                    Filtro Activo
+                </div>
+            )}
+
+            {/* Botón */}
+            <button
+                className={`mt-3 transition-all duration-300 text-white px-4 py-2 rounded flex items-center justify-center transform hover:scale-105 ${
+                    isSearching
+                        ? (isDarkMode ? 'bg-gray-600 cursor-wait' : 'bg-gray-400 cursor-wait')
+                        : isActive
+                            ? (isDarkMode ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-gray-400 cursor-not-allowed opacity-50')
+                            : (isDarkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600')
+                }`}
+                onClick={handleBrandClick}
+                disabled={isSearching || isActive}
+            >
+                {isSearching ? (
+                    <>
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Filtrando...
+                    </>
+                ) : isActive ? (
+                    'Filtro Activo'
+                ) : (
+                    'Filtrar por Marca'
+                )}
+            </button>
+        </div>
+    );
+});
 
 export default function Categoria({ productos, categoria, subcategorias, marcas, todasCategorias }) {
     const { auth } = usePage().props;
@@ -46,164 +160,60 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
         }
     }, [categoria])
 
-    const toggleMenu = () => {
-        setIsOpen(!isOpen);
-    };
-
-    const handleMostrarProductos = () => {
-        setMostrarProductos(true);
-    };
-
     const [isSubcategoryDropdownOpen, setIsSubcategoryDropdownOpen] = useState(true);
     const [selectedBrand, setSelectedBrand] = useState(null);
-    const [filteredProducts, setFilteredProducts] = useState(productos);
 
-    // Efecto para filtrar productos por marca
-    useEffect(() => {
+    // Memoizar productos filtrados
+    const filteredProducts = useMemo(() => {
         if (selectedBrand && selectedBrand !== 'all') {
-            // Convertir ambos valores al mismo tipo para comparación
-            setFilteredProducts(productos.filter(product => 
+            return productos.filter(product =>
                 String(product.marca_id) === String(selectedBrand)
-            ));
-        } else {
-            setFilteredProducts(productos);
+            );
         }
+        return productos;
     }, [selectedBrand, productos]);
 
-    const toggleSubcategoryDropdown = () => {
-        setIsSubcategoryDropdownOpen(!isSubcategoryDropdownOpen);
-    };
+    const toggleMenu = useCallback(() => {
+        setIsOpen(!isOpen);
+    }, [isOpen]);
 
-    const handleBrandChange = (event) => {
+    const handleMostrarProductos = useCallback(() => {
+        setMostrarProductos(true);
+    }, []);
+
+    const toggleSubcategoryDropdown = useCallback(() => {
+        setIsSubcategoryDropdownOpen(!isSubcategoryDropdownOpen);
+    }, [isSubcategoryDropdownOpen]);
+
+    const handleBrandChange = useCallback((event) => {
         const value = event.target.value;
         setSelectedBrand(value === 'all' ? null : value);
-    };
+    }, []);
 
     // Función para manejar el filtro por marca desde las tarjetas
-    const handleBrandFilter = (marcaId) => {
+    const handleBrandFilter = useCallback((marcaId) => {
         setSelectedBrand(String(marcaId));
         // Scroll suave hacia arriba para ver los productos filtrados
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    // Componente de tarjeta de marca integrado
-    const CategoryBrandCard = ({ brand }) => {
-        const [imageLoaded, setImageLoaded] = useState(false);
-        const [isSearching, setIsSearching] = useState(false);
-        const isActive = String(selectedBrand) === String(brand.id_marca);
-
-        const handleBrandClick = (e) => {
-            e.preventDefault();
-            if (isSearching) return;
-            
-            setIsSearching(true);
-            
-            // Aplicar filtro por marca
-            setTimeout(() => {
-                handleBrandFilter(brand.id_marca);
-                setIsSearching(false);
-            }, 300);
-        };
-
-        return (
-            <div
-                className={`relative flex flex-col items-center text-center p-4 group transition-all duration-300 rounded-lg ${
-                    isActive 
-                        ? (isDarkMode ? 'bg-blue-900/50 border-2 border-blue-400' : 'bg-blue-100/70 border-2 border-blue-500')
-                        : (isDarkMode ? 'hover:bg-gray-700/30' : 'hover:bg-gray-100/50')
-                } ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-            >
-                <div className={`w-36 h-36 flex items-center justify-center rounded-full border-2 overflow-hidden transition-all duration-300 bg-white ${
-                    isActive
-                        ? (isDarkMode ? 'border-blue-300 shadow-lg' : 'border-blue-600 shadow-lg')
-                        : (isDarkMode ? 'border-blue-400' : 'border-blue-500')
-                }`}>
-                    
-                    {/* Imagen de la marca */}
-                    <img
-                        src={brand.imagen}
-                        alt={brand.nombre}
-                        className={`object-contain w-32 h-32 transition-opacity duration-300 ${
-                            imageLoaded ? 'opacity-100' : 'opacity-0'
-                        }`}
-                        loading="lazy"
-                        onLoad={() => setImageLoaded(true)}
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                        }}
-                    />
-                    
-                    {/* Fallback si no hay imagen */}
-                    {!imageLoaded && (
-                        <div className={`w-32 h-32 flex items-center justify-center text-4xl font-bold ${
-                            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
-                            {brand.nombre.charAt(0).toUpperCase()}
-                        </div>
-                    )}
-                </div>
-
-                {/* Nombre de la marca */}
-                <h3 className={`mt-4 text-lg font-semibold transition-colors duration-300 ${
-                    isActive 
-                        ? (isDarkMode ? 'text-blue-300' : 'text-blue-700')
-                        : (isDarkMode ? 'text-white' : 'text-gray-900')
-                }`}>
-                    {brand.nombre}
-                </h3>
-
-                {/* Descripción */}
-                {brand.descripcion && (
-                    <p className={`mt-1 text-sm transition-colors duration-300 ${
-                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                    }`}>
-                        {brand.descripcion}
-                    </p>
-                )}
-
-                {/* Indicador de filtro activo */}
-                {isActive && (
-                    <div className={`mt-2 px-2 py-1 rounded-full text-xs font-medium ${
-                        isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
-                    }`}>
-                        Filtro Activo
-                    </div>
-                )}
-
-                {/* Botón */}
-                <button 
-                    className={`mt-3 transition-all duration-300 text-white px-4 py-2 rounded flex items-center justify-center transform hover:scale-105 ${
-                        isSearching 
-                            ? (isDarkMode ? 'bg-gray-600 cursor-wait' : 'bg-gray-400 cursor-wait')
-                            : isActive
-                                ? (isDarkMode ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-gray-400 cursor-not-allowed opacity-50')
-                                : (isDarkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600')
-                    }`}
-                    onClick={handleBrandClick}
-                    disabled={isSearching || isActive}
-                >
-                    {isSearching ? (
-                        <>
-                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Filtrando...
-                        </>
-                    ) : isActive ? (
-                        'Filtro Activo'
-                    ) : (
-                        'Filtrar por Marca'
-                    )}
-                </button>
-            </div>
-        );
-    };
+    }, []);
 
     // Función para limpiar filtros
-    const clearBrandFilter = () => {
+    const clearBrandFilter = useCallback(() => {
         setSelectedBrand(null);
-    };
+    }, []);
+
+    // Memoizar categorías ordenadas
+    const categoriasOrdenadas = useMemo(() => {
+        if (!todasCategorias || todasCategorias.length === 0) return [];
+
+        return [...todasCategorias].sort((a, b) => {
+            const aEsActual = categoria && categoria.id_categoria === a.id_categoria;
+            const bEsActual = categoria && categoria.id_categoria === b.id_categoria;
+            if (aEsActual && !bEsActual) return -1;
+            if (!aEsActual && bEsActual) return 1;
+            return 0;
+        });
+    }, [todasCategorias, categoria]);
 
     return (
         <div>
@@ -284,16 +294,8 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                         id="nav-fijo"
                     >
                         <div className="space-y-2">
-                            {todasCategorias && todasCategorias.length > 0 ? (() => {
-                                const categoriasOrdenadas = [...todasCategorias].sort((a, b) => {
-                                    const aEsActual = categoria && categoria.id_categoria === a.id_categoria;
-                                    const bEsActual = categoria && categoria.id_categoria === b.id_categoria;
-                                    if (aEsActual && !bEsActual) return -1;
-                                    if (!aEsActual && bEsActual) return 1;
-                                    return 0;
-                                });
-                                
-                                return categoriasOrdenadas.map((cat, catIndex) => {
+                            {categoriasOrdenadas.length > 0 ? (
+                                categoriasOrdenadas.map((cat, catIndex) => {
                                 const isCurrentCategory = categoria && categoria.id_categoria === cat.id_categoria;
                                 return (
                                     <div key={cat.id_categoria} className="space-y-1">
@@ -366,8 +368,8 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                                         )}
                                     </div>
                                 );
-                                });
-                            })() : (
+                                })
+                            ) : (
                                 <div className={`p-3 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                                     <p>No hay categorías disponibles</p>
                                 </div>
@@ -455,10 +457,16 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                                     </div>
                                 )}
                             </div>
-                            
+
                             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
                                 {marcas.map((marca) => (
-                                    <CategoryBrandCard key={marca.id_marca} brand={marca} />
+                                    <CategoryBrandCard
+                                        key={marca.id_marca}
+                                        brand={marca}
+                                        selectedBrand={selectedBrand}
+                                        isDarkMode={isDarkMode}
+                                        onBrandFilter={handleBrandFilter}
+                                    />
                                 ))}
                             </div>
                         </div>

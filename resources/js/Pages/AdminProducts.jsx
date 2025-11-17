@@ -3,6 +3,7 @@ import { Head } from "@inertiajs/react";
 import { Link } from "@inertiajs/react";
 import { useTheme } from '../storage/ThemeContext';
 import ProductsView from "../Components/admin/ProductsView";
+import CacheCleaner from "../Components/admin/CacheCleaner";
 
 const AdminProducts = () => {
     const { isDarkMode, toggleDarkMode } = useTheme();
@@ -176,6 +177,9 @@ const AdminProducts = () => {
                     <ProductsView />
                 </div>
             </div>
+
+            {/* Botón flotante para limpiar cache */}
+            <CacheCleaner isAdmin={true} />
         </div>
     );
 };

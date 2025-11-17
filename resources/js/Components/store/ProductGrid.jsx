@@ -506,9 +506,16 @@ const ProductGrid = ({ products: initialProducts }) => {
   );
 };
 
+// Función de comparación personalizada para React.memo
+const arePropsEqual = (prevProps, nextProps) => {
+  return prevProps.product.id === nextProps.product.id &&
+         prevProps.product.title === nextProps.product.title &&
+         prevProps.product.priceWithProfit === nextProps.product.priceWithProfit;
+};
+
 const Card = React.memo(({ product }) => {
   const { isDarkMode } = useTheme();
-  const { formatPrice } = useCurrency(); // ← Agregar esta línea
+  const { formatPrice } = useCurrency();
   const [isVisible, setIsVisible] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const cardRef = useRef(null);
@@ -801,7 +808,7 @@ const Card = React.memo(({ product }) => {
       `}</style>
     </div>
   );
-});
+}, arePropsEqual);
 
 Card.displayName = 'Card';
 
