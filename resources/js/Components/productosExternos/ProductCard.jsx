@@ -12,8 +12,6 @@ export default function ProductCard({ producto }) {
     const cardRef = useRef(null);
     const [inView, setInView] = useState(false);
     const [isTablesOpen, setIsTablesOpen] = useState(false);
-    const [translatedData, setTranslatedData] = useState(null);
-    const [isTranslating, setIsTranslating] = useState(false);
 
     // Lazy loading con Intersection Observer
     useEffect(() => {
@@ -35,54 +33,9 @@ export default function ProductCard({ producto }) {
         return () => observer.disconnect();
     }, []);
 
-    // Lazy translation - translate when card becomes visible
-    useEffect(() => {
-        if (!inView || isTranslating || translatedData) return;
 
-        const translateProduct = async () => {
-            setIsTranslating(true);
-            try {
-                console.log(`[Producto ${producto.id}] Iniciando traducción...`);
-                const response = await fetch(`/api/productos-externos/${producto.id}/translate?lang=es`);
-
-                if (!response.ok) {
-                    console.error(`[Producto ${producto.id}] Error HTTP: ${response.status}`);
-                    const errorText = await response.text();
-                    console.error(`[Producto ${producto.id}] Error details:`, errorText);
-                    // Aún así, usar los datos originales si falla la traducción
-                    setTranslatedData({
-                        heading: producto.heading,
-                        paragraphs: producto.paragraphs,
-                        tables: producto.tables
-                    });
-                    return;
-                }
-
-                const data = await response.json();
-                console.log(`[Producto ${producto.id}] Traducción completada`, data);
-                setTranslatedData(data);
-            } catch (error) {
-                console.error(`[Producto ${producto.id}] Error de red o excepción:`, error);
-                // Usar datos originales en caso de error
-                setTranslatedData({
-                    heading: producto.heading,
-                    paragraphs: producto.paragraphs,
-                    tables: producto.tables
-                });
-            } finally {
-                setIsTranslating(false);
-            }
-        };
-
-        // Añadir un pequeño delay aleatorio para evitar sobrecarga
-        const delay = Math.random() * 500;
-        const timeoutId = setTimeout(translateProduct, delay);
-        return () => clearTimeout(timeoutId);
-    }, [inView, producto.id, isTranslating, translatedData, producto.heading, producto.paragraphs, producto.tables]);
-
-    // Procesar headings (usar traducción si está disponible)
     const headingArray = useMemo(() => {
-        const heading = translatedData?.heading ?? producto.heading;
+        const heading = producto.heading;
         if (Array.isArray(heading)) {
             return heading;
         }
@@ -90,7 +43,7 @@ export default function ProductCard({ producto }) {
             return [heading.trim()];
         }
         return [];
-    }, [producto.heading, translatedData]);
+    }, [producto.heading]);
 
     const headingText = useMemo(() => (
         headingArray.length > 0 ? headingArray.join(' ') : ''
@@ -100,9 +53,8 @@ export default function ProductCard({ producto }) {
         (headingArray[0] ?? '').toString().trim()
     ), [headingArray]);
 
-    // Procesar párrafos (usar traducción si está disponible)
     const paragraphsArray = useMemo(() => {
-        const paragraphs = translatedData?.paragraphs ?? producto.paragraphs;
+        const paragraphs = producto.paragraphs;
         if (Array.isArray(paragraphs)) {
             return paragraphs;
         }
@@ -110,18 +62,17 @@ export default function ProductCard({ producto }) {
             return paragraphs.split(/\r?\n/).filter(p => p && p.trim());
         }
         return [];
-    }, [producto.paragraphs, translatedData]);
+    }, [producto.paragraphs]);
 
     // Procesar imágenes
     const imagesArray = useMemo(() => (
         Array.isArray(producto.images) ? producto.images : []
     ), [producto.images]);
 
-    // Procesar tablas (usar traducción si está disponible)
     const tables = useMemo(() => {
-        const tablesToUse = translatedData?.tables ?? producto.tables;
+        const tablesToUse = producto.tables;
         return Array.isArray(tablesToUse) ? tablesToUse : [];
-    }, [producto.tables, translatedData]);
+    }, [producto.tables]);
 
     // Filtrar imágenes no deseadas
     const filterImage = (img) => {
@@ -180,18 +131,7 @@ export default function ProductCard({ producto }) {
                         : 'border-gray-300 bg-white'
                 }`}
             >
-                {/* Indicador de traducción */}
-                {isTranslating && (
-                    <div className={`absolute top-2 right-2 z-10 px-3 py-1 rounded-full text-xs font-medium flex items-center gap-2 ${
-                        isDarkMode ? 'bg-blue-900/80 text-blue-200' : 'bg-blue-100/80 text-blue-800'
-                    }`}>
-                        <svg className="animate-spin h-3 w-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Traduciendo...
-                    </div>
-                )}
+                
 
                 {/* Header */}
                 {headingText && (

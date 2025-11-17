@@ -231,7 +231,6 @@ Route::get('/productos/{id}/tags', [ProductoController::class, 'getProductoTags'
 Route::get('/productos-externos', [ProductoExternoController::class, 'view'])->name('productos-externos.view');
 Route::get('/api/productos-externos', [ProductoExternoController::class, 'index'])->name('productos-externos.index');
 Route::get('/api/productos-externos/{id}', [ProductoExternoController::class, 'show'])->name('productos-externos.show');
-Route::get('/api/productos-externos/{id}/translate', [ProductoExternoController::class, 'translate'])->name('productos-externos.translate');
 Route::post('/api/productos-externos', [ProductoExternoController::class, 'store'])->name('productos-externos.store');
 Route::put('/api/productos-externos/{id}', [ProductoExternoController::class, 'update'])->name('productos-externos.update');
 Route::delete('/api/productos-externos/{id}', [ProductoExternoController::class, 'destroy'])->name('productos-externos.destroy');
