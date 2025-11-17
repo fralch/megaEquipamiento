@@ -70,8 +70,17 @@
         }
         </script>
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
+        <!-- DNS Prefetch y Preconnect para recursos externos -->
+        <link rel="dns-prefetch" href="https://fonts.bunny.net">
+        <link rel="dns-prefetch" href="https://www.youtube.com">
+        <link rel="dns-prefetch" href="https://megaequipamiento.com">
+        <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+
+        <!-- Preload imágenes críticas del slider -->
+        <link rel="preload" as="image" href="{{ asset('img/slider-img1.webp') }}" type="image/webp" fetchpriority="high">
+        <link rel="preload" as="image" href="{{ asset('img/logo2.jpg') }}" type="image/jpeg">
+
+        <!-- Fonts con display=swap para evitar FOIT -->
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->

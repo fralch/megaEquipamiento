@@ -1,20 +1,24 @@
 import { Head, usePage, router, Link } from "@inertiajs/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { FiLogIn, FiUser, FiLogOut } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import Slider from "@/Components/home/Slider";
-import Sectores from "@/Components/home/Sectores";
-import Categorias_cuadrado from "@/Components/home/Categorias_cuadrado";
-import NavVertical from "@/Components/home/NavVertical";
-import Menu from "@/Components/home/Menu";
-import ClientSlider from "@/Components/home/ClientSlider";
-import BrandSection from "@/Components/home/BrandSection";
-import Footer from "@/Components/home/Footer";
-import Header from "@/Components/home/Header";
-import LabEquipmentSection from "@/Components/home/LabEquipmentSection";
 import ErrorBoundary from "@/Components/ErrorBoundary";
 import { useTheme } from "@/storage/ThemeContext";
-import UserProfileModal from "@/Components/UserProfileModal";
+
+// Componentes críticos (above the fold) - Carga inmediata
+import Slider from "@/Components/home/Slider";
+import Menu from "@/Components/home/Menu";
+import Header from "@/Components/home/Header";
+
+// Componentes no críticos (below the fold) - Lazy loading
+const NavVertical = lazy(() => import("@/Components/home/NavVertical"));
+const LabEquipmentSection = lazy(() => import("@/Components/home/LabEquipmentSection"));
+const Sectores = lazy(() => import("@/Components/home/Sectores"));
+const Categorias_cuadrado = lazy(() => import("@/Components/home/Categorias_cuadrado"));
+const BrandSection = lazy(() => import("@/Components/home/BrandSection"));
+const ClientSlider = lazy(() => import("@/Components/home/ClientSlider"));
+const Footer = lazy(() => import("@/Components/home/Footer"));
+const UserProfileModal = lazy(() => import("@/Components/UserProfileModal"));
 
 export default function Welcome() {
     const { auth } = usePage().props;
@@ -165,7 +169,9 @@ export default function Welcome() {
                 >
                     <Menu toggleMenu={toggleMenu} />
                     <ErrorBoundary>
-                        <NavVertical isOpen={isOpen} onClose={toggleMenu} />
+                        <Suspense fallback={<div />}>
+                            <NavVertical isOpen={isOpen} onClose={toggleMenu} />
+                        </Suspense>
                     </ErrorBoundary>
                     <main className="mt-0 w-full">
                         <ErrorBoundary>
@@ -173,34 +179,62 @@ export default function Welcome() {
                         </ErrorBoundary>
 
                         <ErrorBoundary>
-                            <LabEquipmentSection />
+                            <Suspense fallback={
+                                <div className={`w-full h-96 flex items-center justify-center ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}>
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                                </div>
+                            }>
+                                <LabEquipmentSection />
+                            </Suspense>
                         </ErrorBoundary>
 
                         <ErrorBoundary>
-                            <Sectores />
+                            <Suspense fallback={
+                                <div className={`w-full h-64 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
+                            }>
+                                <Sectores />
+                            </Suspense>
                         </ErrorBoundary>
 
                         <ErrorBoundary>
-                            <Categorias_cuadrado />
+                            <Suspense fallback={
+                                <div className={`w-full h-96 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
+                            }>
+                                <Categorias_cuadrado />
+                            </Suspense>
                         </ErrorBoundary>
 
                         <ErrorBoundary>
-                            <BrandSection />
+                            <Suspense fallback={
+                                <div className={`w-full h-64 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
+                            }>
+                                <BrandSection />
+                            </Suspense>
                         </ErrorBoundary>
 
                         <ErrorBoundary>
-                            <ClientSlider />
+                            <Suspense fallback={
+                                <div className={`w-full h-48 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
+                            }>
+                                <ClientSlider />
+                            </Suspense>
                         </ErrorBoundary>
                     </main>
-                    <Footer />
+                    <Suspense fallback={<div className="w-full h-32 bg-gray-900"></div>}>
+                        <Footer />
+                    </Suspense>
                 </div>
 
-                {/* User Profile Modal */}
-                <UserProfileModal
-                    isOpen={showProfileModal}
-                    onClose={() => setShowProfileModal(false)}
-                    user={auth.user}
-                />
+                {/* User Profile Modal - Lazy loaded */}
+                {showProfileModal && (
+                    <Suspense fallback={null}>
+                        <UserProfileModal
+                            isOpen={showProfileModal}
+                            onClose={() => setShowProfileModal(false)}
+                            user={auth.user}
+                        />
+                    </Suspense>
+                )}
             </div>
         </>
     );

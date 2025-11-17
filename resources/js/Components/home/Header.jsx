@@ -237,7 +237,7 @@ const Header = memo(() => {
       {/* Desktop */}
       <div className="hidden lg:flex container mx-auto items-center px-8 py-8 md:px-12 max-w-full">
         <a href="/" className="mr-auto w-1/6 flex-shrink-0 pr-2 ml-4">
-          <img className="w-full object-contain" src="/img/logo2.jpg" alt="EquinLab Logo" />
+          <img className="w-full object-contain" src="/img/logo2.jpg" alt="EquinLab Logo" fetchpriority="high" decoding="async" />
         </a>
 
         <div className={`flex mx-auto w-full max-w-5xl items-center rounded-md xl:max-w-6xl 2xl:max-w-7xl search-container relative ${isDarkMode ? "bg-gray-700" : "bg-gray-100"}`}>
@@ -460,7 +460,7 @@ const Header = memo(() => {
       {/* Móvil */}
       <div className="lg:hidden">
         <div className="flex items-center justify-between px-4 py-4">
-          <a href="/" className="flex-shrink-0 w-32"><img className="w-full object-contain" src="/img/logo2.jpg" alt="EquinLab Logo" /></a>
+          <a href="/" className="flex-shrink-0 w-32"><img className="w-full object-contain" src="/img/logo2.jpg" alt="EquinLab Logo" fetchpriority="high" decoding="async" /></a>
 
           <div className="flex items-center gap-2">
             <button

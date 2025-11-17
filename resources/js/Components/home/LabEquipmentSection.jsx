@@ -5,12 +5,14 @@ import React, { useState, useEffect } from "react";
 const ImageCarousel = ({ currentIndex, goToPrevious, goToNext, goToSlide, images }) => {
     return (
         <div className="relative w-full h-auto overflow-hidden">
-            {/* Main image */}
+            {/* Main image - OPTIMIZADO */}
             <div>
                 <img
                     src={images[currentIndex].src}
                     alt={images[currentIndex].alt}
                     className="w-full h-auto transition-opacity duration-500"
+                    loading="lazy"
+                    decoding="async"
                 />
             </div>
             {/* Dots indicator (opcional) */}

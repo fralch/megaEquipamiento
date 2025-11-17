@@ -1,11 +1,14 @@
 import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 
 const Slider = () => {
+    const [loadVideo, setLoadVideo] = useState(false);
+
     return (
         <Swiper
             modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
@@ -15,7 +18,7 @@ const Slider = () => {
                 nextEl: '.swiper-button-next',
                 prevEl: '.swiper-button-prev',
             }}
-            pagination={{ 
+            pagination={{
                 clickable: true,
                 dynamicBullets: true,
                 bulletClass: 'swiper-pagination-bullet',
@@ -32,14 +35,20 @@ const Slider = () => {
             touchRatio={1}
             touchAngle={45}
             threshold={10}
-            style={{ 
-                width: "100%", 
+            style={{
+                width: "100%",
                 height: "85vh",
                 minHeight: "400px",
                 maxHeight: "100vh"
             }}
+            onSlideChange={(swiper) => {
+                // Cargar video solo cuando el usuario navega al slide del video
+                if (swiper.realIndex === 0) {
+                    setLoadVideo(true);
+                }
+            }}
         >
-            {/* Slide con iframe */}
+            {/* Slide con iframe - OPTIMIZADO */}
             <SwiperSlide>
                 <div
                     style={{
@@ -48,18 +57,48 @@ const Slider = () => {
                         height: "100%",
                     }}
                 >
-                    <iframe
-                        src="https://www.youtube.com/embed/F8pMhuLK7nE?mute=1&autoplay=1&loop=1&playlist=F8pMhuLK7nE&vq=hd1080&controls=0&modestbranding=1&showinfo=0&rel=0"
-                        title="YouTube video"
-                        style={{ 
-                            width: "100%", 
-                            height: "100%",
-                            border: "none",
-                            objectFit: "cover"
-                        }}
-                        allow="autoplay; encrypted-media"
-                        loading="lazy"
-                    ></iframe>
+                    {loadVideo ? (
+                        <iframe
+                            src="https://www.youtube.com/embed/F8pMhuLK7nE?mute=1&autoplay=1&loop=1&playlist=F8pMhuLK7nE&vq=hd720&controls=0&modestbranding=1&showinfo=0&rel=0"
+                            title="YouTube video"
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                border: "none",
+                                objectFit: "cover"
+                            }}
+                            allow="autoplay; encrypted-media"
+                            loading="lazy"
+                        />
+                    ) : (
+                        // Placeholder hasta que se navegue al slide
+                        <div
+                            style={{
+                                width: "100%",
+                                height: "100%",
+                                backgroundColor: "#0c2249",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                            }}
+                            onClick={() => setLoadVideo(true)}
+                        >
+                            <button
+                                style={{
+                                    fontSize: "4rem",
+                                    color: "white",
+                                    background: "rgba(255,255,255,0.2)",
+                                    borderRadius: "50%",
+                                    width: "100px",
+                                    height: "100px",
+                                    border: "none",
+                                    cursor: "pointer"
+                                }}
+                            >
+                                ▶
+                            </button>
+                        </div>
+                    )}
                     {/* Div que cubre el iframe, con z-index bajo */}
                     <div
                         style={{
@@ -227,11 +266,12 @@ const Slider = () => {
                 </div>
             </SwiperSlide>
 
-            {/* Slide con imagen */}
+            {/* Slide con imagen - PRIMERA IMAGEN PRIORITARIA */}
             <SwiperSlide>
                 <img
                     src="img/slider-img1.webp"
-                    alt="Imagen 1"
+                    alt="Líder en Ventas de Equipos de Laboratorio"
+                    fetchPriority="high"
                     style={{
                         width: "100%",
                         height: "100%",
@@ -395,7 +435,7 @@ const Slider = () => {
                 </div>
             </SwiperSlide>
 
-            {/* Slide con otra imagen */}
+            {/* Slide con otra imagen - LAZY LOADING */}
             <SwiperSlide>
                 <div
                     style={{
@@ -406,7 +446,8 @@ const Slider = () => {
                 >
                     <img
                         src="img/slider-img2.webp"
-                        alt="Imagen 2"
+                        alt="Equipos de Laboratorio en Perú"
+                        loading="lazy"
                         style={{
                             width: "100%",
                             height: "100%",
