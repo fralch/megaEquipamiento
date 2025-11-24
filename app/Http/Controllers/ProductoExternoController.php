@@ -20,6 +20,7 @@ class ProductoExternoController extends Controller
 
         // Paginar los productos externos
         $productosExternos = ProductoExterno::orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc')
             ->paginate($perPage)
             ->withQueryString();
 
@@ -36,7 +37,8 @@ class ProductoExternoController extends Controller
         $search = $request->input('search', '');
 
         // Query base
-        $query = ProductoExterno::orderBy('created_at', 'desc');
+        $query = ProductoExterno::orderBy('created_at', 'desc')
+            ->orderBy('id', 'desc');
 
         // Aplicar búsqueda si existe
         if ($search) {
