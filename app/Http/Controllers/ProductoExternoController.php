@@ -43,8 +43,8 @@ class ProductoExternoController extends Controller
         // Aplicar búsqueda si existe
         if ($search) {
             $query->where(function($q) use ($search) {
-                $q->whereRaw('JSON_SEARCH(heading, "one", ?) IS NOT NULL', ["%{$search}%"])
-                  ->orWhereRaw('JSON_SEARCH(paragraphs, "one", ?) IS NOT NULL', ["%{$search}%"]);
+                $q->where('heading', 'like', "%{$search}%")
+                  ->orWhere('paragraphs', 'like', "%{$search}%");
             });
         }
 
