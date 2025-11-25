@@ -110,6 +110,23 @@ const Menu = ({ toggleMenu }) => {
                     )}
                     <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0">
                         <a
+                            href="/productos-externos"
+                            className={`mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:no-underline ${
+                                isDarkMode 
+                                    ? 'text-gray-200 hover:bg-gray-700' 
+                                    : 'text-black hover:bg-gray-100'
+                            }`}
+                        >
+                            <span className="mr-3 text-xl">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                    <path d={mdiWidgetsOutline} />
+                                </svg>
+                            </span>
+                            <span>Productos Externos</span>
+                        </a>
+                    </li>
+                    <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0">
+                        <a
                             href="/contacto"
                             className={`mx-1 flex h-10 cursor-pointer items-center rounded px-4 leading-10 no-underline transition-colors duration-100 hover:no-underline ${
                                 isDarkMode 
