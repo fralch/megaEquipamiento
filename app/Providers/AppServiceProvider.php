@@ -20,9 +20,15 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
-        
-        // Force HTTPS based on environment configuration
-        if (app()->environment('production')) {
+
+        // Force HTTPS en producción o cuando la request viene por HTTPS
+        if (app()->environment('production') || request()->secure()) {
+            URL::forceScheme('https');
+        }
+
+        // Detectar HTTPS detrás de proxies (CloudFlare, Load Balancers, etc.)
+        if (request()->header('X-Forwarded-Proto') === 'https' ||
+            request()->header('CloudFront-Forwarded-Proto') === 'https') {
             URL::forceScheme('https');
         }
     }
