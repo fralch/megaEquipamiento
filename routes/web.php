@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\ProductoExternoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\SubcategoriaController;
 use App\Http\Controllers\MarcaController;
@@ -225,6 +226,15 @@ Route::post('/product/eliminar-relacion', [ProductoController::class, 'eliminarR
 
 // Rutas de tags (web)
 Route::get('/productos/{id}/tags', [ProductoController::class, 'getProductoTags'])->name('productos.tags');
+
+// Rutas de productos externos
+Route::get('/productos-externos', [ProductoExternoController::class, 'view'])->name('productos-externos.view');
+Route::get('/api/productos-externos', [ProductoExternoController::class, 'index'])->name('productos-externos.index');
+Route::get('/api/productos-externos/{id}', [ProductoExternoController::class, 'show'])->name('productos-externos.show');
+Route::post('/api/productos-externos', [ProductoExternoController::class, 'store'])->name('productos-externos.store');
+Route::put('/api/productos-externos/{id}', [ProductoExternoController::class, 'update'])->name('productos-externos.update');
+Route::delete('/api/productos-externos/{id}', [ProductoExternoController::class, 'destroy'])->name('productos-externos.destroy');
+
 Route::middleware('auth')->group(function () {
     Route::post('/productos/{id}/tags/sync', [ProductoController::class, 'syncProductoTags'])->name('productos.tags.sync');
     Route::post('/productos/{id}/tags/attach', [ProductoController::class, 'attachProductoTag'])->name('productos.tags.attach');
