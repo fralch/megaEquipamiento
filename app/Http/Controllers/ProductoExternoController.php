@@ -37,8 +37,7 @@ class ProductoExternoController extends Controller
         $search = $request->input('search', '');
 
         // Query base
-        $query = ProductoExterno::orderBy('created_at', 'desc')
-            ->orderBy('id', 'desc');
+        $query = ProductoExterno::orderBy('id', 'asc');
 
         // Aplicar búsqueda si existe
         if ($search) {
