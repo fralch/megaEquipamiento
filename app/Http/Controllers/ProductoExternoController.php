@@ -42,10 +42,7 @@ class ProductoExternoController extends Controller
 
         // Aplicar búsqueda si existe
         if ($search) {
-            $query->where(function($q) use ($search) {
-                $q->where('heading', 'like', "%{$search}%")
-                  ->orWhere('paragraphs', 'like', "%{$search}%");
-            });
+            $query->where('heading', 'like', "%{$search}%");
         }
 
         // Paginar los productos externos
