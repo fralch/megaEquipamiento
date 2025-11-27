@@ -95,13 +95,14 @@
         
         .brand-logo {
             margin-bottom: 8px; /* Aumentado para dar más espacio al logo más grande */
+            width: 100%;
+            text-align: center;
         }
         
         .brand-logo img {
-            max-width: 500px; /* Aumentado de 200px a 500px */
-            max-height: 140px; /* Aumentado de 65px a 140px */
-            width: auto;
-            height: auto;
+            width: 90%; /* Ocupar el 90% del ancho disponible */
+            max-width: 100%;
+            height: auto; /* Mantener proporción */
             display: block;
             margin: 0 auto;
         }
