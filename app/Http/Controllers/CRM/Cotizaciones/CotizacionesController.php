@@ -803,7 +803,9 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                $imagen = $primeraImagen;
+                            } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
                             } else {
                                 // Convertir ruta relativa a ruta física
@@ -841,7 +843,9 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                $imagen = $primeraImagen;
+                            } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
                             } else {
                                 // Convertir ruta relativa a ruta física
@@ -931,7 +935,9 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                $imagen = $primeraImagen;
+                            } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
                             } else {
                                 $imagen = public_path($primeraImagen);
@@ -965,7 +971,9 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                $imagen = $primeraImagen;
+                            } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
                             } else {
                                 $imagen = public_path($primeraImagen);
@@ -998,9 +1006,13 @@ class CotizacionesController extends Controller
                             $imagenes = $productoMatch->imagen;
                             if (is_array($imagenes) && count($imagenes) > 0) {
                                 $primeraImagen = $imagenes[0];
-                                $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
-                                    ? $primeraImagen
-                                    : url($primeraImagen);
+                                if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                    $imagen = $primeraImagen;
+                                } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                                    $imagen = $primeraImagen;
+                                } else {
+                                    $imagen = public_path($primeraImagen);
+                                }
                             }
                         }
 
@@ -1029,9 +1041,13 @@ class CotizacionesController extends Controller
                                 $imagenes = $productoTemporalMatch->imagenes;
                                 if (is_array($imagenes) && count($imagenes) > 0) {
                                     $primeraImagen = $imagenes[0];
-                                    $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
-                                        ? $primeraImagen
-                                        : url($primeraImagen);
+                                    if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                    $imagen = $primeraImagen;
+                                } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                                    $imagen = $primeraImagen;
+                                } else {
+                                    $imagen = public_path($primeraImagen);
+                                }
                                 }
                             }
 

@@ -316,8 +316,9 @@
                     @php
                         $imgInfo = $producto['imagen'] ?? null;
                         $esUrl = filter_var($imgInfo, FILTER_VALIDATE_URL);
-                        $existeArchivo = !$esUrl && !empty($imgInfo) && file_exists($imgInfo) && is_file($imgInfo);
-                        $mostrarImagen = !empty($imgInfo) && ($esUrl || $existeArchivo);
+                        $esBase64 = \Illuminate\Support\Str::startsWith($imgInfo, 'data:image');
+                        $existeArchivo = !$esUrl && !$esBase64 && !empty($imgInfo) && file_exists($imgInfo) && is_file($imgInfo);
+                        $mostrarImagen = !empty($imgInfo) && ($esUrl || $esBase64 || $existeArchivo);
                     @endphp
 
                     @if($mostrarImagen)
@@ -416,8 +417,9 @@
                         @php
                             $imgInfoAdicional = $producto_adicional['imagen'] ?? null;
                             $esUrlAdicional = filter_var($imgInfoAdicional, FILTER_VALIDATE_URL);
-                            $existeArchivoAdicional = !$esUrlAdicional && !empty($imgInfoAdicional) && file_exists($imgInfoAdicional) && is_file($imgInfoAdicional);
-                            $mostrarImagenAdicional = !empty($imgInfoAdicional) && ($esUrlAdicional || $existeArchivoAdicional);
+                            $esBase64Adicional = \Illuminate\Support\Str::startsWith($imgInfoAdicional, 'data:image');
+                            $existeArchivoAdicional = !$esUrlAdicional && !$esBase64Adicional && !empty($imgInfoAdicional) && file_exists($imgInfoAdicional) && is_file($imgInfoAdicional);
+                            $mostrarImagenAdicional = !empty($imgInfoAdicional) && ($esUrlAdicional || $esBase64Adicional || $existeArchivoAdicional);
                         @endphp
 
                         @if($mostrarImagenAdicional)
