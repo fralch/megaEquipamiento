@@ -510,6 +510,15 @@
 
         <div class="totals-section">
             <div class="page-break">
+                @php
+                    $monedaSymbol = $cotizacion->moneda == 'dolares' ? '$' : 'S/';
+                    $totalGeneral = $productos->sum('subtotal');
+                    if(isset($productos_adicionales)) {
+                        $totalGeneral += $productos_adicionales->sum('subtotal');
+                    }
+                    $igv = $totalGeneral * 0.18;
+                    $totalFinal = $totalGeneral + $igv;
+                @endphp
                 <div class="bg-red text-center font-bold" style="padding: 6px; border-radius: 3px;">
                     RESUMEN Y TOTALES
                 </div>
@@ -546,7 +555,7 @@
                         @endif
                         <tr>
                             <td colspan="3" class="text-right font-bold">Total productos</td>
-                            <td class="text-right font-bold">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
+                            <td class="text-right font-bold">{{ $monedaSymbol }} {{ number_format((float) $totalGeneral, 2) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -556,15 +565,15 @@
                     <tbody>
                         <tr>
                             <td class="font-bold">SUBTOTAL</td>
-                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
+                            <td class="text-right">{{ $monedaSymbol }} {{ number_format((float) $totalGeneral, 2) }}</td>
                         </tr>
                         <tr>
                             <td class="font-bold">IGV (18%)</td>
-                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 0.18, 2) }}</td>
+                            <td class="text-right">{{ $monedaSymbol }} {{ number_format((float) $igv, 2) }}</td>
                         </tr>
                         <tr>
                             <td class="font-bold bg-dark">TOTAL</td>
-                            <td class="text-right font-bold bg-dark">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 1.18, 2) }}</td>
+                            <td class="text-right font-bold bg-dark">{{ $monedaSymbol }} {{ number_format((float) $totalFinal, 2) }}</td>
                         </tr>
                     </tbody>
                 </table>
