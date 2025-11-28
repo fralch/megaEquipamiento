@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Registrar alias de middleware personalizado
         $middleware->alias([
             'generar.notificaciones.cotizaciones' => \App\Http\Middleware\GenerarNotificacionesCotizaciones::class,
+            'role.admin' => \App\Http\Middleware\CheckAdminRole::class,
         ]);
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {

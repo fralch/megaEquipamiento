@@ -94,6 +94,15 @@ export default function CRMLayout({ children, title }) {
         "COTIZACIONES": "/crm/cotizaciones"
     };
 
+    // Filtrar items del menú según el rol del usuario
+    const filteredMenuItems = menuItems.filter(item => {
+        if (item.key === "usuarios-roles") {
+            const roleName = auth?.user?.rol?.nombre_rol?.toLowerCase();
+            return roleName === 'admin';
+        }
+        return true;
+    });
+
     return (
         <div className={`min-h-screen transition-colors duration-300 ${
             isDarkMode ? 'bg-gray-950' : 'bg-gray-50'
@@ -144,7 +153,7 @@ export default function CRMLayout({ children, title }) {
                 {/* Navigation Menu */}
                 <nav className="p-4 flex-1 overflow-y-auto">
                     <div className="space-y-2">
-                        {menuItems.map((item, index) => (
+                        {filteredMenuItems.map((item, index) => (
                             <div key={index} className="mb-2">
                                 <div
                                     onClick={() => toggleMenu(item.key)}
