@@ -313,11 +313,18 @@
                     {{ $producto['nombre'] }}
                 </div>
                 <div class="product-content">
-                    <div class="product-image">
-                         @if(!empty($producto['imagen']))
-                            <img src="{{ $producto['imagen'] }}" alt="{{ $producto['nombre'] }}">
-                        @endif
-                    </div>
+                    @php
+                        $imgInfo = $producto['imagen'] ?? null;
+                        $esUrl = filter_var($imgInfo, FILTER_VALIDATE_URL);
+                        $existeArchivo = !$esUrl && !empty($imgInfo) && file_exists($imgInfo) && is_file($imgInfo);
+                        $mostrarImagen = !empty($imgInfo) && ($esUrl || $existeArchivo);
+                    @endphp
+
+                    @if($mostrarImagen)
+                        <div class="product-image">
+                            <img src="{{ $imgInfo }}" alt="">
+                        </div>
+                    @endif
 
                     @if(!empty($producto['descripcion']))
                         <div class="section-title">Descripcion:</div>
@@ -406,11 +413,18 @@
                         {{ $producto_adicional['nombre'] }}
                     </div>
                     <div class="product-content">
-                        <div class="product-image">
-                             @if(!empty($producto_adicional['imagen']))
-                                <img src="{{ $producto_adicional['imagen'] }}" alt="{{ $producto_adicional['nombre'] }}">
-                            @endif
-                        </div>
+                        @php
+                            $imgInfoAdicional = $producto_adicional['imagen'] ?? null;
+                            $esUrlAdicional = filter_var($imgInfoAdicional, FILTER_VALIDATE_URL);
+                            $existeArchivoAdicional = !$esUrlAdicional && !empty($imgInfoAdicional) && file_exists($imgInfoAdicional) && is_file($imgInfoAdicional);
+                            $mostrarImagenAdicional = !empty($imgInfoAdicional) && ($esUrlAdicional || $existeArchivoAdicional);
+                        @endphp
+
+                        @if($mostrarImagenAdicional)
+                            <div class="product-image">
+                                <img src="{{ $imgInfoAdicional }}" alt="">
+                            </div>
+                        @endif
 
                         @if(!empty($producto_adicional['descripcion']))
                             <div class="section-title">Descripcion:</div>
