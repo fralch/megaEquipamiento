@@ -263,34 +263,34 @@
                         </div>
                     @endif
                    
-                    <div class="company-ruc" style="display: flex; justify-content: space-between; font-size: 12px;">
-                        <span><span class="font-bold">RUC:</span> {{ $empresa['ruc'] ?? '—' }}</span>
-                        <span style="color: red;"><span class="font-bold">NUMERO DE COTIZACIÓN:</span> {{ $cotizacion->numero }}</span>
-                    </div>
                 </div>
             </div>
             
             <hr>
             
             <!-- Información comercial -->
-            <div class="commercial-info">
-                <div class="info-column">
-                    <span><span class="font-bold">ASESOR COMERCIAL:</span> {{ $vendedor->nombre ?? '—' }}</span>
-                    <span><span class="font-bold">TELEFONO:</span> {{ $vendedor->telefono ?? '—' }}</span>
-                    <span><span class="font-bold">CORREO:</span> {{ $vendedor->correo ?? '—' }}</span>
-                    <span><span class="font-bold">FECHA:</span> {{ \Carbon\Carbon::parse($cotizacion->fecha_cotizacion)->format('d/m/Y') }}</span>
-                    <span><span class="font-bold">VALIDEZ:</span> Válido hasta {{ \Carbon\Carbon::parse($cotizacion->fecha_vencimiento)->format('d/m/Y') }}</span>
-                </div>
-                <div class="info-column">
-                    <span><span class="font-bold">CLIENTE:</span> {{ $cliente->nombre }}</span>
-                    @if($cliente->tipo == 'empresa')
-                        <span><span class="font-bold">CONTACTO:</span> {{ $cliente->contacto ?? '—' }}</span>
-                    @endif
-                    <span><span class="font-bold">CORREO:</span> {{ $cliente->email ?? '—' }}</span>
-                    <span><span class="font-bold">TELEFONO:</span> {{ $cliente->telefono ?? '—' }}</span>
-                    <span><span class="font-bold">RUC:</span> {{ $cliente->ruc ?? $cliente->ruc_dni ?? '—' }}</span>
-                </div>
-            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px;">
+                <tr>
+                    <td style="width: 50%; vertical-align: top;">
+                        <div style="margin-bottom: 3px;"><span class="font-bold">RUC:</span> {{ $empresa['ruc'] ?? '—' }}</div>
+                        <div style="margin-bottom: 3px;"><span class="font-bold">ASESOR COMERCIAL:</span> {{ $vendedor->nombre ?? '—' }}</div>
+                        <div style="margin-bottom: 3px;"><span class="font-bold">TELEFONO:</span> {{ $vendedor->telefono ?? '—' }}</div>
+                        <div style="margin-bottom: 3px;"><span class="font-bold">CORREO:</span> {{ $vendedor->correo ?? '—' }}</div>
+                        <div style="margin-bottom: 3px;"><span class="font-bold">FECHA:</span> {{ \Carbon\Carbon::parse($cotizacion->fecha_cotizacion)->format('d/m/Y') }}</div>
+                        <div style="margin-bottom: 3px;"><span class="font-bold">VALIDEZ:</span> Válido hasta {{ \Carbon\Carbon::parse($cotizacion->fecha_vencimiento)->format('d/m/Y') }}</div>
+                    </td>
+                    <td style="width: 50%; vertical-align: top;">
+                        <div style="margin-bottom: 3px; color: red;"><span class="font-bold">NUMERO DE COTIZACIÓN:</span> {{ $cotizacion->numero }}</div>
+                        <div style="margin-bottom: 3px;"><span class="font-bold">CLIENTE:</span> {{ $cliente->nombre }}</div>
+                        @if($cliente->tipo == 'empresa')
+                            <div style="margin-bottom: 3px;"><span class="font-bold">CONTACTO:</span> {{ $cliente->contacto ?? '—' }}</div>
+                        @endif
+                        <div style="margin-bottom: 3px;"><span class="font-bold">CORREO:</span> {{ $cliente->email ?? '—' }}</div>
+                        <div style="margin-bottom: 3px;"><span class="font-bold">TELEFONO:</span> {{ $cliente->telefono ?? '—' }}</div>
+                        <div style="margin-bottom: 3px;"><span class="font-bold">RUC:</span> {{ $cliente->ruc ?? $cliente->ruc_dni ?? '—' }}</div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 
