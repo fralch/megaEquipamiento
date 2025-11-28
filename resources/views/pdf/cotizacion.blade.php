@@ -100,7 +100,7 @@
         }
         
         .brand-logo img {
-            width: 90%; /* Ocupar el 90% del ancho disponible */
+            width: 95%; /* Ocupar el 90% del ancho disponible */
             max-width: 100%;
             height: auto; /* Mantener proporción */
             display: block;
