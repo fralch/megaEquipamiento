@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiPlus, FiTrash2, FiSave, FiSearch } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }) {
     const { isDarkMode } = useTheme();
@@ -56,7 +57,11 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
             }
         } catch (error) {
             console.error('Error al cargar datos del formulario:', error);
-            alert('Error al cargar datos. Por favor, intente nuevamente.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cargar datos. Por favor, intente nuevamente.'
+            });
         } finally {
             setLoading(false);
         }
@@ -284,7 +289,11 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
 
         // Validar que haya al menos 1 producto
         if (formData.productos.length === 0) {
-            alert('Debe agregar al menos un producto a la cotización');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Atención',
+                text: 'Debe agregar al menos un producto a la cotización'
+            });
             return;
         }
 
@@ -323,7 +332,13 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
             const response = await axios.put(`/crm/cotizaciones/${formData.id}`, dataToSend);
 
             if (response.data.success) {
-                alert('Cotización actualizada exitosamente');
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: 'Cotización actualizada exitosamente',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
                 onSave(); // Llamar callback para recargar datos
                 onClose();
             }
@@ -333,11 +348,23 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
             // Mostrar errores de validación si existen
             if (error.response && error.response.data && error.response.data.errors) {
                 const errores = Object.values(error.response.data.errors).flat().join('\n');
-                alert(`Error de validación:\n${errores}`);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de validación',
+                    text: errores
+                });
             } else if (error.response && error.response.data && error.response.data.message) {
-                alert(`Error: ${error.response.data.message}`);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.response.data.message
+                });
             } else {
-                alert('Error al actualizar cotización. Por favor, intente nuevamente.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al actualizar cotización. Por favor, intente nuevamente.'
+                });
             }
         } finally {
             setLoading(false);

@@ -4,6 +4,7 @@ import { useTheme } from '../../../storage/ThemeContext';
 import { useState, useEffect } from 'react';
 import { differenceInDays, parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import Swal from 'sweetalert2';
 import CRMLayout from '../CRMLayout';
 import ShowCotizaciones from './components/ShowCotizaciones';
 import CreateCotizaciones from './components/CreateCotizaciones';
@@ -80,18 +81,37 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     };
 
     const handleDelete = async (id) => {
-        if (!confirm('¿Está seguro de eliminar esta cotización?')) return;
+        const result = await Swal.fire({
+            title: '¿Está seguro?',
+            text: "No podrá revertir esta acción",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
             const response = await axios.delete(`/crm/cotizaciones/${id}/delete`);
             if (response.data.success) {
                 fetchCotizaciones();
                 fetchEstadisticas();
-                alert('Cotización eliminada exitosamente');
+                Swal.fire(
+                    'Eliminado!',
+                    'La cotización ha sido eliminada.',
+                    'success'
+                );
             }
         } catch (error) {
             console.error('Error al eliminar cotización:', error);
-            alert('Error al eliminar cotización');
+            Swal.fire(
+                'Error',
+                'Hubo un problema al eliminar la cotización.',
+                'error'
+            );
         }
     };
 
@@ -104,7 +124,11 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
             }
         } catch (error) {
             console.error('Error al cargar detalles:', error);
-            alert('Error al cargar detalles de la cotización');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cargar detalles de la cotización'
+            });
         }
     };
 
@@ -117,7 +141,11 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
             }
         } catch (error) {
             console.error('Error al cargar cotización:', error);
-            alert('Error al cargar cotización');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cargar cotización'
+            });
         }
     };
 
@@ -157,11 +185,21 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                 setShowEstadoModal(false);
                 setCotizacionToChangeEstado(null);
                 setNewEstado('');
-                alert('Estado actualizado exitosamente');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Actualizado',
+                    text: 'Estado actualizado exitosamente',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             }
         } catch (error) {
             console.error('Error al cambiar estado:', error);
-            alert('Error al cambiar estado de la cotización');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cambiar estado de la cotización'
+            });
         }
     };
 
