@@ -15,6 +15,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         forma_pago: '',
         cliente_id: '',
         cliente_tipo: 'particular',
+        contacto_id: '', // Nuevo campo para contacto de empresa
         usuario_id: '',
         miempresa_id: '',
         moneda: 'dolares',
@@ -33,6 +34,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const [vendedores, setVendedores] = useState([]);
     const [empresas, setEmpresas] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [contactosEmpresa, setContactosEmpresa] = useState([]); // Nuevo estado para contactos de empresa
 
     // Estados para búsqueda de productos
     const [searchProducto, setSearchProducto] = useState('');
@@ -292,20 +294,41 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         const value = e.target.value;
         if (value) {
             const selectedCliente = clientes.find(c => c.id == value);
+            
+            // Si es empresa, cargar sus contactos
+            let contactos = [];
+            if (selectedCliente && selectedCliente.tipo === 'empresa' && selectedCliente.contactos) {
+                contactos = selectedCliente.contactos;
+            }
+            setContactosEmpresa(contactos);
+
             if (selectedCliente) {
                 setFormData(prev => ({
                     ...prev,
                     cliente_id: value,
-                    cliente_tipo: selectedCliente.tipo || 'particular'
+                    cliente_tipo: selectedCliente.tipo || 'particular',
+                    contacto_id: '', // Resetear contacto seleccionado
+                    // Si es particular, usar sus datos por defecto. Si es empresa, esperar a selección de contacto o usar principal si se desea
+                    // Por ahora mantenemos la lógica existente para particulares, pero para empresas el contacto definirá estos datos si se selecciona uno.
                 }));
             }
         } else {
+            setContactosEmpresa([]);
             setFormData(prev => ({
                 ...prev,
                 cliente_id: '',
-                cliente_tipo: 'particular'
+                cliente_tipo: 'particular',
+                contacto_id: ''
             }));
         }
+    };
+
+    const handleContactoChange = (e) => {
+        const contactoId = e.target.value;
+        setFormData(prev => ({
+            ...prev,
+            contacto_id: contactoId
+        }));
     };
 
     const removeProducto = (index) => {
@@ -690,7 +713,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                 </select>
                             </div>
 
-                            {/* Cliente */}
+                            {/* Selección de Cliente */}
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     <FiUser className="inline w-4 h-4 mr-2" />
@@ -730,6 +753,36 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                     </select>
                                 )}
                             </div>
+
+                            {/* Contacto de Empresa (Solo visible si es empresa y tiene contactos) */}
+                            {formData.cliente_tipo === 'empresa' && contactosEmpresa.length > 0 && (
+                                <div>
+                                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        <FiUser className="inline w-4 h-4 mr-2" />
+                                        Contacto de Empresa
+                                    </label>
+                                    <select
+                                        name="contacto_id"
+                                        value={formData.contacto_id}
+                                        onChange={handleContactoChange}
+                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                                            isDarkMode
+                                                ? 'bg-gray-700 border-gray-600 text-white'
+                                                : 'bg-white border-gray-300 text-gray-900'
+                                        }`}
+                                    >
+                                        <option value="">-- Seleccionar Contacto (Opcional) --</option>
+                                        {contactosEmpresa.map(contacto => (
+                                            <option key={contacto.id} value={contacto.id}>
+                                                {contacto.nombre} {contacto.cargo ? `- ${contacto.cargo}` : ''} {contacto.es_principal ? '(Principal)' : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        Seleccione un contacto específico para la cotización
+                                    </p>
+                                </div>
+                            )}
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     <FiUser className="inline w-4 h-4 mr-2" />

@@ -1,4 +1,4 @@
-import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiUser, FiHash, FiCalendar, FiCheckCircle, FiXCircle } from "react-icons/fi";
+import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiUser, FiHash, FiCalendar, FiCheckCircle, FiXCircle, FiBriefcase, FiStar } from "react-icons/fi";
 import { useTheme } from "../../../../storage/ThemeContext";
 
 export default function ShowEmpresaModal({ isOpen, onClose, empresa }) {
@@ -145,69 +145,70 @@ export default function ShowEmpresaModal({ isOpen, onClose, empresa }) {
             </div>
           </div>
 
-          {/* Información de contacto */}
+          {/* Ubicación */}
           <div>
             <h5 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
-              Información de Contacto
+              Ubicación
             </h5>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                <div className="flex items-center mb-2">
-                  <FiUser className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Contacto Principal
-                  </span>
-                </div>
-                <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {empresa.contacto_principal}
-                </p>
+            <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+              <div className="flex items-center mb-2">
+                <FiMapPin className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+                <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  Dirección
+                </span>
               </div>
+              <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                {empresa.direccion}
+              </p>
+            </div>
+          </div>
 
-              <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                <div className="flex items-center mb-2">
-                  <FiMail className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Email
-                  </span>
-                </div>
-                <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  <a
-                    href={`mailto:${empresa.email}`}
-                    className={`hover:${isDarkMode ? 'text-blue-400' : 'text-blue-600'} transition-colors duration-200`}
-                  >
-                    {empresa.email}
-                  </a>
-                </p>
-              </div>
-
-              <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                <div className="flex items-center mb-2">
-                  <FiPhone className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Teléfono
-                  </span>
-                </div>
-                <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  <a
-                    href={`tel:${empresa.telefono}`}
-                    className={`hover:${isDarkMode ? 'text-blue-400' : 'text-blue-600'} transition-colors duration-200`}
-                  >
-                    {empresa.telefono}
-                  </a>
-                </p>
-              </div>
-
-              <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                <div className="flex items-center mb-2">
-                  <FiMapPin className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    Dirección
-                  </span>
-                </div>
-                <p className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {empresa.direccion}
-                </p>
-              </div>
+          {/* Contactos */}
+          <div>
+            <h5 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+              Contactos
+            </h5>
+            <div className="grid grid-cols-1 gap-4">
+                {(empresa.contactos && empresa.contactos.length > 0 ? empresa.contactos : [{
+                    nombre: empresa.contacto_principal,
+                    email: empresa.email,
+                    telefono: empresa.telefono,
+                    cargo: 'Contacto Principal',
+                    es_principal: true
+                }]).map((contacto, index) => (
+                    <div key={index} className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} border-l-4 ${contacto.es_principal ? 'border-blue-500' : 'border-gray-300'}`}>
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <h6 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                        {contacto.nombre}
+                                    </h6>
+                                    {Boolean(contacto.es_principal) && (
+                                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center">
+                                            <FiStar className="w-3 h-3 mr-1 fill-current" /> Principal
+                                        </span>
+                                    )}
+                                </div>
+                                {contacto.cargo && (
+                                    <div className="flex items-center mb-2 text-sm text-gray-500">
+                                        <FiBriefcase className="w-4 h-4 mr-2" />
+                                        {contacto.cargo}
+                                    </div>
+                                )}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 mt-3">
+                                    <div className="flex items-center">
+                                        <FiMail className={`w-4 h-4 mr-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                        <a href={`mailto:${contacto.email}`} className="hover:underline text-blue-600">{contacto.email}</a>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <FiPhone className={`w-4 h-4 mr-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                        <a href={`tel:${contacto.telefono}`} className="hover:underline text-blue-600">{contacto.telefono}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ))}
             </div>
           </div>
 

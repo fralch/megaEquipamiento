@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiSave, FiUser, FiHash, FiGrid } from "react-icons/fi";
+import { FiX, FiHome, FiMail, FiPhone, FiMapPin, FiSave, FiUser, FiHash, FiGrid, FiPlus, FiTrash2, FiBriefcase, FiStar } from "react-icons/fi";
 import { useTheme } from "../../../../storage/ThemeContext";
 import { router } from "@inertiajs/react";
 import axios from "axios";
@@ -11,13 +11,10 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
     razon_social: "",
     ruc: "",
     sector_id: "",
-    contacto_principal: "",
-    email: "",
-    telefono: "",
     direccion: "",
     usuario_id: "",
-    cliente_id: "",
-    activo: true
+    activo: true,
+    contactos: []
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -40,17 +37,34 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
 
   useEffect(() => {
     if (empresa) {
+      let contactos = [];
+      if (empresa.contactos && empresa.contactos.length > 0) {
+        contactos = empresa.contactos.map(c => ({
+            nombre: c.nombre,
+            email: c.email,
+            telefono: c.telefono,
+            cargo: c.cargo || "",
+            es_principal: Boolean(c.es_principal)
+        }));
+      } else {
+        // Legacy fallback
+        contactos = [{
+            nombre: empresa.contacto_principal || "",
+            email: empresa.email || "",
+            telefono: empresa.telefono || "",
+            cargo: "",
+            es_principal: true
+        }];
+      }
+
       setFormData({
         razon_social: empresa.razon_social || "",
         ruc: empresa.ruc || "",
         sector_id: empresa.sector_id || "",
-        contacto_principal: empresa.contacto_principal || "",
-        email: empresa.email || "",
-        telefono: empresa.telefono || "",
         direccion: empresa.direccion || "",
         usuario_id: empresa.usuario_id || "",
-        cliente_id: empresa.cliente_id || "",
-        activo: empresa.activo ?? true
+        activo: empresa.activo ?? true,
+        contactos: contactos
       });
     }
   }, [empresa]);
@@ -71,6 +85,61 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
     }
   };
 
+  const handleContactChange = (index, field, value) => {
+    const newContactos = [...formData.contactos];
+    newContactos[index][field] = value;
+    setFormData(prev => ({
+      ...prev,
+      contactos: newContactos
+    }));
+
+    // Clear errors for this field
+    if (errors[`contactos.${index}.${field}`]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[`contactos.${index}.${field}`];
+        return newErrors;
+      });
+    }
+  };
+
+  const addContact = () => {
+    setFormData(prev => ({
+      ...prev,
+      contactos: [
+        ...prev.contactos,
+        { nombre: "", email: "", telefono: "", cargo: "", es_principal: false }
+      ]
+    }));
+  };
+
+  const removeContact = (index) => {
+    if (formData.contactos.length === 1) return; // Cannot remove the last contact
+    
+    const newContactos = formData.contactos.filter((_, i) => i !== index);
+    
+    // If we removed the primary contact, make the first one primary
+    if (formData.contactos[index].es_principal && newContactos.length > 0) {
+      newContactos[0].es_principal = true;
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      contactos: newContactos
+    }));
+  };
+
+  const setPrimaryContact = (index) => {
+    const newContactos = formData.contactos.map((contact, i) => ({
+      ...contact,
+      es_principal: i === index
+    }));
+    setFormData(prev => ({
+      ...prev,
+      contactos: newContactos
+    }));
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -84,21 +153,6 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
       newErrors.ruc = "El RUC debe tener 11 dígitos";
     }
 
-
-    if (!formData.contacto_principal.trim()) {
-      newErrors.contacto_principal = "El contacto principal es requerido";
-    }
-
-    if (!formData.email.trim()) {
-      newErrors.email = "El email es requerido";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "El email no es válido";
-    }
-
-    if (!formData.telefono.trim()) {
-      newErrors.telefono = "El teléfono es requerido";
-    }
-
     if (!formData.direccion.trim()) {
       newErrors.direccion = "La dirección es requerida";
     }
@@ -106,6 +160,21 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
     if (!formData.usuario_id) {
       newErrors.usuario_id = "Debe seleccionar un usuario";
     }
+
+    // Validate contacts
+    formData.contactos.forEach((contact, index) => {
+      if (!contact.nombre.trim()) {
+        newErrors[`contactos.${index}.nombre`] = "El nombre es requerido";
+      }
+      if (!contact.email.trim()) {
+        newErrors[`contactos.${index}.email`] = "El email es requerido";
+      } else if (!/\S+@\S+\.\S+/.test(contact.email)) {
+        newErrors[`contactos.${index}.email`] = "Email inválido";
+      }
+      if (!contact.telefono.trim()) {
+        newErrors[`contactos.${index}.telefono`] = "El teléfono es requerido";
+      }
+    });
 
     return newErrors;
   };
@@ -298,118 +367,6 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
                 <label className={`block text-sm font-medium mb-2 ${
                   isDarkMode ? 'text-gray-300' : 'text-gray-700'
                 }`}>
-                  <FiUser className="inline w-4 h-4 mr-1" />
-                  Cliente Enlazado (Opcional)
-                </label>
-                <select
-                  name="cliente_id"
-                  value={formData.cliente_id}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white'
-                      : 'bg-white border-gray-300 text-gray-900'
-                  } ${errors.cliente_id ? 'border-red-500' : ''}`}
-                >
-                  <option value="">Sin cliente enlazado</option>
-                  {clientes?.map((cliente) => (
-                    <option key={cliente.id} value={cliente.id}>
-                      {cliente.nombrecompleto} - {cliente.ruc}
-                    </option>
-                  ))}
-                </select>
-                {errors.cliente_id && (
-                  <p className="mt-1 text-sm text-red-600">{errors.cliente_id}</p>
-                )}
-                <p className={`mt-1 text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  Seleccione un cliente para enlazar esta empresa con un contacto principal
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Información de contacto */}
-          <div>
-            <h4 className={`text-md font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              Información de Contacto
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  <FiUser className="inline w-4 h-4 mr-1" />
-                  Contacto Principal *
-                </label>
-                <input
-                  type="text"
-                  name="contacto_principal"
-                  value={formData.contacto_principal}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } ${errors.contacto_principal ? 'border-red-500' : ''}`}
-                  placeholder="Juan Pérez"
-                />
-                {errors.contacto_principal && (
-                  <p className="mt-1 text-sm text-red-600">{errors.contacto_principal}</p>
-                )}
-              </div>
-
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  <FiMail className="inline w-4 h-4 mr-1" />
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } ${errors.email ? 'border-red-500' : ''}`}
-                  placeholder="contacto@empresa.com"
-                />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                )}
-              </div>
-
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  <FiPhone className="inline w-4 h-4 mr-1" />
-                  Teléfono *
-                </label>
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    isDarkMode
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  } ${errors.telefono ? 'border-red-500' : ''}`}
-                  placeholder="999 888 777"
-                />
-                {errors.telefono && (
-                  <p className="mt-1 text-sm text-red-600">{errors.telefono}</p>
-                )}
-              </div>
-
-              <div>
-                <label className={`block text-sm font-medium mb-2 ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
                   <FiMapPin className="inline w-4 h-4 mr-1" />
                   Dirección *
                 </label>
@@ -429,6 +386,156 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios, c
                   <p className="mt-1 text-sm text-red-600">{errors.direccion}</p>
                 )}
               </div>
+
+              
+            </div>
+          </div>
+
+          {/* Contactos */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h4 className={`text-md font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                Contactos
+              </h4>
+              <button
+                type="button"
+                onClick={addContact}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center"
+              >
+                <FiPlus className="w-4 h-4 mr-1" />
+                Agregar Contacto
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              {formData.contactos.map((contact, index) => (
+                <div 
+                  key={index} 
+                  className={`p-4 rounded-lg border relative ${
+                    isDarkMode ? 'border-gray-700 bg-gray-700/30' : 'border-gray-200 bg-gray-50'
+                  }`}
+                >
+                  {/* Header del contacto (Principal tag and remove button) */}
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center">
+                      <button
+                        type="button"
+                        onClick={() => setPrimaryContact(index)}
+                        className={`flex items-center text-xs font-medium px-2 py-1 rounded-full transition-colors ${
+                          contact.es_principal
+                            ? 'bg-blue-100 text-blue-800'
+                            : isDarkMode ? 'bg-gray-600 text-gray-300 hover:bg-gray-500' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                        }`}
+                      >
+                        <FiStar className={`w-3 h-3 mr-1 ${contact.es_principal ? 'fill-current' : ''}`} />
+                        {contact.es_principal ? 'Contacto Principal' : 'Marcar como Principal'}
+                      </button>
+                    </div>
+                    
+                    {formData.contactos.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeContact(index)}
+                        className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
+                        title="Eliminar contacto"
+                      >
+                        <FiTrash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        <FiUser className="inline w-4 h-4 mr-1" />
+                        Nombre Completo *
+                      </label>
+                      <input
+                        type="text"
+                        value={contact.nombre}
+                        onChange={(e) => handleContactChange(index, 'nombre', e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          isDarkMode
+                            ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                        } ${errors[`contactos.${index}.nombre`] ? 'border-red-500' : ''}`}
+                        placeholder="Juan Pérez"
+                      />
+                      {errors[`contactos.${index}.nombre`] && (
+                        <p className="mt-1 text-sm text-red-600">{errors[`contactos.${index}.nombre`]}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        <FiBriefcase className="inline w-4 h-4 mr-1" />
+                        Cargo / Puesto
+                      </label>
+                      <input
+                        type="text"
+                        value={contact.cargo}
+                        onChange={(e) => handleContactChange(index, 'cargo', e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          isDarkMode
+                            ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                        }`}
+                        placeholder="Gerente General"
+                      />
+                    </div>
+
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        <FiMail className="inline w-4 h-4 mr-1" />
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        value={contact.email}
+                        onChange={(e) => handleContactChange(index, 'email', e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          isDarkMode
+                            ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                        } ${errors[`contactos.${index}.email`] ? 'border-red-500' : ''}`}
+                        placeholder="contacto@empresa.com"
+                      />
+                      {errors[`contactos.${index}.email`] && (
+                        <p className="mt-1 text-sm text-red-600">{errors[`contactos.${index}.email`]}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className={`block text-sm font-medium mb-2 ${
+                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                      }`}>
+                        <FiPhone className="inline w-4 h-4 mr-1" />
+                        Teléfono *
+                      </label>
+                      <input
+                        type="tel"
+                        value={contact.telefono}
+                        onChange={(e) => handleContactChange(index, 'telefono', e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          isDarkMode
+                            ? 'bg-gray-800 border-gray-600 text-white placeholder-gray-400'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                        } ${errors[`contactos.${index}.telefono`] ? 'border-red-500' : ''}`}
+                        placeholder="999 888 777"
+                      />
+                      {errors[`contactos.${index}.telefono`] && (
+                        <p className="mt-1 text-sm text-red-600">{errors[`contactos.${index}.telefono`]}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

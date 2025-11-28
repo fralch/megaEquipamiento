@@ -137,7 +137,7 @@ class CotizacionesController extends Controller
                     ];
                 });
 
-            $empresas = EmpresaCliente::with('vendedor')
+            $empresas = EmpresaCliente::with(['vendedor', 'contactos'])
                 ->where('activo', true)
                 ->orderBy('razon_social')
                 ->get()
@@ -149,6 +149,16 @@ class CotizacionesController extends Controller
                         'email' => $empresa->email,
                         'telefono' => $empresa->telefono,
                         'vendedor_id' => $empresa->usuario_id,
+                        'contactos' => $empresa->contactos->map(function ($contacto) {
+                            return [
+                                'id' => $contacto->id,
+                                'nombre' => $contacto->nombre,
+                                'email' => $contacto->email,
+                                'telefono' => $contacto->telefono,
+                                'cargo' => $contacto->cargo,
+                                'es_principal' => $contacto->es_principal
+                            ];
+                        }),
                     ];
                 });
 
