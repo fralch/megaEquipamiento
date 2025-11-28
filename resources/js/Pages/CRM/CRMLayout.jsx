@@ -94,14 +94,19 @@ export default function CRMLayout({ children, title }) {
         "COTIZACIONES": "/crm/cotizaciones"
     };
 
-    // Filtrar items del menú según el rol del usuario
-    const filteredMenuItems = menuItems.filter(item => {
-        if (item.key === "usuarios-roles") {
+    // Items del menú (sin filtrar para mostrar todo)
+    const filteredMenuItems = menuItems;
+
+    const handleNavigation = (url, itemKey) => {
+        if (itemKey === "usuarios-roles") {
             const roleName = auth?.user?.rol?.nombre_rol?.toLowerCase();
-            return roleName === 'admin';
+            if (roleName !== 'admin') {
+                alert("No tiene permisos para acceder a este módulo");
+                return;
+            }
         }
-        return true;
-    });
+        router.visit(url);
+    };
 
     return (
         <div className={`min-h-screen transition-colors duration-300 ${
@@ -176,7 +181,7 @@ export default function CRMLayout({ children, title }) {
                                         {item.items.map((subItem, subIndex) => (
                                             <div
                                                 key={subIndex}
-                                                onClick={() => router.visit(routeMap[subItem])}
+                                                onClick={() => handleNavigation(routeMap[subItem], item.key)}
                                                 className={`px-4 py-2 text-sm rounded-lg cursor-pointer transition-colors duration-200 ${
                                                     isDarkMode ? 'text-gray-400 hover:text-blue-400 hover:bg-gray-800' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
                                                 }`}
