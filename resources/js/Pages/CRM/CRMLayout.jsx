@@ -9,6 +9,7 @@ import {
 import { useTheme } from '../../storage/ThemeContext';
 import { useCRM } from '../../storage/CRMContext';
 import NotificacionesCotizaciones from '../../Components/CRM/Notificaciones/NotificacionesCotizaciones';
+import Swal from 'sweetalert2';
 
 export default function CRMLayout({ children, title }) {
     const { auth } = usePage().props;
@@ -101,7 +102,13 @@ export default function CRMLayout({ children, title }) {
         if (itemKey === "usuarios-roles") {
             const roleName = auth?.user?.rol?.nombre_rol?.toLowerCase();
             if (roleName !== 'admin') {
-                alert("No tiene permisos para acceder a este módulo");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Acceso denegado',
+                    text: 'No tiene permisos para acceder a este módulo',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Entendido'
+                });
                 return;
             }
         }
