@@ -23,6 +23,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
     };
 
     const handleExportPdf = async () => {
+        console.log('Iniciando exportación de PDF para cotización:', cotizacion.id);
         setIsExporting(true);
         // Agrega cancelación y timeout para evitar que el botón quede bloqueado si el servidor se demora
         const controller = new AbortController();
@@ -30,12 +31,20 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
         const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
         try {
+            console.log(`Fetching: /crm/cotizaciones/${cotizacion.id}/export-pdf`);
             const response = await fetch(`/crm/cotizaciones/${cotizacion.id}/export-pdf`, {
                 signal: controller.signal,
             });
-            if (!response.ok) throw new Error('Error al generar el PDF');
+            console.log('Respuesta recibida:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error en respuesta:', errorText);
+                throw new Error('Error al generar el PDF');
+            }
 
             const blob = await response.blob();
+            console.log('Blob recibido, tamaño:', blob.size);
             const url = window.URL.createObjectURL(blob);
 
             const link = document.createElement('a');
@@ -48,10 +57,13 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
             setTimeout(() => {
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
+                console.log('Limpieza completada');
             }, 0);
         } catch (error) {
+            console.error('Excepción capturada en handleExportPdf:', error);
             const aborted = error?.name === 'AbortError' || String(error?.message || '').toLowerCase().includes('aborted');
             if (aborted) {
+                console.warn('La solicitud fue abortada por timeout o usuario');
                 alert('La generación del PDF está tardando más de lo esperado. Intente nuevamente o verifique el servidor.');
             } else {
                 console.error('Error al exportar PDF:', error);
@@ -60,6 +72,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
         } finally {
             clearTimeout(timeoutId);
             setIsExporting(false);
+            console.log('Finalizado handleExportPdf');
         }
     };
 
