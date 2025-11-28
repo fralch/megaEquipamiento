@@ -4,6 +4,7 @@
 /public/build
 /public/hot
 /public/storage
+/public/img/empresas
 /public/productos
 /storage/*.key
 /storage/pail
