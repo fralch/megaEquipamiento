@@ -330,7 +330,7 @@ class CotizacionesController extends Controller
     {
         try {
             $cotizacion = Cotizacion::with([
-                'vendedor:id_usuario,nombre,apellido,correo',
+                'vendedor:id_usuario,nombre,apellido,correo,telefono',
                 'miEmpresa:id,nombre,ruc,email,telefono,imagen_logo,imagen_firma',
                 'detallesProductos.producto',
                 'detallesAdicionales'
@@ -367,6 +367,7 @@ class CotizacionesController extends Controller
                 $vendedorData = (object)[
                     'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
                     'correo' => $cotizacion->vendedor->correo ?? '',
+                    'telefono' => $cotizacion->vendedor->telefono ?? '',
                 ];
             }
             $cotizacion->vendedor_data = $vendedorData;
@@ -719,7 +720,7 @@ class CotizacionesController extends Controller
         try {
             // Cargar cotización con relaciones básicas
             $cotizacion = Cotizacion::with([
-                'vendedor:id_usuario,nombre,apellido,correo',
+                'vendedor:id_usuario,nombre,apellido,correo,telefono',
                 'miEmpresa',
                 'detallesProductos',
                 'detallesAdicionales'
@@ -1092,6 +1093,7 @@ class CotizacionesController extends Controller
                 $vendedor = (object)[
                     'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
                     'correo' => $cotizacion->vendedor->correo ?? '',
+                    'telefono' => $cotizacion->vendedor->telefono ?? '',
                 ];
             }
 
@@ -1149,7 +1151,7 @@ class CotizacionesController extends Controller
         try {
             // Obtener cotización; si no se pasa id, usar la primera disponible
             $cotizacionQuery = Cotizacion::with([
-                'vendedor:id_usuario,nombre,apellido,correo',
+                'vendedor:id_usuario,nombre,apellido,correo,telefono',
                 'miEmpresa',
                 'detallesProductos',
                 'detallesAdicionales'
@@ -1348,6 +1350,7 @@ class CotizacionesController extends Controller
                 $vendedor = (object)[
                     'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
                     'correo' => $cotizacion->vendedor->correo ?? '',
+                    'telefono' => $cotizacion->vendedor->telefono ?? '',
                 ];
             }
 
