@@ -285,20 +285,20 @@
             <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
                 <tr>
                     <td style="width: 50%; vertical-align: top;">
-                        <div style="margin-bottom: 3px;"><span class="font-bold">ASESOR COMERCIAL:</span> {{ $vendedor->nombre ?? '—' }}</div>
-                        <div style="margin-bottom: 3px;"><span class="font-bold">TELEFONO:</span> {{ $vendedor->telefono ?? '—' }}</div>
-                        <div style="margin-bottom: 3px;"><span class="font-bold">CORREO:</span> {{ $vendedor->correo ?? '—' }}</div>
-                        <div style="margin-bottom: 3px;"><span class="font-bold">FECHA:</span> {{ \Carbon\Carbon::parse($cotizacion->fecha_cotizacion)->format('d/m/Y') }}</div>
-                        <div style="margin-bottom: 3px;"><span class="font-bold">VALIDEZ:</span> Válido hasta {{ \Carbon\Carbon::parse($cotizacion->fecha_vencimiento)->format('d/m/Y') }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">ASESOR COMERCIAL:</span> {{ $vendedor->nombre ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">TELEFONO:</span> {{ $vendedor->telefono ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">CORREO:</span> {{ $vendedor->correo ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">FECHA:</span> {{ \Carbon\Carbon::parse($cotizacion->fecha_cotizacion)->format('d/m/Y') }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">VALIDEZ:</span> Válido hasta {{ \Carbon\Carbon::parse($cotizacion->fecha_vencimiento)->format('d/m/Y') }}</div>
                     </td>
                     <td style="width: 50%; vertical-align: top;">
-                        <div style="margin-bottom: 3px;"><span class="font-bold">CLIENTE:</span> {{ $cliente->nombre }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">CLIENTE:</span> {{ $cliente->nombre }}</div>
                         @if($cliente->tipo == 'empresa')
-                            <div style="margin-bottom: 3px;"><span class="font-bold">CONTACTO:</span> {{ $cliente->contacto ?? '—' }}</div>
+                            <div style="margin-bottom: 1px;"><span class="font-bold">CONTACTO:</span> {{ $cliente->contacto ?? '—' }}</div>
                         @endif
-                        <div style="margin-bottom: 3px;"><span class="font-bold">CORREO:</span> {{ $cliente->email ?? '—' }}</div>
-                        <div style="margin-bottom: 3px;"><span class="font-bold">TELEFONO:</span> {{ $cliente->telefono ?? '—' }}</div>
-                        <div style="margin-bottom: 3px;"><span class="font-bold">RUC:</span> {{ $cliente->ruc ?? $cliente->ruc_dni ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">CORREO:</span> {{ $cliente->email ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">TELEFONO:</span> {{ $cliente->telefono ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">RUC:</span> {{ $cliente->ruc ?? $cliente->ruc_dni ?? '—' }}</div>
                     </td>
                 </tr>
             </table>
