@@ -714,10 +714,12 @@ class CotizacionesController extends Controller
     /**
      * Exportar cotización a PDF
      */
-    public function exportPdf($id)
+    public function exportPdf(Request $request, $id)
     {
         Log::info("Iniciando exportación de PDF para cotización ID: {$id}");
         try {
+            $mostrarFirma = $request->query('mostrar_firma', '1') === '1';
+
             // Cargar cotización con relaciones básicas
             $cotizacion = Cotizacion::with([
                 'vendedor:id_usuario,nombre,apellido,correo,telefono',
@@ -1119,6 +1121,7 @@ class CotizacionesController extends Controller
                 'empresa' => $empresa,
                 'cliente' => $cotizacion->cliente,
                 'vendedor' => $vendedor,
+                'mostrar_firma' => $mostrarFirma,
             ];
 
             // Generar el PDF

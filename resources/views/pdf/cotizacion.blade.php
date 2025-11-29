@@ -583,7 +583,7 @@
 
         <!-- Footer - Solo al final del documento -->
         <div class="footer">
-            @if($empresa && !empty($empresa['imagen_firma']))
+            @if($empresa && !empty($empresa['imagen_firma']) && (isset($mostrar_firma) ? $mostrar_firma : true))
                 <div class="signature-container">
                     <img src="{{ public_path($empresa['imagen_firma']) }}" alt="Firma">
                 </div>

@@ -5,6 +5,7 @@ import { useState } from 'react';
 export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
     const { isDarkMode } = useTheme();
     const [isExporting, setIsExporting] = useState(false);
+    const [mostrarFirma, setMostrarFirma] = useState(true);
 
     if (!isOpen || !cotizacion) return null;
 
@@ -31,8 +32,13 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
         const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
         try {
-            console.log(`Fetching: /crm/cotizaciones/${cotizacion.id}/export-pdf`);
-            const response = await fetch(`/crm/cotizaciones/${cotizacion.id}/export-pdf`, {
+            const urlParams = new URLSearchParams({
+                mostrar_firma: mostrarFirma ? '1' : '0'
+            });
+            const endpointUrl = `/crm/cotizaciones/${cotizacion.id}/export-pdf?${urlParams.toString()}`;
+            
+            console.log(`Fetching: ${endpointUrl}`);
+            const response = await fetch(endpointUrl, {
                 signal: controller.signal,
             });
             console.log('Respuesta recibida:', response.status, response.statusText);
@@ -354,30 +360,44 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                 <div className={`px-6 py-4 border-t flex justify-between items-center ${
                     isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-gray-50'
                 }`}>
-                    <button
-                        onClick={handleExportPdf}
-                        disabled={isExporting}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                            isExporting
-                                ? 'bg-blue-400 cursor-not-allowed'
-                                : 'bg-blue-600 hover:bg-blue-700'
-                        } text-white`}
-                    >
-                        {isExporting ? (
-                            <>
-                                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Generando PDF...
-                            </>
-                        ) : (
-                            <>
-                                <FiDownload className="w-4 h-4" />
-                                Exportar a PDF
-                            </>
-                        )}
-                    </button>
+                    <div className="flex items-center gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={mostrarFirma}
+                                onChange={(e) => setMostrarFirma(e.target.checked)}
+                                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                            />
+                            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                Incluir firma en PDF
+                            </span>
+                        </label>
+                        
+                        <button
+                            onClick={handleExportPdf}
+                            disabled={isExporting}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                                isExporting
+                                    ? 'bg-blue-400 cursor-not-allowed'
+                                    : 'bg-blue-600 hover:bg-blue-700'
+                            } text-white`}
+                        >
+                            {isExporting ? (
+                                <>
+                                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Generando PDF...
+                                </>
+                            ) : (
+                                <>
+                                    <FiDownload className="w-4 h-4" />
+                                    Exportar a PDF
+                                </>
+                            )}
+                        </button>
+                    </div>
                     <button
                         onClick={onClose}
                         disabled={isExporting}
