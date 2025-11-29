@@ -10,6 +10,9 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
     ruc: "",
     email: "",
     telefono: "",
+    codigo_cotizacion: "",
+    contador_cotizacion: 0,
+    anio_cotizacion: "",
     id_usuario: "",
     imagen_logo: null,
     imagen_firma: null
@@ -26,6 +29,9 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
         ruc: empresa.ruc || "",
         email: empresa.email || "",
         telefono: empresa.telefono || "",
+        codigo_cotizacion: empresa.codigo_cotizacion || "",
+        contador_cotizacion: empresa.contador_cotizacion || 0,
+        anio_cotizacion: empresa.anio_cotizacion || "",
         id_usuario: empresa.id_usuario || "",
         imagen_logo: null,
         imagen_firma: null
@@ -342,6 +348,78 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
                 {errors.telefono && (
                   <p className="mt-1 text-sm text-red-600">{errors.telefono}</p>
                 )}
+              </div>
+            </div>
+          </div>
+
+          {/* Configuración de Cotizaciones */}
+          <div>
+            <h4 className={`text-md font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Configuración de Cotizaciones
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  <FiHash className="inline w-4 h-4 mr-1" />
+                  Prefijo de Código (Ej: EIIL)
+                </label>
+                <input
+                  type="text"
+                  name="codigo_cotizacion"
+                  value={formData.codigo_cotizacion}
+                  onChange={handleInputChange}
+                  placeholder="COT"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isDarkMode
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  } ${errors.codigo_cotizacion ? 'border-red-500' : ''}`}
+                />
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  <FiHash className="inline w-4 h-4 mr-1" />
+                  Contador Actual
+                </label>
+                <input
+                  type="number"
+                  name="contador_cotizacion"
+                  value={formData.contador_cotizacion}
+                  onChange={handleInputChange}
+                  min="0"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isDarkMode
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  } ${errors.contador_cotizacion ? 'border-red-500' : ''}`}
+                />
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  <FiHash className="inline w-4 h-4 mr-1" />
+                  Año del Código
+                </label>
+                <input
+                  type="text"
+                  name="anio_cotizacion"
+                  value={formData.anio_cotizacion}
+                  onChange={handleInputChange}
+                  maxLength="4"
+                  placeholder={new Date().getFullYear().toString()}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isDarkMode
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  } ${errors.anio_cotizacion ? 'border-red-500' : ''}`}
+                />
               </div>
             </div>
           </div>

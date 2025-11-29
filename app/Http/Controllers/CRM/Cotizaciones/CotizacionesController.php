@@ -86,6 +86,9 @@ class CotizacionesController extends Controller
                 $cotizacion->vendedor_nombre = $cotizacion->vendedor
                     ? $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido
                     : 'N/A';
+                
+                // Cargar miEmpresa
+                $cotizacion->mi_empresa = $cotizacion->miEmpresa;
 
                 return $cotizacion;
             });

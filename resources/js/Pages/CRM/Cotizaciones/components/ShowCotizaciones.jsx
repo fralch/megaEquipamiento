@@ -23,6 +23,33 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
         });
     };
 
+    const getFormattedCodigo = () => {
+        if (!cotizacion) return '';
+        
+        // Si ya tiene un formato personalizado (no empieza con COT-), usarlo
+        // O si no hay info de empresa, usar el número tal cual
+        if (!cotizacion.numero?.startsWith('COT-') || !cotizacion.mi_empresa?.codigo_cotizacion) {
+            return cotizacion.numero || `COT-${cotizacion.id}`;
+        }
+
+        // Intentar reformatear si es COT-YYYY-NNN y tenemos empresa
+        try {
+            const parts = cotizacion.numero.split('-');
+            if (parts.length === 3) {
+                // COT-2025-002 -> parts[2] is 002
+                const number = parts[2];
+                const year = parts[1];
+                const prefix = cotizacion.mi_empresa.codigo_cotizacion;
+                // Formato deseado: PREFIJO-NUMERO(8)-AÑO
+                return `${prefix}-${number.padStart(8, '0')}-${year}`;
+            }
+        } catch (e) {
+            console.error('Error formatting code', e);
+        }
+        
+        return cotizacion.numero;
+    };
+
     const handleExportPdf = async () => {
         console.log('Iniciando exportación de PDF para cotización:', cotizacion.id);
         setIsExporting(true);
@@ -96,7 +123,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                             Detalles de Cotización
                         </h2>
                         <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {cotizacion.numero || `COT-${cotizacion.id}`}
+                            {getFormattedCodigo()}
                         </p>
                     </div>
                     <button

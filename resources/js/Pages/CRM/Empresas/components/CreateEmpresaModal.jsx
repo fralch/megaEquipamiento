@@ -10,6 +10,9 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         ruc: '',
         email: '',
         telefono: '',
+        codigo_cotizacion: '',
+        contador_cotizacion: 0,
+        anio_cotizacion: new Date().getFullYear().toString(),
         id_usuario: '',
         imagen_logo: null,
         imagen_firma: null
@@ -72,6 +75,9 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         if (formData.ruc) data.append('ruc', formData.ruc);
         if (formData.email) data.append('email', formData.email);
         if (formData.telefono) data.append('telefono', formData.telefono);
+        if (formData.codigo_cotizacion) data.append('codigo_cotizacion', formData.codigo_cotizacion);
+        if (formData.contador_cotizacion) data.append('contador_cotizacion', formData.contador_cotizacion);
+        if (formData.anio_cotizacion) data.append('anio_cotizacion', formData.anio_cotizacion);
         if (formData.id_usuario) data.append('id_usuario', formData.id_usuario);
         if (formData.imagen_logo) data.append('imagen_logo', formData.imagen_logo);
         if (formData.imagen_firma) data.append('imagen_firma', formData.imagen_firma);
@@ -260,6 +266,79 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
                                 {errors.email && (
                                     <p className="mt-1 text-sm text-red-500">{errors.email}</p>
                                 )}
+                            </div>
+
+                            {/* Configuración de Cotizaciones */}
+                            <div className="md:col-span-2 border-t border-b py-4 my-2 border-gray-200 dark:border-gray-700">
+                                <h4 className={`text-sm font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Configuración de Cotizaciones
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Prefijo de Código (Ej: EIIL)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="codigo_cotizacion"
+                                            value={formData.codigo_cotizacion}
+                                            onChange={handleChange}
+                                            placeholder="COT"
+                                            className={`w-full px-4 py-2 rounded-lg border ${
+                                                errors.codigo_cotizacion
+                                                    ? 'border-red-500'
+                                                    : isDarkMode
+                                                        ? 'border-gray-600 bg-gray-700 text-white'
+                                                        : 'border-gray-300 bg-white text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Contador Actual (Ej: 100)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="contador_cotizacion"
+                                            value={formData.contador_cotizacion}
+                                            onChange={handleChange}
+                                            min="0"
+                                            className={`w-full px-4 py-2 rounded-lg border ${
+                                                errors.contador_cotizacion
+                                                    ? 'border-red-500'
+                                                    : isDarkMode
+                                                        ? 'border-gray-600 bg-gray-700 text-white'
+                                                        : 'border-gray-300 bg-white text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Año del Código (Ej: {new Date().getFullYear()})
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="anio_cotizacion"
+                                            value={formData.anio_cotizacion}
+                                            onChange={handleChange}
+                                            maxLength={4}
+                                            placeholder={new Date().getFullYear().toString()}
+                                            className={`w-full px-4 py-2 rounded-lg border ${
+                                                errors.anio_cotizacion
+                                                    ? 'border-red-500'
+                                                    : isDarkMode
+                                                        ? 'border-gray-600 bg-gray-700 text-white'
+                                                        : 'border-gray-300 bg-white text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Usuario Responsable */}
