@@ -314,7 +314,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     // Filtrar clientes basado en la búsqueda (mínimo 3 caracteres) y tipo
     const clientesSource = formData.cliente_tipo === 'empresa' ? clientesEmpresas : clientesParticulares;
     
-    const clientesFiltrados = searchCliente.length >= 3 
+    const clientesFiltrados = searchCliente.length >= 1 
         ? clientesSource.filter(cliente => 
             cliente.nombre.toLowerCase().includes(searchCliente.toLowerCase())
           )
@@ -787,7 +787,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                                 type="text"
                                                 value={searchCliente}
                                                 onChange={(e) => handleSearchClienteChange(e.target.value)}
-                                                placeholder={formData.cliente_tipo === 'empresa' ? "Escriba 3 letras para buscar empresa..." : "Escriba 3 letras para buscar cliente..."}
+                                                placeholder={formData.cliente_tipo === 'empresa' ? "Escriba para buscar empresa..." : "Escriba  para buscar cliente..."}
                                                 className={`w-full px-3 py-2 pr-10 border rounded-lg ${
                                                     isDarkMode
                                                         ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
@@ -800,7 +800,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                         </div>
                                         
                                         {/* Dropdown de clientes */}
-                                        {showClienteDropdown && searchCliente.length >= 3 && (
+                                        {showClienteDropdown && searchCliente.length >= 1 && (
                                             <div className={`absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border rounded-lg shadow-lg ${
                                                 isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
                                             }`}>
