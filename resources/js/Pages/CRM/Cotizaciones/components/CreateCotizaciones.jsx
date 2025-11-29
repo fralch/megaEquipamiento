@@ -44,6 +44,11 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const searchTimeoutRef = useRef(null);
     const dropdownRef = useRef(null);
 
+    // Estados para búsqueda de clientes (Empresas)
+    const [searchCliente, setSearchCliente] = useState('');
+    const [showClienteDropdown, setShowClienteDropdown] = useState(false);
+    const clienteDropdownRef = useRef(null);
+
     // Estados para búsqueda de productos adicionales
     const [searchProductoAdicional, setSearchProductoAdicional] = useState('');
     const [productosAdicionalesResultados, setProductosAdicionalesResultados] = useState([]);
@@ -67,6 +72,9 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             }
             if (dropdownAdicionalRef.current && !dropdownAdicionalRef.current.contains(event.target)) {
                 setShowProductoAdicionalDropdown(false);
+            }
+            if (clienteDropdownRef.current && !clienteDropdownRef.current.contains(event.target)) {
+                setShowClienteDropdown(false);
             }
         };
 
@@ -283,10 +291,59 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             const newExchangeRate = parseFloat(value) || 3.7;
             convertAllProducts('soles', newExchangeRate);
         }
+
+        // Si cambia el tipo de cliente, limpiar selección
+        if (name === 'cliente_tipo' && value !== formData.cliente_tipo) {
+            setSearchCliente('');
+            setContactosEmpresa([]);
+            setFormData(prev => ({
+                ...prev,
+                [name]: value,
+                cliente_id: '',
+                contacto_id: ''
+            }));
+            return;
+        }
         
         setFormData(prev => ({
             ...prev,
             [name]: value
+        }));
+    };
+
+    // Filtrar clientes basado en la búsqueda (mínimo 3 caracteres) y tipo
+    const clientesSource = formData.cliente_tipo === 'empresa' ? clientesEmpresas : clientesParticulares;
+    
+    const clientesFiltrados = searchCliente.length >= 3 
+        ? clientesSource.filter(cliente => 
+            cliente.nombre.toLowerCase().includes(searchCliente.toLowerCase())
+          )
+        : [];
+
+    const handleSearchClienteChange = (value) => {
+        setSearchCliente(value);
+        setShowClienteDropdown(true);
+        
+        // Si el usuario está escribiendo, limpiamos la selección anterior para asegurar consistencia
+        if (formData.cliente_id) {
+             setFormData(prev => ({ ...prev, cliente_id: '', contacto_id: '' }));
+             setContactosEmpresa([]);
+        }
+    };
+
+    const selectClienteAutocomplete = (cliente) => {
+        setSearchCliente(cliente.nombre);
+        setShowClienteDropdown(false);
+        
+        // Cargar contactos solo si es empresa
+        const contactos = formData.cliente_tipo === 'empresa' ? (cliente.contactos || []) : [];
+        setContactosEmpresa(contactos);
+
+        setFormData(prev => ({
+            ...prev,
+            cliente_id: cliente.id,
+            // Mantenemos el tipo actual
+            contacto_id: '',
         }));
     };
 
@@ -724,33 +781,64 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                                     </div>
                                 ) : (
-                                    <select
-                                        name="cliente_id"
-                                        value={formData.cliente_id}
-                                        onChange={handleClienteChange}
-                                        className={`w-full px-3 py-2 border rounded-lg ${
-                                            isDarkMode
-                                                ? 'bg-gray-700 border-gray-600 text-white'
-                                                : 'bg-white border-gray-300 text-gray-900'
-                                        }`}
-                                        required
-                                    >
-                                        <option value="">
-                                            {formData.cliente_tipo === 'empresa' ? 'Seleccionar empresa' : 'Seleccionar cliente'}
-                                        </option>
-                                        {formData.cliente_tipo === 'empresa'
-                                            ? clientesEmpresas.map(cliente => (
-                                                <option key={cliente.id} value={cliente.id}>
-                                                    {cliente.nombre}
-                                                </option>
-                                            ))
-                                            : clientesParticulares.map(cliente => (
-                                                <option key={cliente.id} value={cliente.id}>
-                                                    {cliente.nombre}
-                                                </option>
-                                            ))
-                                        }
-                                    </select>
+                                    <div className="relative" ref={clienteDropdownRef}>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={searchCliente}
+                                                onChange={(e) => handleSearchClienteChange(e.target.value)}
+                                                placeholder={formData.cliente_tipo === 'empresa' ? "Escriba 3 letras para buscar empresa..." : "Escriba 3 letras para buscar cliente..."}
+                                                className={`w-full px-3 py-2 pr-10 border rounded-lg ${
+                                                    isDarkMode
+                                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                } ${!formData.cliente_id && searchCliente.length > 0 && searchCliente.length < 3 ? 'border-yellow-500 focus:ring-yellow-500' : 'focus:ring-blue-500 focus:border-transparent'} focus:ring-2`}
+                                            />
+                                            <div className="absolute right-3 top-3">
+                                                    <FiSearch className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Dropdown de clientes */}
+                                        {showClienteDropdown && searchCliente.length >= 3 && (
+                                            <div className={`absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border rounded-lg shadow-lg ${
+                                                isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
+                                            }`}>
+                                                {clientesFiltrados.length > 0 ? (
+                                                    clientesFiltrados.map((cliente) => (
+                                                        <div
+                                                            key={cliente.id}
+                                                            onClick={() => selectClienteAutocomplete(cliente)}
+                                                            className={`px-3 py-2 cursor-pointer hover:${isDarkMode ? 'bg-gray-600' : 'bg-gray-100'} ${
+                                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                                            } border-b last:border-b-0 ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}
+                                                        >
+                                                            <div className="font-medium">{cliente.nombre}</div>
+                                                            {cliente.ruc && (
+                                                                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                    RUC: {cliente.ruc}
+                                                                </div>
+                                                            )}
+                                                            {cliente.dni && (
+                                                                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                    DNI: {cliente.dni}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className={`px-3 py-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                        No se encontraron resultados
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                        {searchCliente.length > 0 && searchCliente.length < 3 && (
+                                            <p className={`text-xs mt-1 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
+                                                Ingrese al menos 3 caracteres para buscar.
+                                            </p>
+                                        )}
+                                    </div>
                                 )}
                             </div>
 
