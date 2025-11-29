@@ -173,20 +173,47 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
         }
 
-        const newProducto = {
-            id: producto.id,
-            nombre: producto.nombre,
-            cantidad: 1,
-            precio_unitario: precioFinal,
-            subtotal: precioFinal,
-            es_temporal: producto.es_temporal || false,
-            ...(producto.es_temporal && { producto_temporal_id: producto.id })
-        };
+        setFormData(prev => {
+            // Verificar si el producto ya existe
+            const existingProductIndex = prev.productos.findIndex(p => 
+                p.id === producto.id && 
+                !!p.es_temporal === !!producto.es_temporal
+            );
 
-        setFormData(prev => ({
-            ...prev,
-            productos: [...prev.productos, newProducto]
-        }));
+            if (existingProductIndex >= 0) {
+                // Si existe, actualizamos la cantidad
+                const newProductos = [...prev.productos];
+                const existingProduct = newProductos[existingProductIndex];
+                const newCantidad = (parseFloat(existingProduct.cantidad) || 0) + 1;
+                
+                newProductos[existingProductIndex] = {
+                    ...existingProduct,
+                    cantidad: newCantidad,
+                    subtotal: newCantidad * (parseFloat(existingProduct.precio_unitario) || 0)
+                };
+
+                return {
+                    ...prev,
+                    productos: newProductos
+                };
+            }
+
+            // Si no existe, lo agregamos como nuevo
+            const newProducto = {
+                id: producto.id,
+                nombre: producto.nombre,
+                cantidad: 1,
+                precio_unitario: precioFinal,
+                subtotal: precioFinal,
+                es_temporal: producto.es_temporal || false,
+                ...(producto.es_temporal && { producto_temporal_id: producto.id })
+            };
+
+            return {
+                ...prev,
+                productos: [...prev.productos, newProducto]
+            };
+        });
 
         // Limpiar búsqueda
         setSearchProducto('');
@@ -582,20 +609,47 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
         }
 
-        const newProducto = {
-            id: producto.id,
-            nombre: producto.nombre,
-            cantidad: 1,
-            precio_unitario: precioFinal,
-            subtotal: precioFinal,
-            es_temporal: producto.es_temporal || false,
-            ...(producto.es_temporal && { producto_temporal_id: producto.id })
-        };
+        setFormData(prev => {
+            // Verificar si el producto ya existe en adicionales
+            const existingProductIndex = prev.productos_adicionales.findIndex(p => 
+                p.id === producto.id && 
+                !!p.es_temporal === !!producto.es_temporal
+            );
 
-        setFormData(prev => ({
-            ...prev,
-            productos_adicionales: [...prev.productos_adicionales, newProducto]
-        }));
+            if (existingProductIndex >= 0) {
+                // Si existe, actualizamos la cantidad
+                const newProductos = [...prev.productos_adicionales];
+                const existingProduct = newProductos[existingProductIndex];
+                const newCantidad = (parseFloat(existingProduct.cantidad) || 0) + 1;
+                
+                newProductos[existingProductIndex] = {
+                    ...existingProduct,
+                    cantidad: newCantidad,
+                    subtotal: newCantidad * (parseFloat(existingProduct.precio_unitario) || 0)
+                };
+
+                return {
+                    ...prev,
+                    productos_adicionales: newProductos
+                };
+            }
+
+            // Si no existe, lo agregamos como nuevo
+            const newProducto = {
+                id: producto.id,
+                nombre: producto.nombre,
+                cantidad: 1,
+                precio_unitario: precioFinal,
+                subtotal: precioFinal,
+                es_temporal: producto.es_temporal || false,
+                ...(producto.es_temporal && { producto_temporal_id: producto.id })
+            };
+
+            return {
+                ...prev,
+                productos_adicionales: [...prev.productos_adicionales, newProducto]
+            };
+        });
 
         // Limpiar búsqueda
         setSearchProductoAdicional('');
