@@ -1,11 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiPlus, FiTrash2, FiSearch } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
+import { usePage } from '@inertiajs/react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
 export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const { isDarkMode } = useTheme();
+    const { auth } = usePage().props;
+
+    // Función para obtener el ID del usuario autenticado
+    const getAuthUserId = () => {
+        // El modelo Usuario usa 'id_usuario' como primaryKey, pero Laravel lo expone como 'id'
+        const userId = auth?.user?.id_usuario || auth?.user?.id || '';
+        console.log('Auth user data:', auth?.user);
+        console.log('Selected user ID:', userId);
+        return userId;
+    };
 
     const [formData, setFormData] = useState({
         fecha_cotizacion: new Date().toISOString().split('T')[0],
@@ -17,7 +28,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         cliente_id: '',
         cliente_tipo: 'particular',
         contacto_id: '', // Nuevo campo para contacto de empresa
-        usuario_id: '',
+        usuario_id: getAuthUserId(),
         miempresa_id: '',
         moneda: 'dolares',
         tipo_cambio: 3.7,
@@ -61,6 +72,28 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     // Cargar datos iniciales cuando se abre el modal
     useEffect(() => {
         if (isOpen) {
+            // Resetear el formulario al abrir el modal
+            setFormData({
+                fecha_cotizacion: new Date().toISOString().split('T')[0],
+                fecha_vencimiento: '',
+                entrega: '',
+                lugar_entrega: '',
+                garantia: '',
+                forma_pago: '',
+                cliente_id: '',
+                cliente_tipo: 'particular',
+                contacto_id: '',
+                usuario_id: getAuthUserId(), // Auto-seleccionar usuario autenticado
+                miempresa_id: '',
+                moneda: 'dolares',
+                tipo_cambio: 3.7,
+                productos: [],
+                total_monto_productos: 0,
+                productos_adicionales: [],
+                total_adicionales_monto: 0,
+                total: 0,
+                notas: ''
+            });
             loadFormData();
         }
     }, [isOpen]);
@@ -99,6 +132,10 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                 setClientesEmpresas(empresas);
                 setVendedores(data.vendedores || []);
                 setEmpresas(data.empresas || []);
+
+                // Debug: Verificar que el usuario autenticado está en la lista de vendedores
+                console.log('Vendedores cargados:', data.vendedores);
+                console.log('Usuario autenticado ID:', getAuthUserId());
             }
         } catch (error) {
             console.error('Error al cargar datos del formulario:', error);
