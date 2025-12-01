@@ -42,11 +42,6 @@ class GenerarNotificacionesCotizaciones extends Command
         foreach ($cotizacionesVencidas as $cotizacion) {
             $diasVencimiento = $cotizacion->dias_vencimiento;
 
-            // Solo crear notificaciones si ha pasado al menos 3 días
-            if ($diasVencimiento < 3) {
-                continue;
-            }
-
             // Determinar nivel de urgencia
             if ($diasVencimiento >= 3 && $diasVencimiento < 5) {
                 $nivelUrgencia = 'warning';

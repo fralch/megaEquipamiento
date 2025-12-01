@@ -93,9 +93,50 @@ class CotizacionesController extends Controller
                 return $cotizacion;
             });
 
+            // Calcular contadores globales de notificaciones (vencidas)
+            // Warning: 3-4 días vencida
+            // Danger: 5+ días vencida
+            $now = \Carbon\Carbon::now();
+            $userId = $usuario ? $usuario->id_usuario : null;
+
+            $baseQuery = Cotizacion::query();
+            if ($userId && ($usuario->nombre_usuario !== 'Admin')) {
+                $baseQuery->where('usuario_id', $userId);
+            }
+
+            // Warning: Vencimiento entre 3 y 4 días atrás
+            // Fecha vencimiento <= hoy - 3 dias AND Fecha vencimiento > hoy - 5 dias
+            // Ejemplo: Hoy es 10. 
+            // 3 días atrás: 7. 4 días atrás: 6.
+            // Si vence el 7 (hace 3 días) -> Warning.
+            // Si vence el 6 (hace 4 días) -> Warning.
+            // Si vence el 5 (hace 5 días) -> Danger.
+            
+            $warningDateStart = $now->copy()->subDays(4)->startOfDay();
+            $warningDateEnd = $now->copy()->subDays(3)->endOfDay();
+            
+            $dangerDateEnd = $now->copy()->subDays(5)->endOfDay();
+
+            $warningCount = (clone $baseQuery)
+                ->whereBetween('fecha_vencimiento', [$warningDateStart, $warningDateEnd])
+                ->count();
+
+            $dangerCount = (clone $baseQuery)
+                ->where('fecha_vencimiento', '<=', $dangerDateEnd)
+                ->count();
+
+            $notificationStats = [
+                'warningCount' => $warningCount,
+                'dangerCount' => $dangerCount,
+                'totalCount' => $warningCount + $dangerCount
+            ];
+
             // Si es una petición AJAX, retornar JSON
             if ($request->expectsJson() || $request->wantsJson()) {
-                return response()->json($cotizaciones);
+                return response()->json([
+                    'cotizaciones' => $cotizaciones,
+                    'notificationStats' => $notificationStats
+                ]);
             }
 
             // Renderizar la vista con Inertia
@@ -109,7 +150,8 @@ class CotizacionesController extends Controller
                     'from' => $cotizaciones->firstItem(),
                     'to' => $cotizaciones->lastItem(),
                 ],
-                'filters' => $request->only(['search', 'estado', 'vendedor_id', 'sort_field', 'sort_direction'])
+                'filters' => $request->only(['search', 'estado', 'vendedor_id', 'sort_field', 'sort_direction']),
+                'notificationStats' => $notificationStats
             ]);
         } catch (\Exception $e) {
             Log::error('Error al obtener cotizaciones: ' . $e->getMessage());

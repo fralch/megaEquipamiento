@@ -11,7 +11,7 @@ import CreateCotizaciones from './components/CreateCotizaciones';
 import EditCotizaciones from './components/EditCotizaciones';
 import axios from 'axios';
 
-export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], pagination: initialPagination = null, filters: initialFilters = {} }) {
+export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], pagination: initialPagination = null, filters: initialFilters = {}, notificationStats }) {
     const { isDarkMode } = useTheme();
     const [searchTerm, setSearchTerm] = useState(initialFilters.search || '');
     const [filterEstado, setFilterEstado] = useState(initialFilters.estado || 'all');
@@ -276,12 +276,13 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         return notif !== null;
     });
 
-    const notificacionesWarning = cotizacionesConNotificacion.filter(c => {
+    // Usar estadísticas globales si están disponibles, de lo contrario usar local (fallback)
+    const notificacionesWarning = notificationStats?.warningCount ?? cotizacionesConNotificacion.filter(c => {
         const notif = getNotificationInfo(c);
         return notif?.nivel === 'warning';
     }).length;
 
-    const notificacionesDanger = cotizacionesConNotificacion.filter(c => {
+    const notificacionesDanger = notificationStats?.dangerCount ?? cotizacionesConNotificacion.filter(c => {
         const notif = getNotificationInfo(c);
         return notif?.nivel === 'danger';
     }).length;

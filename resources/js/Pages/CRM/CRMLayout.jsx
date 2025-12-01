@@ -11,10 +11,15 @@ import { useCRM } from '../../storage/CRMContext';
 import NotificacionesCotizaciones from '../../Components/CRM/Notificaciones/NotificacionesCotizaciones';
 import Swal from 'sweetalert2';
 
-export default function CRMLayout({ children, title }) {
-    const { auth } = usePage().props;
+export default function CRMLayout({ children, title, notifications }) {
+    const { auth, notificationStats } = usePage().props;
     const { isDarkMode, toggleDarkMode } = useTheme();
     const { expandedMenus, toggleMenu } = useCRM();
+
+    // Priorizar stats globales, fallback a props locales si existen
+    const activeStats = notificationStats || notifications;
+    const dangerCount = activeStats?.dangerCount || 0;
+    const warningCount = activeStats?.warningCount || 0;
 
     // Función para generar iniciales del usuario
     const getUserInitials = (name) => {
@@ -220,7 +225,30 @@ export default function CRMLayout({ children, title }) {
                                     Panel de Control del Sistema CRM
                                 </p>
                             </div>
+
                             <div className="flex items-center gap-4">
+                                {/* Global Notifications - Alerts */}
+                                {(dangerCount > 0 || warningCount > 0) && (
+                                    <div className="hidden md:flex items-center gap-2 mr-2">
+                                        {dangerCount > 0 && (
+                                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                                isDarkMode ? 'bg-red-900/40 text-red-300 border border-red-800' : 'bg-red-50 text-red-700 border border-red-100'
+                                            }`}>
+                                                <FiAlertCircle className="w-3.5 h-3.5" />
+                                                <span>{dangerCount} vencidas</span>
+                                            </div>
+                                        )}
+                                        {warningCount > 0 && (
+                                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                                isDarkMode ? 'bg-yellow-900/40 text-yellow-300 border border-yellow-800' : 'bg-yellow-50 text-yellow-700 border border-yellow-100'
+                                            }`}>
+                                                <FiAlertTriangle className="w-3.5 h-3.5" />
+                                                <span>{warningCount} por vencer</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* Theme Toggle Button */}
                                 <button
                                     onClick={toggleDarkMode}

@@ -5,14 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\NotificacionCotizacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Artisan;
 
 class NotificacionCotizacionController extends Controller
 {
+    /**
+     * Helper para regenerar notificaciones
+     */
+    private function regenerarNotificaciones()
+    {
+        try {
+            Artisan::call('cotizaciones:generar-notificaciones');
+        } catch (\Exception $e) {
+            \Log::error('Error al generar notificaciones: ' . $e->getMessage());
+        }
+    }
+
     /**
      * Obtener todas las notificaciones del usuario autenticado
      */
     public function index(Request $request)
     {
+        $this->regenerarNotificaciones();
         $usuarioId = Auth::id();
 
         $query = NotificacionCotizacion::with(['cotizacion.clienteParticular', 'cotizacion.empresaCliente'])
@@ -128,6 +142,7 @@ class NotificacionCotizacionController extends Controller
      */
     public function porUrgencia()
     {
+        $this->regenerarNotificaciones();
         $usuarioId = Auth::id();
 
         $notificaciones = [
