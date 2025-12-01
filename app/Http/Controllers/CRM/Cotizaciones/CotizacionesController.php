@@ -664,12 +664,20 @@ class CotizacionesController extends Controller
     public function estadisticas()
     {
         try {
-            $total = Cotizacion::count();
-            $montoTotal = Cotizacion::sum('total');
-            $pendientes = Cotizacion::where('estado', 'pendiente')->count();
-            $aprobadas = Cotizacion::where('estado', 'aprobada')->count();
-            $enviadas = Cotizacion::where('estado', 'enviada')->count();
-            $rechazadas = Cotizacion::where('estado', 'rechazada')->count();
+            $usuario = auth()->user();
+            $baseQuery = Cotizacion::query();
+
+            // Limitar resultados a las cotizaciones del usuario autenticado
+            if ($usuario && ($usuario->nombre_usuario !== 'Admin')) {
+                $baseQuery->where('usuario_id', $usuario->id_usuario);
+            }
+
+            $total = (clone $baseQuery)->count();
+            $montoTotal = (clone $baseQuery)->sum('total');
+            $pendientes = (clone $baseQuery)->where('estado', 'pendiente')->count();
+            $aprobadas = (clone $baseQuery)->where('estado', 'aprobada')->count();
+            $enviadas = (clone $baseQuery)->where('estado', 'enviada')->count();
+            $rechazadas = (clone $baseQuery)->where('estado', 'rechazada')->count();
 
             return response()->json([
                 'success' => true,
