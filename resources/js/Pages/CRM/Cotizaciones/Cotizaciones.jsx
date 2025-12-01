@@ -221,7 +221,8 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     };
 
     const formatCurrency = (amount, currency = 'soles') => {
-        const symbol = currency === 'dolares' ? '$' : 'S/';
+        console.log(amount, currency);
+        const symbol =   '$'; 
         return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
     };
 

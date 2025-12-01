@@ -673,7 +673,7 @@ class CotizacionesController extends Controller
             }
 
             $total = (clone $baseQuery)->count();
-            $montoTotal = (clone $baseQuery)->sum('total');
+            $montoTotal = (clone $baseQuery)->where('estado', 'aprobada')->sum('total');
             $pendientes = (clone $baseQuery)->where('estado', 'pendiente')->count();
             $aprobadas = (clone $baseQuery)->where('estado', 'aprobada')->count();
             $enviadas = (clone $baseQuery)->where('estado', 'enviada')->count();
