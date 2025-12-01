@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { router } from "@inertiajs/react";
 import { FiX, FiUpload } from "react-icons/fi";
+import axios from 'axios';
+import Swal from 'sweetalert2';
 import { useTheme } from '../../../../storage/ThemeContext';
 
 export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
@@ -83,31 +85,47 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         if (formData.imagen_firma) data.append('imagen_firma', formData.imagen_firma);
 
         try {
-            const response = await fetch(route('crm.empresas.store'), {
-                method: 'POST',
+            const response = await axios.post(route('crm.empresas.store', undefined, false), data, {
                 headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: data
+                    'Content-Type': 'multipart/form-data'
+                }
             });
 
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                alert('Empresa creada exitosamente');
+            if (response.data.success) {
+                await Swal.fire({
+                    title: '¡Éxito!',
+                    text: 'Empresa creada exitosamente',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
                 handleClose();
             } else {
-                if (result.errors) {
-                    setErrors(result.errors);
-                } else {
-                    alert('Error al crear la empresa: ' + (result.message || 'Error desconocido'));
-                }
+                await Swal.fire({
+                    title: 'Error',
+                    text: 'Error al crear la empresa',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
             }
         } catch (error) {
             console.error('Error al crear empresa:', error);
-            alert('Error al crear la empresa');
+            if (error.response && error.response.data && error.response.data.errors) {
+                setErrors(error.response.data.errors);
+                await Swal.fire({
+                    title: 'Error de validación',
+                    text: 'Por favor revise los campos del formulario',
+                    icon: 'warning',
+                    confirmButtonText: 'Aceptar'
+                });
+            } else {
+                await Swal.fire({
+                    title: 'Error',
+                    text: 'Error al crear la empresa: ' + (error.response?.data?.message || error.message || 'Error desconocido'),
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
         }
     };
 

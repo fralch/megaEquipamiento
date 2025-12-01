@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { FiX, FiHome, FiMail, FiPhone, FiSave, FiUser, FiHash, FiImage } from "react-icons/fi";
 import { useTheme } from "../../../../storage/ThemeContext";
 import { router } from "@inertiajs/react";
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios }) {
   const { isDarkMode } = useTheme();
@@ -138,32 +140,48 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
         }
       });
 
-      const response = await fetch(route('crm.empresas.update', empresa.id), {
-        method: 'POST',
+      const response = await axios.post(route('crm.empresas.update', empresa.id, false), submitData, {
         headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: submitData
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        alert('Empresa actualizada exitosamente');
+      if (response.data.success) {
+        await Swal.fire({
+          title: '¡Éxito!',
+          text: 'Empresa actualizada exitosamente',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        });
         onClose();
         setErrors({});
       } else {
-        if (data.errors) {
-          setErrors(data.errors);
-        } else {
-          alert('Error al actualizar la empresa: ' + (data.message || 'Error desconocido'));
-        }
+        await Swal.fire({
+          title: 'Error',
+          text: 'Error al actualizar la empresa',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
       }
     } catch (error) {
       console.error('Error al actualizar empresa:', error);
-      alert('Error al actualizar la empresa');
+      if (error.response && error.response.data && error.response.data.errors) {
+        setErrors(error.response.data.errors);
+        await Swal.fire({
+          title: 'Error de validación',
+          text: 'Por favor revise los campos del formulario',
+          icon: 'warning',
+          confirmButtonText: 'Aceptar'
+        });
+      } else {
+        await Swal.fire({
+          title: 'Error',
+          text: 'Error al actualizar la empresa: ' + (error.response?.data?.message || error.message || 'Error desconocido'),
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        });
+      }
     } finally {
       setIsLoading(false);
     }
