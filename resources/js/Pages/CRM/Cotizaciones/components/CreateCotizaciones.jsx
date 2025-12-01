@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiPlus, FiTrash2, FiSearch } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const { isDarkMode } = useTheme();
@@ -101,7 +102,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             }
         } catch (error) {
             console.error('Error al cargar datos del formulario:', error);
-            alert('Error al cargar datos. Por favor, intente nuevamente.');
+            Swal.fire('Error', 'Error al cargar datos. Por favor, intente nuevamente.', 'error');
         } finally {
             setLoading(false);
         }
@@ -480,7 +481,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
         // Validar que haya al menos un producto
         if (formData.productos.length === 0) {
-            alert('Debe agregar al menos un producto a la cotización');
+            Swal.fire('Atención', 'Debe agregar al menos un producto a la cotización', 'warning');
             return;
         }
 
@@ -523,20 +524,20 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             const response = await axios.post('/crm/cotizaciones/store', dataToSend);
 
             if (response.data.success) {
-                alert('Cotización creada exitosamente');
+                Swal.fire('Éxito', 'Cotización creada exitosamente', 'success');
                 onSave();
                 onClose();
             } else {
-                alert('Error al crear cotización: ' + (response.data.message || 'Error desconocido'));
+                Swal.fire('Error', 'Error al crear cotización: ' + (response.data.message || 'Error desconocido'), 'error');
             }
         } catch (error) {
             console.error('Error al crear cotización:', error);
             if (error.response?.data?.errors) {
                 const errors = error.response.data.errors;
                 const errorMessages = Object.values(errors).flat().join('\n');
-                alert('Errores de validación:\n' + errorMessages);
+                Swal.fire('Error', 'Errores de validación:\n' + errorMessages, 'error');
             } else {
-                alert('Error al crear cotización: ' + (error.response?.data?.message || error.message));
+                Swal.fire('Error', 'Error al crear cotización: ' + (error.response?.data?.message || error.message), 'error');
             }
         } finally {
             setLoading(false);
