@@ -30,6 +30,15 @@ class GenerarNotificacionesCotizaciones extends Command
     {
         $this->info('Generando notificaciones de cotizaciones vencidas...');
 
+        // Limpiar notificaciones de cotizaciones que ya no deberían estar notificadas (aprobadas o rechazadas)
+        $deletedCount = NotificacionCotizacion::whereHas('cotizacion', function ($query) {
+            $query->whereIn('estado', ['aprobada', 'rechazada']);
+        })->delete();
+        
+        if ($deletedCount > 0) {
+            $this->info("Se eliminaron {$deletedCount} notificaciones de cotizaciones aprobadas/rechazadas.");
+        }
+
         // Obtener todas las cotizaciones vencidas
         $cotizacionesVencidas = Cotizacion::where('fecha_vencimiento', '<', Carbon::now())
             ->whereIn('estado', ['pendiente', 'enviada', 'negociacion'])

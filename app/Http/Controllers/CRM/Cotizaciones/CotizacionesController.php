@@ -104,6 +104,9 @@ class CotizacionesController extends Controller
                 $baseQuery->where('usuario_id', $userId);
             }
 
+            // Excluir cotizaciones aprobadas o rechazadas de las notificaciones
+            $baseQuery->whereNotIn('estado', ['aprobada', 'rechazada']);
+
             // Warning: Vencimiento entre 3 y 4 días atrás
             // Fecha vencimiento <= hoy - 3 dias AND Fecha vencimiento > hoy - 5 dias
             // Ejemplo: Hoy es 10. 
@@ -642,6 +645,11 @@ class CotizacionesController extends Controller
         try {
             $cotizacion = Cotizacion::findOrFail($id);
             $cotizacion->update(['estado' => $request->estado]);
+
+            // Eliminar notificaciones si el estado es aprobada o rechazada
+            if (in_array($request->estado, ['aprobada', 'rechazada'])) {
+                \App\Models\NotificacionCotizacion::where('cotizacion_id', $cotizacion->id)->delete();
+            }
 
             return response()->json([
                 'success' => true,

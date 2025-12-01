@@ -232,6 +232,8 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     };
 
     const getNotificationInfo = (cotizacion) => {
+        if (['aprobada', 'rechazada'].includes(cotizacion.estado)) return null;
+
         if (!cotizacion.fecha_vencimiento) return null;
 
         const fechaVencimiento = parseISO(cotizacion.fecha_vencimiento);
