@@ -23,7 +23,9 @@ class DashboardController extends Controller
     {
         try {
             $usuario = auth()->user();
-            $isAdmin = $usuario && $usuario->nombre_usuario === 'Admin';
+            // Cargar la relación rol para verificar si es admin
+            $usuario->load('rol');
+            $isAdmin = $usuario && $usuario->rol && strtolower($usuario->rol->nombre_rol) === 'admin';
 
             // Total de productos
             $totalProductos = Producto::count();
@@ -191,7 +193,9 @@ class DashboardController extends Controller
     {
         try {
             $usuario = auth()->user();
-            $isAdmin = $usuario && $usuario->nombre_usuario === 'Admin';
+            // Cargar la relación rol para verificar si es admin
+            $usuario->load('rol');
+            $isAdmin = $usuario && $usuario->rol && strtolower($usuario->rol->nombre_rol) === 'admin';
 
             // Ventas por mes (últimos 6 meses)
             $ventasPorMes = [];
