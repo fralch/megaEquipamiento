@@ -1,5 +1,5 @@
 import { Head, router } from "@inertiajs/react";
-import { FiBarChart, FiEdit, FiTrash2, FiPlus, FiEye, FiSearch, FiDownload, FiSend, FiClock, FiUser, FiCalendar, FiRefreshCw, FiX, FiAlertTriangle, FiAlertCircle, FiBell } from "react-icons/fi";
+import { FiBarChart, FiEdit, FiTrash2, FiPlus, FiEye, FiSearch, FiDownload, FiSend, FiClock, FiUser, FiCalendar, FiRefreshCw, FiX, FiAlertTriangle, FiAlertCircle, FiBell, FiTrendingUp } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import { useState, useEffect } from 'react';
 import { differenceInDays, parseISO, format } from 'date-fns';
@@ -10,6 +10,18 @@ import ShowCotizaciones from './components/ShowCotizaciones';
 import CreateCotizaciones from './components/CreateCotizaciones';
 import EditCotizaciones from './components/EditCotizaciones';
 import axios from 'axios';
+import {
+    ComposedChart,
+    Line,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+    Area
+} from 'recharts';
 
 export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], pagination: initialPagination = null, filters: initialFilters = {}, notificationStats }) {
     const { isDarkMode } = useTheme();
@@ -24,7 +36,12 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         monto_total: 0,
         pendientes: 0,
         aprobadas: 0,
+        diario: { count: 0, monto: 0 },
+        semanal: { count: 0, monto: 0 },
+        mensual: { count: 0, monto: 0 },
+        charts: { daily: [], weekly: [], monthly: [] }
     });
+    const [chartPeriod, setChartPeriod] = useState('daily'); // 'daily', 'weekly', 'monthly'
     const [loading, setLoading] = useState(false);
     const [showEstadoModal, setShowEstadoModal] = useState(false);
     const [cotizacionToChangeEstado, setCotizacionToChangeEstado] = useState(null);
@@ -221,7 +238,6 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     };
 
     const formatCurrency = (amount, currency = 'soles') => {
-        console.log(amount, currency);
         const symbol =   '$'; 
         return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
     };
@@ -332,13 +348,224 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         }
     ];
 
+    const seguimientoDisplay = [
+        {
+            titulo: "Hoy",
+            count: estadisticas.diario?.count || 0,
+            monto: estadisticas.diario?.monto || 0,
+            color: "indigo",
+            icon: FiClock
+        },
+        {
+            titulo: "Esta Semana",
+            count: estadisticas.semanal?.count || 0,
+            monto: estadisticas.semanal?.monto || 0,
+            color: "teal",
+            icon: FiCalendar
+        },
+        {
+            titulo: "Este Mes",
+            count: estadisticas.mensual?.count || 0,
+            monto: estadisticas.mensual?.monto || 0,
+            color: "orange",
+            icon: FiBarChart
+        }
+    ];
+
+    const getChartData = () => {
+        switch (chartPeriod) {
+            case 'daily': return estadisticas.charts?.daily || [];
+            case 'weekly': return estadisticas.charts?.weekly || [];
+            case 'monthly': return estadisticas.charts?.monthly || [];
+            default: return [];
+        }
+    };
+
+    const CustomTooltip = ({ active, payload, label }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className={`p-3 rounded shadow-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                    <p className="font-bold mb-2">{label}</p>
+                    <p className="text-sm text-blue-500">
+                        Monto: {formatCurrency(payload[0]?.value)}
+                    </p>
+                    <p className="text-sm text-orange-500">
+                        Cantidad: {payload[1]?.value}
+                    </p>
+                </div>
+            );
+        }
+        return null;
+    };
+
     return (
         <>
             <Head title="Cotizaciones" />
             <CRMLayout title="Gestión de Cotizaciones" notifications={notificationsSummary}>
                 <div className="p-6">
 
-                    {/* Estadísticas */}
+                    {/* Seguimiento Temporal (Cards) */}
+                    <div className="mb-6">
+                        <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                            Seguimiento de Actividad
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {seguimientoDisplay.map((stat, index) => (
+                                <div key={index} className={`rounded-xl shadow-sm border p-6 transition-all duration-300 hover:shadow-lg ${
+                                    isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+                                }`}>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className={`p-3 rounded-full ${
+                                            stat.color === 'indigo' ? 'bg-indigo-100 text-indigo-600' :
+                                            stat.color === 'teal' ? 'bg-teal-100 text-teal-600' :
+                                            'bg-orange-100 text-orange-600'
+                                        }`}>
+                                            <stat.icon className="w-6 h-6" />
+                                        </div>
+                                        <div className={`text-right`}>
+                                            <p className={`text-xs font-medium uppercase tracking-wider ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                {stat.titulo}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-end justify-between">
+                                        <div>
+                                            <p className={`text-2xl font-bold ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                {stat.count}
+                                            </p>
+                                            <p className={`text-xs ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                Cotizaciones
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className={`text-lg font-semibold ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                {formatCurrency(stat.monto)}
+                                            </p>
+                                            <p className={`text-xs ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                Monto Total
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Gráfico de Evolución */}
+                    <div className={`mb-6 rounded-xl shadow-sm border p-6 ${
+                        isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+                    }`}>
+                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                            <div className="flex items-center gap-2">
+                                <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-900/20 text-blue-400' : 'bg-blue-50 text-blue-600'}`}>
+                                    <FiTrendingUp className="w-5 h-5" />
+                                </div>
+                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                                    Evolución de Ventas
+                                </h3>
+                            </div>
+                            
+                            <div className="flex bg-gray-100 p-1 rounded-lg dark:bg-gray-800">
+                                <button
+                                    onClick={() => setChartPeriod('daily')}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                        chartPeriod === 'daily'
+                                            ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-700 dark:text-blue-400'
+                                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                                    }`}
+                                >
+                                    Últimos 7 días
+                                </button>
+                                <button
+                                    onClick={() => setChartPeriod('weekly')}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                        chartPeriod === 'weekly'
+                                            ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-700 dark:text-blue-400'
+                                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                                    }`}
+                                >
+                                    Últimas 4 semanas
+                                </button>
+                                <button
+                                    onClick={() => setChartPeriod('monthly')}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                        chartPeriod === 'monthly'
+                                            ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-700 dark:text-blue-400'
+                                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                                    }`}
+                                >
+                                    Últimos 12 meses
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="h-[300px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <ComposedChart
+                                    data={getChartData()}
+                                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} vertical={false} />
+                                    <XAxis 
+                                        dataKey="name" 
+                                        stroke={isDarkMode ? '#9ca3af' : '#6b7280'} 
+                                        tick={{ fontSize: 12 }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                    />
+                                    <YAxis 
+                                        yAxisId="left"
+                                        orientation="left"
+                                        stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
+                                        tick={{ fontSize: 12 }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tickFormatter={(value) => `$${value}`}
+                                    />
+                                    <YAxis 
+                                        yAxisId="right"
+                                        orientation="right"
+                                        stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
+                                        tick={{ fontSize: 12 }}
+                                        axisLine={false}
+                                        tickLine={false}
+                                    />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Legend />
+                                    <Bar 
+                                        yAxisId="left"
+                                        dataKey="monto" 
+                                        name="Monto Total" 
+                                        fill="#3b82f6" 
+                                        radius={[4, 4, 0, 0]}
+                                        barSize={40}
+                                    />
+                                    <Line 
+                                        yAxisId="right"
+                                        type="monotone" 
+                                        dataKey="count" 
+                                        name="Cantidad" 
+                                        stroke="#f97316" 
+                                        strokeWidth={3}
+                                        dot={{ r: 4, fill: "#f97316", strokeWidth: 2, stroke: "#fff" }}
+                                        activeDot={{ r: 6 }}
+                                    />
+                                </ComposedChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    {/* Estadísticas Generales */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                         {estadisticasDisplay.map((stat, index) => (
                             <div key={index} className={`rounded-xl shadow-sm border p-6 transition-all duration-300 hover:shadow-lg ${

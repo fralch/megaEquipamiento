@@ -232,11 +232,81 @@ class DashboardController extends Controller
                     ];
                 });
 
+            // --- Gráficos de evolución temporal (Diario, Semanal, Mensual) ---
+            $now = Carbon::now();
+            $baseQuery = Cotizacion::query();
+            if (!$isAdmin) {
+                $baseQuery->where('usuario_id', $usuario->id_usuario);
+            }
+
+            // 1. Diario (Últimos 7 días)
+            $dailyRaw = (clone $baseQuery)
+                ->where('created_at', '>=', $now->copy()->subDays(6)->startOfDay())
+                ->get()
+                ->groupBy(function($date) {
+                    return Carbon::parse($date->created_at)->format('Y-m-d');
+                });
+
+            $dailyChart = [];
+            for ($i = 6; $i >= 0; $i--) {
+                $date = $now->copy()->subDays($i)->format('Y-m-d');
+                $dayData = $dailyRaw->get($date);
+                $dailyChart[] = [
+                    'name' => Carbon::parse($date)->locale('es')->isoFormat('dddd D'),
+                    'full_date' => $date,
+                    'count' => $dayData ? $dayData->count() : 0,
+                    'monto' => $dayData ? $dayData->sum('total') : 0
+                ];
+            }
+
+            // 2. Semanal (Últimas 4 semanas)
+            $weeklyChart = [];
+            for ($i = 3; $i >= 0; $i--) {
+                $startOfWeek = $now->copy()->subWeeks($i)->startOfWeek();
+                $endOfWeek = $now->copy()->subWeeks($i)->endOfWeek();
+                
+                $weekData = (clone $baseQuery)
+                    ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                    ->get();
+
+                $weeklyChart[] = [
+                    'name' => 'Sem ' . $startOfWeek->format('d/m'),
+                    'range' => $startOfWeek->format('d/m') . ' - ' . $endOfWeek->format('d/m'),
+                    'count' => $weekData->count(),
+                    'monto' => $weekData->sum('total')
+                ];
+            }
+
+            // 3. Mensual (Últimos 12 meses)
+            $monthlyChart = [];
+            for ($i = 11; $i >= 0; $i--) {
+                $monthDate = $now->copy()->subMonths($i);
+                $year = $monthDate->year;
+                $month = $monthDate->month;
+
+                $monthData = (clone $baseQuery)
+                    ->whereYear('created_at', $year)
+                    ->whereMonth('created_at', $month)
+                    ->get();
+
+                $monthlyChart[] = [
+                    'name' => $monthDate->locale('es')->isoFormat('MMM YY'),
+                    'full_date' => $monthDate->format('Y-m'),
+                    'count' => $monthData->count(),
+                    'monto' => $monthData->sum('total')
+                ];
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => [
                     'ventas_por_mes' => $ventasPorMes,
                     'cotizaciones_por_estado' => $cotizacionesPorEstado,
+                    'evolution_charts' => [
+                        'daily' => $dailyChart,
+                        'weekly' => $weeklyChart,
+                        'monthly' => $monthlyChart
+                    ]
                 ]
             ]);
 

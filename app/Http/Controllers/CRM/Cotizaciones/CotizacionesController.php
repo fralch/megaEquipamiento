@@ -687,6 +687,33 @@ class CotizacionesController extends Controller
             $enviadas = (clone $baseQuery)->where('estado', 'enviada')->count();
             $rechazadas = (clone $baseQuery)->where('estado', 'rechazada')->count();
 
+            // Estadísticas de seguimiento temporal (basado en fecha de creación)
+            // Estos indicadores son siempre del usuario logueado
+            $personalQuery = Cotizacion::query();
+            if ($usuario) {
+                $personalQuery->where('usuario_id', $usuario->id_usuario);
+            }
+
+            $now = \Carbon\Carbon::now();
+            
+            // Diario (Hoy)
+            $diarioQuery = (clone $personalQuery)->whereDate('created_at', $now->today());
+            $diarioCount = $diarioQuery->count();
+            $diarioMonto = $diarioQuery->sum('total');
+
+            // Semanal (Esta semana)
+            $semanalQuery = (clone $personalQuery)->whereBetween('created_at', [
+                $now->copy()->startOfWeek(), 
+                $now->copy()->endOfWeek()
+            ]);
+            $semanalCount = $semanalQuery->count();
+            $semanalMonto = $semanalQuery->sum('total');
+
+            // Mensual (Este mes)
+            $mensualQuery = (clone $personalQuery)->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year);
+            $mensualCount = $mensualQuery->count();
+            $mensualMonto = $mensualQuery->sum('total');
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -696,6 +723,19 @@ class CotizacionesController extends Controller
                     'aprobadas' => $aprobadas,
                     'enviadas' => $enviadas,
                     'rechazadas' => $rechazadas,
+                    // Indicadores Agregados
+                    'diario' => [
+                        'count' => $diarioCount,
+                        'monto' => $diarioMonto
+                    ],
+                    'semanal' => [
+                        'count' => $semanalCount,
+                        'monto' => $semanalMonto
+                    ],
+                    'mensual' => [
+                        'count' => $mensualCount,
+                        'monto' => $mensualMonto
+                    ]
                 ]
             ]);
         } catch (\Exception $e) {
