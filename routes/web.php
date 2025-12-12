@@ -453,3 +453,23 @@ Route::get('/robots.txt', function () {
         'Content-Type' => 'text/plain'
     ]);
 })->name('robots.txt');
+
+
+
+// Rutas para app de match
+Route::prefix('match-api')->name('match.')->group(function () {
+    // Profile (Now managing Independent Match Users)
+    Route::get('/profile', [\App\Http\Controllers\Match\MatchProfileController::class, 'show'])->name('profile.show');
+    Route::post('/profile', [\App\Http\Controllers\Match\MatchProfileController::class, 'store'])->name('profile.store');
+    Route::match(['put', 'patch'], '/profile', [\App\Http\Controllers\Match\MatchProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/photo', [\App\Http\Controllers\Match\MatchProfileController::class, 'uploadPhoto'])->name('profile.photo');
+
+    // Swipe
+    Route::get('/candidates', [\App\Http\Controllers\Match\MatchSwipeController::class, 'getCandidates'])->name('candidates');
+    Route::post('/swipe', [\App\Http\Controllers\Match\MatchSwipeController::class, 'swipe'])->name('swipe');
+
+    // Matches & Chat
+    Route::get('/matches', [\App\Http\Controllers\Match\MatchController::class, 'index'])->name('matches.index');
+    Route::get('/matches/{id}/messages', [\App\Http\Controllers\Match\MatchController::class, 'getMessages'])->name('matches.messages');
+    Route::post('/matches/{id}/messages', [\App\Http\Controllers\Match\MatchController::class, 'sendMessage'])->name('matches.send');
+});
