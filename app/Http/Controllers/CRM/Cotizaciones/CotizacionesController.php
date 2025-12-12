@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
+use setasign\Fpdi\Fpdi;
 
 class CotizacionesController extends Controller
 {
@@ -1225,14 +1226,79 @@ class CotizacionesController extends Controller
                 'mostrar_firma' => $mostrarFirma,
             ];
 
-            // Generar el PDF
+            // Generar el PDF (DomPDF)
             $pdf = Pdf::loadView('pdf.cotizacion', $data);
             $pdf->setPaper('a4', 'portrait');
 
             // Nombre del archivo
             $filename = 'Cotizacion_' . $cotizacion->numero . '.pdf';
 
-            Log::info("PDF generado correctamente para cotización ID: {$id}. Nombre: {$filename}");
+            // Obtener tipo de condiciones del request
+            $tipoCondiciones = $request->query('tipo_condiciones', 'ventas');
+            
+            // Determinar archivo a usar
+            $condicionesFilename = null;
+            if ($tipoCondiciones === 'ventas') {
+                $condicionesFilename = 'VENTAS_CONDICIONES.pdf';
+            } elseif ($tipoCondiciones === 'calibracion') {
+                $condicionesFilename = 'CALIBRACION_CONDICIONES.pdf';
+            }
+            
+            // Ruta del archivo de condiciones
+            $condicionesPath = $condicionesFilename ? public_path('docs/' . $condicionesFilename) : null;
+            
+            // Variable para el path temporal, para poder eliminarlo en finally o después
+            $tempPath = null;
+
+            if ($condicionesPath && file_exists($condicionesPath)) {
+                try {
+                    Log::info("Fusionando con archivo de condiciones: {$condicionesPath}");
+                    
+                    // Guardar el PDF generado temporalmente
+                    $tempPath = tempnam(sys_get_temp_dir(), 'cotizacion_temp_' . $id . '_');
+                    file_put_contents($tempPath, $pdf->output());
+
+                    // Iniciar FPDI
+                    $fpdi = new Fpdi();
+
+                    // Importar páginas del PDF generado (Cotización)
+                    $pageCount = $fpdi->setSourceFile($tempPath);
+                    for ($i = 1; $i <= $pageCount; $i++) {
+                        $templateId = $fpdi->importPage($i);
+                        $size = $fpdi->getTemplateSize($templateId);
+                        $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                        $fpdi->useTemplate($templateId);
+                    }
+
+                    // Importar páginas del PDF de condiciones
+                    $pageCountCondiciones = $fpdi->setSourceFile($condicionesPath);
+                    for ($i = 1; $i <= $pageCountCondiciones; $i++) {
+                        $templateId = $fpdi->importPage($i);
+                        $size = $fpdi->getTemplateSize($templateId);
+                        $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                        $fpdi->useTemplate($templateId);
+                    }
+
+                    Log::info("PDF fusionado correctamente para cotización ID: {$id}. Nombre: {$filename}");
+                    
+                    return response($fpdi->Output('S'), 200, [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+                    ]);
+
+                } catch (\Exception $e) {
+                    Log::error("Error al fusionar PDFs: " . $e->getMessage());
+                    // Si falla la fusión, intentar devolver al menos la cotización sola
+                    return $pdf->download($filename);
+                } finally {
+                    // Limpiar archivo temporal
+                    if ($tempPath && file_exists($tempPath)) {
+                        unlink($tempPath);
+                    }
+                }
+            }
+
+            Log::info("PDF generado correctamente para cotización ID: {$id}. Nombre: {$filename} (Sin condiciones)");
             return $pdf->download($filename);
         } catch (\Exception $e) {
             Log::error('Error al exportar cotización a PDF en CotizacionesController@exportPdf');

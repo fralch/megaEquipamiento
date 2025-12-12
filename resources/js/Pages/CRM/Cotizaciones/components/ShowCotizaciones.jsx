@@ -6,6 +6,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
     const { isDarkMode } = useTheme();
     const [isExporting, setIsExporting] = useState(false);
     const [mostrarFirma, setMostrarFirma] = useState(true);
+    const [tipoCondiciones, setTipoCondiciones] = useState('ventas');
 
     if (!isOpen || !cotizacion) return null;
 
@@ -60,7 +61,8 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
 
         try {
             const urlParams = new URLSearchParams({
-                mostrar_firma: mostrarFirma ? '1' : '0'
+                mostrar_firma: mostrarFirma ? '1' : '0',
+                tipo_condiciones: tipoCondiciones
             });
             const endpointUrl = `/crm/cotizaciones/${cotizacion.id}/export-pdf?${urlParams.toString()}`;
             
@@ -388,6 +390,20 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                     isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-gray-50'
                 }`}>
                     <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <select
+                                value={tipoCondiciones}
+                                onChange={(e) => setTipoCondiciones(e.target.value)}
+                                className={`text-sm rounded border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 ${
+                                    isDarkMode ? 'bg-gray-800 text-white border-gray-600' : 'bg-white text-gray-700'
+                                }`}
+                            >
+                                <option value="ventas">Condiciones de Venta</option>
+                                <option value="calibracion">Condiciones de Calibración</option>
+                                <option value="none">Sin condiciones</option>
+                            </select>
+                        </div>
+
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
                                 type="checkbox"
@@ -396,7 +412,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                                 className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
                             />
                             <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                Incluir firma en PDF
+                                Incluir firma
                             </span>
                         </label>
                         
