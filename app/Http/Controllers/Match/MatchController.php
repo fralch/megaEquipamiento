@@ -12,15 +12,13 @@ class MatchController extends Controller
 {
     private function getCurrentUser()
     {
-        $id = request('user_id');
-        if (!$id) return null;
-        return MatchUser::find($id);
+        return auth()->user();
     }
 
     public function index()
     {
         $currentUser = $this->getCurrentUser();
-        if (!$currentUser) return response()->json(['message' => 'User required (user_id)'], 401);
+        if (!$currentUser) return response()->json(['message' => 'Unauthorized'], 401);
         
         // Find pairs where I am p1 or p2
         $matches = MatchPair::where(function($q) use ($currentUser) {

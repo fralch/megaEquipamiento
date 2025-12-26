@@ -2,16 +2,32 @@
 
 namespace App\Models\Match;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 
-class MatchUser extends Model
+class MatchUser extends Authenticatable
 {
+    use HasApiTokens, Notifiable;
+
     protected $table = 'match_users';
     
     protected $fillable = [
-        'name', 'age', 'gender', 'description', 
+        'name', 'email', 'password', 'age', 'gender', 'description', 
         'interested_in', 'instagram', 'whatsapp'
     ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+        ];
+    }
 
     public function photos()
     {

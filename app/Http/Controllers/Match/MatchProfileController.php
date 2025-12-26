@@ -9,13 +9,9 @@ use Illuminate\Support\Facades\Storage;
 
 class MatchProfileController extends Controller
 {
-    // Helper to get current MatchUser from request
-    // Since we don't have auth, we expect ?user_id=X
     private function getCurrentUser()
     {
-        $id = request('user_id');
-        if (!$id) return null;
-        return MatchUser::find($id);
+        return auth()->user();
     }
 
     public function show(Request $request)
@@ -23,40 +19,16 @@ class MatchProfileController extends Controller
         $user = $this->getCurrentUser();
         
         if (!$user) {
-            return response()->json(['message' => 'User not found or user_id missing', 'exists' => false], 404);
+            return response()->json(['message' => 'Unauthorized'], 401);
         }
         
         $user->load('photos');
-        $user->exists = true; 
         return response()->json($user);
     }
 
     public function store(Request $request)
     {
-        // Validation simplified as requested
-        $data = $request->validate([
-            'age' => 'required|integer|min:18',
-            'gender' => 'required|string',
-            'description' => 'nullable|string',
-            'interested_in' => 'required|string',
-            'instagram' => 'nullable|string', 
-            'whatsapp' => 'nullable|string',
-            // Optional fields not strictly in list but good to have
-            'name' => 'nullable|string', 
-        ]);
-
-        // Logic to update if exists (if user_id provided) or create new
-        if ($request->has('user_id')) {
-             $user = MatchUser::find($request->user_id);
-             if ($user) {
-                 $user->update($data);
-                 return response()->json($user);
-             }
-        }
-        
-        // Create new
-        $user = MatchUser::create($data);
-        return response()->json($user);
+        return response()->json(['message' => 'Please use /register to create an account'], 405);
     }
 
     public function update(Request $request)

@@ -12,15 +12,13 @@ class MatchSwipeController extends Controller
 {
     private function getCurrentUser()
     {
-        $id = request('user_id');
-        if (!$id) return null;
-        return MatchUser::find($id);
+        return auth()->user();
     }
 
     public function getCandidates(Request $request)
     {
         $currentUser = $this->getCurrentUser();
-        if (!$currentUser) return response()->json(['message' => 'User required (user_id)'], 400);
+        if (!$currentUser) return response()->json(['message' => 'Unauthorized'], 401);
         
         // Get IDs of profiles already swiped
         $swipedIds = MatchSwipe::where('swiper_id', $currentUser->id)->pluck('swiped_id');
@@ -44,7 +42,7 @@ class MatchSwipeController extends Controller
     public function swipe(Request $request)
     {
         $currentUser = $this->getCurrentUser();
-        if (!$currentUser) return response()->json(['message' => 'User required (user_id)'], 400);
+        if (!$currentUser) return response()->json(['message' => 'Unauthorized'], 401);
 
         $request->validate([
             'swiped_profile_id' => 'required|exists:match_users,id',

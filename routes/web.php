@@ -458,18 +458,28 @@ Route::get('/robots.txt', function () {
 
 // Rutas para app de match
 Route::prefix('match-api')->name('match.')->group(function () {
-    // Profile (Now managing Independent Match Users)
-    Route::get('/profile', [\App\Http\Controllers\Match\MatchProfileController::class, 'show'])->name('profile.show');
-    Route::post('/profile', [\App\Http\Controllers\Match\MatchProfileController::class, 'store'])->name('profile.store');
-    Route::match(['put', 'patch'], '/profile', [\App\Http\Controllers\Match\MatchProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/photo', [\App\Http\Controllers\Match\MatchProfileController::class, 'uploadPhoto'])->name('profile.photo');
+    // Auth Routes
+    Route::post('/register', [\App\Http\Controllers\Match\MatchAuthController::class, 'register'])->name('register');
+    Route::post('/login', [\App\Http\Controllers\Match\MatchAuthController::class, 'login'])->name('login');
+    
+    Route::middleware('auth:sanctum')->group(function() {
+        Route::post('/logout', [\App\Http\Controllers\Match\MatchAuthController::class, 'logout'])->name('logout');
+        Route::get('/me', [\App\Http\Controllers\Match\MatchAuthController::class, 'me'])->name('me');
+        
+        // Profile (Now managing Independent Match Users)
+        Route::get('/profile', [\App\Http\Controllers\Match\MatchProfileController::class, 'show'])->name('profile.show');
+        // store is deprecated in favor of register
+        Route::post('/profile', [\App\Http\Controllers\Match\MatchProfileController::class, 'store'])->name('profile.store');
+        Route::match(['put', 'patch'], '/profile', [\App\Http\Controllers\Match\MatchProfileController::class, 'update'])->name('profile.update');
+        Route::post('/profile/photo', [\App\Http\Controllers\Match\MatchProfileController::class, 'uploadPhoto'])->name('profile.photo');
 
-    // Swipe
-    Route::get('/candidates', [\App\Http\Controllers\Match\MatchSwipeController::class, 'getCandidates'])->name('candidates');
-    Route::post('/swipe', [\App\Http\Controllers\Match\MatchSwipeController::class, 'swipe'])->name('swipe');
+        // Swipe
+        Route::get('/candidates', [\App\Http\Controllers\Match\MatchSwipeController::class, 'getCandidates'])->name('candidates');
+        Route::post('/swipe', [\App\Http\Controllers\Match\MatchSwipeController::class, 'swipe'])->name('swipe');
 
-    // Matches & Chat
-    Route::get('/matches', [\App\Http\Controllers\Match\MatchController::class, 'index'])->name('matches.index');
-    Route::get('/matches/{id}/messages', [\App\Http\Controllers\Match\MatchController::class, 'getMessages'])->name('matches.messages');
-    Route::post('/matches/{id}/messages', [\App\Http\Controllers\Match\MatchController::class, 'sendMessage'])->name('matches.send');
+        // Matches & Chat
+        Route::get('/matches', [\App\Http\Controllers\Match\MatchController::class, 'index'])->name('matches.index');
+        Route::get('/matches/{id}/messages', [\App\Http\Controllers\Match\MatchController::class, 'getMessages'])->name('matches.messages');
+        Route::post('/matches/{id}/messages', [\App\Http\Controllers\Match\MatchController::class, 'sendMessage'])->name('matches.send');
+    });
 });
