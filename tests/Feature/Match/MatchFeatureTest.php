@@ -255,4 +255,27 @@ class MatchFeatureTest extends TestCase
         $this->assertCount(1, $response->json());
         $this->assertEquals('Hello there!', $response->json()[0]['content']);
     }
+
+    public function test_get_profile_returns_photo()
+    {
+        Storage::fake('public');
+        $user = MatchUser::create([
+            'email' => 'photo_get@example.com',
+            'password' => 'secret123',
+            'name' => 'Photo User Get',
+            'age' => 20,
+            'gender' => 'male',
+            'interested_in' => 'female',
+            'description' => 'Test'
+        ]);
+        
+        $user->photos()->create(['url' => '/storage/test.jpg', 'order' => 0]);
+
+        Sanctum::actingAs($user, ['*']);
+
+        $response = $this->getJson(route('match.profile.show'));
+        
+        $response->assertStatus(200);
+        $this->assertEquals('/storage/test.jpg', $response->json('photo'));
+    }
 }

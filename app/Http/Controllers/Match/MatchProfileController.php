@@ -23,6 +23,7 @@ class MatchProfileController extends Controller
         }
         
         $user->load('photos');
+        $user->photo = $user->photos->first() ? $user->photos->first()->url : null;
         return response()->json($user);
     }
 
@@ -37,6 +38,9 @@ class MatchProfileController extends Controller
         if (!$user) return response()->json(['message' => 'User not found'], 404);
         
         $user->update($request->all());
+        
+        $user->load('photos');
+        $user->photo = $user->photos->first() ? $user->photos->first()->url : null;
         
         return response()->json($user);
     }
