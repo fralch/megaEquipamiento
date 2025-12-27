@@ -17,14 +17,27 @@ class MatchProfileController extends Controller
     public function show(Request $request)
     {
         $user = $this->getCurrentUser();
-        
+
         if (!$user) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
-        
+
         $user->load('photos');
-        $user->photo = $user->photos->first() ? $user->photos->first()->url : null;
-        return response()->json($user);
+
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'age' => $user->age,
+            'gender' => $user->gender,
+            'description' => $user->description,
+            'interested_in' => $user->interested_in,
+            'instagram' => $user->instagram,
+            'whatsapp' => $user->whatsapp,
+            'photos' => $user->photos,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+        ]);
     }
 
     public function store(Request $request)
@@ -38,9 +51,6 @@ class MatchProfileController extends Controller
         if (!$user) return response()->json(['message' => 'User not found'], 404);
         
         $user->update($request->all());
-        
-        $user->load('photos');
-        $user->photo = $user->photos->first() ? $user->photos->first()->url : null;
         
         return response()->json($user);
     }

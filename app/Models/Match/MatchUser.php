@@ -31,7 +31,7 @@ class MatchUser extends Authenticatable
 
     public function photos()
     {
-        return $this->hasMany(MatchPhoto::class)->orderBy('order');
+        return $this->hasMany(MatchPhoto::class, 'match_user_id')->orderBy('order');
     }
 
     public function swipes_made()
