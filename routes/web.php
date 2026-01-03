@@ -477,6 +477,9 @@ Route::prefix('match-api')->name('match.')->group(function () {
         Route::get('/candidates', [\App\Http\Controllers\Match\MatchSwipeController::class, 'getCandidates'])->name('candidates');
         Route::post('/swipe', [\App\Http\Controllers\Match\MatchSwipeController::class, 'swipe'])->name('swipe');
 
+        // Instagram Integration
+        Route::get('/instagram/profile-picture', [\App\Http\Controllers\Match\MatchInstagramController::class, 'getProfilePicture'])->name('instagram.picture');
+
         // Matches & Chat
         Route::get('/matches', [\App\Http\Controllers\Match\MatchController::class, 'index'])->name('matches.index');
         Route::get('/matches/{id}/profile', [\App\Http\Controllers\Match\MatchController::class, 'getMatchProfile'])->name('matches.profile');
