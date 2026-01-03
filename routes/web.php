@@ -461,6 +461,9 @@ Route::prefix('match-api')->name('match.')->group(function () {
     // Auth Routes
     Route::post('/register', [\App\Http\Controllers\Match\MatchAuthController::class, 'register'])->name('register');
     Route::post('/login', [\App\Http\Controllers\Match\MatchAuthController::class, 'login'])->name('login');
+
+    // Instagram Integration (Public)
+    Route::get('/instagram/profile-picture', [\App\Http\Controllers\Match\MatchInstagramController::class, 'getProfilePicture'])->name('instagram.picture');
     
     Route::middleware('auth:sanctum')->group(function() {
         Route::post('/logout', [\App\Http\Controllers\Match\MatchAuthController::class, 'logout'])->name('logout');
@@ -476,9 +479,6 @@ Route::prefix('match-api')->name('match.')->group(function () {
         // Swipe
         Route::get('/candidates', [\App\Http\Controllers\Match\MatchSwipeController::class, 'getCandidates'])->name('candidates');
         Route::post('/swipe', [\App\Http\Controllers\Match\MatchSwipeController::class, 'swipe'])->name('swipe');
-
-        // Instagram Integration
-        Route::get('/instagram/profile-picture', [\App\Http\Controllers\Match\MatchInstagramController::class, 'getProfilePicture'])->name('instagram.picture');
 
         // Matches & Chat
         Route::get('/matches', [\App\Http\Controllers\Match\MatchController::class, 'index'])->name('matches.index');
