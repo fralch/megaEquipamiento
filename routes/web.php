@@ -479,6 +479,7 @@ Route::prefix('match-api')->name('match.')->group(function () {
 
         // Matches & Chat
         Route::get('/matches', [\App\Http\Controllers\Match\MatchController::class, 'index'])->name('matches.index');
+        Route::get('/matches/{id}/profile', [\App\Http\Controllers\Match\MatchController::class, 'getMatchProfile'])->name('matches.profile');
         Route::get('/matches/{id}/messages', [\App\Http\Controllers\Match\MatchController::class, 'getMessages'])->name('matches.messages');
         Route::post('/matches/{id}/messages', [\App\Http\Controllers\Match\MatchController::class, 'sendMessage'])->name('matches.send');
     });

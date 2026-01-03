@@ -34,6 +34,7 @@ class MatchController extends Controller
                 $other = $pair->user_1_id === $currentUser->id ? $pair->user2 : $pair->user1;
                 
                 if($other) {
+                    $other->photo = $other->photos->first() ? $other->photos->first()->url : null;
                     $pair->other_profile = $other;
                 }
                 
@@ -43,6 +44,22 @@ class MatchController extends Controller
             });
             
         return response()->json($matches);
+    }
+
+    public function getMatchProfile($id)
+    {
+        $currentUser = $this->getCurrentUser();
+        if (!$currentUser) return response()->json(['message' => 'Unauthorized'], 401);
+
+        $pair = MatchPair::with(['user1.photos', 'user2.photos'])->findOrFail($id);
+        
+        if ($pair->user_1_id !== $currentUser->id && $pair->user_2_id !== $currentUser->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $otherProfile = $pair->user_1_id === $currentUser->id ? $pair->user2 : $pair->user1;
+        
+        return response()->json($otherProfile);
     }
 
     public function getMessages($id)
