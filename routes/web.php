@@ -49,7 +49,7 @@ Route::get('/marcas/{id}', [ProductoController::class, 'ProductViewByMarca'])->n
 Route::get('/sector/{id_tag_parent}', [SectorController::class, 'show'])->name('sector.view');
 Route::get('/sectores', [SectorController::class, 'index'])->name('sectores.index');
 Route::get('/contacto', function () { return Inertia::render('Contacto'); })->name('contacto.view');
-Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
+Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware(['auth', \App\Http\Middleware\CheckAdminRole::class]);
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
 
 // Ruta pública para previsualizar la vista HTML de cotización (solo entorno local)

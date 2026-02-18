@@ -70,7 +70,7 @@ const Menu = ({ toggleMenu }) => {
                             </span>
                         </a>
                     </li>
-                    {auth.user && (
+                    {auth.user && auth.user.nombre_usuario === 'Admin' && (
                         <li className="relative hidden md:block w-full md:w-auto mb-2 md:mb-0">
                             <Link
                                 href="/crear"
