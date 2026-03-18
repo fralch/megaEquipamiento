@@ -59,7 +59,7 @@ class Cotizacion extends Model
 
         static::creating(function ($cotizacion) {
             if (!$cotizacion->numero) {
-                $cotizacion->numero = self::generarNumeroCotizacion();
+                $cotizacion->numero = self::generarNumeroCotizacion($cotizacion);
             }
         });
     }
@@ -67,9 +67,40 @@ class Cotizacion extends Model
     /**
      * Genera un número de cotización único
      */
-    private static function generarNumeroCotizacion()
+    private static function generarNumeroCotizacion($cotizacion)
     {
-        $year = date('Y');
+        // Obtener la empresa emisora
+        $miEmpresa = NuestraEmpresa::find($cotizacion->miempresa_id);
+        
+        if ($miEmpresa) {
+            $prefix = $miEmpresa->codigo_cotizacion ?: 'COT';
+            $nextNumber = ($miEmpresa->contador_cotizacion ?: 0) + 1;
+            
+            // Determinar el año: usar configuración de empresa si existe, sino año de fecha cotización
+            if ($miEmpresa->anio_cotizacion) {
+                $year = $miEmpresa->anio_cotizacion;
+            } else {
+                $date = $cotizacion->fecha_cotizacion 
+                    ? \Carbon\Carbon::parse($cotizacion->fecha_cotizacion) 
+                    : now();
+                $year = $date->format('Y');
+            }
+            
+            // Actualizar el contador de la empresa
+            $miEmpresa->contador_cotizacion = $nextNumber;
+            $miEmpresa->save();
+            
+            // Formato: PREFIJO-NUMERO(8 digitos)-AÑO
+            // Ejemplo: EIIL-00000123-2025
+            return sprintf('%s-%08d-%s', $prefix, $nextNumber, $year);
+        }
+        
+        // Fallback si no hay empresa o configuración (comportamiento anterior)
+        $date = $cotizacion->fecha_cotizacion 
+            ? \Carbon\Carbon::parse($cotizacion->fecha_cotizacion) 
+            : now();
+        $year = $date->format('Y');
+
         $lastCotizacion = self::where('numero', 'like', "COT-{$year}-%")
             ->orderBy('numero', 'desc')
             ->first();

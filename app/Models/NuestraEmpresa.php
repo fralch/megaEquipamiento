@@ -20,6 +20,9 @@ class NuestraEmpresa extends Model
         'imagen_logo',
         'imagen_firma',
         'id_usuario',
+        'codigo_cotizacion',
+        'contador_cotizacion',
+        'anio_cotizacion',
     ];
 
     protected $casts = [

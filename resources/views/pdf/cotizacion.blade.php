@@ -95,13 +95,14 @@
         
         .brand-logo {
             margin-bottom: 8px; /* Aumentado para dar más espacio al logo más grande */
+            width: 100%;
+            text-align: center;
         }
         
         .brand-logo img {
-            max-width: 500px; /* Aumentado de 200px a 500px */
-            max-height: 140px; /* Aumentado de 65px a 140px */
-            width: auto;
-            height: auto;
+            width: 95%; /* Ocupar el 90% del ancho disponible */
+            max-width: 100%;
+            height: auto; /* Mantener proporción */
             display: block;
             margin: 0 auto;
         }
@@ -262,34 +263,45 @@
                         </div>
                     @endif
                    
-                    <div class="company-ruc" style="display: flex; justify-content: space-between; font-size: 12px;">
-                        <span><span class="font-bold">RUC:</span> {{ $empresa['ruc'] ?? '—' }}</span>
-                        <span style="color: red;"><span class="font-bold">NUMERO DE COTIZACIÓN:</span> {{ $cotizacion->numero }}</span>
-                    </div>
                 </div>
             </div>
             
-            <hr>
+
             
             <!-- Información comercial -->
-            <div class="commercial-info">
-                <div class="info-column">
-                    <span><span class="font-bold">ASESOR COMERCIAL:</span> {{ $vendedor->nombre ?? '—' }}</span>
-                    <span><span class="font-bold">TELEFONO:</span> {{ $vendedor->telefono ?? '—' }}</span>
-                    <span><span class="font-bold">CORREO:</span> {{ $vendedor->correo ?? '—' }}</span>
-                    <span><span class="font-bold">FECHA:</span> {{ \Carbon\Carbon::parse($cotizacion->fecha_cotizacion)->format('d/m/Y') }}</span>
-                    <span><span class="font-bold">VALIDEZ:</span> Válido hasta {{ \Carbon\Carbon::parse($cotizacion->fecha_vencimiento)->format('d/m/Y') }}</span>
-                </div>
-                <div class="info-column">
-                    <span><span class="font-bold">CLIENTE:</span> {{ $cliente->nombre }}</span>
-                    @if($cliente->tipo == 'empresa')
-                        <span><span class="font-bold">CONTACTO:</span> {{ $cliente->contacto ?? '—' }}</span>
-                    @endif
-                    <span><span class="font-bold">CORREO:</span> {{ $cliente->email ?? '—' }}</span>
-                    <span><span class="font-bold">TELEFONO:</span> {{ $cliente->telefono ?? '—' }}</span>
-                    <span><span class="font-bold">RUC:</span> {{ $cliente->ruc ?? $cliente->ruc_dni ?? '—' }}</span>
-                </div>
-            </div>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px;">
+                <tr>
+                    <td style="width: 50%; vertical-align: top;">
+                        <div style="margin-bottom: 3px;"><span class="font-bold">RUC:</span> {{ $empresa['ruc'] ?? '—' }}</div>
+                    </td>
+                    <td style="width: 50%; vertical-align: top;">
+                        <div style="margin-bottom: 3px; color: black;"><span class="font-bold">NUMERO DE COTIZACIÓN:</span><span style="color: red;"> {{ $cotizacion->numero }}</span></div>
+                    </td>
+                </tr>
+            </table>
+
+         <hr>
+
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                <tr>
+                    <td style="width: 50%; vertical-align: top;">
+                        <div style="margin-bottom: 1px;"><span class="font-bold">ASESOR COMERCIAL:</span> {{ $vendedor->nombre ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">TELEFONO:</span> {{ $vendedor->telefono ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">CORREO:</span> {{ $vendedor->correo ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">FECHA:</span> {{ \Carbon\Carbon::parse($cotizacion->fecha_cotizacion)->format('d/m/Y') }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">VALIDEZ:</span> Válido hasta {{ \Carbon\Carbon::parse($cotizacion->fecha_vencimiento)->format('d/m/Y') }}</div>
+                    </td>
+                    <td style="width: 50%; vertical-align: top;">
+                        <div style="margin-bottom: 1px;"><span class="font-bold">CLIENTE:</span> {{ $cliente->nombre }}</div>
+                        @if($cliente->tipo == 'empresa')
+                            <div style="margin-bottom: 1px;"><span class="font-bold">CONTACTO:</span> {{ $cliente->contacto ?? '—' }}</div>
+                        @endif
+                        <div style="margin-bottom: 1px;"><span class="font-bold">CORREO:</span> {{ $cliente->email ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">TELEFONO:</span> {{ $cliente->telefono ?? '—' }}</div>
+                        <div style="margin-bottom: 1px;"><span class="font-bold">RUC:</span> {{ $cliente->ruc ?? $cliente->ruc_dni ?? '—' }}</div>
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 
@@ -301,11 +313,19 @@
                     {{ $producto['nombre'] }}
                 </div>
                 <div class="product-content">
-                    <div class="product-image">
-                         @if(!empty($producto['imagen']))
-                            <img src="{{ $producto['imagen'] }}" alt="{{ $producto['nombre'] }}">
-                        @endif
-                    </div>
+                    @php
+                        $imgInfo = $producto['imagen'] ?? null;
+                        $esUrl = filter_var($imgInfo, FILTER_VALIDATE_URL);
+                        $esBase64 = \Illuminate\Support\Str::startsWith($imgInfo, 'data:image');
+                        $existeArchivo = !$esUrl && !$esBase64 && !empty($imgInfo) && file_exists($imgInfo) && is_file($imgInfo);
+                        $mostrarImagen = !empty($imgInfo) && ($esUrl || $esBase64 || $existeArchivo);
+                    @endphp
+
+                    @if($mostrarImagen)
+                        <div class="product-image">
+                            <img src="{{ $imgInfo }}" alt="">
+                        </div>
+                    @endif
 
                     @if(!empty($producto['descripcion']))
                         <div class="section-title">Descripcion:</div>
@@ -394,11 +414,19 @@
                         {{ $producto_adicional['nombre'] }}
                     </div>
                     <div class="product-content">
-                        <div class="product-image">
-                             @if(!empty($producto_adicional['imagen']))
-                                <img src="{{ $producto_adicional['imagen'] }}" alt="{{ $producto_adicional['nombre'] }}">
-                            @endif
-                        </div>
+                        @php
+                            $imgInfoAdicional = $producto_adicional['imagen'] ?? null;
+                            $esUrlAdicional = filter_var($imgInfoAdicional, FILTER_VALIDATE_URL);
+                            $esBase64Adicional = \Illuminate\Support\Str::startsWith($imgInfoAdicional, 'data:image');
+                            $existeArchivoAdicional = !$esUrlAdicional && !$esBase64Adicional && !empty($imgInfoAdicional) && file_exists($imgInfoAdicional) && is_file($imgInfoAdicional);
+                            $mostrarImagenAdicional = !empty($imgInfoAdicional) && ($esUrlAdicional || $esBase64Adicional || $existeArchivoAdicional);
+                        @endphp
+
+                        @if($mostrarImagenAdicional)
+                            <div class="product-image">
+                                <img src="{{ $imgInfoAdicional }}" alt="">
+                            </div>
+                        @endif
 
                         @if(!empty($producto_adicional['descripcion']))
                             <div class="section-title">Descripcion:</div>
@@ -482,6 +510,15 @@
 
         <div class="totals-section">
             <div class="page-break">
+                @php
+                    $monedaSymbol = $cotizacion->moneda == 'dolares' ? '$' : 'S/';
+                    $totalGeneral = $productos->sum('subtotal');
+                    if(isset($productos_adicionales)) {
+                        $totalGeneral += $productos_adicionales->sum('subtotal');
+                    }
+                    $igv = $totalGeneral * 0.18;
+                    $totalFinal = $totalGeneral + $igv;
+                @endphp
                 <div class="bg-red text-center font-bold" style="padding: 6px; border-radius: 3px;">
                     RESUMEN Y TOTALES
                 </div>
@@ -518,7 +555,7 @@
                         @endif
                         <tr>
                             <td colspan="3" class="text-right font-bold">Total productos</td>
-                            <td class="text-right font-bold">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
+                            <td class="text-right font-bold">{{ $monedaSymbol }} {{ number_format((float) $totalGeneral, 2) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -528,15 +565,15 @@
                     <tbody>
                         <tr>
                             <td class="font-bold">SUBTOTAL</td>
-                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos, 2) }}</td>
+                            <td class="text-right">{{ $monedaSymbol }} {{ number_format((float) $totalGeneral, 2) }}</td>
                         </tr>
                         <tr>
                             <td class="font-bold">IGV (18%)</td>
-                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 0.18, 2) }}</td>
+                            <td class="text-right">{{ $monedaSymbol }} {{ number_format((float) $igv, 2) }}</td>
                         </tr>
                         <tr>
                             <td class="font-bold bg-dark">TOTAL</td>
-                            <td class="text-right font-bold bg-dark">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $cotizacion->total_monto_productos * 1.18, 2) }}</td>
+                            <td class="text-right font-bold bg-dark">{{ $monedaSymbol }} {{ number_format((float) $totalFinal, 2) }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -546,7 +583,7 @@
 
         <!-- Footer - Solo al final del documento -->
         <div class="footer">
-            @if($empresa && !empty($empresa['imagen_firma']))
+            @if($empresa && !empty($empresa['imagen_firma']) && (isset($mostrar_firma) ? $mostrar_firma : true))
                 <div class="signature-container">
                     <img src="{{ public_path($empresa['imagen_firma']) }}" alt="Firma">
                 </div>

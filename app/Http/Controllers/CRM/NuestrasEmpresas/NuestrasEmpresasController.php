@@ -80,6 +80,9 @@ class NuestrasEmpresasController extends Controller
             'telefono' => 'nullable|string|max:20',
             'ruc' => 'nullable|string|max:11|unique:nuestras_empresas,ruc',
             'id_usuario' => 'nullable|exists:usuarios,id_usuario',
+            'codigo_cotizacion' => 'nullable|string|max:10',
+            'contador_cotizacion' => 'nullable|integer|min:0',
+            'anio_cotizacion' => 'nullable|string|max:4',
             'imagen_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'imagen_firma' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
@@ -186,6 +189,9 @@ class NuestrasEmpresasController extends Controller
                     Rule::unique('nuestras_empresas', 'ruc')->ignore($empresa->id)
                 ],
                 'id_usuario' => 'nullable|exists:usuarios,id_usuario',
+                'codigo_cotizacion' => 'nullable|string|max:10',
+                'contador_cotizacion' => 'nullable|integer|min:0',
+                'anio_cotizacion' => 'nullable|string|max:4',
                 'imagen_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'imagen_firma' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ], [

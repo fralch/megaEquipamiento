@@ -9,11 +9,17 @@ import {
 import { useTheme } from '../../storage/ThemeContext';
 import { useCRM } from '../../storage/CRMContext';
 import NotificacionesCotizaciones from '../../Components/CRM/Notificaciones/NotificacionesCotizaciones';
+import Swal from 'sweetalert2';
 
-export default function CRMLayout({ children, title }) {
-    const { auth } = usePage().props;
+export default function CRMLayout({ children, title, notifications }) {
+    const { auth, notificationStats } = usePage().props;
     const { isDarkMode, toggleDarkMode } = useTheme();
     const { expandedMenus, toggleMenu } = useCRM();
+
+    // Priorizar stats globales, fallback a props locales si existen
+    const activeStats = notificationStats || notifications;
+    const dangerCount = activeStats?.dangerCount || 0;
+    const warningCount = activeStats?.warningCount || 0;
 
     // Función para generar iniciales del usuario
     const getUserInitials = (name) => {
@@ -94,6 +100,26 @@ export default function CRMLayout({ children, title }) {
         "COTIZACIONES": "/crm/cotizaciones"
     };
 
+    // Items del menú (sin filtrar para mostrar todo)
+    const filteredMenuItems = menuItems;
+
+    const handleNavigation = (url, itemKey) => {
+        if (itemKey === "usuarios-roles") {
+            const roleName = auth?.user?.rol?.nombre_rol?.toLowerCase();
+            if (roleName !== 'admin') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Acceso denegado',
+                    text: 'No tiene permisos para acceder a este módulo',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+            }
+        }
+        router.visit(url);
+    };
+
     return (
         <div className={`min-h-screen transition-colors duration-300 ${
             isDarkMode ? 'bg-gray-950' : 'bg-gray-50'
@@ -144,7 +170,7 @@ export default function CRMLayout({ children, title }) {
                 {/* Navigation Menu */}
                 <nav className="p-4 flex-1 overflow-y-auto">
                     <div className="space-y-2">
-                        {menuItems.map((item, index) => (
+                        {filteredMenuItems.map((item, index) => (
                             <div key={index} className="mb-2">
                                 <div
                                     onClick={() => toggleMenu(item.key)}
@@ -167,7 +193,7 @@ export default function CRMLayout({ children, title }) {
                                         {item.items.map((subItem, subIndex) => (
                                             <div
                                                 key={subIndex}
-                                                onClick={() => router.visit(routeMap[subItem])}
+                                                onClick={() => handleNavigation(routeMap[subItem], item.key)}
                                                 className={`px-4 py-2 text-sm rounded-lg cursor-pointer transition-colors duration-200 ${
                                                     isDarkMode ? 'text-gray-400 hover:text-blue-400 hover:bg-gray-800' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'
                                                 }`}
@@ -199,7 +225,30 @@ export default function CRMLayout({ children, title }) {
                                     Panel de Control del Sistema CRM
                                 </p>
                             </div>
+
                             <div className="flex items-center gap-4">
+                                {/* Global Notifications - Alerts */}
+                                {(dangerCount > 0 || warningCount > 0) && (
+                                    <div className="hidden md:flex items-center gap-2 mr-2">
+                                        {dangerCount > 0 && (
+                                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                                isDarkMode ? 'bg-red-900/40 text-red-300 border border-red-800' : 'bg-red-50 text-red-700 border border-red-100'
+                                            }`}>
+                                                <FiAlertCircle className="w-3.5 h-3.5" />
+                                                <span>{dangerCount} vencidas</span>
+                                            </div>
+                                        )}
+                                        {warningCount > 0 && (
+                                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                                                isDarkMode ? 'bg-yellow-900/40 text-yellow-300 border border-yellow-800' : 'bg-yellow-50 text-yellow-700 border border-yellow-100'
+                                            }`}>
+                                                <FiAlertTriangle className="w-3.5 h-3.5" />
+                                                <span>{warningCount} por vencer</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 {/* Theme Toggle Button */}
                                 <button
                                     onClick={toggleDarkMode}

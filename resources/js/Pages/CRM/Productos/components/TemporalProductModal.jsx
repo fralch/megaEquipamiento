@@ -19,6 +19,8 @@ export default function TemporalProductModal({ isOpen, onClose, onSave }) {
     });
     const [previewImages, setPreviewImages] = useState([]);
     const [errors, setErrors] = useState({});
+    const [marcaSearch, setMarcaSearch] = useState('');
+    const [showMarcaSuggestions, setShowMarcaSuggestions] = useState(false);
 
     // Cargar marcas al abrir el modal
     useEffect(() => {
@@ -55,6 +57,21 @@ export default function TemporalProductModal({ isOpen, onClose, onSave }) {
             ...prev,
             especificaciones_tecnicas: value
         }));
+    };
+
+    const handleMarcaSearchChange = (e) => {
+        const value = e.target.value;
+        setMarcaSearch(value);
+        if (formData.marca_id) {
+            setFormData(prev => ({ ...prev, marca_id: '' }));
+        }
+        setShowMarcaSuggestions(value.length >= 1);
+    };
+
+    const selectMarca = (marca) => {
+        setFormData(prev => ({ ...prev, marca_id: marca.id_marca }));
+        setMarcaSearch(marca.nombre);
+        setShowMarcaSuggestions(false);
     };
 
     const handleImageChange = (e) => {
@@ -165,6 +182,8 @@ export default function TemporalProductModal({ isOpen, onClose, onSave }) {
         });
         setPreviewImages([]);
         setErrors({});
+        setMarcaSearch('');
+        setShowMarcaSuggestions(false);
     };
 
     const handleClose = () => {
@@ -280,27 +299,52 @@ export default function TemporalProductModal({ isOpen, onClose, onSave }) {
                                     </div>
 
                                     {/* Marca */}
-                                    <div>
+                                    <div className="relative">
                                         <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Marca
                                         </label>
-                                        <select
-                                            name="marca_id"
-                                            value={formData.marca_id}
-                                            onChange={handleChange}
+                                        <input
+                                            type="text"
+                                            value={marcaSearch}
+                                            onChange={handleMarcaSearchChange}
+                                            onBlur={() => setTimeout(() => setShowMarcaSuggestions(false), 200)}
+                                            onFocus={() => {
+                                                if (marcaSearch.length >= 1) setShowMarcaSuggestions(true);
+                                            }}
                                             className={`w-full px-3 py-2 border rounded-lg ${
                                                 isDarkMode
                                                     ? 'bg-gray-700 border-gray-600 text-white'
                                                     : 'bg-white border-gray-300 text-gray-900'
                                             } focus:outline-none focus:ring-2 focus:ring-blue-500`}
-                                        >
-                                            <option value="">Seleccione una marca</option>
-                                            {marcas.map((marca) => (
-                                                <option key={marca.id_marca} value={marca.id_marca}>
-                                                    {marca.nombre}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            placeholder="Escriba para buscar marca..."
+                                        />
+                                        {showMarcaSuggestions && (
+                                            <div className={`absolute z-10 w-full mt-1 max-h-60 overflow-auto rounded-md shadow-lg ${
+                                                isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'
+                                            }`}>
+                                                {marcas.filter(m => m.nombre.toLowerCase().includes(marcaSearch.toLowerCase())).length > 0 ? (
+                                                    marcas
+                                                        .filter(marca => marca.nombre.toLowerCase().includes(marcaSearch.toLowerCase()))
+                                                        .map((marca) => (
+                                                            <div
+                                                                key={marca.id_marca}
+                                                                onClick={() => selectMarca(marca)}
+                                                                className={`px-4 py-2 cursor-pointer ${
+                                                                    isDarkMode 
+                                                                        ? 'hover:bg-gray-600 text-gray-200' 
+                                                                        : 'hover:bg-gray-100 text-gray-900'
+                                                                }`}
+                                                            >
+                                                                {marca.nombre}
+                                                            </div>
+                                                        ))
+                                                ) : (
+                                                    <div className={`px-4 py-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                        No se encontraron marcas
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 

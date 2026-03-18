@@ -44,4 +44,12 @@ class EmpresaCliente extends Model
     {
         return $this->belongsTo(Sector::class, 'sector_id', 'id_sector');
     }
+
+    /**
+     * Relación con los contactos de la empresa
+     */
+    public function contactos()
+    {
+        return $this->hasMany(ContactoEmpresa::class, 'empresa_cliente_id');
+    }
 }

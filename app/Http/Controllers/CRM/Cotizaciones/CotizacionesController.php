@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
+use setasign\Fpdi\Fpdi;
 
 class CotizacionesController extends Controller
 {
@@ -86,13 +87,60 @@ class CotizacionesController extends Controller
                 $cotizacion->vendedor_nombre = $cotizacion->vendedor
                     ? $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido
                     : 'N/A';
+                
+                // Cargar miEmpresa
+                $cotizacion->mi_empresa = $cotizacion->miEmpresa;
 
                 return $cotizacion;
             });
 
+            // Calcular contadores globales de notificaciones (vencidas)
+            // Warning: 3-4 días vencida
+            // Danger: 5+ días vencida
+            $now = \Carbon\Carbon::now();
+            $userId = $usuario ? $usuario->id_usuario : null;
+
+            $baseQuery = Cotizacion::query();
+            if ($userId && ($usuario->nombre_usuario !== 'Admin')) {
+                $baseQuery->where('usuario_id', $userId);
+            }
+
+            // Excluir cotizaciones aprobadas o rechazadas de las notificaciones
+            $baseQuery->whereNotIn('estado', ['aprobada', 'rechazada']);
+
+            // Warning: Vencimiento entre 3 y 4 días atrás
+            // Fecha vencimiento <= hoy - 3 dias AND Fecha vencimiento > hoy - 5 dias
+            // Ejemplo: Hoy es 10. 
+            // 3 días atrás: 7. 4 días atrás: 6.
+            // Si vence el 7 (hace 3 días) -> Warning.
+            // Si vence el 6 (hace 4 días) -> Warning.
+            // Si vence el 5 (hace 5 días) -> Danger.
+            
+            $warningDateStart = $now->copy()->subDays(4)->startOfDay();
+            $warningDateEnd = $now->copy()->subDays(3)->endOfDay();
+            
+            $dangerDateEnd = $now->copy()->subDays(5)->endOfDay();
+
+            $warningCount = (clone $baseQuery)
+                ->whereBetween('fecha_vencimiento', [$warningDateStart, $warningDateEnd])
+                ->count();
+
+            $dangerCount = (clone $baseQuery)
+                ->where('fecha_vencimiento', '<=', $dangerDateEnd)
+                ->count();
+
+            $notificationStats = [
+                'warningCount' => $warningCount,
+                'dangerCount' => $dangerCount,
+                'totalCount' => $warningCount + $dangerCount
+            ];
+
             // Si es una petición AJAX, retornar JSON
             if ($request->expectsJson() || $request->wantsJson()) {
-                return response()->json($cotizaciones);
+                return response()->json([
+                    'cotizaciones' => $cotizaciones,
+                    'notificationStats' => $notificationStats
+                ]);
             }
 
             // Renderizar la vista con Inertia
@@ -106,7 +154,8 @@ class CotizacionesController extends Controller
                     'from' => $cotizaciones->firstItem(),
                     'to' => $cotizaciones->lastItem(),
                 ],
-                'filters' => $request->only(['search', 'estado', 'vendedor_id', 'sort_field', 'sort_direction'])
+                'filters' => $request->only(['search', 'estado', 'vendedor_id', 'sort_field', 'sort_direction']),
+                'notificationStats' => $notificationStats
             ]);
         } catch (\Exception $e) {
             Log::error('Error al obtener cotizaciones: ' . $e->getMessage());
@@ -137,7 +186,7 @@ class CotizacionesController extends Controller
                     ];
                 });
 
-            $empresas = EmpresaCliente::with('vendedor')
+            $empresas = EmpresaCliente::with(['vendedor', 'contactos'])
                 ->where('activo', true)
                 ->orderBy('razon_social')
                 ->get()
@@ -149,6 +198,16 @@ class CotizacionesController extends Controller
                         'email' => $empresa->email,
                         'telefono' => $empresa->telefono,
                         'vendedor_id' => $empresa->usuario_id,
+                        'contactos' => $empresa->contactos->map(function ($contacto) {
+                            return [
+                                'id' => $contacto->id,
+                                'nombre' => $contacto->nombre,
+                                'email' => $contacto->email,
+                                'telefono' => $contacto->telefono,
+                                'cargo' => $contacto->cargo,
+                                'es_principal' => $contacto->es_principal
+                            ];
+                        }),
                     ];
                 });
 
@@ -320,7 +379,7 @@ class CotizacionesController extends Controller
     {
         try {
             $cotizacion = Cotizacion::with([
-                'vendedor:id_usuario,nombre,apellido,correo',
+                'vendedor:id_usuario,nombre,apellido,correo,telefono',
                 'miEmpresa:id,nombre,ruc,email,telefono,imagen_logo,imagen_firma',
                 'detallesProductos.producto',
                 'detallesAdicionales'
@@ -357,6 +416,7 @@ class CotizacionesController extends Controller
                 $vendedorData = (object)[
                     'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
                     'correo' => $cotizacion->vendedor->correo ?? '',
+                    'telefono' => $cotizacion->vendedor->telefono ?? '',
                 ];
             }
             $cotizacion->vendedor_data = $vendedorData;
@@ -587,6 +647,11 @@ class CotizacionesController extends Controller
             $cotizacion = Cotizacion::findOrFail($id);
             $cotizacion->update(['estado' => $request->estado]);
 
+            // Eliminar notificaciones si el estado es aprobada o rechazada
+            if (in_array($request->estado, ['aprobada', 'rechazada'])) {
+                \App\Models\NotificacionCotizacion::where('cotizacion_id', $cotizacion->id)->delete();
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Estado actualizado exitosamente',
@@ -608,12 +673,47 @@ class CotizacionesController extends Controller
     public function estadisticas()
     {
         try {
-            $total = Cotizacion::count();
-            $montoTotal = Cotizacion::sum('total');
-            $pendientes = Cotizacion::where('estado', 'pendiente')->count();
-            $aprobadas = Cotizacion::where('estado', 'aprobada')->count();
-            $enviadas = Cotizacion::where('estado', 'enviada')->count();
-            $rechazadas = Cotizacion::where('estado', 'rechazada')->count();
+            $usuario = auth()->user();
+            $baseQuery = Cotizacion::query();
+
+            // Limitar resultados a las cotizaciones del usuario autenticado
+            if ($usuario && ($usuario->nombre_usuario !== 'Admin')) {
+                $baseQuery->where('usuario_id', $usuario->id_usuario);
+            }
+
+            $total = (clone $baseQuery)->count();
+            $montoTotal = (clone $baseQuery)->where('estado', 'aprobada')->sum('total');
+            $pendientes = (clone $baseQuery)->where('estado', 'pendiente')->count();
+            $aprobadas = (clone $baseQuery)->where('estado', 'aprobada')->count();
+            $enviadas = (clone $baseQuery)->where('estado', 'enviada')->count();
+            $rechazadas = (clone $baseQuery)->where('estado', 'rechazada')->count();
+
+            // Estadísticas de seguimiento temporal (basado en fecha de creación)
+            // Estos indicadores son siempre del usuario logueado
+            $personalQuery = Cotizacion::query();
+            if ($usuario) {
+                $personalQuery->where('usuario_id', $usuario->id_usuario);
+            }
+
+            $now = \Carbon\Carbon::now();
+            
+            // Diario (Hoy)
+            $diarioQuery = (clone $personalQuery)->whereDate('created_at', $now->today());
+            $diarioCount = $diarioQuery->count();
+            $diarioMonto = $diarioQuery->sum('total');
+
+            // Semanal (Esta semana)
+            $semanalQuery = (clone $personalQuery)->whereBetween('created_at', [
+                $now->copy()->startOfWeek(), 
+                $now->copy()->endOfWeek()
+            ]);
+            $semanalCount = $semanalQuery->count();
+            $semanalMonto = $semanalQuery->sum('total');
+
+            // Mensual (Este mes)
+            $mensualQuery = (clone $personalQuery)->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year);
+            $mensualCount = $mensualQuery->count();
+            $mensualMonto = $mensualQuery->sum('total');
 
             return response()->json([
                 'success' => true,
@@ -624,6 +724,19 @@ class CotizacionesController extends Controller
                     'aprobadas' => $aprobadas,
                     'enviadas' => $enviadas,
                     'rechazadas' => $rechazadas,
+                    // Indicadores Agregados
+                    'diario' => [
+                        'count' => $diarioCount,
+                        'monto' => $diarioMonto
+                    ],
+                    'semanal' => [
+                        'count' => $semanalCount,
+                        'monto' => $semanalMonto
+                    ],
+                    'mensual' => [
+                        'count' => $mensualCount,
+                        'monto' => $mensualMonto
+                    ]
                 ]
             ]);
         } catch (\Exception $e) {
@@ -703,12 +816,15 @@ class CotizacionesController extends Controller
     /**
      * Exportar cotización a PDF
      */
-    public function exportPdf($id)
+    public function exportPdf(Request $request, $id)
     {
+        Log::info("Iniciando exportación de PDF para cotización ID: {$id}");
         try {
+            $mostrarFirma = $request->query('mostrar_firma', '1') === '1';
+
             // Cargar cotización con relaciones básicas
             $cotizacion = Cotizacion::with([
-                'vendedor:id_usuario,nombre,apellido,correo',
+                'vendedor:id_usuario,nombre,apellido,correo,telefono',
                 'miEmpresa',
                 'detallesProductos',
                 'detallesAdicionales'
@@ -802,7 +918,9 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                $imagen = $primeraImagen;
+                            } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
                             } else {
                                 // Convertir ruta relativa a ruta física
@@ -813,7 +931,13 @@ class CotizacionesController extends Controller
 
                     // Especificaciones técnicas - pasarlas tal cual están
                     if (!empty($productoTemporal->especificaciones_tecnicas)) {
-                        $especificaciones = $productoTemporal->especificaciones_tecnicas;
+                        $specs = $productoTemporal->especificaciones_tecnicas;
+                        if (is_string($specs)) {
+                            $decoded = json_decode($specs, true);
+                            $especificaciones = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+                        } elseif (is_array($specs)) {
+                            $especificaciones = $specs;
+                        }
                     }
                 }
                 // Si el detalle tiene un producto regular asociado, obtener sus datos
@@ -834,7 +958,9 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                $imagen = $primeraImagen;
+                            } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
                             } else {
                                 // Convertir ruta relativa a ruta física
@@ -845,7 +971,13 @@ class CotizacionesController extends Controller
 
                     // Especificaciones técnicas - pasarlas tal cual están (array de arrays o con secciones)
                     if (!empty($producto->especificaciones_tecnicas)) {
-                        $especificaciones = $producto->especificaciones_tecnicas;
+                        $specs = $producto->especificaciones_tecnicas;
+                        if (is_string($specs)) {
+                            $decoded = json_decode($specs, true);
+                            $especificaciones = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+                        } elseif (is_array($specs)) {
+                            $especificaciones = $specs;
+                        }
                     }
                 }
 
@@ -918,7 +1050,9 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                $imagen = $primeraImagen;
+                            } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
                             } else {
                                 $imagen = public_path($primeraImagen);
@@ -928,7 +1062,13 @@ class CotizacionesController extends Controller
 
                     // Especificaciones técnicas - pasarlas tal cual están
                     if (!empty($productoTemporal->especificaciones_tecnicas)) {
-                        $especificaciones = $productoTemporal->especificaciones_tecnicas;
+                        $specs = $productoTemporal->especificaciones_tecnicas;
+                        if (is_string($specs)) {
+                            $decoded = json_decode($specs, true);
+                            $especificaciones = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+                        } elseif (is_array($specs)) {
+                            $especificaciones = $specs;
+                        }
                     }
                 }
                 // Si el detalle tiene un producto regular asociado
@@ -946,7 +1086,9 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                $imagen = $primeraImagen;
+                            } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
                             } else {
                                 $imagen = public_path($primeraImagen);
@@ -956,7 +1098,13 @@ class CotizacionesController extends Controller
 
                     // Especificaciones técnicas - pasarlas tal cual están
                     if (!empty($producto->especificaciones_tecnicas)) {
-                        $especificaciones = $producto->especificaciones_tecnicas;
+                        $specs = $producto->especificaciones_tecnicas;
+                        if (is_string($specs)) {
+                            $decoded = json_decode($specs, true);
+                            $especificaciones = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+                        } elseif (is_array($specs)) {
+                            $especificaciones = $specs;
+                        }
                     }
                 } else {
                     // Si no tiene producto vinculado, intentar buscar por nombre en productos regulares
@@ -973,15 +1121,25 @@ class CotizacionesController extends Controller
                             $imagenes = $productoMatch->imagen;
                             if (is_array($imagenes) && count($imagenes) > 0) {
                                 $primeraImagen = $imagenes[0];
-                                $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
-                                    ? $primeraImagen
-                                    : url($primeraImagen);
+                                if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                    $imagen = $primeraImagen;
+                                } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                                    $imagen = $primeraImagen;
+                                } else {
+                                    $imagen = public_path($primeraImagen);
+                                }
                             }
                         }
 
                         // Especificaciones técnicas - pasarlas tal cual están
                         if (!empty($productoMatch->especificaciones_tecnicas)) {
-                            $especificaciones = $productoMatch->especificaciones_tecnicas;
+                            $specs = $productoMatch->especificaciones_tecnicas;
+                            if (is_string($specs)) {
+                                $decoded = json_decode($specs, true);
+                                $especificaciones = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+                            } elseif (is_array($specs)) {
+                                $especificaciones = $specs;
+                            }
                         }
                     } else {
                         // Si tampoco se encuentra, intentar buscar en productos temporales
@@ -998,15 +1156,25 @@ class CotizacionesController extends Controller
                                 $imagenes = $productoTemporalMatch->imagenes;
                                 if (is_array($imagenes) && count($imagenes) > 0) {
                                     $primeraImagen = $imagenes[0];
-                                    $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL)
-                                        ? $primeraImagen
-                                        : url($primeraImagen);
+                                    if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                    $imagen = $primeraImagen;
+                                } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                                    $imagen = $primeraImagen;
+                                } else {
+                                    $imagen = public_path($primeraImagen);
+                                }
                                 }
                             }
 
                             // Especificaciones técnicas - pasarlas tal cual están
                             if (!empty($productoTemporalMatch->especificaciones_tecnicas)) {
-                                $especificaciones = $productoTemporalMatch->especificaciones_tecnicas;
+                                $specs = $productoTemporalMatch->especificaciones_tecnicas;
+                                if (is_string($specs)) {
+                                    $decoded = json_decode($specs, true);
+                                    $especificaciones = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+                                } elseif (is_array($specs)) {
+                                    $especificaciones = $specs;
+                                }
                             }
                         }
                     }
@@ -1029,6 +1197,7 @@ class CotizacionesController extends Controller
                 $vendedor = (object)[
                     'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
                     'correo' => $cotizacion->vendedor->correo ?? '',
+                    'telefono' => $cotizacion->vendedor->telefono ?? '',
                 ];
             }
 
@@ -1054,18 +1223,87 @@ class CotizacionesController extends Controller
                 'empresa' => $empresa,
                 'cliente' => $cotizacion->cliente,
                 'vendedor' => $vendedor,
+                'mostrar_firma' => $mostrarFirma,
             ];
 
-            // Generar el PDF
+            // Generar el PDF (DomPDF)
             $pdf = Pdf::loadView('pdf.cotizacion', $data);
             $pdf->setPaper('a4', 'portrait');
 
             // Nombre del archivo
             $filename = 'Cotizacion_' . $cotizacion->numero . '.pdf';
 
+            // Obtener tipo de condiciones del request
+            $tipoCondiciones = $request->query('tipo_condiciones', 'ventas');
+            
+            // Determinar archivo a usar
+            $condicionesFilename = null;
+            if ($tipoCondiciones === 'ventas') {
+                $condicionesFilename = 'VENTAS_CONDICIONES.pdf';
+            } elseif ($tipoCondiciones === 'calibracion') {
+                $condicionesFilename = 'CALIBRACION_CONDICIONES.pdf';
+            }
+            
+            // Ruta del archivo de condiciones
+            $condicionesPath = $condicionesFilename ? public_path('docs/' . $condicionesFilename) : null;
+            
+            // Variable para el path temporal, para poder eliminarlo en finally o después
+            $tempPath = null;
+
+            if ($condicionesPath && file_exists($condicionesPath)) {
+                try {
+                    Log::info("Fusionando con archivo de condiciones: {$condicionesPath}");
+                    
+                    // Guardar el PDF generado temporalmente
+                    $tempPath = tempnam(sys_get_temp_dir(), 'cotizacion_temp_' . $id . '_');
+                    file_put_contents($tempPath, $pdf->output());
+
+                    // Iniciar FPDI
+                    $fpdi = new Fpdi();
+
+                    // Importar páginas del PDF generado (Cotización)
+                    $pageCount = $fpdi->setSourceFile($tempPath);
+                    for ($i = 1; $i <= $pageCount; $i++) {
+                        $templateId = $fpdi->importPage($i);
+                        $size = $fpdi->getTemplateSize($templateId);
+                        $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                        $fpdi->useTemplate($templateId);
+                    }
+
+                    // Importar páginas del PDF de condiciones
+                    $pageCountCondiciones = $fpdi->setSourceFile($condicionesPath);
+                    for ($i = 1; $i <= $pageCountCondiciones; $i++) {
+                        $templateId = $fpdi->importPage($i);
+                        $size = $fpdi->getTemplateSize($templateId);
+                        $fpdi->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                        $fpdi->useTemplate($templateId);
+                    }
+
+                    Log::info("PDF fusionado correctamente para cotización ID: {$id}. Nombre: {$filename}");
+                    
+                    return response($fpdi->Output('S'), 200, [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+                    ]);
+
+                } catch (\Exception $e) {
+                    Log::error("Error al fusionar PDFs: " . $e->getMessage());
+                    // Si falla la fusión, intentar devolver al menos la cotización sola
+                    return $pdf->download($filename);
+                } finally {
+                    // Limpiar archivo temporal
+                    if ($tempPath && file_exists($tempPath)) {
+                        unlink($tempPath);
+                    }
+                }
+            }
+
+            Log::info("PDF generado correctamente para cotización ID: {$id}. Nombre: {$filename} (Sin condiciones)");
             return $pdf->download($filename);
         } catch (\Exception $e) {
-            Log::error('Error al exportar cotización a PDF: ' . $e->getMessage());
+            Log::error('Error al exportar cotización a PDF en CotizacionesController@exportPdf');
+            Log::error('ID: ' . $id);
+            Log::error('Mensaje: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
             return response()->json([
                 'success' => false,
@@ -1083,7 +1321,7 @@ class CotizacionesController extends Controller
         try {
             // Obtener cotización; si no se pasa id, usar la primera disponible
             $cotizacionQuery = Cotizacion::with([
-                'vendedor:id_usuario,nombre,apellido,correo',
+                'vendedor:id_usuario,nombre,apellido,correo,telefono',
                 'miEmpresa',
                 'detallesProductos',
                 'detallesAdicionales'
@@ -1153,7 +1391,13 @@ class CotizacionesController extends Controller
                         }
                     }
                     if (!empty($productoTemporal->especificaciones_tecnicas)) {
-                        $especificaciones = $productoTemporal->especificaciones_tecnicas;
+                        $specs = $productoTemporal->especificaciones_tecnicas;
+                        if (is_string($specs)) {
+                            $decoded = json_decode($specs, true);
+                            $especificaciones = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+                        } elseif (is_array($specs)) {
+                            $especificaciones = $specs;
+                        }
                     }
                 } elseif ($detalle->producto_id && isset($productosCompletos[$detalle->producto_id])) {
                     $producto = $productosCompletos[$detalle->producto_id];
@@ -1170,7 +1414,13 @@ class CotizacionesController extends Controller
                         }
                     }
                     if (!empty($producto->especificaciones_tecnicas)) {
-                        $especificaciones = $producto->especificaciones_tecnicas;
+                        $specs = $producto->especificaciones_tecnicas;
+                        if (is_string($specs)) {
+                            $decoded = json_decode($specs, true);
+                            $especificaciones = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+                        } elseif (is_array($specs)) {
+                            $especificaciones = $specs;
+                        }
                     }
                 }
 
@@ -1221,7 +1471,13 @@ class CotizacionesController extends Controller
                         }
                     }
                     if (!empty($productoTemporal->especificaciones_tecnicas)) {
-                        $especificaciones = $productoTemporal->especificaciones_tecnicas;
+                        $specs = $productoTemporal->especificaciones_tecnicas;
+                        if (is_string($specs)) {
+                            $decoded = json_decode($specs, true);
+                            $especificaciones = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+                        } elseif (is_array($specs)) {
+                            $especificaciones = $specs;
+                        }
                     }
                 } elseif ($detalle->producto_id && isset($adicionalesCompletos[$detalle->producto_id])) {
                     $producto = $adicionalesCompletos[$detalle->producto_id];
@@ -1237,7 +1493,13 @@ class CotizacionesController extends Controller
                         }
                     }
                     if (!empty($producto->especificaciones_tecnicas)) {
-                        $especificaciones = $producto->especificaciones_tecnicas;
+                        $specs = $producto->especificaciones_tecnicas;
+                        if (is_string($specs)) {
+                            $decoded = json_decode($specs, true);
+                            $especificaciones = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
+                        } elseif (is_array($specs)) {
+                            $especificaciones = $specs;
+                        }
                     }
                 }
 
@@ -1258,6 +1520,7 @@ class CotizacionesController extends Controller
                 $vendedor = (object)[
                     'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
                     'correo' => $cotizacion->vendedor->correo ?? '',
+                    'telefono' => $cotizacion->vendedor->telefono ?? '',
                 ];
             }
 

@@ -8,6 +8,17 @@ import { useTheme } from '../../storage/ThemeContext';
 import CRMLayout from './CRMLayout';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import {
+    ComposedChart,
+    Line,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+} from 'recharts';
 
 export default function CrmDashboard() {
     const { isDarkMode } = useTheme();
@@ -16,8 +27,46 @@ export default function CrmDashboard() {
     const [stats, setStats] = useState([]);
     const [actividadReciente, setActividadReciente] = useState([]);
     const [tareasProximas, setTareasProximas] = useState([]);
+    
+    // Chart states
+    const [evolutionCharts, setEvolutionCharts] = useState({ daily: [], weekly: [], monthly: [] });
+    const [chartPeriod, setChartPeriod] = useState('daily'); // 'daily', 'weekly', 'monthly'
+    const [loadingCharts, setLoadingCharts] = useState(true);
 
-    // Fetch dashboard statistics
+    // Helper format currency
+    const formatCurrency = (amount) => {
+        return `S/ ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+
+    // Get chart data based on period
+    const getChartData = () => {
+        switch (chartPeriod) {
+            case 'daily': return evolutionCharts.daily || [];
+            case 'weekly': return evolutionCharts.weekly || [];
+            case 'monthly': return evolutionCharts.monthly || [];
+            default: return [];
+        }
+    };
+
+    // Custom tooltip for chart
+    const CustomTooltip = ({ active, payload, label }) => {
+        if (active && payload && payload.length) {
+            return (
+                <div className={`p-3 rounded shadow-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700 text-white' : 'bg-white border-gray-200 text-gray-900'}`}>
+                    <p className="font-bold mb-2">{label}</p>
+                    <p className="text-sm text-blue-500">
+                        Monto: {formatCurrency(payload[0]?.value)}
+                    </p>
+                    <p className="text-sm text-orange-500">
+                        Cantidad: {payload[1]?.value}
+                    </p>
+                </div>
+            );
+        }
+        return null;
+    };
+
+    // Fetch dashboard statistics and charts
     useEffect(() => {
         const fetchEstadisticas = async () => {
             try {
@@ -115,7 +164,22 @@ export default function CrmDashboard() {
             }
         };
 
+        const fetchGraficos = async () => {
+            try {
+                setLoadingCharts(true);
+                const response = await axios.get('/crm/dashboard/graficos');
+                if (response.data.success) {
+                    setEvolutionCharts(response.data.data.evolution_charts || { daily: [], weekly: [], monthly: [] });
+                }
+            } catch (error) {
+                console.error('Error al obtener gráficos:', error);
+            } finally {
+                setLoadingCharts(false);
+            }
+        };
+
         fetchEstadisticas();
+        fetchGraficos();
     }, []);
 
 
@@ -237,6 +301,116 @@ export default function CrmDashboard() {
                                     <div className="text-sm opacity-70">Gestionar productos</div>
                                 </div>
                             </button>
+                        </div>
+                    </div>
+
+                    {/* Gráfico de Evolución de Ventas */}
+                    <div className={`rounded-xl shadow-sm border p-6 ${
+                        isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+                    }`}>
+                        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+                            <div className="flex items-center gap-2">
+                                <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-900/20 text-blue-400' : 'bg-blue-50 text-blue-600'}`}>
+                                    <FiTrendingUp className="w-5 h-5" />
+                                </div>
+                                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                                    Evolución de Ventas
+                                </h3>
+                            </div>
+                            
+                            <div className="flex bg-gray-100 p-1 rounded-lg dark:bg-gray-800">
+                                <button
+                                    onClick={() => setChartPeriod('daily')}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                        chartPeriod === 'daily'
+                                            ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-700 dark:text-blue-400'
+                                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                                    }`}
+                                >
+                                    Últimos 7 días
+                                </button>
+                                <button
+                                    onClick={() => setChartPeriod('weekly')}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                        chartPeriod === 'weekly'
+                                            ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-700 dark:text-blue-400'
+                                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                                    }`}
+                                >
+                                    Últimas 4 semanas
+                                </button>
+                                <button
+                                    onClick={() => setChartPeriod('monthly')}
+                                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+                                        chartPeriod === 'monthly'
+                                            ? 'bg-white text-blue-600 shadow-sm dark:bg-gray-700 dark:text-blue-400'
+                                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                                    }`}
+                                >
+                                    Últimos 12 meses
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="h-[300px] w-full">
+                            {loadingCharts ? (
+                                <div className="flex justify-center items-center h-full">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                </div>
+                            ) : (
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <ComposedChart
+                                        data={getChartData()}
+                                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" stroke={isDarkMode ? '#374151' : '#e5e7eb'} vertical={false} />
+                                        <XAxis 
+                                            dataKey="name" 
+                                            stroke={isDarkMode ? '#9ca3af' : '#6b7280'} 
+                                            tick={{ fontSize: 12 }}
+                                            axisLine={false}
+                                            tickLine={false}
+                                        />
+                                        <YAxis 
+                                            yAxisId="left"
+                                            orientation="left"
+                                            stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
+                                            tick={{ fontSize: 12 }}
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tickFormatter={(value) => `S/ ${value}`}
+                                        />
+                                        <YAxis 
+                                            yAxisId="right"
+                                            orientation="right"
+                                            stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
+                                            tick={{ fontSize: 12 }}
+                                            axisLine={false}
+                                            tickLine={false}
+                                        />
+                                        <Tooltip content={<CustomTooltip />} />
+                                        <Legend />
+                                        <Bar 
+                                            yAxisId="left"
+                                            dataKey="monto" 
+                                            name="Monto Total" 
+                                            fill="#3b82f6" 
+                                            radius={[4, 4, 0, 0]}
+                                            barSize={40}
+                                        />
+                                        <Line 
+                                            yAxisId="right"
+                                            type="monotone" 
+                                            dataKey="count" 
+                                            name="Cantidad" 
+                                            stroke="#f97316" 
+                                            strokeWidth={3}
+                                            dot={{ r: 4, fill: "#f97316", strokeWidth: 2, stroke: "#fff" }}
+                                            activeDot={{ r: 6 }}
+                                        />
+                                    </ComposedChart>
+                                </ResponsiveContainer>
+                            )}
                         </div>
                     </div>
 

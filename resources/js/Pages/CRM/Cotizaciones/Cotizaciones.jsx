@@ -4,13 +4,14 @@ import { useTheme } from '../../../storage/ThemeContext';
 import { useState, useEffect } from 'react';
 import { differenceInDays, parseISO, format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import Swal from 'sweetalert2';
 import CRMLayout from '../CRMLayout';
 import ShowCotizaciones from './components/ShowCotizaciones';
 import CreateCotizaciones from './components/CreateCotizaciones';
 import EditCotizaciones from './components/EditCotizaciones';
 import axios from 'axios';
 
-export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], pagination: initialPagination = null, filters: initialFilters = {} }) {
+export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], pagination: initialPagination = null, filters: initialFilters = {}, notificationStats }) {
     const { isDarkMode } = useTheme();
     const [searchTerm, setSearchTerm] = useState(initialFilters.search || '');
     const [filterEstado, setFilterEstado] = useState(initialFilters.estado || 'all');
@@ -23,6 +24,9 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         monto_total: 0,
         pendientes: 0,
         aprobadas: 0,
+        diario: { count: 0, monto: 0 },
+        semanal: { count: 0, monto: 0 },
+        mensual: { count: 0, monto: 0 }
     });
     const [loading, setLoading] = useState(false);
     const [showEstadoModal, setShowEstadoModal] = useState(false);
@@ -80,18 +84,37 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     };
 
     const handleDelete = async (id) => {
-        if (!confirm('¿Está seguro de eliminar esta cotización?')) return;
+        const result = await Swal.fire({
+            title: '¿Está seguro?',
+            text: "No podrá revertir esta acción",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (!result.isConfirmed) return;
 
         try {
             const response = await axios.delete(`/crm/cotizaciones/${id}/delete`);
             if (response.data.success) {
                 fetchCotizaciones();
                 fetchEstadisticas();
-                alert('Cotización eliminada exitosamente');
+                Swal.fire(
+                    'Eliminado!',
+                    'La cotización ha sido eliminada.',
+                    'success'
+                );
             }
         } catch (error) {
             console.error('Error al eliminar cotización:', error);
-            alert('Error al eliminar cotización');
+            Swal.fire(
+                'Error',
+                'Hubo un problema al eliminar la cotización.',
+                'error'
+            );
         }
     };
 
@@ -104,7 +127,11 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
             }
         } catch (error) {
             console.error('Error al cargar detalles:', error);
-            alert('Error al cargar detalles de la cotización');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cargar detalles de la cotización'
+            });
         }
     };
 
@@ -117,7 +144,11 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
             }
         } catch (error) {
             console.error('Error al cargar cotización:', error);
-            alert('Error al cargar cotización');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cargar cotización'
+            });
         }
     };
 
@@ -157,11 +188,21 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                 setShowEstadoModal(false);
                 setCotizacionToChangeEstado(null);
                 setNewEstado('');
-                alert('Estado actualizado exitosamente');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Actualizado',
+                    text: 'Estado actualizado exitosamente',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
             }
         } catch (error) {
             console.error('Error al cambiar estado:', error);
-            alert('Error al cambiar estado de la cotización');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al cambiar estado de la cotización'
+            });
         }
     };
 
@@ -183,7 +224,7 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     };
 
     const formatCurrency = (amount, currency = 'soles') => {
-        const symbol = currency === 'dolares' ? '$' : 'S/';
+        const symbol =   '$'; 
         return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
     };
 
@@ -193,6 +234,8 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     };
 
     const getNotificationInfo = (cotizacion) => {
+        if (['aprobada', 'rechazada'].includes(cotizacion.estado)) return null;
+
         if (!cotizacion.fecha_vencimiento) return null;
 
         const fechaVencimiento = parseISO(cotizacion.fecha_vencimiento);
@@ -238,12 +281,13 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         return notif !== null;
     });
 
-    const notificacionesWarning = cotizacionesConNotificacion.filter(c => {
+    // Usar estadísticas globales si están disponibles, de lo contrario usar local (fallback)
+    const notificacionesWarning = notificationStats?.warningCount ?? cotizacionesConNotificacion.filter(c => {
         const notif = getNotificationInfo(c);
         return notif?.nivel === 'warning';
     }).length;
 
-    const notificacionesDanger = cotizacionesConNotificacion.filter(c => {
+    const notificacionesDanger = notificationStats?.dangerCount ?? cotizacionesConNotificacion.filter(c => {
         const notif = getNotificationInfo(c);
         return notif?.nivel === 'danger';
     }).length;
@@ -290,13 +334,94 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         }
     ];
 
+    const seguimientoDisplay = [
+        {
+            titulo: "Hoy",
+            count: estadisticas.diario?.count || 0,
+            monto: estadisticas.diario?.monto || 0,
+            color: "indigo",
+            icon: FiClock
+        },
+        {
+            titulo: "Esta Semana",
+            count: estadisticas.semanal?.count || 0,
+            monto: estadisticas.semanal?.monto || 0,
+            color: "teal",
+            icon: FiCalendar
+        },
+        {
+            titulo: "Este Mes",
+            count: estadisticas.mensual?.count || 0,
+            monto: estadisticas.mensual?.monto || 0,
+            color: "orange",
+            icon: FiBarChart
+        }
+    ];
+
     return (
         <>
             <Head title="Cotizaciones" />
             <CRMLayout title="Gestión de Cotizaciones" notifications={notificationsSummary}>
                 <div className="p-6">
 
-                    {/* Estadísticas */}
+                    {/* Seguimiento Temporal (Cards) */}
+                    <div className="mb-6">
+                        <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+                            Seguimiento de Actividad
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {seguimientoDisplay.map((stat, index) => (
+                                <div key={index} className={`rounded-xl shadow-sm border p-6 transition-all duration-300 hover:shadow-lg ${
+                                    isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+                                }`}>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className={`p-3 rounded-full ${
+                                            stat.color === 'indigo' ? 'bg-indigo-100 text-indigo-600' :
+                                            stat.color === 'teal' ? 'bg-teal-100 text-teal-600' :
+                                            'bg-orange-100 text-orange-600'
+                                        }`}>
+                                            <stat.icon className="w-6 h-6" />
+                                        </div>
+                                        <div className={`text-right`}>
+                                            <p className={`text-xs font-medium uppercase tracking-wider ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                {stat.titulo}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-end justify-between">
+                                        <div>
+                                            <p className={`text-2xl font-bold ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                {stat.count}
+                                            </p>
+                                            <p className={`text-xs ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                Cotizaciones
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className={`text-lg font-semibold ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                {formatCurrency(stat.monto)}
+                                            </p>
+                                            <p className={`text-xs ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                            }`}>
+                                                Monto Total
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Estadísticas Generales */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                         {estadisticasDisplay.map((stat, index) => (
                             <div key={index} className={`rounded-xl shadow-sm border p-6 transition-all duration-300 hover:shadow-lg ${

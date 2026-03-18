@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Head, router } from "@inertiajs/react";
+import Swal from 'sweetalert2';
+import axios from 'axios';
 import { FiHome, FiEdit, FiTrash, FiEye, FiPlus, FiSearch, FiRefreshCw } from "react-icons/fi";
 import { useTheme } from '../../../storage/ThemeContext';
 import CRMLayout from '../CRMLayout';
@@ -118,27 +120,47 @@ export default function VerEmpresas({ auth }) {
     };
 
     const handleDelete = async (empresa) => {
-        if (confirm(`¿Estás seguro de eliminar la empresa "${empresa.nombre}"?`)) {
-            try {
-                const response = await fetch(route('crm.empresas.destroy', empresa.id), {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                });
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: `Se eliminará la empresa "${empresa.nombre}"`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
 
-                if (response.ok) {
+        if (result.isConfirmed) {
+            try {
+                const response = await axios.delete(route('crm.empresas.destroy', empresa.id, false));
+
+                if (response.data.success) {
+                    await Swal.fire({
+                        title: '¡Eliminado!',
+                        text: 'La empresa ha sido eliminada correctamente',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
                     // Refresh the data
                     fetchEmpresas(currentPage, searchTerm);
                 } else {
-                    const errorData = await response.json();
-                    alert('Error al eliminar la empresa: ' + (errorData.message || 'Error desconocido'));
+                    await Swal.fire({
+                        title: 'Error',
+                        text: 'Error al eliminar la empresa: ' + (response.data.message || 'Error desconocido'),
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
                 }
             } catch (error) {
                 console.error('Error al eliminar empresa:', error);
-                alert('Error al eliminar la empresa');
+                await Swal.fire({
+                    title: 'Error',
+                    text: 'Error al eliminar la empresa: ' + (error.response?.data?.message || error.message || 'Error desconocido'),
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
             }
         }
     };

@@ -23,6 +23,12 @@ return Application::configure(basePath: dirname(__DIR__))
         // Registrar alias de middleware personalizado
         $middleware->alias([
             'generar.notificaciones.cotizaciones' => \App\Http\Middleware\GenerarNotificacionesCotizaciones::class,
+            'role.admin' => \App\Http\Middleware\CheckAdminRole::class,
+        ]);
+
+        // Desactivar protección CSRF para todas las rutas
+        $middleware->validateCsrfTokens(except: [
+            '*'
         ]);
 
         $middleware->validateCsrfTokens(except: [

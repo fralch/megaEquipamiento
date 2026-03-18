@@ -1,10 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiPlus, FiTrash2, FiSearch } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
+import { usePage } from '@inertiajs/react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const { isDarkMode } = useTheme();
+    const { auth } = usePage().props;
+
+    // Función para obtener el ID del usuario autenticado
+    const getAuthUserId = () => {
+        // El modelo Usuario usa 'id_usuario' como primaryKey, pero Laravel lo expone como 'id'
+        const userId = auth?.user?.id_usuario || auth?.user?.id || '';
+        console.log('Auth user data:', auth?.user);
+        console.log('Selected user ID:', userId);
+        return userId;
+    };
 
     const [formData, setFormData] = useState({
         fecha_cotizacion: new Date().toISOString().split('T')[0],
@@ -15,7 +27,8 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         forma_pago: '',
         cliente_id: '',
         cliente_tipo: 'particular',
-        usuario_id: '',
+        contacto_id: '', // Nuevo campo para contacto de empresa
+        usuario_id: getAuthUserId(),
         miempresa_id: '',
         moneda: 'dolares',
         tipo_cambio: 3.7,
@@ -33,6 +46,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const [vendedores, setVendedores] = useState([]);
     const [empresas, setEmpresas] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [contactosEmpresa, setContactosEmpresa] = useState([]); // Nuevo estado para contactos de empresa
 
     // Estados para búsqueda de productos
     const [searchProducto, setSearchProducto] = useState('');
@@ -41,6 +55,11 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     const [loadingSearch, setLoadingSearch] = useState(false);
     const searchTimeoutRef = useRef(null);
     const dropdownRef = useRef(null);
+
+    // Estados para búsqueda de clientes (Empresas)
+    const [searchCliente, setSearchCliente] = useState('');
+    const [showClienteDropdown, setShowClienteDropdown] = useState(false);
+    const clienteDropdownRef = useRef(null);
 
     // Estados para búsqueda de productos adicionales
     const [searchProductoAdicional, setSearchProductoAdicional] = useState('');
@@ -53,6 +72,28 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
     // Cargar datos iniciales cuando se abre el modal
     useEffect(() => {
         if (isOpen) {
+            // Resetear el formulario al abrir el modal
+            setFormData({
+                fecha_cotizacion: new Date().toISOString().split('T')[0],
+                fecha_vencimiento: '',
+                entrega: '',
+                lugar_entrega: '',
+                garantia: '',
+                forma_pago: '',
+                cliente_id: '',
+                cliente_tipo: 'particular',
+                contacto_id: '',
+                usuario_id: getAuthUserId(), // Auto-seleccionar usuario autenticado
+                miempresa_id: '',
+                moneda: 'dolares',
+                tipo_cambio: 3.7,
+                productos: [],
+                total_monto_productos: 0,
+                productos_adicionales: [],
+                total_adicionales_monto: 0,
+                total: 0,
+                notas: ''
+            });
             loadFormData();
         }
     }, [isOpen]);
@@ -65,6 +106,9 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             }
             if (dropdownAdicionalRef.current && !dropdownAdicionalRef.current.contains(event.target)) {
                 setShowProductoAdicionalDropdown(false);
+            }
+            if (clienteDropdownRef.current && !clienteDropdownRef.current.contains(event.target)) {
+                setShowClienteDropdown(false);
             }
         };
 
@@ -88,10 +132,14 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                 setClientesEmpresas(empresas);
                 setVendedores(data.vendedores || []);
                 setEmpresas(data.empresas || []);
+
+                // Debug: Verificar que el usuario autenticado está en la lista de vendedores
+                console.log('Vendedores cargados:', data.vendedores);
+                console.log('Usuario autenticado ID:', getAuthUserId());
             }
         } catch (error) {
             console.error('Error al cargar datos del formulario:', error);
-            alert('Error al cargar datos. Por favor, intente nuevamente.');
+            Swal.fire('Error', 'Error al cargar datos. Por favor, intente nuevamente.', 'error');
         } finally {
             setLoading(false);
         }
@@ -163,20 +211,47 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
         }
 
-        const newProducto = {
-            id: producto.id,
-            nombre: producto.nombre,
-            cantidad: 1,
-            precio_unitario: precioFinal,
-            subtotal: precioFinal,
-            es_temporal: producto.es_temporal || false,
-            ...(producto.es_temporal && { producto_temporal_id: producto.id })
-        };
+        setFormData(prev => {
+            // Verificar si el producto ya existe
+            const existingProductIndex = prev.productos.findIndex(p => 
+                p.id === producto.id && 
+                !!p.es_temporal === !!producto.es_temporal
+            );
 
-        setFormData(prev => ({
-            ...prev,
-            productos: [...prev.productos, newProducto]
-        }));
+            if (existingProductIndex >= 0) {
+                // Si existe, actualizamos la cantidad
+                const newProductos = [...prev.productos];
+                const existingProduct = newProductos[existingProductIndex];
+                const newCantidad = (parseFloat(existingProduct.cantidad) || 0) + 1;
+                
+                newProductos[existingProductIndex] = {
+                    ...existingProduct,
+                    cantidad: newCantidad,
+                    subtotal: newCantidad * (parseFloat(existingProduct.precio_unitario) || 0)
+                };
+
+                return {
+                    ...prev,
+                    productos: newProductos
+                };
+            }
+
+            // Si no existe, lo agregamos como nuevo
+            const newProducto = {
+                id: producto.id,
+                nombre: producto.nombre,
+                cantidad: 1,
+                precio_unitario: precioFinal,
+                subtotal: precioFinal,
+                es_temporal: producto.es_temporal || false,
+                ...(producto.es_temporal && { producto_temporal_id: producto.id })
+            };
+
+            return {
+                ...prev,
+                productos: [...prev.productos, newProducto]
+            };
+        });
 
         // Limpiar búsqueda
         setSearchProducto('');
@@ -281,6 +356,19 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             const newExchangeRate = parseFloat(value) || 3.7;
             convertAllProducts('soles', newExchangeRate);
         }
+
+        // Si cambia el tipo de cliente, limpiar selección
+        if (name === 'cliente_tipo' && value !== formData.cliente_tipo) {
+            setSearchCliente('');
+            setContactosEmpresa([]);
+            setFormData(prev => ({
+                ...prev,
+                [name]: value,
+                cliente_id: '',
+                contacto_id: ''
+            }));
+            return;
+        }
         
         setFormData(prev => ({
             ...prev,
@@ -288,24 +376,81 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
         }));
     };
 
+    // Filtrar clientes basado en la búsqueda (mínimo 3 caracteres) y tipo
+    const clientesSource = formData.cliente_tipo === 'empresa' ? clientesEmpresas : clientesParticulares;
+    
+    const clientesFiltrados = searchCliente.length >= 1 
+        ? clientesSource.filter(cliente => 
+            cliente.nombre.toLowerCase().includes(searchCliente.toLowerCase())
+          )
+        : [];
+
+    const handleSearchClienteChange = (value) => {
+        setSearchCliente(value);
+        setShowClienteDropdown(true);
+        
+        // Si el usuario está escribiendo, limpiamos la selección anterior para asegurar consistencia
+        if (formData.cliente_id) {
+             setFormData(prev => ({ ...prev, cliente_id: '', contacto_id: '' }));
+             setContactosEmpresa([]);
+        }
+    };
+
+    const selectClienteAutocomplete = (cliente) => {
+        setSearchCliente(cliente.nombre);
+        setShowClienteDropdown(false);
+        
+        // Cargar contactos solo si es empresa
+        const contactos = formData.cliente_tipo === 'empresa' ? (cliente.contactos || []) : [];
+        setContactosEmpresa(contactos);
+
+        setFormData(prev => ({
+            ...prev,
+            cliente_id: cliente.id,
+            // Mantenemos el tipo actual
+            contacto_id: '',
+        }));
+    };
+
     const handleClienteChange = (e) => {
         const value = e.target.value;
         if (value) {
             const selectedCliente = clientes.find(c => c.id == value);
+            
+            // Si es empresa, cargar sus contactos
+            let contactos = [];
+            if (selectedCliente && selectedCliente.tipo === 'empresa' && selectedCliente.contactos) {
+                contactos = selectedCliente.contactos;
+            }
+            setContactosEmpresa(contactos);
+
             if (selectedCliente) {
                 setFormData(prev => ({
                     ...prev,
                     cliente_id: value,
-                    cliente_tipo: selectedCliente.tipo || 'particular'
+                    cliente_tipo: selectedCliente.tipo || 'particular',
+                    contacto_id: '', // Resetear contacto seleccionado
+                    // Si es particular, usar sus datos por defecto. Si es empresa, esperar a selección de contacto o usar principal si se desea
+                    // Por ahora mantenemos la lógica existente para particulares, pero para empresas el contacto definirá estos datos si se selecciona uno.
                 }));
             }
         } else {
+            setContactosEmpresa([]);
             setFormData(prev => ({
                 ...prev,
                 cliente_id: '',
-                cliente_tipo: 'particular'
+                cliente_tipo: 'particular',
+                contacto_id: ''
             }));
         }
+    };
+
+    const handleContactoChange = (e) => {
+        const contactoId = e.target.value;
+        setFormData(prev => ({
+            ...prev,
+            contacto_id: contactoId
+        }));
     };
 
     const removeProducto = (index) => {
@@ -373,7 +518,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
         // Validar que haya al menos un producto
         if (formData.productos.length === 0) {
-            alert('Debe agregar al menos un producto a la cotización');
+            Swal.fire('Atención', 'Debe agregar al menos un producto a la cotización', 'warning');
             return;
         }
 
@@ -416,20 +561,20 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             const response = await axios.post('/crm/cotizaciones/store', dataToSend);
 
             if (response.data.success) {
-                alert('Cotización creada exitosamente');
+                Swal.fire('Éxito', 'Cotización creada exitosamente', 'success');
                 onSave();
                 onClose();
             } else {
-                alert('Error al crear cotización: ' + (response.data.message || 'Error desconocido'));
+                Swal.fire('Error', 'Error al crear cotización: ' + (response.data.message || 'Error desconocido'), 'error');
             }
         } catch (error) {
             console.error('Error al crear cotización:', error);
             if (error.response?.data?.errors) {
                 const errors = error.response.data.errors;
                 const errorMessages = Object.values(errors).flat().join('\n');
-                alert('Errores de validación:\n' + errorMessages);
+                Swal.fire('Error', 'Errores de validación:\n' + errorMessages, 'error');
             } else {
-                alert('Error al crear cotización: ' + (error.response?.data?.message || error.message));
+                Swal.fire('Error', 'Error al crear cotización: ' + (error.response?.data?.message || error.message), 'error');
             }
         } finally {
             setLoading(false);
@@ -502,20 +647,47 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
             precioFinal = precioFinal * parseFloat(formData.tipo_cambio || 3.7);
         }
 
-        const newProducto = {
-            id: producto.id,
-            nombre: producto.nombre,
-            cantidad: 1,
-            precio_unitario: precioFinal,
-            subtotal: precioFinal,
-            es_temporal: producto.es_temporal || false,
-            ...(producto.es_temporal && { producto_temporal_id: producto.id })
-        };
+        setFormData(prev => {
+            // Verificar si el producto ya existe en adicionales
+            const existingProductIndex = prev.productos_adicionales.findIndex(p => 
+                p.id === producto.id && 
+                !!p.es_temporal === !!producto.es_temporal
+            );
 
-        setFormData(prev => ({
-            ...prev,
-            productos_adicionales: [...prev.productos_adicionales, newProducto]
-        }));
+            if (existingProductIndex >= 0) {
+                // Si existe, actualizamos la cantidad
+                const newProductos = [...prev.productos_adicionales];
+                const existingProduct = newProductos[existingProductIndex];
+                const newCantidad = (parseFloat(existingProduct.cantidad) || 0) + 1;
+                
+                newProductos[existingProductIndex] = {
+                    ...existingProduct,
+                    cantidad: newCantidad,
+                    subtotal: newCantidad * (parseFloat(existingProduct.precio_unitario) || 0)
+                };
+
+                return {
+                    ...prev,
+                    productos_adicionales: newProductos
+                };
+            }
+
+            // Si no existe, lo agregamos como nuevo
+            const newProducto = {
+                id: producto.id,
+                nombre: producto.nombre,
+                cantidad: 1,
+                precio_unitario: precioFinal,
+                subtotal: precioFinal,
+                es_temporal: producto.es_temporal || false,
+                ...(producto.es_temporal && { producto_temporal_id: producto.id })
+            };
+
+            return {
+                ...prev,
+                productos_adicionales: [...prev.productos_adicionales, newProducto]
+            };
+        });
 
         // Limpiar búsqueda
         setSearchProductoAdicional('');
@@ -690,7 +862,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                 </select>
                             </div>
 
-                            {/* Cliente */}
+                            {/* Selección de Cliente */}
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     <FiUser className="inline w-4 h-4 mr-2" />
@@ -701,35 +873,96 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
                                     </div>
                                 ) : (
+                                    <div className="relative" ref={clienteDropdownRef}>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={searchCliente}
+                                                onChange={(e) => handleSearchClienteChange(e.target.value)}
+                                                placeholder={formData.cliente_tipo === 'empresa' ? "Escriba para buscar empresa..." : "Escriba  para buscar cliente..."}
+                                                className={`w-full px-3 py-2 pr-10 border rounded-lg ${
+                                                    isDarkMode
+                                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                                } ${!formData.cliente_id && searchCliente.length > 0 && searchCliente.length < 3 ? 'border-yellow-500 focus:ring-yellow-500' : 'focus:ring-blue-500 focus:border-transparent'} focus:ring-2`}
+                                            />
+                                            <div className="absolute right-3 top-3">
+                                                    <FiSearch className={`w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Dropdown de clientes */}
+                                        {showClienteDropdown && searchCliente.length >= 1 && (
+                                            <div className={`absolute z-10 w-full mt-1 max-h-60 overflow-y-auto border rounded-lg shadow-lg ${
+                                                isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'
+                                            }`}>
+                                                {clientesFiltrados.length > 0 ? (
+                                                    clientesFiltrados.map((cliente) => (
+                                                        <div
+                                                            key={cliente.id}
+                                                            onClick={() => selectClienteAutocomplete(cliente)}
+                                                            className={`px-3 py-2 cursor-pointer hover:${isDarkMode ? 'bg-gray-600' : 'bg-gray-100'} ${
+                                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                                            } border-b last:border-b-0 ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}
+                                                        >
+                                                            <div className="font-medium">{cliente.nombre}</div>
+                                                            {cliente.ruc && (
+                                                                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                    RUC: {cliente.ruc}
+                                                                </div>
+                                                            )}
+                                                            {cliente.dni && (
+                                                                <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                                    DNI: {cliente.dni}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className={`px-3 py-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                        No se encontraron resultados
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                        {searchCliente.length > 0 && searchCliente.length < 3 && (
+                                            <p className={`text-xs mt-1 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
+                                                Ingrese al menos 3 caracteres para buscar.
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Contacto de Empresa (Solo visible si es empresa y tiene contactos) */}
+                            {formData.cliente_tipo === 'empresa' && contactosEmpresa.length > 0 && (
+                                <div>
+                                    <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                        <FiUser className="inline w-4 h-4 mr-2" />
+                                        Contacto de Empresa
+                                    </label>
                                     <select
-                                        name="cliente_id"
-                                        value={formData.cliente_id}
-                                        onChange={handleClienteChange}
-                                        className={`w-full px-3 py-2 border rounded-lg ${
+                                        name="contacto_id"
+                                        value={formData.contacto_id}
+                                        onChange={handleContactoChange}
+                                        className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                                             isDarkMode
                                                 ? 'bg-gray-700 border-gray-600 text-white'
                                                 : 'bg-white border-gray-300 text-gray-900'
                                         }`}
-                                        required
                                     >
-                                        <option value="">
-                                            {formData.cliente_tipo === 'empresa' ? 'Seleccionar empresa' : 'Seleccionar cliente'}
-                                        </option>
-                                        {formData.cliente_tipo === 'empresa'
-                                            ? clientesEmpresas.map(cliente => (
-                                                <option key={cliente.id} value={cliente.id}>
-                                                    {cliente.nombre}
-                                                </option>
-                                            ))
-                                            : clientesParticulares.map(cliente => (
-                                                <option key={cliente.id} value={cliente.id}>
-                                                    {cliente.nombre}
-                                                </option>
-                                            ))
-                                        }
+                                        <option value="">-- Seleccionar Contacto (Opcional) --</option>
+                                        {contactosEmpresa.map(contacto => (
+                                            <option key={contacto.id} value={contacto.id}>
+                                                {contacto.nombre} {contacto.cargo ? `- ${contacto.cargo}` : ''} {contacto.es_principal ? '(Principal)' : ''}
+                                            </option>
+                                        ))}
                                     </select>
-                                )}
-                            </div>
+                                    <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                        Seleccione un contacto específico para la cotización
+                                    </p>
+                                </div>
+                            )}
                             <div>
                                 <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                     <FiUser className="inline w-4 h-4 mr-2" />

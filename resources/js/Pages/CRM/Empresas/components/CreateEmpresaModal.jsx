@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { router } from "@inertiajs/react";
 import { FiX, FiUpload } from "react-icons/fi";
+import axios from 'axios';
+import Swal from 'sweetalert2';
 import { useTheme } from '../../../../storage/ThemeContext';
 
 export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
@@ -10,6 +12,9 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         ruc: '',
         email: '',
         telefono: '',
+        codigo_cotizacion: '',
+        contador_cotizacion: 0,
+        anio_cotizacion: new Date().getFullYear().toString(),
         id_usuario: '',
         imagen_logo: null,
         imagen_firma: null
@@ -72,36 +77,55 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         if (formData.ruc) data.append('ruc', formData.ruc);
         if (formData.email) data.append('email', formData.email);
         if (formData.telefono) data.append('telefono', formData.telefono);
+        if (formData.codigo_cotizacion) data.append('codigo_cotizacion', formData.codigo_cotizacion);
+        if (formData.contador_cotizacion) data.append('contador_cotizacion', formData.contador_cotizacion);
+        if (formData.anio_cotizacion) data.append('anio_cotizacion', formData.anio_cotizacion);
         if (formData.id_usuario) data.append('id_usuario', formData.id_usuario);
         if (formData.imagen_logo) data.append('imagen_logo', formData.imagen_logo);
         if (formData.imagen_firma) data.append('imagen_firma', formData.imagen_firma);
 
         try {
-            const response = await fetch(route('crm.empresas.store'), {
-                method: 'POST',
+            const response = await axios.post(route('crm.empresas.store', undefined, false), data, {
                 headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: data
+                    'Content-Type': 'multipart/form-data'
+                }
             });
 
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                alert('Empresa creada exitosamente');
+            if (response.data.success) {
+                await Swal.fire({
+                    title: '¡Éxito!',
+                    text: 'Empresa creada exitosamente',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
                 handleClose();
             } else {
-                if (result.errors) {
-                    setErrors(result.errors);
-                } else {
-                    alert('Error al crear la empresa: ' + (result.message || 'Error desconocido'));
-                }
+                await Swal.fire({
+                    title: 'Error',
+                    text: 'Error al crear la empresa',
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
             }
         } catch (error) {
             console.error('Error al crear empresa:', error);
-            alert('Error al crear la empresa');
+            if (error.response && error.response.data && error.response.data.errors) {
+                setErrors(error.response.data.errors);
+                await Swal.fire({
+                    title: 'Error de validación',
+                    text: 'Por favor revise los campos del formulario',
+                    icon: 'warning',
+                    confirmButtonText: 'Aceptar'
+                });
+            } else {
+                await Swal.fire({
+                    title: 'Error',
+                    text: 'Error al crear la empresa: ' + (error.response?.data?.message || error.message || 'Error desconocido'),
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+            }
         }
     };
 
@@ -260,6 +284,79 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
                                 {errors.email && (
                                     <p className="mt-1 text-sm text-red-500">{errors.email}</p>
                                 )}
+                            </div>
+
+                            {/* Configuración de Cotizaciones */}
+                            <div className="md:col-span-2 border-t border-b py-4 my-2 border-gray-200 dark:border-gray-700">
+                                <h4 className={`text-sm font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Configuración de Cotizaciones
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Prefijo de Código (Ej: EIIL)
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="codigo_cotizacion"
+                                            value={formData.codigo_cotizacion}
+                                            onChange={handleChange}
+                                            placeholder="COT"
+                                            className={`w-full px-4 py-2 rounded-lg border ${
+                                                errors.codigo_cotizacion
+                                                    ? 'border-red-500'
+                                                    : isDarkMode
+                                                        ? 'border-gray-600 bg-gray-700 text-white'
+                                                        : 'border-gray-300 bg-white text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Contador Actual (Ej: 100)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="contador_cotizacion"
+                                            value={formData.contador_cotizacion}
+                                            onChange={handleChange}
+                                            min="0"
+                                            className={`w-full px-4 py-2 rounded-lg border ${
+                                                errors.contador_cotizacion
+                                                    ? 'border-red-500'
+                                                    : isDarkMode
+                                                        ? 'border-gray-600 bg-gray-700 text-white'
+                                                        : 'border-gray-300 bg-white text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Año del Código (Ej: {new Date().getFullYear()})
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="anio_cotizacion"
+                                            value={formData.anio_cotizacion}
+                                            onChange={handleChange}
+                                            maxLength={4}
+                                            placeholder={new Date().getFullYear().toString()}
+                                            className={`w-full px-4 py-2 rounded-lg border ${
+                                                errors.anio_cotizacion
+                                                    ? 'border-red-500'
+                                                    : isDarkMode
+                                                        ? 'border-gray-600 bg-gray-700 text-white'
+                                                        : 'border-gray-300 bg-white text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Usuario Responsable */}

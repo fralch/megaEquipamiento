@@ -49,7 +49,7 @@ Route::get('/marcas/{id}', [ProductoController::class, 'ProductViewByMarca'])->n
 Route::get('/sector/{id_tag_parent}', [SectorController::class, 'show'])->name('sector.view');
 Route::get('/sectores', [SectorController::class, 'index'])->name('sectores.index');
 Route::get('/contacto', function () { return Inertia::render('Contacto'); })->name('contacto.view');
-Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware('auth');
+Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware(['auth', \App\Http\Middleware\CheckAdminRole::class]);
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
 
 // Ruta pública para previsualizar la vista HTML de cotización (solo entorno local)
@@ -171,31 +171,34 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
         Route::match(['delete', 'post'], '/{id}/delete', [ProductoTemporalController::class, 'destroy'])->name('destroy');
     });
 
-    // Rutas de roles (deben ir antes de las rutas de usuarios para evitar conflictos)
-    Route::prefix('usuarios/roles')->name('usuarios.roles.')->group(function () {
-        Route::get('/', [RolesUsuariosController::class, 'index'])->name('index');
-        Route::post('/', [RolesUsuariosController::class, 'store'])->name('store');
-        Route::get('/users-count', [RolesUsuariosController::class, 'getUsersCount'])->name('users-count');
-        Route::post('/assign-role', [RolesUsuariosController::class, 'assignRole'])->name('assign');
-        Route::post('/bulk-assign', [RolesUsuariosController::class, 'bulkAssignRole'])->name('bulk-assign');
-        Route::get('/{id}', [RolesUsuariosController::class, 'show'])->name('show');
-        Route::match(['put', 'post'], '/{id}', [RolesUsuariosController::class, 'update'])->name('update');
-        Route::match(['delete', 'post'], '/{id}/delete', [RolesUsuariosController::class, 'destroy'])->name('destroy');
-        Route::post('/{userId}/remove-role', [RolesUsuariosController::class, 'removeRole'])->name('remove');
-    });
+    // Rutas de roles y usuarios (Protegidas por rol admin)
+    Route::middleware('role.admin')->group(function () {
+        // Rutas de roles (deben ir antes de las rutas de usuarios para evitar conflictos)
+        Route::prefix('usuarios/roles')->name('usuarios.roles.')->group(function () {
+            Route::get('/', [RolesUsuariosController::class, 'index'])->name('index');
+            Route::post('/', [RolesUsuariosController::class, 'store'])->name('store');
+            Route::get('/users-count', [RolesUsuariosController::class, 'getUsersCount'])->name('users-count');
+            Route::post('/assign-role', [RolesUsuariosController::class, 'assignRole'])->name('assign');
+            Route::post('/bulk-assign', [RolesUsuariosController::class, 'bulkAssignRole'])->name('bulk-assign');
+            Route::get('/{id}', [RolesUsuariosController::class, 'show'])->name('show');
+            Route::match(['put', 'post'], '/{id}', [RolesUsuariosController::class, 'update'])->name('update');
+            Route::match(['delete', 'post'], '/{id}/delete', [RolesUsuariosController::class, 'destroy'])->name('destroy');
+            Route::post('/{userId}/remove-role', [RolesUsuariosController::class, 'removeRole'])->name('remove');
+        });
 
-    // Rutas de usuarios
-    Route::prefix('usuarios')->name('usuarios.')->group(function () {
-        Route::get('/', [UsuariosGestionController::class, 'index'])->name('index');
-        Route::post('/', [UsuariosGestionController::class, 'store'])->name('store');
-        Route::post('/bulk-delete', [UsuariosGestionController::class, 'bulkDelete'])->name('bulk-delete');
-        Route::get('/export', [UsuariosGestionController::class, 'export'])->name('export');
-        Route::get('/{id}', [UsuariosGestionController::class, 'show'])->name('show');
-        Route::match(['put', 'post'], '/{id}', [UsuariosGestionController::class, 'update'])->name('update');
-        Route::match(['delete', 'post'], '/{id}/delete', [UsuariosGestionController::class, 'destroy'])->name('destroy');
-        Route::post('/{id}/toggle-status', [UsuariosGestionController::class, 'toggleStatus'])->name('toggle-status');
-        Route::post('/{id}/change-password', [UsuariosGestionController::class, 'changePassword'])->name('change-password');
-        Route::post('/{id}/reset-password', [UsuariosGestionController::class, 'resetPassword'])->name('reset-password');
+        // Rutas de usuarios
+        Route::prefix('usuarios')->name('usuarios.')->group(function () {
+            Route::get('/', [UsuariosGestionController::class, 'index'])->name('index');
+            Route::post('/', [UsuariosGestionController::class, 'store'])->name('store');
+            Route::post('/bulk-delete', [UsuariosGestionController::class, 'bulkDelete'])->name('bulk-delete');
+            Route::get('/export', [UsuariosGestionController::class, 'export'])->name('export');
+            Route::get('/{id}', [UsuariosGestionController::class, 'show'])->name('show');
+            Route::match(['put', 'post'], '/{id}', [UsuariosGestionController::class, 'update'])->name('update');
+            Route::match(['delete', 'post'], '/{id}/delete', [UsuariosGestionController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/toggle-status', [UsuariosGestionController::class, 'toggleStatus'])->name('toggle-status');
+            Route::post('/{id}/change-password', [UsuariosGestionController::class, 'changePassword'])->name('change-password');
+            Route::post('/{id}/reset-password', [UsuariosGestionController::class, 'resetPassword'])->name('reset-password');
+        });
     });
 });
 

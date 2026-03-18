@@ -5,6 +5,8 @@ import { useState } from 'react';
 export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
     const { isDarkMode } = useTheme();
     const [isExporting, setIsExporting] = useState(false);
+    const [mostrarFirma, setMostrarFirma] = useState(true);
+    const [tipoCondiciones, setTipoCondiciones] = useState('ventas');
 
     if (!isOpen || !cotizacion) return null;
 
@@ -22,7 +24,35 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
         });
     };
 
+    const getFormattedCodigo = () => {
+        if (!cotizacion) return '';
+        
+        // Si ya tiene un formato personalizado (no empieza con COT-), usarlo
+        // O si no hay info de empresa, usar el número tal cual
+        if (!cotizacion.numero?.startsWith('COT-') || !cotizacion.mi_empresa?.codigo_cotizacion) {
+            return cotizacion.numero || `COT-${cotizacion.id}`;
+        }
+
+        // Intentar reformatear si es COT-YYYY-NNN y tenemos empresa
+        try {
+            const parts = cotizacion.numero.split('-');
+            if (parts.length === 3) {
+                // COT-2025-002 -> parts[2] is 002
+                const number = parts[2];
+                const year = parts[1];
+                const prefix = cotizacion.mi_empresa.codigo_cotizacion;
+                // Formato deseado: PREFIJO-NUMERO(8)-AÑO
+                return `${prefix}-${number.padStart(8, '0')}-${year}`;
+            }
+        } catch (e) {
+            console.error('Error formatting code', e);
+        }
+        
+        return cotizacion.numero;
+    };
+
     const handleExportPdf = async () => {
+        console.log('Iniciando exportación de PDF para cotización:', cotizacion.id);
         setIsExporting(true);
         // Agrega cancelación y timeout para evitar que el botón quede bloqueado si el servidor se demora
         const controller = new AbortController();
@@ -30,12 +60,26 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
         const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
         try {
-            const response = await fetch(`/crm/cotizaciones/${cotizacion.id}/export-pdf`, {
+            const urlParams = new URLSearchParams({
+                mostrar_firma: mostrarFirma ? '1' : '0',
+                tipo_condiciones: tipoCondiciones
+            });
+            const endpointUrl = `/crm/cotizaciones/${cotizacion.id}/export-pdf?${urlParams.toString()}`;
+            
+            console.log(`Fetching: ${endpointUrl}`);
+            const response = await fetch(endpointUrl, {
                 signal: controller.signal,
             });
-            if (!response.ok) throw new Error('Error al generar el PDF');
+            console.log('Respuesta recibida:', response.status, response.statusText);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Error en respuesta:', errorText);
+                throw new Error('Error al generar el PDF');
+            }
 
             const blob = await response.blob();
+            console.log('Blob recibido, tamaño:', blob.size);
             const url = window.URL.createObjectURL(blob);
 
             const link = document.createElement('a');
@@ -48,10 +92,13 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
             setTimeout(() => {
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
+                console.log('Limpieza completada');
             }, 0);
         } catch (error) {
+            console.error('Excepción capturada en handleExportPdf:', error);
             const aborted = error?.name === 'AbortError' || String(error?.message || '').toLowerCase().includes('aborted');
             if (aborted) {
+                console.warn('La solicitud fue abortada por timeout o usuario');
                 alert('La generación del PDF está tardando más de lo esperado. Intente nuevamente o verifique el servidor.');
             } else {
                 console.error('Error al exportar PDF:', error);
@@ -60,6 +107,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
         } finally {
             clearTimeout(timeoutId);
             setIsExporting(false);
+            console.log('Finalizado handleExportPdf');
         }
     };
 
@@ -77,7 +125,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                             Detalles de Cotización
                         </h2>
                         <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {cotizacion.numero || `COT-${cotizacion.id}`}
+                            {getFormattedCodigo()}
                         </p>
                     </div>
                     <button
@@ -341,30 +389,58 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                 <div className={`px-6 py-4 border-t flex justify-between items-center ${
                     isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-gray-50'
                 }`}>
-                    <button
-                        onClick={handleExportPdf}
-                        disabled={isExporting}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-                            isExporting
-                                ? 'bg-blue-400 cursor-not-allowed'
-                                : 'bg-blue-600 hover:bg-blue-700'
-                        } text-white`}
-                    >
-                        {isExporting ? (
-                            <>
-                                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Generando PDF...
-                            </>
-                        ) : (
-                            <>
-                                <FiDownload className="w-4 h-4" />
-                                Exportar a PDF
-                            </>
-                        )}
-                    </button>
+                    <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <select
+                                value={tipoCondiciones}
+                                onChange={(e) => setTipoCondiciones(e.target.value)}
+                                className={`text-sm rounded border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 ${
+                                    isDarkMode ? 'bg-gray-800 text-white border-gray-600' : 'bg-white text-gray-700'
+                                }`}
+                            >
+                                <option value="ventas">Condiciones de Venta</option>
+                                <option value="calibracion">Condiciones de Calibración</option>
+                                <option value="none">Sin condiciones</option>
+                            </select>
+                        </div>
+
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={mostrarFirma}
+                                onChange={(e) => setMostrarFirma(e.target.checked)}
+                                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                            />
+                            <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                Incluir firma
+                            </span>
+                        </label>
+                        
+                        <button
+                            onClick={handleExportPdf}
+                            disabled={isExporting}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                                isExporting
+                                    ? 'bg-blue-400 cursor-not-allowed'
+                                    : 'bg-blue-600 hover:bg-blue-700'
+                            } text-white`}
+                        >
+                            {isExporting ? (
+                                <>
+                                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    Generando PDF...
+                                </>
+                            ) : (
+                                <>
+                                    <FiDownload className="w-4 h-4" />
+                                    Exportar a PDF
+                                </>
+                            )}
+                        </button>
+                    </div>
                     <button
                         onClick={onClose}
                         disabled={isExporting}

@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\EmpresaCliente;
 use App\Models\Usuario;
 use App\Models\Cliente;
+use App\Models\ContactoEmpresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class EmpresasClientesController extends Controller
@@ -17,7 +19,7 @@ class EmpresasClientesController extends Controller
      */
     public function index(Request $request)
     {
-        $query = EmpresaCliente::with('vendedor');
+        $query = EmpresaCliente::with(['vendedor', 'contactos']);
 
         // Búsqueda
         if ($request->has('search')) {
@@ -82,11 +84,13 @@ class EmpresasClientesController extends Controller
         $validator = Validator::make($request->all(), [
             'razon_social' => 'required|string|max:255',
             'ruc' => 'required|string|size:11|unique:empresasclientes,ruc',
-            'contacto_principal' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'telefono' => 'required|string|max:20',
             'direccion' => 'required|string|max:500',
             'usuario_id' => 'required|exists:usuarios,id_usuario',
+            'contactos' => 'required|array|min:1',
+            'contactos.*.nombre' => 'required|string|max:255',
+            'contactos.*.email' => 'required|email|max:255',
+            'contactos.*.telefono' => 'required|string|max:20',
+            'contactos.*.cargo' => 'nullable|string|max:100',
         ]);
 
         if ($validator->fails()) {
@@ -94,22 +98,39 @@ class EmpresasClientesController extends Controller
         }
 
         try {
+            DB::beginTransaction();
+
+            // Find primary contact or take the first one
+            $contactos = collect($request->contactos);
+            $primaryContact = $contactos->firstWhere('es_principal', true) ?? $contactos->first();
+
             $empresa = EmpresaCliente::create([
                 'razon_social' => $request->razon_social,
                 'ruc' => $request->ruc,
-                'sector' => $request->sector,
-                'contacto_principal' => $request->contacto_principal,
-                'email' => $request->email,
-                'telefono' => $request->telefono,
+                'sector_id' => $request->sector_id,
+                'contacto_principal' => $primaryContact['nombre'],
+                'email' => $primaryContact['email'],
+                'telefono' => $primaryContact['telefono'],
                 'direccion' => $request->direccion,
                 'usuario_id' => $request->usuario_id,
-                'cliente_id' => $request->cliente_id,
                 'activo' => $request->activo ?? true,
             ]);
 
+            foreach ($request->contactos as $contactoData) {
+                $empresa->contactos()->create([
+                    'nombre' => $contactoData['nombre'],
+                    'email' => $contactoData['email'],
+                    'telefono' => $contactoData['telefono'],
+                    'cargo' => $contactoData['cargo'] ?? null,
+                    'es_principal' => isset($contactoData['es_principal']) ? $contactoData['es_principal'] : false,
+                ]);
+            }
+
+            DB::commit();
             return redirect()->route('crm.clientes.empresas.index')->with('success', 'Empresa cliente creada exitosamente');
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return back()->withErrors(['error' => 'Error al crear la empresa cliente: ' . $e->getMessage()]);
         }
     }
@@ -119,7 +140,7 @@ class EmpresasClientesController extends Controller
      */
     public function show($id)
     {
-        $empresa = EmpresaCliente::with('vendedor')->findOrFail($id);
+        $empresa = EmpresaCliente::with(['vendedor', 'contactos'])->findOrFail($id);
 
         return response()->json([
             'success' => true,
@@ -137,11 +158,13 @@ class EmpresasClientesController extends Controller
         $validator = Validator::make($request->all(), [
             'razon_social' => 'required|string|max:255',
             'ruc' => 'required|string|size:11|unique:empresasclientes,ruc,' . $id,
-            'contacto_principal' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'telefono' => 'required|string|max:20',
             'direccion' => 'required|string|max:500',
             'usuario_id' => 'required|exists:usuarios,id_usuario',
+            'contactos' => 'required|array|min:1',
+            'contactos.*.nombre' => 'required|string|max:255',
+            'contactos.*.email' => 'required|email|max:255',
+            'contactos.*.telefono' => 'required|string|max:20',
+            'contactos.*.cargo' => 'nullable|string|max:100',
         ]);
 
         if ($validator->fails()) {
@@ -149,22 +172,42 @@ class EmpresasClientesController extends Controller
         }
 
         try {
+            DB::beginTransaction();
+
+            $contactos = collect($request->contactos);
+            $primaryContact = $contactos->firstWhere('es_principal', true) ?? $contactos->first();
+
             $empresa->update([
                 'razon_social' => $request->razon_social,
                 'ruc' => $request->ruc,
-                'sector' => $request->sector,
-                'contacto_principal' => $request->contacto_principal,
-                'email' => $request->email,
-                'telefono' => $request->telefono,
+                'sector_id' => $request->sector_id,
+                'contacto_principal' => $primaryContact['nombre'],
+                'email' => $primaryContact['email'],
+                'telefono' => $primaryContact['telefono'],
                 'direccion' => $request->direccion,
                 'usuario_id' => $request->usuario_id,
-                'cliente_id' => $request->cliente_id,
                 'activo' => $request->activo ?? true,
             ]);
 
+            // Sync contacts: delete all and recreate
+            // A better approach would be to keep IDs if provided, but for simplicity and since it's a sub-resource often edited in bulk on the parent form:
+            $empresa->contactos()->delete();
+
+            foreach ($request->contactos as $contactoData) {
+                $empresa->contactos()->create([
+                    'nombre' => $contactoData['nombre'],
+                    'email' => $contactoData['email'],
+                    'telefono' => $contactoData['telefono'],
+                    'cargo' => $contactoData['cargo'] ?? null,
+                    'es_principal' => isset($contactoData['es_principal']) ? $contactoData['es_principal'] : false,
+                ]);
+            }
+
+            DB::commit();
             return redirect()->route('crm.clientes.empresas.index')->with('success', 'Empresa cliente actualizada exitosamente');
 
         } catch (\Exception $e) {
+            DB::rollBack();
             return back()->withErrors(['error' => 'Error al actualizar la empresa cliente: ' . $e->getMessage()]);
         }
     }
