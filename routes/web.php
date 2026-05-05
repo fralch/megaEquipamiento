@@ -479,6 +479,10 @@ Route::prefix('match-api')->name('match.')->group(function () {
         Route::match(['put', 'patch'], '/profile', [\App\Http\Controllers\Match\MatchProfileController::class, 'update'])->name('profile.update');
         Route::post('/profile/photo', [\App\Http\Controllers\Match\MatchProfileController::class, 'uploadPhoto'])->name('profile.photo');
 
+        // Notifications
+        Route::get('/notifications', [\App\Http\Controllers\Match\MatchProfileController::class, 'getNotifications'])->name('notifications.index');
+        Route::post('/notifications/{id}/read', [\App\Http\Controllers\Match\MatchProfileController::class, 'markAsRead'])->name('notifications.read');
+
         // Swipe
         Route::get('/candidates', [\App\Http\Controllers\Match\MatchSwipeController::class, 'getCandidates'])->name('candidates');
         Route::post('/swipe', [\App\Http\Controllers\Match\MatchSwipeController::class, 'swipe'])->name('swipe');

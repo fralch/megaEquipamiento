@@ -23,6 +23,9 @@ class MatchAuthController extends Controller
             'description' => 'nullable|string',
             'instagram' => 'nullable|string',
             'whatsapp' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'city' => 'nullable|string',
         ]);
 
         // Since we cast 'password' => 'hashed' in the model, we don't need Hash::make here
@@ -36,6 +39,9 @@ class MatchAuthController extends Controller
             'description' => $request->description,
             'instagram' => $request->instagram,
             'whatsapp' => $request->whatsapp,
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'city' => $request->city,
         ]);
 
         $token = $user->createToken('match-app')->plainTextToken;

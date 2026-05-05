@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Match\MatchUser;
 use App\Models\Match\MatchSwipe;
 use App\Models\Match\MatchPair;
+use App\Models\Match\MatchNotification;
 
 class MatchSwipeController extends Controller
 {
@@ -31,10 +32,21 @@ class MatchSwipeController extends Controller
         if ($currentUser->interested_in !== 'everyone') {
             $query->where('gender', $currentUser->interested_in);
         }
+
+        // Distance filtering (Haversine Formula)
+        if ($currentUser->latitude && $currentUser->longitude) {
+            $lat = $currentUser->latitude;
+            $lng = $currentUser->longitude;
+            $radius = $request->query('radius', 50); // Default 50km
+
+            $query->selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$lat, $lng, $lat])
+                ->having('distance', '<=', $radius)
+                ->orderBy('distance', 'asc');
+        } else {
+            $query->inRandomOrder();
+        }
         
-        $candidates = $query->inRandomOrder()
-            ->limit(20)
-            ->get();
+        $candidates = $query->limit(20)->get();
             
         return response()->json($candidates);
     }
@@ -89,6 +101,14 @@ class MatchSwipeController extends Controller
                 ]);
                 
                 $isMatch = true;
+            }
+        }
+        
+        return response()->json(['status' => 'success', 'match' => $isMatch]);
+    }
+}
+', '¡Nuevo Match!', "Has hecho match con {$otherUser->name}", ['match_user_id' => $otherUser->id]);
+                MatchNotification::send($otherUser->id, 'match', '¡Nuevo Match!', "Has hecho match con {$currentUser->name}", ['match_user_id' => $currentUser->id]);
             }
         }
         

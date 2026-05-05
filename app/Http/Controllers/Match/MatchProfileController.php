@@ -34,6 +34,9 @@ class MatchProfileController extends Controller
             'interested_in' => $user->interested_in,
             'instagram' => $user->instagram,
             'whatsapp' => $user->whatsapp,
+            'latitude' => $user->latitude,
+            'longitude' => $user->longitude,
+            'city' => $user->city,
             'photos' => $user->photos,
             'created_at' => $user->created_at,
             'updated_at' => $user->updated_at,
@@ -50,9 +53,46 @@ class MatchProfileController extends Controller
         $user = $this->getCurrentUser();
         if (!$user) return response()->json(['message' => 'User not found'], 404);
         
+        $request->validate([
+            'name' => 'nullable|string',
+            'age' => 'nullable|integer|min:18',
+            'gender' => 'nullable|string',
+            'interested_in' => 'nullable|string',
+            'description' => 'nullable|string',
+            'instagram' => 'nullable|string',
+            'whatsapp' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'city' => 'nullable|string',
+            'fcm_token' => 'nullable|string',
+        ]);
+
         $user->update($request->all());
         
         return response()->json($user);
+    }
+
+    public function getNotifications()
+    {
+        $user = $this->getCurrentUser();
+        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
+
+        $notifications = $user->notifications;
+
+        return response()->json($notifications);
+    }
+
+    public function markAsRead($id)
+    {
+        $user = $this->getCurrentUser();
+        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
+
+        $notification = $user->notifications()->where('id', $id)->first();
+        if ($notification) {
+            $notification->update(['is_read' => true]);
+        }
+
+        return response()->json(['status' => 'success']);
     }
 
     public function uploadPhoto(Request $request)

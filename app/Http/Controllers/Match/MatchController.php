@@ -96,6 +96,13 @@ class MatchController extends Controller
             'content' => $request->content,
             'is_read' => false
         ]);
+
+        // Notify recipient
+        $recipientId = $pair->user_1_id === $currentUser->id ? $pair->user_2_id : $pair->user_1_id;
+        MatchNotification::send($recipientId, 'message', 'Nuevo mensaje', "{$currentUser->name} te envió un mensaje", [
+            'match_pair_id' => $pair->id,
+            'sender_id' => $currentUser->id
+        ]);
         
         return response()->json($msg);
     }

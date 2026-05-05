@@ -14,7 +14,7 @@ class MatchUser extends Authenticatable
     
     protected $fillable = [
         'name', 'email', 'password', 'age', 'gender', 'description', 
-        'interested_in', 'instagram', 'whatsapp'
+        'interested_in', 'instagram', 'whatsapp', 'latitude', 'longitude', 'city', 'fcm_token'
     ];
 
     protected $hidden = [
@@ -32,6 +32,11 @@ class MatchUser extends Authenticatable
     public function photos()
     {
         return $this->hasMany(MatchPhoto::class, 'match_user_id')->orderBy('order');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(MatchNotification::class, 'match_user_id')->latest()->limit(10);
     }
 
     public function swipes_made()
