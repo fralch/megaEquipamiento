@@ -72,7 +72,7 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user() ? $request->user()->load('rol') : null,
+                'user' => $request->user() ? ($request->user() instanceof \App\Models\Usuario ? $request->user()->load('rol') : $request->user()) : null,
             ],
             'notificationStats' => $notificationStats,
         ];

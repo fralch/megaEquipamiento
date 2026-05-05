@@ -101,14 +101,13 @@ class MatchSwipeController extends Controller
                 ]);
                 
                 $isMatch = true;
-            }
-        }
-        
-        return response()->json(['status' => 'success', 'match' => $isMatch]);
-    }
-}
-', '¡Nuevo Match!', "Has hecho match con {$otherUser->name}", ['match_user_id' => $otherUser->id]);
-                MatchNotification::send($otherUser->id, 'match', '¡Nuevo Match!', "Has hecho match con {$currentUser->name}", ['match_user_id' => $currentUser->id]);
+
+                // Notify both users
+                $otherUser = MatchUser::find($swipedId);
+                if ($otherUser) {
+                    MatchNotification::send($currentUser->id, 'match', '¡Nuevo Match!', "Has hecho match con {$otherUser->name}", ['match_user_id' => $otherUser->id]);
+                    MatchNotification::send($otherUser->id, 'match', '¡Nuevo Match!', "Has hecho match con {$currentUser->name}", ['match_user_id' => $currentUser->id]);
+                }
             }
         }
         
