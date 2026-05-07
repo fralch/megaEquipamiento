@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Match\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Match\MatchNotification;
 use App\Models\Match\MatchPhoto;
+use App\Models\Match\MatchUser;
+use App\Services\FirebaseNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -83,6 +85,17 @@ class MatchAdminPhotoModerationController extends Controller
             "Tu foto no fue aprobada. Motivo: {$validated['reason']}",
             ['photo_id' => $photo->id, 'reason' => $validated['reason']]
         );
+
+        $user = MatchUser::find($photo->match_user_id);
+        if ($user?->fcm_token) {
+            $firebase = new FirebaseNotificationService();
+            $firebase->sendToToken(
+                $user->fcm_token,
+                'Tu foto fue rechazada',
+                "Motivo: {$validated['reason']}",
+                ['type' => 'photo_rejected', 'photo_id' => (string) $photo->id]
+            );
+        }
 
         return response()->json([
             'id' => (string) $photo->id,

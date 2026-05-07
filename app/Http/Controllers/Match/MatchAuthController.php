@@ -77,6 +77,10 @@ class MatchAuthController extends Controller
 
         $user->forceFill(['last_active_at' => now()])->save();
 
+        if ($request->fcm_token) {
+            $user->forceFill(['fcm_token' => $request->fcm_token])->save();
+        }
+
         $token = $user->createToken('match-app')->plainTextToken;
 
         return response()->json([
