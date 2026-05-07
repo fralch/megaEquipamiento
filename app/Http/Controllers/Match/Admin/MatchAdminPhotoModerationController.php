@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Match\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Match\MatchNotification;
 use App\Models\Match\MatchPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -74,6 +75,14 @@ class MatchAdminPhotoModerationController extends Controller
             'moderation_reason' => $validated['reason'],
             'moderated_by' => $request->user()->id,
         ])->save();
+
+        MatchNotification::send(
+            $photo->match_user_id,
+            'photo_rejected',
+            'Tu foto fue rechazada',
+            "Tu foto no fue aprobada. Motivo: {$validated['reason']}",
+            ['photo_id' => $photo->id, 'reason' => $validated['reason']]
+        );
 
         return response()->json([
             'id' => (string) $photo->id,
