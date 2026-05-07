@@ -67,6 +67,16 @@ class MatchAuthController extends Controller
             ]);
         }
 
+        if ($user->status === 'banned') {
+            return response()->json(['message' => 'Tu cuenta esta suspendida.'], 403);
+        }
+
+        if ($user->status === 'inactive') {
+            return response()->json(['message' => 'Tu cuenta esta inactiva.'], 403);
+        }
+
+        $user->forceFill(['last_active_at' => now()])->save();
+
         $token = $user->createToken('match-app')->plainTextToken;
 
         return response()->json([

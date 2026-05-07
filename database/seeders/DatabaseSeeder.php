@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
+            MatchAdminSeeder::class,
             TagSeeder::class,
         ]);
     }

@@ -13,8 +13,8 @@ class MatchUser extends Authenticatable
     protected $table = 'match_users';
     
     protected $fillable = [
-        'name', 'email', 'password', 'age', 'gender', 'description', 
-        'interested_in', 'instagram', 'whatsapp', 'latitude', 'longitude', 'city', 'fcm_token'
+        'name', 'email', 'password', 'age', 'gender', 'description',
+        'interested_in', 'instagram', 'whatsapp', 'latitude', 'longitude', 'city', 'fcm_token',
     ];
 
     protected $hidden = [
@@ -26,6 +26,8 @@ class MatchUser extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'banned_at' => 'datetime',
+            'last_active_at' => 'datetime',
         ];
     }
 

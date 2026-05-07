@@ -459,6 +459,28 @@ Route::get('/robots.txt', function () {
 
 
 
+// Rutas para administracion aislada de app de match
+Route::prefix('admin-api-match')->name('admin.match.')->group(function () {
+    Route::post('/auth/login', [\App\Http\Controllers\Match\Admin\MatchAdminAuthController::class, 'login'])->name('auth.login');
+
+    Route::middleware(['auth:sanctum', 'match.admin'])->group(function () {
+        Route::post('/auth/logout', [\App\Http\Controllers\Match\Admin\MatchAdminAuthController::class, 'logout'])->name('auth.logout');
+        Route::get('/dashboard/stats', [\App\Http\Controllers\Match\Admin\MatchAdminDashboardController::class, 'stats'])->name('dashboard.stats');
+
+        Route::get('/users', [\App\Http\Controllers\Match\Admin\MatchAdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{userId}', [\App\Http\Controllers\Match\Admin\MatchAdminUserController::class, 'show'])->name('users.show');
+        Route::post('/users/{userId}/ban', [\App\Http\Controllers\Match\Admin\MatchAdminUserController::class, 'ban'])->name('users.ban');
+        Route::post('/users/{userId}/unban', [\App\Http\Controllers\Match\Admin\MatchAdminUserController::class, 'unban'])->name('users.unban');
+
+        Route::get('/moderation/photos', [\App\Http\Controllers\Match\Admin\MatchAdminPhotoModerationController::class, 'index'])->name('moderation.photos.index');
+        Route::post('/moderation/photos/{photoId}/approve', [\App\Http\Controllers\Match\Admin\MatchAdminPhotoModerationController::class, 'approve'])->name('moderation.photos.approve');
+        Route::post('/moderation/photos/{photoId}/reject', [\App\Http\Controllers\Match\Admin\MatchAdminPhotoModerationController::class, 'reject'])->name('moderation.photos.reject');
+
+        Route::get('/settings', [\App\Http\Controllers\Match\Admin\MatchAdminSettingsController::class, 'show'])->name('settings.show');
+        Route::put('/settings', [\App\Http\Controllers\Match\Admin\MatchAdminSettingsController::class, 'update'])->name('settings.update');
+    });
+});
+
 // Rutas para app de match
 Route::prefix('match-api')->name('match.')->group(function () {
     // Auth Routes
