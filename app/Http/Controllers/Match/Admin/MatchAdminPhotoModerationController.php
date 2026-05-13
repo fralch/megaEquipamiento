@@ -8,7 +8,9 @@ use App\Models\Match\MatchPhoto;
 use App\Models\Match\MatchUser;
 use App\Services\FirebaseNotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Throwable;
 
 class MatchAdminPhotoModerationController extends Controller
 {
@@ -88,13 +90,20 @@ class MatchAdminPhotoModerationController extends Controller
 
         $user = MatchUser::find($photo->match_user_id);
         if ($user?->fcm_token) {
-            $firebase = new FirebaseNotificationService();
-            $firebase->sendToToken(
-                $user->fcm_token,
-                'Tu foto fue rechazada',
-                "Motivo: {$validated['reason']}",
-                ['type' => 'photo_rejected', 'photo_id' => (string) $photo->id]
-            );
+            try {
+                app(FirebaseNotificationService::class)->sendToToken(
+                    $user->fcm_token,
+                    'Tu foto fue rechazada',
+                    "Motivo: {$validated['reason']}",
+                    ['type' => 'photo_rejected', 'photo_id' => (string) $photo->id]
+                );
+            } catch (Throwable $exception) {
+                Log::error('Photo rejection Firebase notification failed', [
+                    'match_user_id' => $user->id,
+                    'photo_id' => $photo->id,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
         }
 
         return response()->json([

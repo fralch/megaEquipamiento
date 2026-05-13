@@ -3,10 +3,12 @@
 namespace Tests\Feature\Match;
 
 use App\Models\Match\MatchAdmin;
+use App\Models\Match\MatchNotification;
 use App\Models\Match\MatchPair;
 use App\Models\Match\MatchPhoto;
 use App\Models\Match\MatchSetting;
 use App\Models\Match\MatchUser;
+use App\Services\FirebaseNotificationService;
 use Tests\TestCase;
 
 class MatchAdminApiTest extends TestCase
@@ -17,6 +19,7 @@ class MatchAdminApiTest extends TestCase
             ->whereHas('user1', fn ($query) => $query->where('email', 'like', '%@admin-api-match.test'))
             ->orWhereHas('user2', fn ($query) => $query->where('email', 'like', '%@admin-api-match.test'))
             ->delete();
+        MatchNotification::query()->whereHas('user', fn ($query) => $query->where('email', 'like', '%@admin-api-match.test'))->delete();
         MatchPhoto::query()->whereHas('user', fn ($query) => $query->where('email', 'like', '%@admin-api-match.test'))->delete();
         MatchUser::query()->where('email', 'like', '%@admin-api-match.test')->delete();
         MatchAdmin::query()
@@ -116,6 +119,61 @@ class MatchAdminApiTest extends TestCase
             ->assertJsonPath('status', 'approved');
 
         $this->assertSame('approved', $photo->fresh()->status);
+    }
+
+    public function test_rejects_match_photo_and_notifies_user(): void
+    {
+        $token = $this->matchAdminToken();
+        $firebase = new class {
+            public array $calls = [];
+
+            public function sendToToken(string $token, string $title, string $body, array $data = []): bool
+            {
+                $this->calls[] = compact('token', 'title', 'body', 'data');
+
+                return true;
+            }
+        };
+
+        $this->app->instance(FirebaseNotificationService::class, $firebase);
+
+        $user = $this->matchUser([
+            'fcm_token' => 'test-fcm-token',
+        ]);
+        $photo = MatchPhoto::create([
+            'match_user_id' => $user->id,
+            'url' => '/storage/match_photos/rejected.jpg',
+            'order' => 0,
+        ]);
+
+        $this->withHeader('Authorization', "Bearer {$token}")
+            ->postJson("/admin-api-match/moderation/photos/{$photo->id}/reject", [
+                'reason' => 'La imagen no cumple las normas',
+            ])
+            ->assertOk()
+            ->assertJsonPath('status', 'rejected')
+            ->assertJsonPath('message', 'Foto rechazada correctamente');
+
+        $photo->refresh();
+
+        $this->assertSame('rejected', $photo->status);
+        $this->assertSame('La imagen no cumple las normas', $photo->moderation_reason);
+        $this->assertNotNull($photo->moderated_at);
+
+        $this->assertDatabaseHas('match_notifications', [
+            'match_user_id' => $user->id,
+            'type' => 'photo_rejected',
+            'title' => 'Tu foto fue rechazada',
+            'content' => 'Tu foto no fue aprobada. Motivo: La imagen no cumple las normas',
+            'is_read' => false,
+        ]);
+
+        $this->assertCount(1, $firebase->calls);
+        $this->assertSame('test-fcm-token', $firebase->calls[0]['token']);
+        $this->assertSame('Tu foto fue rechazada', $firebase->calls[0]['title']);
+        $this->assertSame('Motivo: La imagen no cumple las normas', $firebase->calls[0]['body']);
+        $this->assertSame('photo_rejected', $firebase->calls[0]['data']['type']);
+        $this->assertSame((string) $photo->id, $firebase->calls[0]['data']['photo_id']);
     }
 
     public function test_updates_match_settings_and_returns_dashboard_stats(): void
