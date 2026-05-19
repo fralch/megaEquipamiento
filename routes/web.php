@@ -503,6 +503,7 @@ Route::prefix('match-api')->name('match.')->group(function () {
 
         // Notifications
         Route::get('/notifications', [\App\Http\Controllers\Match\MatchProfileController::class, 'getNotifications'])->name('notifications.index');
+        Route::get('/notifications/test-push', \App\Http\Controllers\Match\MatchTestNotificationController::class)->name('notifications.test-push');
         Route::post('/notifications/{id}/read', [\App\Http\Controllers\Match\MatchProfileController::class, 'markAsRead'])->name('notifications.read');
 
         // Swipe

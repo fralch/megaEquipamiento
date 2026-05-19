@@ -134,6 +134,24 @@ Chat entre pares.
 *   **GET** `/matches/{match_id}/messages?user_id={id}`
 *   Retorna historial de chat ordenado cronológicamente.
 
+#### Probar Notificaciones Push
+*   **GET** `/notifications/test-push`
+*   Requiere autenticación Sanctum como usuario de la app de citas.
+*   Dispara una notificación FCM de prueba a todos los dispositivos con `fcm_token` registrado en `match_users`.
+*   Query params opcionales:
+    *   `title`: Título de la notificación.
+    *   `body`: Cuerpo de la notificación.
+*   Respuesta:
+    ```json
+    {
+      "status": "success",
+      "test_id": "uuid",
+      "devices_targeted": 3,
+      "sent": 3,
+      "failed": 0
+    }
+    ```
+
 #### Enviar Mensaje
 *   **POST** `/matches/{match_id}/messages?user_id={id}`
 *   Body:
