@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../storage/ThemeContext';
+import { getProductUrl } from "../../utils/productUrl";
 
 const URL_API = import.meta.env.VITE_API_URL;
 
@@ -373,7 +374,7 @@ const ProductsView = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex gap-2">
                         <a
-                          href={`/producto/${product.id_producto}`}
+                          href={getProductUrl(product)}
                           className={`px-3 py-1 rounded-md text-xs transition-colors duration-200 ${
                             isDarkMode
                               ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-400'

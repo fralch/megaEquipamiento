@@ -7,6 +7,7 @@ import { useCurrency } from '../../storage/CurrencyContext';
 import { useCompare } from '../../hooks/useCompare';
 import countryCodeMap from '../store/countryJSON.json';
 import SubcategoryProducts from './SubcategoryProducts';
+import { getProductUrl } from "../../utils/productUrl";
 
 const ModalPendingRelation = ({ productId, relatedProductId, initialRelated = [], onSave, onClose, isPendingRelation = false }) => {
     const { isDarkMode } = useTheme();
@@ -427,7 +428,7 @@ const RelatedProducts = ({ productId, currentProductSubcategoryId }) => {
                 onMouseEnter={() => setHoveredProductId(product.id_producto)}
                 onMouseLeave={() => setHoveredProductId(null)}
             >
-                <Link href={`/producto/${product.id_producto}`}>
+                <Link href={getProductUrl(product)}>
                     <div className="relative">
                         {/* Área de imagen con fondo adaptable */}
                         <div className={`h-40 overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
@@ -514,12 +515,12 @@ const RelatedProducts = ({ productId, currentProductSubcategoryId }) => {
                             if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a') {
                                 e.stopPropagation();
                             } else {
-                                window.location.href = `/producto/${product.id_producto}`;
+                                window.location.href = getProductUrl(product);
                             }
                         }}
                     >
                         <a 
-                            href={`/producto/${product.id_producto}`}
+                            href={getProductUrl(product)}
                             className={`text-xl font-semibold mb-2 text-center transition-colors cursor-pointer ${
                                 isDarkMode 
                                     ? 'hover:text-blue-300 text-gray-100' 

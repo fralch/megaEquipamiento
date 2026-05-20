@@ -1,4 +1,5 @@
 import React, { createContext, useReducer, useEffect, useContext } from 'react';
+import { getProductUrl } from "../utils/productUrl";
 
 export const RecentlyViewedContext = createContext();
 
@@ -93,7 +94,7 @@ export const RecentlyViewedProvider = ({ children }) => {
       sku: product.sku,
       descripcion: product.descripcion,
       marca: product.marca || { nombre: product.nombre_marca },
-      link: product.link || `/producto/${product.id || product.id_producto}`
+      link: product.link || getProductUrl(product)
     };
 
     dispatch({ type: 'ADD_RECENTLY_VIEWED', product: productToAdd });

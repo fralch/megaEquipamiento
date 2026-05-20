@@ -4,6 +4,7 @@ import { CartContext } from '../../storage/CartContext';
 import { useTheme } from '../../storage/ThemeContext';
 import { useCurrency } from '../../storage/CurrencyContext';
 import { useCompare } from '../../hooks/useCompare';
+import { getProductUrl } from "../../utils/productUrl";
 
 const URL_API = import.meta.env.VITE_API_URL;
 const FALLBACK_IMAGE = '/img/logo2.jpg';
@@ -140,7 +141,7 @@ const ProductGrid = ({ products: initialProducts }) => {
       flag: countryName ? `https://flagcdn.com/w320/${countryCode}.png` : '',
       marca: item.marca?.imagen || '',
       nombre_marca: item.marca?.nombre || '',
-      link: `/producto/${item.id_producto}`,
+      link: getProductUrl(item),
       descripcion: item.descripcion || '',
       video: item.video || '',
       envio: item.envio || '',

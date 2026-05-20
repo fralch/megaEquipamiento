@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, memo } from "react";
 import axios from "axios";
 import CartIcon from "./CartIcon";
 import { useTheme } from "../../storage/ThemeContext";
+import { getProductUrl } from "../../utils/productUrl";
 
 const Header = memo(() => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -189,7 +190,7 @@ const Header = memo(() => {
   }, [searchTerm]);
 
   // Navegación
-  const handleProductClick = (p) => { window.location.href = `/producto/${p.id_producto}`; setIsModalOpen(false); };
+  const handleProductClick = (p) => { window.location.href = getProductUrl(p); setIsModalOpen(false); };
   const handleMarcaClick = (m) => { window.location.href = `/marcas/${m.id_marca}`; setIsModalOpen(false); };
   const handleCategoriaClick = (c) => { window.location.href = `/categorias/${c.id_categoria}`; setIsModalOpen(false); };
   const handleSubcategoriaClick = (s) => { window.location.href = `/subcategoria/${s.id_subcategoria}`; setIsModalOpen(false); };
