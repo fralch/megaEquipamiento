@@ -22,9 +22,28 @@ const Subcategorias = ({ onSubmit }) => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
-  const totalPages = Math.ceil(subcategorias.length / itemsPerPage);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSubcategoria, setSelectedSubcategoria] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const getCategoriaNombre = (idCategoria) => (
+    categoriasOptions.find(cat => cat.id_categoria === idCategoria)?.nombre || ''
+  );
+
+  const normalizedSearchTerm = searchTerm.trim().toLowerCase();
+  const filteredSubcategorias = subcategorias.filter((subcategoria) => {
+    if (!normalizedSearchTerm) {
+      return true;
+    }
+
+    return [
+      subcategoria.id_subcategoria,
+      subcategoria.nombre,
+      subcategoria.descripcion,
+      getCategoriaNombre(subcategoria.id_categoria),
+    ].some((value) => String(value || '').toLowerCase().includes(normalizedSearchTerm));
+  });
+  const totalPages = Math.ceil(filteredSubcategorias.length / itemsPerPage);
 
   const handleOpenEditModal = (subcategoria) => {
     setSelectedSubcategoria(subcategoria);
@@ -80,6 +99,10 @@ const Subcategorias = ({ onSubmit }) => {
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -292,7 +315,7 @@ const Subcategorias = ({ onSubmit }) => {
   // Calcular los índices de los elementos a mostrar
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = [...subcategorias].reverse().slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = [...filteredSubcategorias].reverse().slice(indexOfFirstItem, indexOfLastItem);
 
   return (
     <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-md rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 w-full mx-auto transition-colors`}>
@@ -450,6 +473,23 @@ const Subcategorias = ({ onSubmit }) => {
 
       <div className="mt-6 sm:mt-8">
         <h2 className={`text-base sm:text-lg font-bold mb-3 sm:mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Subcategorías Existentes</h2>
+        <div className="mb-4">
+          <label htmlFor="search-subcategorias" className={`block text-xs sm:text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            Buscar subcategorías
+          </label>
+          <input
+            id="search-subcategorias"
+            type="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Buscar por nombre, descripción o categoría"
+            className={`mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 transition-colors ${
+              isDarkMode
+                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+            }`}
+          />
+        </div>
         <div className="overflow-x-auto">
           <table className={`min-w-full divide-y transition-colors ${
             isDarkMode ? 'divide-gray-600' : 'divide-gray-200'
@@ -485,7 +525,7 @@ const Subcategorias = ({ onSubmit }) => {
                       <div className={`max-w-xs truncate text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>{subcategoria.descripcion || '-'}</div>
                     </td>
                     <td className={`px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-900'}`}>
-                      {categoriasOptions.find(cat => cat.id_categoria === subcategoria.id_categoria)?.nombre || ''}
+                      {getCategoriaNombre(subcategoria.id_categoria)}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
                       <div className="flex flex-col sm:flex-row gap-1 sm:gap-3">
@@ -513,7 +553,7 @@ const Subcategorias = ({ onSubmit }) => {
                   <td colSpan="5" className={`px-3 sm:px-6 py-4 text-center text-xs sm:text-sm ${
                     isDarkMode ? 'text-gray-400' : 'text-gray-500'
                   }`}>
-                    No hay subcategorías disponibles
+                    {searchTerm ? 'No se encontraron subcategorías con ese criterio' : 'No hay subcategorías disponibles'}
                   </td>
                 </tr>
               )}
