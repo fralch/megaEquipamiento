@@ -138,6 +138,8 @@ const SelectorImagenesBanco = ({
                                             <img
                                                 src={imagen.url}
                                                 alt={imagen.nombre}
+                                                loading="lazy"
+                                                decoding="async"
                                                 className="w-full h-full object-cover"
                                             />
                                         ) : (

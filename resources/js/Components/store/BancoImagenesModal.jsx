@@ -19,6 +19,10 @@ const getUploadedDateLabel = (image) => {
   return image.fecha_subida_label || image.fecha_label || image.fecha_modificacion_label || 'Sin fecha';
 };
 
+const getUploadedDate = (image) => {
+  return image.fecha_modificacion_fecha || image.fecha_subida_fecha || (image.fecha_subida || image.fecha || '').slice(0, 10);
+};
+
 const BancoImagenesModal = ({ isOpen, onClose, onSelectImages }) => {
   const { isDarkMode } = useTheme();
   const [images, setImages] = useState([]);
@@ -26,6 +30,7 @@ const BancoImagenesModal = ({ isOpen, onClose, onSelectImages }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [collectionFilter, setCollectionFilter] = useState('Todas las colecciones');
+  const [dateFilter, setDateFilter] = useState('');
   const [collections, setCollections] = useState([]);
 
   useEffect(() => {
@@ -55,7 +60,8 @@ const BancoImagenesModal = ({ isOpen, onClose, onSelectImages }) => {
     const matchesSearch = image.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCollection = collectionFilter === 'Todas las colecciones' || 
                              (image.collection_name || 'Sin colección') === collectionFilter;
-    return matchesSearch && matchesCollection;
+    const matchesDate = dateFilter === '' || getUploadedDate(image) === dateFilter;
+    return matchesSearch && matchesCollection && matchesDate;
   });
 
   const toggleImageSelection = (image) => {
@@ -138,6 +144,19 @@ const BancoImagenesModal = ({ isOpen, onClose, onSelectImages }) => {
                 ))}
               </select>
             </div>
+            <div className="md:w-48">
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className={`w-full px-3 py-2 rounded-md border transition-colors duration-300 ${
+                  isDarkMode 
+                    ? 'bg-gray-700 border-gray-600 text-white focus:border-indigo-400' 
+                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500'
+                }`}
+                title="Filtrar por fecha de modificación"
+              />
+            </div>
           </div>
         </div>
 
@@ -181,6 +200,8 @@ const BancoImagenesModal = ({ isOpen, onClose, onSelectImages }) => {
                   <img
                     src={image.url}
                     alt={image.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-24 object-cover rounded"
                   />
                   <div className={`mt-2 text-xs text-center transition-colors duration-300 ${
@@ -195,7 +216,7 @@ const BancoImagenesModal = ({ isOpen, onClose, onSelectImages }) => {
                     <p className={`text-[11px] mt-1 transition-colors duration-300 ${
                       isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     }`}>
-                      Subido: {getUploadedDateLabel(image)}
+                      Modificado: {getUploadedDateLabel(image)}
                     </p>
                   </div>
                 </div>

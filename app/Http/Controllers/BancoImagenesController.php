@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 
 class BancoImagenesController extends Controller
@@ -20,8 +21,9 @@ class BancoImagenesController extends Controller
         $tipoArchivo = $request->get('tipo', 'image'); // 'image' | 'todos'
         $termino = $request->get('buscar');
         $coleccion = $request->get('coleccion');
+        $fecha = $request->get('fecha');
 
-        $imagenesFiltradas = $todasImagenes->filter(function ($imagen) use ($tipoArchivo, $termino, $coleccion) {
+        $imagenesFiltradas = $todasImagenes->filter(function ($imagen) use ($tipoArchivo, $termino, $coleccion, $fecha) {
             // Filtro por tipo (mime)
             if ($tipoArchivo !== 'todos' && ! str_starts_with(($imagen['tipo'] ?? ''), $tipoArchivo)) {
                 return false;
@@ -39,6 +41,10 @@ class BancoImagenesController extends Controller
 
             // Filtro por colección (ruta relativa de carpeta o 'general')
             if ($coleccion && ($imagen['coleccion'] ?? $imagen['collection_name'] ?? null) !== $coleccion) {
+                return false;
+            }
+
+            if ($fecha && ! $this->imagenCorrespondeAFecha($imagen, $fecha)) {
                 return false;
             }
 
@@ -71,6 +77,7 @@ class BancoImagenesController extends Controller
                 'buscar' => $termino,
                 'tipo' => $tipoArchivo,
                 'coleccion' => $coleccion,
+                'fecha' => $fecha,
             ],
             'colecciones' => $this->obtenerTodasColecciones(),
         ]);
@@ -81,8 +88,11 @@ class BancoImagenesController extends Controller
      */
     public function getAllImagesJson(Request $request)
     {
+        $fecha = $request->get('fecha');
+
         $imagenes = collect($this->obtenerImagenesPublic())
             ->filter(fn ($img) => str_starts_with(($img['tipo'] ?? ''), 'image'))
+            ->filter(fn ($img) => ! $fecha || $this->imagenCorrespondeAFecha($img, $fecha))
             ->values();
 
         return response()->json([
@@ -100,9 +110,10 @@ class BancoImagenesController extends Controller
         $termino = $request->get('q', '');
         $tipo = $request->get('tipo', 'image');
         $limite = (int) $request->get('limite', 10);
+        $fecha = $request->get('fecha');
 
         $resultados = collect($this->obtenerImagenesPublic())
-            ->filter(function ($imagen) use ($tipo, $termino) {
+            ->filter(function ($imagen) use ($tipo, $termino, $fecha) {
                 // Tipo
                 if ($tipo !== 'todos' && ! str_starts_with(($imagen['tipo'] ?? ''), $tipo)) {
                     return false;
@@ -116,6 +127,10 @@ class BancoImagenesController extends Controller
                     if (! str_contains($nombre, $q) && ! str_contains($archivo, $q)) {
                         return false;
                     }
+                }
+
+                if ($fecha && ! $this->imagenCorrespondeAFecha($imagen, $fecha)) {
+                    return false;
                 }
 
                 return true;
@@ -133,8 +148,10 @@ class BancoImagenesController extends Controller
                     'coleccion' => $imagen['coleccion'] ?? $imagen['collection_name'] ?? '',
                     'fecha' => $imagen['fecha'] ?? '',
                     'fecha_label' => $imagen['fecha_label'] ?? '',
+                    'fecha_modificacion_fecha' => $imagen['fecha_modificacion_fecha'] ?? '',
                     'fecha_modificacion_timestamp' => $imagen['fecha_modificacion_timestamp'] ?? 0,
                     'fecha_subida' => $imagen['fecha_subida'] ?? '',
+                    'fecha_subida_fecha' => $imagen['fecha_subida_fecha'] ?? '',
                     'fecha_subida_label' => $imagen['fecha_subida_label'] ?? '',
                     'fecha_subida_timestamp' => $imagen['fecha_subida_timestamp'] ?? 0,
                     'fuente' => $imagen['fuente'] ?? 'public',
@@ -197,8 +214,8 @@ class BancoImagenesController extends Controller
             $nombreBase = pathinfo($archivo->getFilename(), PATHINFO_FILENAME);
 
             $tam = $this->formatearTamano($archivo->getSize());
-            $fechaModificacion = $archivo->getMTime();
-            $fechaSubida = $archivo->getCTime();
+            $fechaModificacionTimestamp = $archivo->getMTime();
+            $fechaModificacion = Carbon::createFromTimestamp($fechaModificacionTimestamp, config('app.timezone'));
 
             $imagenes[] = [
                 'id' => 'public_'.md5($rutaRelativa),
@@ -216,14 +233,16 @@ class BancoImagenesController extends Controller
                 // Colección (dos llaves compatibles)
                 'collection_name' => $coleccion,
                 'coleccion' => $coleccion,
-                'fecha' => date('Y-m-d H:i:s', $fechaModificacion),
-                'fecha_label' => date('d/m/Y H:i', $fechaModificacion),
-                'fecha_modificacion' => date('Y-m-d H:i:s', $fechaModificacion),
-                'fecha_modificacion_label' => date('d/m/Y H:i', $fechaModificacion),
-                'fecha_modificacion_timestamp' => $fechaModificacion,
-                'fecha_subida' => date('Y-m-d H:i:s', $fechaSubida),
-                'fecha_subida_label' => date('d/m/Y H:i', $fechaSubida),
-                'fecha_subida_timestamp' => $fechaSubida,
+                'fecha' => $fechaModificacion->format('Y-m-d H:i:s'),
+                'fecha_label' => $fechaModificacion->format('d/m/Y H:i'),
+                'fecha_modificacion' => $fechaModificacion->format('Y-m-d H:i:s'),
+                'fecha_modificacion_fecha' => $fechaModificacion->toDateString(),
+                'fecha_modificacion_label' => $fechaModificacion->format('d/m/Y H:i'),
+                'fecha_modificacion_timestamp' => $fechaModificacionTimestamp,
+                'fecha_subida' => $fechaModificacion->format('Y-m-d H:i:s'),
+                'fecha_subida_fecha' => $fechaModificacion->toDateString(),
+                'fecha_subida_label' => $fechaModificacion->format('d/m/Y H:i'),
+                'fecha_subida_timestamp' => $fechaModificacionTimestamp,
                 'fuente' => 'public',
                 'ruta_completa' => $rutaRelativa,
             ];
@@ -307,5 +326,10 @@ class BancoImagenesController extends Controller
         $rutaRelativa = trim(str_replace('\\', '/', $rutaRelativa), '/');
 
         return $rutaRelativa === 'build' || str_starts_with($rutaRelativa, 'build/');
+    }
+
+    private function imagenCorrespondeAFecha(array $imagen, string $fecha): bool
+    {
+        return ($imagen['fecha_modificacion_fecha'] ?? $imagen['fecha_subida_fecha'] ?? '') === $fecha;
     }
 }
