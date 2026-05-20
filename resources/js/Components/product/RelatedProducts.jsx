@@ -224,6 +224,23 @@ const RelatedProducts = ({ productId, currentProductSubcategoryId }) => {
     const [hoveredProductId, setHoveredProductId] = useState(null);
     const [expandedTypes, setExpandedTypes] = useState({});
 
+    const getDisplayPrice = (product) => {
+        const values = [
+            product?.precio_ganancia,
+            product?.precio_sin_ganancia,
+            product?.precio_igv,
+        ];
+
+        for (const value of values) {
+            const numericValue = Number.parseFloat(value);
+            if (Number.isFinite(numericValue)) {
+                return numericValue;
+            }
+        }
+
+        return 0;
+    };
+
     // Obtener tipos de relaciones y agrupar productos
     const groupedProducts = relationTypes.reduce((acc, type) => {
         acc[type.nombre] = relatedProducts.filter(
@@ -493,7 +510,7 @@ const RelatedProducts = ({ productId, currentProductSubcategoryId }) => {
                         <div className="border-t border-slate-600 pt-3">
                             {product.marca?.nombre !== 'aralab' && (
                                 <div className="flex justify-between items-center mb-2">
-                                    <span className="text-2xl font-bold text-blue-400">{formatPrice(product.precio_ganancia)}</span>
+                                    <span className="text-2xl font-bold text-blue-400">{formatPrice(getDisplayPrice(product))}</span>
                                 </div>
                             )}
                             <div className="text-xs text-gray-400">

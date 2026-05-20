@@ -59,6 +59,24 @@ const ProductPage = ({ producto }) => {
     const [hoveredRecentProductId, setHoveredRecentProductId] = useState(null);
     const productUrl = getProductUrl(producto);
     const absoluteProductUrl = `${window.location.origin}${productUrl}`;
+    const getDisplayPrice = useCallback((product) => {
+        const values = [
+            product?.precio_ganancia,
+            product?.precio_sin_ganancia,
+            product?.precio_igv,
+            product?.priceWithoutProfit,
+            product?.price,
+        ];
+
+        for (const value of values) {
+            const numericValue = Number.parseFloat(value);
+            if (Number.isFinite(numericValue)) {
+                return numericValue;
+            }
+        }
+
+        return 0;
+    }, []);
 
     // Agregar producto a la lista de vistos recientemente cuando se carga la página
     useEffect(() => {
@@ -69,9 +87,9 @@ const ProductPage = ({ producto }) => {
                 image: Array.isArray(producto.imagen) 
                     ? (producto.imagen[0]?.startsWith('http') ? producto.imagen[0] : `/${producto.imagen[0]}`)
                     : (producto.imagen?.startsWith('http') ? producto.imagen : `/${producto.imagen}`),
-                price: parseFloat(producto.precio_ganancia || 0),
-                priceWithoutProfit: parseFloat(producto.precio_ganancia || 0),
-                priceWithProfit: parseFloat(producto.precio_ganancia || 0),
+                price: getDisplayPrice(producto),
+                priceWithoutProfit: getDisplayPrice(producto),
+                priceWithProfit: getDisplayPrice(producto),
                 sku: producto.sku,
                 descripcion: producto.descripcion,
                 marca: producto.marca || { nombre: '' },
@@ -80,7 +98,7 @@ const ProductPage = ({ producto }) => {
             
             addRecentlyViewed(productForRecent);
         }
-    }, [producto]);
+    }, [producto, getDisplayPrice]);
 
     useEffect(() => {
         const fetchCategoryData = async () => {

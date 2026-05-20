@@ -20,6 +20,23 @@ const SubcategoryProducts = ({ productId, currentProductSubcategoryId }) => {
     const [hoveredProductId, setHoveredProductId] = useState(null);
     const [isExpanded, setIsExpanded] = useState(false);
 
+    const getDisplayPrice = (product) => {
+        const values = [
+            product?.precio_ganancia,
+            product?.precio_sin_ganancia,
+            product?.precio_igv,
+        ];
+
+        for (const value of values) {
+            const numericValue = Number.parseFloat(value);
+            if (Number.isFinite(numericValue)) {
+                return numericValue;
+            }
+        }
+
+        return 0;
+    };
+
     useEffect(() => {
         const fetchSubcategoryData = async () => {
             if (!currentProductSubcategoryId) {
@@ -189,7 +206,7 @@ const SubcategoryProducts = ({ productId, currentProductSubcategoryId }) => {
                         <div className="border-t border-slate-600 pt-3">
                             {product.marca?.nombre !== 'aralab' && (
                                 <div className="flex justify-between items-center mb-2">
-                                    <span className="text-2xl font-bold text-blue-400">{formatPrice(product.precio_ganancia)}</span>
+                                    <span className="text-2xl font-bold text-blue-400">{formatPrice(getDisplayPrice(product))}</span>
                                 </div>
                             )}
                             <div className="text-xs text-gray-400">

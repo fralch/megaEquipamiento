@@ -29,15 +29,21 @@ export const CurrencyProvider = ({ children }) => {
         }
     };
 
+    const normalizePrice = (price) => {
+        const numericPrice = Number.parseFloat(price);
+        return Number.isFinite(numericPrice) ? numericPrice : 0;
+    };
+
     const convertPrice = (priceInUSD, targetCurrencyType = null) => {
+        const normalizedPrice = normalizePrice(priceInUSD);
         // Si no se especifica moneda objetivo, usar la actual
         const targetCurrency = targetCurrencyType || Object.keys(currencyMap).find(key => currencyMap[key].code === currency);
         const currencyInfo = currencyMap[targetCurrency];
         
         if (currencyInfo) {
-            return priceInUSD * currencyInfo.rate;
+            return normalizedPrice * currencyInfo.rate;
         }
-        return priceInUSD;
+        return normalizedPrice;
     };
 
     const formatCurrency = (amount) => {
@@ -60,6 +66,7 @@ export const CurrencyProvider = ({ children }) => {
         formatCurrency,
         formatPrice,
         convertPrice,
+        normalizePrice,
         currencyMap
     };
 
