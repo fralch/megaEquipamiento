@@ -18,21 +18,21 @@ class BancoImagenesController extends Controller
 
         // Filtros
         $tipoArchivo = $request->get('tipo', 'image'); // 'image' | 'todos'
-        $termino     = $request->get('buscar');
-        $coleccion   = $request->get('coleccion');
+        $termino = $request->get('buscar');
+        $coleccion = $request->get('coleccion');
 
         $imagenesFiltradas = $todasImagenes->filter(function ($imagen) use ($tipoArchivo, $termino, $coleccion) {
             // Filtro por tipo (mime)
-            if ($tipoArchivo !== 'todos' && !str_starts_with(($imagen['tipo'] ?? ''), $tipoArchivo)) {
+            if ($tipoArchivo !== 'todos' && ! str_starts_with(($imagen['tipo'] ?? ''), $tipoArchivo)) {
                 return false;
             }
 
             // Filtro por término de búsqueda (nombre o archivo)
             if ($termino) {
                 $q = mb_strtolower($termino);
-                $nombre  = mb_strtolower($imagen['nombre'] ?? $imagen['name'] ?? '');
+                $nombre = mb_strtolower($imagen['nombre'] ?? $imagen['name'] ?? '');
                 $archivo = mb_strtolower($imagen['archivo'] ?? '');
-                if (!str_contains($nombre, $q) && !str_contains($archivo, $q)) {
+                if (! str_contains($nombre, $q) && ! str_contains($archivo, $q)) {
                     return false;
                 }
             }
@@ -46,9 +46,9 @@ class BancoImagenesController extends Controller
         })->values();
 
         // Paginación manual
-        $page    = (int) $request->get('page', 1);
+        $page = (int) $request->get('page', 1);
         $perPage = 20;
-        $offset  = ($page - 1) * $perPage;
+        $offset = ($page - 1) * $perPage;
 
         $slice = $imagenesFiltradas->slice($offset, $perPage)->values();
 
@@ -58,7 +58,7 @@ class BancoImagenesController extends Controller
             $perPage,
             $page,
             [
-                'path'     => $request->url(),
+                'path' => $request->url(),
                 'pageName' => 'page',
             ]
         );
@@ -66,10 +66,10 @@ class BancoImagenesController extends Controller
         $paginator->appends($request->query());
 
         return Inertia::render('BancoImagenes/Index', [
-            'imagenes'    => $paginator,
-            'filtros'     => [
-                'buscar'    => $termino,
-                'tipo'      => $tipoArchivo,
+            'imagenes' => $paginator,
+            'filtros' => [
+                'buscar' => $termino,
+                'tipo' => $tipoArchivo,
                 'coleccion' => $coleccion,
             ],
             'colecciones' => $this->obtenerTodasColecciones(),
@@ -86,7 +86,7 @@ class BancoImagenesController extends Controller
             ->values();
 
         return response()->json([
-            'imagenes'    => $imagenes,
+            'imagenes' => $imagenes,
             'colecciones' => $this->obtenerTodasColecciones(),
         ]);
     }
@@ -98,40 +98,46 @@ class BancoImagenesController extends Controller
     public function buscar(Request $request)
     {
         $termino = $request->get('q', '');
-        $tipo    = $request->get('tipo', 'image');
-        $limite  = (int) $request->get('limite', 10);
+        $tipo = $request->get('tipo', 'image');
+        $limite = (int) $request->get('limite', 10);
 
         $resultados = collect($this->obtenerImagenesPublic())
             ->filter(function ($imagen) use ($tipo, $termino) {
                 // Tipo
-                if ($tipo !== 'todos' && !str_starts_with(($imagen['tipo'] ?? ''), $tipo)) {
+                if ($tipo !== 'todos' && ! str_starts_with(($imagen['tipo'] ?? ''), $tipo)) {
                     return false;
                 }
 
                 // Texto
                 if ($termino !== '') {
                     $q = mb_strtolower($termino);
-                    $nombre  = mb_strtolower($imagen['nombre'] ?? $imagen['name'] ?? '');
+                    $nombre = mb_strtolower($imagen['nombre'] ?? $imagen['name'] ?? '');
                     $archivo = mb_strtolower($imagen['archivo'] ?? '');
-                    if (!str_contains($nombre, $q) && !str_contains($archivo, $q)) {
+                    if (! str_contains($nombre, $q) && ! str_contains($archivo, $q)) {
                         return false;
                     }
                 }
 
                 return true;
             })
-            ->sortByDesc('fecha')
+            ->sortByDesc('fecha_modificacion_timestamp')
             ->take($limite)
             ->map(function ($imagen) {
                 return [
-                    'id'         => $imagen['id'],
-                    'nombre'     => $imagen['nombre'] ?? $imagen['name'] ?? '',
-                    'archivo'    => $imagen['archivo'] ?? '',
-                    'url'        => $imagen['url'] ?? '',
-                    'tipo'       => $imagen['tipo'] ?? $imagen['mime_type'] ?? '',
-                    'tamano'     => $imagen['tamano'] ?? $imagen['tamano_formateado'] ?? '',
-                    'coleccion'  => $imagen['coleccion'] ?? $imagen['collection_name'] ?? '',
-                    'fuente'     => $imagen['fuente'] ?? 'public',
+                    'id' => $imagen['id'],
+                    'nombre' => $imagen['nombre'] ?? $imagen['name'] ?? '',
+                    'archivo' => $imagen['archivo'] ?? '',
+                    'url' => $imagen['url'] ?? '',
+                    'tipo' => $imagen['tipo'] ?? $imagen['mime_type'] ?? '',
+                    'tamano' => $imagen['tamano'] ?? $imagen['tamano_formateado'] ?? '',
+                    'coleccion' => $imagen['coleccion'] ?? $imagen['collection_name'] ?? '',
+                    'fecha' => $imagen['fecha'] ?? '',
+                    'fecha_label' => $imagen['fecha_label'] ?? '',
+                    'fecha_modificacion_timestamp' => $imagen['fecha_modificacion_timestamp'] ?? 0,
+                    'fecha_subida' => $imagen['fecha_subida'] ?? '',
+                    'fecha_subida_label' => $imagen['fecha_subida_label'] ?? '',
+                    'fecha_subida_timestamp' => $imagen['fecha_subida_timestamp'] ?? 0,
+                    'fuente' => $imagen['fuente'] ?? 'public',
                 ];
             })
             ->values();
@@ -149,10 +155,10 @@ class BancoImagenesController extends Controller
      */
     private function obtenerImagenesPublic(): array
     {
-        $imagenes   = [];
+        $imagenes = [];
         $rutaPublic = public_path();
 
-        if (!is_dir($rutaPublic)) {
+        if (! is_dir($rutaPublic)) {
             return $imagenes;
         }
 
@@ -161,56 +167,72 @@ class BancoImagenesController extends Controller
         );
 
         foreach ($iterator as $archivo) {
-            if (!$archivo->isFile()) {
+            if (! $archivo->isFile()) {
                 continue;
             }
 
             $extension = strtolower($archivo->getExtension());
             $extPermitidas = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'];
 
-            if (!in_array($extension, $extPermitidas, true)) {
+            if (! in_array($extension, $extPermitidas, true)) {
                 continue;
             }
 
             // Rutas
-            $rutaAbs      = $archivo->getPathname();
+            $rutaAbs = $archivo->getPathname();
             $rutaRelativa = str_replace(public_path(), '', $rutaAbs);
             $rutaRelativa = ltrim(str_replace('\\', '/', $rutaRelativa), '/');
 
+            if ($this->debeOmitirRutaPublica($rutaRelativa)) {
+                continue;
+            }
+
             // Colección = ruta de carpetas dentro de /public. Si está en /public directamente => 'general'
-            $rutaCarpeta         = dirname($rutaAbs);
+            $rutaCarpeta = dirname($rutaAbs);
             $rutaRelativaCarpeta = str_replace(public_path(), '', $rutaCarpeta);
             $rutaRelativaCarpeta = trim(str_replace('\\', '/', $rutaRelativaCarpeta), '/');
-            $coleccion           = $rutaRelativaCarpeta === '' ? 'general' : $rutaRelativaCarpeta;
+            $coleccion = $rutaRelativaCarpeta === '' ? 'general' : $rutaRelativaCarpeta;
 
-            $mimeType  = $this->obtenerMimeType($extension);
+            $mimeType = $this->obtenerMimeType($extension);
             $nombreBase = pathinfo($archivo->getFilename(), PATHINFO_FILENAME);
 
             $tam = $this->formatearTamano($archivo->getSize());
+            $fechaModificacion = $archivo->getMTime();
+            $fechaSubida = $archivo->getCTime();
 
             $imagenes[] = [
-                'id'                 => 'public_' . md5($rutaRelativa),
+                'id' => 'public_'.md5($rutaRelativa),
                 // Compatibilidad de nombres
-                'name'               => $nombreBase,
-                'nombre'             => $nombreBase,
-                'archivo'            => $archivo->getFilename(),
-                'url'                => asset($rutaRelativa),
+                'name' => $nombreBase,
+                'nombre' => $nombreBase,
+                'archivo' => $archivo->getFilename(),
+                'url' => asset($rutaRelativa),
                 // Compatibilidad de tipos
-                'mime_type'          => $mimeType,
-                'tipo'               => $mimeType,
+                'mime_type' => $mimeType,
+                'tipo' => $mimeType,
                 // Tamaño (dos llaves compatibles)
-                'tamano_formateado'  => $tam,
-                'tamano'             => $tam,
+                'tamano_formateado' => $tam,
+                'tamano' => $tam,
                 // Colección (dos llaves compatibles)
-                'collection_name'    => $coleccion,
-                'coleccion'          => $coleccion,
-                'fecha'              => date('Y-m-d H:i:s', $archivo->getMTime()),
-                'fuente'             => 'public',
-                'ruta_completa'      => $rutaRelativa,
+                'collection_name' => $coleccion,
+                'coleccion' => $coleccion,
+                'fecha' => date('Y-m-d H:i:s', $fechaModificacion),
+                'fecha_label' => date('d/m/Y H:i', $fechaModificacion),
+                'fecha_modificacion' => date('Y-m-d H:i:s', $fechaModificacion),
+                'fecha_modificacion_label' => date('d/m/Y H:i', $fechaModificacion),
+                'fecha_modificacion_timestamp' => $fechaModificacion,
+                'fecha_subida' => date('Y-m-d H:i:s', $fechaSubida),
+                'fecha_subida_label' => date('d/m/Y H:i', $fechaSubida),
+                'fecha_subida_timestamp' => $fechaSubida,
+                'fuente' => 'public',
+                'ruta_completa' => $rutaRelativa,
             ];
         }
 
-        return $imagenes;
+        return collect($imagenes)
+            ->sortByDesc('fecha_modificacion_timestamp')
+            ->values()
+            ->all();
     }
 
     /**
@@ -219,7 +241,7 @@ class BancoImagenesController extends Controller
     private function obtenerTodasColecciones(): array
     {
         $colecciones = [];
-        $rutaPublic  = public_path();
+        $rutaPublic = public_path();
 
         if (is_dir($rutaPublic)) {
             $iterator = new \RecursiveIteratorIterator(
@@ -231,7 +253,7 @@ class BancoImagenesController extends Controller
                 if ($item->isDir()) {
                     $rutaRel = str_replace($rutaPublic, '', $item->getPathname());
                     $rutaRel = trim(str_replace('\\', '/', $rutaRel), '/');
-                    if ($rutaRel !== '') {
+                    if ($rutaRel !== '' && ! $this->debeOmitirRutaPublica($rutaRel)) {
                         $colecciones[] = $rutaRel;
                     }
                 }
@@ -253,13 +275,13 @@ class BancoImagenesController extends Controller
     private function obtenerMimeType(string $extension): string
     {
         $mimeTypes = [
-            'jpg'  => 'image/jpeg',
+            'jpg' => 'image/jpeg',
             'jpeg' => 'image/jpeg',
-            'png'  => 'image/png',
-            'gif'  => 'image/gif',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
             'webp' => 'image/webp',
-            'svg'  => 'image/svg+xml',
-            'bmp'  => 'image/bmp',
+            'svg' => 'image/svg+xml',
+            'bmp' => 'image/bmp',
         ];
 
         return $mimeTypes[$extension] ?? 'image/unknown';
@@ -276,6 +298,14 @@ class BancoImagenesController extends Controller
             $bytes /= 1024;
             $i++;
         }
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
+    }
+
+    private function debeOmitirRutaPublica(string $rutaRelativa): bool
+    {
+        $rutaRelativa = trim(str_replace('\\', '/', $rutaRelativa), '/');
+
+        return $rutaRelativa === 'build' || str_starts_with($rutaRelativa, 'build/');
     }
 }

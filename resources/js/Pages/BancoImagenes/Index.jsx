@@ -180,6 +180,9 @@ export default function BancoImagenes({ auth, imagenes, filtros, colecciones }) 
                                                 <p className="text-xs text-gray-500 truncate" title={imagen.collection_name}>
                                                     {imagen.collection_name || 'Sin colección'}
                                                 </p>
+                                                <p className="text-xs text-gray-500 truncate" title={imagen.fecha_subida || imagen.fecha}>
+                                                    Subido: {imagen.fecha_subida_label || imagen.fecha_label || 'Sin fecha'}
+                                                </p>
                                             </div>
 
                                             {/* Acciones */}
@@ -365,6 +368,13 @@ export default function BancoImagenes({ auth, imagenes, filtros, colecciones }) 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Colección</label>
                                         <p className="mt-1 text-sm text-gray-900">{imagenSeleccionada.collection_name}</p>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Fecha de subida</label>
+                                        <p className="mt-1 text-sm text-gray-900">
+                                            {imagenSeleccionada.fecha_subida_label || imagenSeleccionada.fecha_label || 'Sin fecha'}
+                                        </p>
                                     </div>
                                     
                                     <div>

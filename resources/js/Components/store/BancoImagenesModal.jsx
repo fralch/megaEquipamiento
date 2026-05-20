@@ -1,6 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../storage/ThemeContext';
 
+const getModifiedAt = (image) => {
+  const timestamp = Number(image.fecha_modificacion_timestamp ?? 0);
+
+  if (timestamp > 0) {
+    return timestamp;
+  }
+
+  return Date.parse(image.fecha || image.updated_at || image.created_at || '') || 0;
+};
+
+const sortImagesByModifiedDesc = (imageList) => {
+  return [...imageList].sort((a, b) => getModifiedAt(b) - getModifiedAt(a));
+};
+
+const getUploadedDateLabel = (image) => {
+  return image.fecha_subida_label || image.fecha_label || image.fecha_modificacion_label || 'Sin fecha';
+};
+
 const BancoImagenesModal = ({ isOpen, onClose, onSelectImages }) => {
   const { isDarkMode } = useTheme();
   const [images, setImages] = useState([]);
@@ -21,9 +39,10 @@ const BancoImagenesModal = ({ isOpen, onClose, onSelectImages }) => {
     try {
       const response = await fetch('/banco-imagenes/api/all');
       const data = await response.json();
-      setImages(data.imagenes || []);
+      const sortedImages = sortImagesByModifiedDesc(data.imagenes || []);
+      setImages(sortedImages);
       
-      const uniqueCollections = [...new Set(data.imagenes.map(img => img.collection_name || 'Sin colección'))];
+      const uniqueCollections = [...new Set(sortedImages.map(img => img.collection_name || 'Sin colección'))];
       setCollections(['Todas las colecciones', ...uniqueCollections]);
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -172,6 +191,11 @@ const BancoImagenesModal = ({ isOpen, onClose, onSelectImages }) => {
                       isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     }`}>
                       {image.collection_name || 'Sin colección'}
+                    </p>
+                    <p className={`text-[11px] mt-1 transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                      Subido: {getUploadedDateLabel(image)}
                     </p>
                   </div>
                 </div>
