@@ -2,10 +2,7 @@
 require 'vendor/autoload.php';
 $app = require_once 'bootstrap/app.php';
 $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
-try {
-    $service = app(App\Services\FirebaseNotificationService::class);
-    $service->sendToToken('dummy_token', 'Test', 'Body');
-    echo "Success: Sent message.\n";
-} catch (\Throwable $e) {
-    echo "Error: " . $e->getMessage() . "\n";
-}
+$s = json_decode(file_get_contents(storage_path('app/firebase/service-account.json')), true);
+$res = openssl_pkey_get_private($s['private_key']);
+echo $res ? 'KEY IS VALID' : 'ERROR OPENSSL: ' . openssl_error_string();
+echo "\n";
