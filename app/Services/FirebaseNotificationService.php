@@ -12,7 +12,7 @@ class FirebaseNotificationService
 
     public function __construct()
     {
-        $factory = (new Factory)->withServiceAccount(base_path(env('FIREBASE_CREDENTIALS')));
+        $factory = (new Factory)->withServiceAccount(base_path(config('firebase.credentials.file')));
         $this->messaging = $factory->createMessaging();
     }
 
