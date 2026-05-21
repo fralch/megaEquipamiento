@@ -19,7 +19,7 @@ class FirebaseNotificationService
     public function sendToToken(string $token, string $title, string $body, array $data = []): bool
     {
         try {
-            $message = CloudMessage::withTarget('token', $token)
+            $message = CloudMessage::new()->withToken($token)
                 ->withNotification([
                     'title' => $title,
                     'body' => $body,
