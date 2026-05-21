@@ -38,14 +38,18 @@ class MatchTestNotificationController extends Controller
         try {
             $firebase = app(FirebaseNotificationService::class);
         } catch (Throwable $exception) {
-            report($exception);
+            \Illuminate\Support\Facades\Log::error('Error inicializando Firebase:', [
+                'message' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
 
             return response()->json([
                 'status' => 'firebase_unavailable',
-                'message' => 'No se pudo inicializar Firebase. Revisa FIREBASE_CREDENTIALS.',
+                'message' => 'No se pudo inicializar Firebase: ' . $exception->getMessage(),
                 'devices_targeted' => $tokens->count(),
                 'sent' => 0,
                 'failed' => $tokens->count(),
+                'error_detail' => $exception->getMessage(), // Added for debugging
             ], 500);
         }
 
