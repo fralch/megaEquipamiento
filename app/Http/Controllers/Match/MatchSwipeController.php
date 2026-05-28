@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Match;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Match\MatchUser;
-use App\Models\Match\MatchSwipe;
-use App\Models\Match\MatchPair;
 use App\Models\Match\MatchNotification;
+use App\Models\Match\MatchPair;
+use App\Models\Match\MatchSwipe;
+use App\Models\Match\MatchUser;
+use App\Services\FirebaseNotificationService;
+use Illuminate\Http\Request;
+use Throwable;
 
 class MatchSwipeController extends Controller
 {
@@ -16,101 +18,164 @@ class MatchSwipeController extends Controller
         return auth()->user();
     }
 
+    private function sendPushNotification(MatchUser $user, string $title, string $body, array $data): void
+    {
+        if ($user->fcm_token) {
+            try {
+                app(FirebaseNotificationService::class)->sendToToken(
+                    $user->fcm_token,
+                    $title,
+                    $body,
+                    $data
+                );
+            } catch (Throwable $exception) {
+                \Illuminate\Support\Facades\Log::error('Firebase notification failed', [
+                    'match_user_id' => $user->id,
+                    'error' => $exception->getMessage(),
+                ]);
+            }
+        }
+    }
+
     public function getCandidates(Request $request)
     {
         $currentUser = $this->getCurrentUser();
-        if (!$currentUser) return response()->json(['message' => 'Unauthorized'], 401);
-        
-        // Get IDs of profiles already swiped
+        if (! $currentUser) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
         $swipedIds = MatchSwipe::where('swiper_id', $currentUser->id)->pluck('swiped_id');
-        
+
         $query = MatchUser::where('id', '!=', $currentUser->id)
             ->whereNotIn('id', $swipedIds)
             ->with('photos');
 
-        // Apply gender preference
         if ($currentUser->interested_in !== 'everyone') {
             $query->where('gender', $currentUser->interested_in);
         }
 
-        // Distance filtering (Haversine Formula)
         if ($currentUser->latitude && $currentUser->longitude) {
             $lat = $currentUser->latitude;
             $lng = $currentUser->longitude;
-            $radius = $request->query('radius', 50); // Default 50km
+            $radius = $request->query('radius', 50);
 
-            $query->selectRaw("*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance", [$lat, $lng, $lat])
+            $query->selectRaw('*, (6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance', [$lat, $lng, $lat])
                 ->having('distance', '<=', $radius)
                 ->orderBy('distance', 'asc');
         } else {
             $query->inRandomOrder();
         }
-        
+
         $candidates = $query->limit(20)->get();
-            
+
         return response()->json($candidates);
     }
 
     public function swipe(Request $request)
     {
         $currentUser = $this->getCurrentUser();
-        if (!$currentUser) return response()->json(['message' => 'Unauthorized'], 401);
+        if (! $currentUser) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
 
         $request->validate([
             'swiped_profile_id' => 'required|exists:match_users,id',
-            'type' => 'required|in:like,dislike,superlike'
+            'type' => 'required|in:like,dislike,superlike',
         ]);
-        
+
         $swipedId = $request->swiped_profile_id;
         $type = $request->type;
-        
-        // Prevent duplicate swipes
-        if (MatchSwipe::where('swiper_id', $currentUser->id)->where('swiped_id', $swipedId)->exists()) {
-             return response()->json(['message' => 'Already swiped'], 400);
+
+        if ($currentUser->id === (int) $swipedId) {
+            return response()->json(['message' => 'Cannot swipe on yourself'], 400);
         }
 
-        // Record swipe
+        if (MatchSwipe::where('swiper_id', $currentUser->id)->where('swiped_id', $swipedId)->exists()) {
+            return response()->json(['message' => 'Already swiped'], 400);
+        }
+
+        $targetUser = MatchUser::find($swipedId);
+        if (! $targetUser) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
         try {
             MatchSwipe::create([
                 'swiper_id' => $currentUser->id,
                 'swiped_id' => $swipedId,
-                'type' => $type
+                'type' => $type,
             ]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error recording swipe'], 500);
         }
-        
+
         $isMatch = false;
-        
-        // Check match logic
+
+        if ($type === 'superlike') {
+            MatchNotification::send(
+                $swipedId,
+                'superlike_received',
+                '¡Nuevo Superlike!',
+                'Alguien te hizo superlike. ¡Apurate a ver quién es!',
+                ['swiper_id' => $currentUser->id]
+            );
+            $this->sendPushNotification(
+                $targetUser,
+                '¡Nuevo Superlike!',
+                'Alguien te hizo superlike. ¡Apurate a ver quién es!',
+                ['type' => 'superlike_received', 'swiper_id' => (string) $currentUser->id]
+            );
+        } elseif ($type === 'like') {
+            MatchNotification::send(
+                $swipedId,
+                'like_received',
+                '¡Nuevo Like!',
+                'Alguien te dio like. Si también te gusta, ¡será match!',
+                ['swiper_id' => $currentUser->id]
+            );
+            $this->sendPushNotification(
+                $targetUser,
+                '¡Nuevo Like!',
+                'Alguien te dio like. Si también te gusta, ¡será match!',
+                ['type' => 'like_received', 'swiper_id' => (string) $currentUser->id]
+            );
+        }
+
         if ($type === 'like' || $type === 'superlike') {
-            // Check if they liked me
             $otherSwipe = MatchSwipe::where('swiper_id', $swipedId)
                 ->where('swiped_id', $currentUser->id)
                 ->whereIn('type', ['like', 'superlike'])
                 ->first();
-                
+
             if ($otherSwipe) {
-                // IT'S A MATCH!
                 $id1 = min($currentUser->id, $swipedId);
                 $id2 = max($currentUser->id, $swipedId);
-                
+
                 MatchPair::firstOrCreate([
                     'user_1_id' => $id1,
-                    'user_2_id' => $id2
+                    'user_2_id' => $id2,
                 ]);
-                
+
                 $isMatch = true;
 
-                // Notify both users
-                $otherUser = MatchUser::find($swipedId);
-                if ($otherUser) {
-                    MatchNotification::send($currentUser->id, 'match', '¡Nuevo Match!', "Has hecho match con {$otherUser->name}", ['match_user_id' => $otherUser->id]);
-                    MatchNotification::send($otherUser->id, 'match', '¡Nuevo Match!', "Has hecho match con {$currentUser->name}", ['match_user_id' => $currentUser->id]);
-                }
+                MatchNotification::send($currentUser->id, 'match', '¡Nuevo Match!', "Has hecho match con {$targetUser->name}", ['match_user_id' => $targetUser->id]);
+                MatchNotification::send($targetUser->id, 'match', '¡Nuevo Match!', "Has hecho match con {$currentUser->name}", ['match_user_id' => $currentUser->id]);
+
+                $this->sendPushNotification(
+                    $targetUser,
+                    '¡Nuevo Match!',
+                    "¡{$currentUser->name} también te dio like!",
+                    ['type' => 'match_created', 'match_user_id' => (string) $currentUser->id]
+                );
+                $this->sendPushNotification(
+                    $currentUser,
+                    '¡Nuevo Match!',
+                    "¡{$targetUser->name} también te dio like!",
+                    ['type' => 'match_created', 'match_user_id' => (string) $targetUser->id]
+                );
             }
         }
-        
+
         return response()->json(['status' => 'success', 'match' => $isMatch]);
     }
 }
