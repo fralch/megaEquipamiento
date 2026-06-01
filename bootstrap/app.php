@@ -24,7 +24,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'generar.notificaciones.cotizaciones' => \App\Http\Middleware\GenerarNotificacionesCotizaciones::class,
             'role.admin' => \App\Http\Middleware\CheckAdminRole::class,
-            'match.admin' => \App\Http\Middleware\EnsureMatchAdmin::class,
         ]);
 
         // Desactivar protección CSRF para todas las rutas
@@ -32,9 +31,6 @@ return Application::configure(basePath: dirname(__DIR__))
             '*'
         ]);
 
-        $middleware->validateCsrfTokens(except: [
-            'match-api/*',
-        ]);
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         // Ejecutar el comando de notificaciones cada hora
