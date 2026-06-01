@@ -16,13 +16,35 @@ use Illuminate\Support\Facades\Log;
 class ProductoController extends Controller
 {
      /* Vista de productos */
-     public function ProductView(Request $request, $producto_id)
+     public function ProductView(Request $request, string $productoSlug)
      {
-        // Obtener el producto desde la solicitud
-        $producto = Producto::with('marca')->find($producto_id);
+        $productoId = $this->extractProductIdFromSlug($productoSlug);
+
+        if (!$productoId) {
+            abort(404);
+        }
+
+        $producto = Producto::with('marca')->findOrFail($productoId);
+
+        if ($productoSlug !== $producto->seo_slug) {
+            return redirect($producto->product_url, 301);
+        }
     
         // Renderizar la vista con Inertia y pasar el producto
         return Inertia::render('Product', compact('producto'));
+     }
+
+     private function extractProductIdFromSlug(string $productoSlug): ?int
+     {
+        if (ctype_digit($productoSlug)) {
+            return (int) $productoSlug;
+        }
+
+        if (preg_match('/-(\d+)$/', $productoSlug, $matches)) {
+            return (int) $matches[1];
+        }
+
+        return null;
      }
 
 

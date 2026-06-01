@@ -6,6 +6,7 @@ import { CartContext } from '../../storage/CartContext';
 import { useCurrency } from '../../storage/CurrencyContext';
 import { useCompare } from '../../hooks/useCompare';
 import countryCodeMap from '../store/countryJSON.json';
+import { getProductUrl } from "../../utils/productUrl";
 
 const SubcategoryProducts = ({ productId, currentProductSubcategoryId }) => {
     const { isDarkMode } = useTheme();
@@ -18,6 +19,23 @@ const SubcategoryProducts = ({ productId, currentProductSubcategoryId }) => {
     const [error, setError] = useState(null);
     const [hoveredProductId, setHoveredProductId] = useState(null);
     const [isExpanded, setIsExpanded] = useState(false);
+
+    const getDisplayPrice = (product) => {
+        const values = [
+            product?.precio_ganancia,
+            product?.precio_sin_ganancia,
+            product?.precio_igv,
+        ];
+
+        for (const value of values) {
+            const numericValue = Number.parseFloat(value);
+            if (Number.isFinite(numericValue)) {
+                return numericValue;
+            }
+        }
+
+        return 0;
+    };
 
     useEffect(() => {
         const fetchSubcategoryData = async () => {
@@ -123,7 +141,7 @@ const SubcategoryProducts = ({ productId, currentProductSubcategoryId }) => {
                 onMouseEnter={() => setHoveredProductId(product.id_producto)}
                 onMouseLeave={() => setHoveredProductId(null)}
             >
-                <Link href={`/producto/${product.id_producto}`}>
+                <Link href={getProductUrl(product)}>
                     <div className="relative">
                         {/* Área de imagen con fondo adaptable */}
                         <div className={`h-40 overflow-hidden ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
@@ -188,7 +206,7 @@ const SubcategoryProducts = ({ productId, currentProductSubcategoryId }) => {
                         <div className="border-t border-slate-600 pt-3">
                             {product.marca?.nombre !== 'aralab' && (
                                 <div className="flex justify-between items-center mb-2">
-                                    <span className="text-2xl font-bold text-blue-400">{formatPrice(product.precio_ganancia)}</span>
+                                    <span className="text-2xl font-bold text-blue-400">{formatPrice(getDisplayPrice(product))}</span>
                                 </div>
                             )}
                             <div className="text-xs text-gray-400">
@@ -210,12 +228,12 @@ const SubcategoryProducts = ({ productId, currentProductSubcategoryId }) => {
                             if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a') {
                                 e.stopPropagation();
                             } else {
-                                window.location.href = `/producto/${product.id_producto}`;
+                                window.location.href = getProductUrl(product);
                             }
                         }}
                     >
                         <a 
-                            href={`/producto/${product.id_producto}`}
+                            href={getProductUrl(product)}
                             className={`text-xl font-semibold mb-2 text-center transition-colors cursor-pointer ${
                                 isDarkMode 
                                     ? 'hover:text-blue-300 text-gray-100' 

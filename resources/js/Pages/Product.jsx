@@ -25,6 +25,7 @@ import ModalRelatedProducts from "../Components/product/ModalRelatedProducts";
 import RelatedProducts from "../Components/product/RelatedProducts";
 import ProductCategoryEdit from "../Components/product/ProductCategoryEdit";
 import BancoImagenesModal from '../Components/store/BancoImagenesModal';
+import { getProductUrl } from "../utils/productUrl";
 
 // Currency formatting function moved to CurrencyContext
 // probando github actions
@@ -56,6 +57,26 @@ const ProductPage = ({ producto }) => {
     const [categoriaCurrent, setCategoriaCurrent] = useState(null);
     const [subcategoriaCurrent, setSubcategoriaCurrent] = useState(null);
     const [hoveredRecentProductId, setHoveredRecentProductId] = useState(null);
+    const productUrl = getProductUrl(producto);
+    const absoluteProductUrl = `${window.location.origin}${productUrl}`;
+    const getDisplayPrice = useCallback((product) => {
+        const values = [
+            product?.precio_ganancia,
+            product?.precio_sin_ganancia,
+            product?.precio_igv,
+            product?.priceWithoutProfit,
+            product?.price,
+        ];
+
+        for (const value of values) {
+            const numericValue = Number.parseFloat(value);
+            if (Number.isFinite(numericValue)) {
+                return numericValue;
+            }
+        }
+
+        return 0;
+    }, []);
 
     // Agregar producto a la lista de vistos recientemente cuando se carga la página
     useEffect(() => {
@@ -66,18 +87,18 @@ const ProductPage = ({ producto }) => {
                 image: Array.isArray(producto.imagen) 
                     ? (producto.imagen[0]?.startsWith('http') ? producto.imagen[0] : `/${producto.imagen[0]}`)
                     : (producto.imagen?.startsWith('http') ? producto.imagen : `/${producto.imagen}`),
-                price: parseFloat(producto.precio_ganancia || 0),
-                priceWithoutProfit: parseFloat(producto.precio_ganancia || 0),
-                priceWithProfit: parseFloat(producto.precio_ganancia || 0),
+                price: getDisplayPrice(producto),
+                priceWithoutProfit: getDisplayPrice(producto),
+                priceWithProfit: getDisplayPrice(producto),
                 sku: producto.sku,
                 descripcion: producto.descripcion,
                 marca: producto.marca || { nombre: '' },
-                link: `/producto/${producto.id_producto}`
+                link: productUrl
             };
             
             addRecentlyViewed(productForRecent);
         }
-    }, [producto]);
+    }, [producto, getDisplayPrice]);
 
     useEffect(() => {
         const fetchCategoryData = async () => {
@@ -1179,7 +1200,7 @@ const ProductPage = ({ producto }) => {
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
                 <meta property="og:image:alt" content={`${producto.nombre} - ${producto.marca?.nombre || 'Producto de calidad'}`} />
-                <meta property="og:url" content={`${window.location.origin}/producto/${producto.id_producto}`} />
+                <meta property="og:url" content={absoluteProductUrl} />
                 <meta property="og:type" content="product" />
                 <meta property="og:site_name" content="Mega Equipamiento" />
                 <meta property="og:locale" content="es_PE" />
@@ -1222,7 +1243,7 @@ const ProductPage = ({ producto }) => {
                         "category": `${categoriaCurrent?.nombre_categoria || ''} > ${subcategoriaCurrent?.nombre || ''}`,
                         "offers": {
                             "@type": "Offer",
-                            "url": `${window.location.origin}/producto/${producto.id_producto}`,
+                            "url": absoluteProductUrl,
                             "priceCurrency": "PEN",
                             "price": producto.precio_ganancia,
                             "priceValidUntil": new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -1292,14 +1313,14 @@ const ProductPage = ({ producto }) => {
                                 "@type": "ListItem",
                                 "position": 4,
                                 "name": producto.nombre,
-                                "item": `${window.location.origin}/producto/${producto.id_producto}`
+                                "item": absoluteProductUrl
                             }
                         ]
                     })}
                 </script>
                 
                 {/* Canonical URL */}
-                <link rel="canonical" href={`${window.location.origin}/producto/${producto.id_producto}`} />
+                <link rel="canonical" href={absoluteProductUrl} />
                 
                 {/* Preload critical resources */}
                 <link rel="preload" as="image" href={Array.isArray(producto.imagen) ? (producto.imagen[0]?.startsWith('http') ? producto.imagen[0] : `/${producto.imagen[0]}`) : (producto.imagen?.startsWith('http') ? producto.imagen : `/${producto.imagen}`)} />

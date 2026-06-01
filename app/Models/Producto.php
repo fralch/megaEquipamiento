@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -51,6 +52,11 @@ class Producto extends Model implements HasMedia
         'updated_at' => 'datetime:Y-m-d\TH:i:sP',
     ];
 
+    protected $appends = [
+        'seo_slug',
+        'product_url',
+    ];
+
     // Eager loading por defecto para optimizar consultas
     // protected $with = ['marca', 'subcategoria']; // Removed for debugging
 
@@ -82,6 +88,18 @@ class Producto extends Model implements HasMedia
     public function tags()
     {
         return $this->belongsToMany(Tag::class, 'producto_tag', 'id_producto', 'id_tag')->withTimestamps();
+    }
+
+    public function getSeoSlugAttribute(): string
+    {
+        $slug = Str::slug($this->nombre ?: 'producto');
+
+        return "{$slug}-{$this->id_producto}";
+    }
+
+    public function getProductUrlAttribute(): string
+    {
+        return "/producto/{$this->seo_slug}";
     }
 
     // Helpers de imágenes

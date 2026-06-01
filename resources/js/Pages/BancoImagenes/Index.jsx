@@ -18,7 +18,8 @@ export default function BancoImagenes({ auth, imagenes, filtros, colecciones }) 
     const { data: filtroData, setData: setFiltroData, get } = useForm({
         buscar: filtros.buscar || '',
         tipo: filtros.tipo || 'image',
-        coleccion: filtros.coleccion || ''
+        coleccion: filtros.coleccion || '',
+        fecha: filtros.fecha || ''
     });
 
     const handleSubirArchivo = (e) => {
@@ -111,6 +112,14 @@ export default function BancoImagenes({ auth, imagenes, filtros, colecciones }) 
                                         ))}
                                     </select>
 
+                                    <input
+                                        type="date"
+                                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                        value={filtroData.fecha}
+                                        onChange={(e) => setFiltroData('fecha', e.target.value)}
+                                        title="Filtrar por fecha de modificación"
+                                    />
+
                                     <button
                                         onClick={handleFiltrar}
                                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
@@ -151,6 +160,8 @@ export default function BancoImagenes({ auth, imagenes, filtros, colecciones }) 
                                                     <img
                                                         src={imagen.url}
                                                         alt={imagen.name}
+                                                        loading="lazy"
+                                                        decoding="async"
                                                         className="w-full h-full object-cover cursor-pointer"
                                                         onClick={() => abrirModal(imagen)}
                                                         title={imagen.name}
@@ -179,6 +190,9 @@ export default function BancoImagenes({ auth, imagenes, filtros, colecciones }) 
                                                 </h4>
                                                 <p className="text-xs text-gray-500 truncate" title={imagen.collection_name}>
                                                     {imagen.collection_name || 'Sin colección'}
+                                                </p>
+                                                <p className="text-xs text-gray-500 truncate" title={imagen.fecha_subida || imagen.fecha}>
+                                                    Modificado: {imagen.fecha_subida_label || imagen.fecha_label || 'Sin fecha'}
                                                 </p>
                                             </div>
 
@@ -328,6 +342,8 @@ export default function BancoImagenes({ auth, imagenes, filtros, colecciones }) 
                                         <img
                                             src={imagenSeleccionada.url}
                                             alt={imagenSeleccionada.name}
+                                            loading="eager"
+                                            decoding="async"
                                             className="max-w-full max-h-[400px] object-contain"
                                         />
                                     ) : (
@@ -365,6 +381,13 @@ export default function BancoImagenes({ auth, imagenes, filtros, colecciones }) 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">Colección</label>
                                         <p className="mt-1 text-sm text-gray-900">{imagenSeleccionada.collection_name}</p>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Fecha de modificación</label>
+                                        <p className="mt-1 text-sm text-gray-900">
+                                            {imagenSeleccionada.fecha_subida_label || imagenSeleccionada.fecha_label || 'Sin fecha'}
+                                        </p>
                                     </div>
                                     
                                     <div>

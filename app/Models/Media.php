@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\MediaCollections\Models\Media as BaseMedia;
 
 class Media extends BaseMedia
@@ -16,7 +15,7 @@ class Media extends BaseMedia
     public static function getBancoImagenes()
     {
         return static::where('collection_name', 'banco_imagenes')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->get();
     }
 
@@ -25,8 +24,8 @@ class Media extends BaseMedia
      */
     public static function getImagenesPorTipo($mimeType = 'image')
     {
-        return static::where('mime_type', 'like', $mimeType . '%')
-            ->orderBy('created_at', 'desc')
+        return static::where('mime_type', 'like', $mimeType.'%')
+            ->orderBy('updated_at', 'desc')
             ->get();
     }
 
@@ -35,9 +34,9 @@ class Media extends BaseMedia
      */
     public static function buscarImagenes($termino)
     {
-        return static::where('name', 'like', '%' . $termino . '%')
-            ->orWhere('file_name', 'like', '%' . $termino . '%')
-            ->orderBy('created_at', 'desc')
+        return static::where('name', 'like', '%'.$termino.'%')
+            ->orWhere('file_name', 'like', '%'.$termino.'%')
+            ->orderBy('updated_at', 'desc')
             ->get();
     }
 
@@ -56,11 +55,11 @@ class Media extends BaseMedia
     {
         $bytes = $this->size;
         $units = ['B', 'KB', 'MB', 'GB'];
-        
+
         for ($i = 0; $bytes > 1024; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 }

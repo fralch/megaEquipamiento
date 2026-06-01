@@ -1,8 +1,20 @@
 import React, { createContext, useReducer, useEffect, useContext } from 'react';
+import { getProductUrl } from "../utils/productUrl";
 
 export const RecentlyViewedContext = createContext();
 
 const MAX_RECENT_ITEMS = 10;
+
+const firstValidPrice = (...values) => {
+  for (const value of values) {
+    const numericValue = Number.parseFloat(value);
+    if (Number.isFinite(numericValue)) {
+      return numericValue;
+    }
+  }
+
+  return 0;
+};
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -13,10 +25,10 @@ const reducer = (state, action) => {
       const existingIndex = state.findIndex(item => item.id === product.id);
       
       if (existingIndex >= 0) {
-        // Si existe, moverlo al principio de la lista (actualizar timestamp)
+        // Si existe, moverlo al principio y refrescar datos que pudieron corregirse en BD/API.
         const updatedList = [...state];
         const [existingProduct] = updatedList.splice(existingIndex, 1);
-        return [{ ...existingProduct, viewedAt: Date.now() }, ...updatedList];
+        return [{ ...existingProduct, ...product, viewedAt: Date.now() }, ...updatedList];
       } else {
         // Si no existe, agregarlo al principio
         const newList = [{ ...product, viewedAt: Date.now() }, ...state];
@@ -87,13 +99,13 @@ export const RecentlyViewedProvider = ({ children }) => {
       id: product.id || product.id_producto,
       title: product.title || product.nombre,
       image: product.image || product.imagen,
-      price: product.price || product.precio_sin_ganancia,
-      priceWithoutProfit: product.priceWithoutProfit || product.precio_sin_ganancia,
-      priceWithProfit: product.priceWithProfit || product.precio_ganancia,
+      price: firstValidPrice(product.price, product.precio_igv, product.precio_ganancia, product.precio_sin_ganancia),
+      priceWithoutProfit: firstValidPrice(product.priceWithoutProfit, product.precio_ganancia, product.precio_sin_ganancia, product.precio_igv),
+      priceWithProfit: firstValidPrice(product.priceWithProfit, product.precio_ganancia, product.precio_igv, product.precio_sin_ganancia),
       sku: product.sku,
       descripcion: product.descripcion,
       marca: product.marca || { nombre: product.nombre_marca },
-      link: product.link || `/producto/${product.id || product.id_producto}`
+      link: product.link || getProductUrl(product)
     };
 
     dispatch({ type: 'ADD_RECENTLY_VIEWED', product: productToAdd });

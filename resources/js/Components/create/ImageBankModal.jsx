@@ -1,6 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../storage/ThemeContext';
 
+const getModifiedAt = (image) => {
+  const timestamp = Number(image.fecha_modificacion_timestamp ?? 0);
+
+  if (timestamp > 0) {
+    return timestamp;
+  }
+
+  return Date.parse(image.fecha || image.updated_at || image.created_at || '') || 0;
+};
+
+const sortImagesByModifiedDesc = (imageList) => {
+  return [...imageList].sort((a, b) => getModifiedAt(b) - getModifiedAt(a));
+};
+
+const getUploadedDateLabel = (image) => {
+  return image.fecha_subida_label || image.fecha_label || image.fecha_modificacion_label || 'Sin fecha';
+};
+
+const getUploadedDate = (image) => {
+  return image.fecha_modificacion_fecha || image.fecha_subida_fecha || (image.fecha_subida || image.fecha || '').slice(0, 10);
+};
+
 const ImageBankModal = ({ isOpen, onClose, onSelectImages }) => {
   const { isDarkMode } = useTheme();
   const [images, setImages] = useState([]);
@@ -8,6 +30,7 @@ const ImageBankModal = ({ isOpen, onClose, onSelectImages }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [collectionFilter, setCollectionFilter] = useState('Todas las colecciones');
+  const [dateFilter, setDateFilter] = useState('');
   const [collections, setCollections] = useState([]);
 
   useEffect(() => {
@@ -21,10 +44,11 @@ const ImageBankModal = ({ isOpen, onClose, onSelectImages }) => {
     try {
       const response = await fetch('/banco-imagenes/api/all');
       const data = await response.json();
-      setImages(data.imagenes || []);
+      const sortedImages = sortImagesByModifiedDesc(data.imagenes || []);
+      setImages(sortedImages);
       
       // Extraer colecciones únicas
-      const uniqueCollections = [...new Set(data.imagenes.map(img => img.collection_name || 'Sin colección'))];
+      const uniqueCollections = [...new Set(sortedImages.map(img => img.collection_name || 'Sin colección'))];
       setCollections(['Todas las colecciones', ...uniqueCollections]);
     } catch (error) {
       console.error('Error fetching images:', error);
@@ -37,7 +61,8 @@ const ImageBankModal = ({ isOpen, onClose, onSelectImages }) => {
     const matchesSearch = image.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCollection = collectionFilter === 'Todas las colecciones' || 
                              (image.collection_name || 'Sin colección') === collectionFilter;
-    return matchesSearch && matchesCollection;
+    const matchesDate = dateFilter === '' || getUploadedDate(image) === dateFilter;
+    return matchesSearch && matchesCollection && matchesDate;
   });
 
   const toggleImageSelection = (image) => {
@@ -120,6 +145,19 @@ const ImageBankModal = ({ isOpen, onClose, onSelectImages }) => {
                 ))}
               </select>
             </div>
+            <div className="md:w-48">
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className={`w-full px-3 py-2 rounded-md border transition-colors duration-300 ${
+                  isDarkMode 
+                    ? 'bg-gray-700 border-gray-600 text-white focus:border-indigo-400' 
+                    : 'bg-white border-gray-300 text-gray-900 focus:border-indigo-500'
+                }`}
+                title="Filtrar por fecha de modificación"
+              />
+            </div>
           </div>
         </div>
 
@@ -163,6 +201,8 @@ const ImageBankModal = ({ isOpen, onClose, onSelectImages }) => {
                   <img
                     src={image.url}
                     alt={image.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-24 object-cover rounded"
                   />
                   <div className={`mt-2 text-xs text-center transition-colors duration-300 ${
@@ -173,6 +213,11 @@ const ImageBankModal = ({ isOpen, onClose, onSelectImages }) => {
                       isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     }`}>
                       {image.collection_name || 'Sin colección'}
+                    </p>
+                    <p className={`text-[11px] mt-1 transition-colors duration-300 ${
+                      isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                      Modificado: {getUploadedDateLabel(image)}
                     </p>
                   </div>
                 </div>
