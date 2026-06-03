@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opción 5 - Asistente de Compra Técnica</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="proposal-page assistant-page">
+    <nav class="design-nav floating">
+        <a class="brand" href="../index.html"><img src="../../public/img/logo2.jpg" alt="Mega Equipamiento"></a>
+        <div class="nav-links">
+            <a href="../hub/index.html">Hub</a>
+            <a href="../mega-menu/index.html">Mega menu</a>
+            <a href="../sectores/index.html">Sectores</a>
+            <a href="../marketplace/index.html">Marketplace</a>
+            <a class="is-active" href="../asistente/index.html">Asistente</a>
+        </div>
+    </nav>
+
+    <header class="assistant-hero">
+        <div>
+            <p class="eyebrow">Opción 5 / lead técnico</p>
+            <h1>Un flujo guiado para convertir dudas técnicas en cotizaciones.</h1>
+            <p>Funciona mejor como módulo dentro del Hub Profesional, no como reemplazo total del catálogo.</p>
+        </div>
+    </header>
+
+    <main class="assistant-workflow">
+        <section class="assistant-panel">
+            <p class="eyebrow">Paso 1</p>
+            <h2>¿Qué necesitas resolver?</h2>
+            <div class="choice-list" id="choiceList">
+                <button class="is-active" data-choice="esterilizar">Esterilizar muestras</button>
+                <button data-choice="medir">Medir variables de campo</button>
+                <button data-choice="calibrar">Calibrar instrumentos</button>
+                <button data-choice="pesar">Pesar con precisión</button>
+            </div>
+        </section>
+
+        <section class="assistant-result">
+            <span>Resultado sugerido</span>
+            <h2 id="assistantTitle">Autoclaves y esterilizadores</h2>
+            <p id="assistantText">Revisa volumen, temperatura de trabajo, tipo de carga y normas de seguridad.</p>
+            <div class="result-tags" id="assistantTags"></div>
+            <div class="spec-box">
+                <label>Rango / capacidad</label>
+                <div class="range-line"><span></span></div>
+                <label>Prioridad comercial</label>
+                <div class="priority-row"><button>Precio</button><button class="is-active">Precisión</button><button>Disponibilidad</button></div>
+            </div>
+            <button class="assistant-cta">Enviar a cotización</button>
+        </section>
+    </main>
+
+    <section class="decision-notes">
+        <div><strong>Mejor para</strong><p>Usuarios que no conocen el nombre exacto del producto.</p></div>
+        <div><strong>Complejidad</strong><p>Alta. Requiere reglas de recomendación.</p></div>
+        <div><strong>Recomendación</strong><p>Agregarlo como módulo futuro dentro de la home.</p></div>
+    </section>
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opción 2 - Mega Menu Industrial</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body class="proposal-page mega-page">
+    <nav class="design-nav floating">
+        <a class="brand" href="../index.html"><img src="../../public/img/logo2.jpg" alt="Mega Equipamiento"></a>
+        <div class="nav-links">
+            <a href="../hub/index.html">Hub</a>
+            <a class="is-active" href="../mega-menu/index.html">Mega menu</a>
+            <a href="../sectores/index.html">Sectores</a>
+            <a href="../marketplace/index.html">Marketplace</a>
+            <a href="../asistente/index.html">Asistente</a>
+        </div>
+    </nav>
+
+    <header class="screen-header compact">
+        <p class="eyebrow">Opción 2 / navegación escalable</p>
+        <h1>Mega menú diseñado para un catálogo técnico grande.</h1>
+        <p>Resuelve la exploración cuando el usuario ya sabe el rubro, la categoría o la marca que necesita.</p>
+    </header>
+
+    <main class="mega-shell">
+        <section class="shop-topbar">
+            <button class="category-trigger">Todas las categorías</button>
+            <div class="search">
+                <span class="search-icon" aria-hidden="true"></span>
+                <input type="search" placeholder="Buscar equipos, marcas, fichas técnicas...">
+                <button>Buscar</button>
+            </div>
+            <button class="quote-btn">Cotizar</button>
+        </section>
+
+        <section class="industrial-menu">
+            <aside class="mega-sidebar">
+                <button class="mega-item is-active" data-menu="lab">Laboratorio</button>
+                <button class="mega-item" data-menu="medicion">Medición industrial</button>
+                <button class="mega-item" data-menu="clinico">Clínico y mobiliario</button>
+                <button class="mega-item" data-menu="insumos">Insumos y reactivos</button>
+                <button class="mega-item" data-menu="servicios">Servicios</button>
+            </aside>
+            <div class="mega-content">
+                <div class="mega-title">
+                    <div>
+                        <p class="eyebrow" id="megaKicker">Línea principal</p>
+                        <h2 id="megaTitle">Laboratorio</h2>
+                    </div>
+                    <a href="#">Ver toda la línea</a>
+                </div>
+                <div class="mega-columns">
+                    <div class="mega-categories" id="megaCategories"></div>
+                    <div class="mega-feature">
+                        <span>Atajo comercial</span>
+                        <strong id="megaFeatureTitle">Cotiza equipos por aplicación</strong>
+                        <p id="megaFeatureText">Recibe sugerencias según uso, rango, norma o presupuesto.</p>
+                        <button>Solicitar asesoría</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="decision-notes">
+            <div><strong>Mejor para</strong><p>Catálogos con muchas categorías, subcategorías y marcas.</p></div>
+            <div><strong>Complejidad</strong><p>Media. Requiere datos bien jerarquizados.</p></div>
+            <div><strong>Recomendación</strong><p>Implementarlo junto al Hub Profesional.</p></div>
+        </section>
+    </main>
+    <script src="../script.js"></script>
+</body>
+</html>
