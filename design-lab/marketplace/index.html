@@ -25,7 +25,7 @@
                 <h1>Una experiencia tipo marketplace, pero sobria para compra técnica B2B.</h1>
                 <p>Categorías top, productos buscados, ofertas por volumen y marcas oficiales desde la primera pantalla.</p>
                 <div class="hero-search">
-                    <input type="search" value="Buscar por producto, SKU o marca..." aria-label="Búsqueda marketplace">
+                    <input type="search" placeholder="Buscar por producto, SKU o marca..." aria-label="Búsqueda marketplace">
                     <button>Buscar</button>
                 </div>
             </div>
@@ -37,21 +37,93 @@
         </section>
 
         <section class="quick-grid polished">
-            <div>Autoclaves</div>
-            <div>Balanzas</div>
-            <div>Medidores</div>
-            <div>Microscopía</div>
-            <div>Termometría</div>
-            <div>Calibración</div>
+            <div>
+                <svg class="svg-icon" style="width: 20px; height: 20px; stroke: var(--brand); margin-bottom: 6px;" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                <span>Autoclaves</span>
+            </div>
+            <div>
+                <svg class="svg-icon" style="width: 20px; height: 20px; stroke: var(--brand); margin-bottom: 6px;" viewBox="0 0 24 24"><path d="M20 12H4M12 3v18M12 12l4-4M12 12l-4-4"/></svg>
+                <span>Balanzas</span>
+            </div>
+            <div>
+                <svg class="svg-icon" style="width: 20px; height: 20px; stroke: var(--brand); margin-bottom: 6px;" viewBox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z"/></svg>
+                <span>Medidores</span>
+            </div>
+            <div>
+                <svg class="svg-icon" style="width: 20px; height: 20px; stroke: var(--brand); margin-bottom: 6px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M14.5 14.5L19 19"/></svg>
+                <span>Microscopía</span>
+            </div>
+            <div>
+                <svg class="svg-icon" style="width: 20px; height: 20px; stroke: var(--brand); margin-bottom: 6px;" viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                <span>Termometría</span>
+            </div>
+            <div>
+                <svg class="svg-icon" style="width: 20px; height: 20px; stroke: var(--brand); margin-bottom: 6px;" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Calibración</span>
+            </div>
         </section>
 
         <section class="product-shelves">
-            <div class="shelf-head"><strong>Más buscados esta semana</strong><a href="#">Ver todo</a></div>
+            <div class="shelf-head">
+                <strong>Más buscados esta semana</strong>
+                <a href="#">
+                    <span>Ver todo</span>
+                    <svg class="svg-icon" style="width: 14px; height: 14px; margin-left: 4px;" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
             <div class="product-row">
-                <article><span></span><strong>Balanza analítica</strong><p>Laboratorio / precisión</p><button>Comparar</button></article>
-                <article><span></span><strong>Termómetro IR</strong><p>Medición industrial</p><button>Cotizar</button></article>
-                <article><span></span><strong>Autoclave vertical</strong><p>Esterilización</p><button>Ver ficha</button></article>
-                <article><span></span><strong>Sonómetro</strong><p>Campo y seguridad</p><button>Comparar</button></article>
+                <article>
+                    <span>
+                        <svg class="svg-icon" style="width: 48px; height: 48px; stroke: var(--brand); opacity: 0.7; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%);" viewBox="0 0 24 24">
+                            <path d="M3 6h18M6 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/>
+                            <line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+                        </svg>
+                    </span>
+                    <strong>Balanza analítica</strong>
+                    <p>Laboratorio / precisión</p>
+                    <button>
+                        <span>Comparar</span>
+                    </button>
+                </article>
+                <article>
+                    <span>
+                        <svg class="svg-icon" style="width: 48px; height: 48px; stroke: var(--brand); opacity: 0.7; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%);" viewBox="0 0 24 24">
+                            <path d="M12 18h.01M8 21h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z"/>
+                            <path d="M9 7h6M9 11h6"/>
+                        </svg>
+                    </span>
+                    <strong>Termómetro IR</strong>
+                    <p>Medición industrial</p>
+                    <button>
+                        <span>Cotizar</span>
+                    </button>
+                </article>
+                <article>
+                    <span>
+                        <svg class="svg-icon" style="width: 48px; height: 48px; stroke: var(--brand); opacity: 0.7; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%);" viewBox="0 0 24 24">
+                            <rect x="5" y="3" width="14" height="18" rx="2"/>
+                            <line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/>
+                        </svg>
+                    </span>
+                    <strong>Autoclave vertical</strong>
+                    <p>Esterilización</p>
+                    <button>
+                        <span>Ver ficha</span>
+                    </button>
+                </article>
+                <article>
+                    <span>
+                        <svg class="svg-icon" style="width: 48px; height: 48px; stroke: var(--brand); opacity: 0.7; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%);" viewBox="0 0 24 24">
+                            <path d="M19 11a7 7 0 0 1-7 7m0 0a7 7 0 0 1-7-7m7 7v4m0 0H8m4 0h4"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </span>
+                    <strong>Sonómetro</strong>
+                    <p>Campo y seguridad</p>
+                    <button>
+                        <span>Comparar</span>
+                    </button>
+                </article>
             </div>
         </section>
 
@@ -61,9 +133,18 @@
     </main>
 
     <section class="decision-notes">
-        <div><strong>Mejor para</strong><p>Venta cruzada, productos populares y navegación familiar.</p></div>
-        <div><strong>Complejidad</strong><p>Media. Requiere curar destacados para no saturar.</p></div>
-        <div><strong>Recomendación</strong><p>Útil si el foco principal es conversión rápida.</p></div>
+        <div>
+            <strong>Mejor para</strong>
+            <p>Venta cruzada, productos populares y navegación familiar.</p>
+        </div>
+        <div>
+            <strong>Complejidad</strong>
+            <p>Media. Requiere curar destacados para no saturar.</p>
+        </div>
+        <div>
+            <strong>Recomendación</strong>
+            <p>Útil si el foco principal es conversión rápida.</p>
+        </div>
     </section>
 </body>
 </html>
