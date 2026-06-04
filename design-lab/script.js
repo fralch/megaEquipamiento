@@ -5,12 +5,12 @@ const menuData = {
         featureTitle: "Cotiza equipos por aplicación",
         featureText: "Recibe sugerencias según uso, rango, norma o presupuesto.",
         items: [
-            { title: "Autoclaves Verticales", desc: "Esterilización y bioseguridad industrial", price: "2,499.00", oldPrice: "3,100.00", discount: "19", stars: "★★★★★", reviews: "28", moq: "1 ud" },
-            { title: "Balanzas Analíticas", desc: "Precisión extrema para análisis científico", price: "1,250.00", oldPrice: "1,600.00", discount: "21", stars: "★★★★☆", reviews: "19", moq: "1 ud" },
-            { title: "Microscopía Digital", desc: "Óptica avanzada para biología y clínica", price: "950.00", oldPrice: "1,200.00", discount: "20", stars: "★★★★★", reviews: "12", moq: "1 ud" },
-            { title: "Centrífugas de Banco", desc: "Velocidad constante para microplacas y tubos", price: "780.00", oldPrice: "980.00", discount: "20", stars: "★★★★☆", reviews: "15", moq: "1 ud" },
-            { title: "Agitadores Magnéticos", desc: "Agitación homogénea con placa calefactora", price: "340.00", oldPrice: "420.00", discount: "19", stars: "★★★★☆", reviews: "8", moq: "2 uds" },
-            { title: "Incubadoras de Cultivo", desc: "Cámaras con control de temperatura", price: "1,850.00", oldPrice: "2,200.00", discount: "15", stars: "★★★★★", reviews: "6", moq: "1 ud" }
+            { title: "Autoclaves Verticales", desc: "Esterilización y bioseguridad industrial", img: "../../public/categorias/1755374994_68a0e592b4c86_0.jpg", price: "2,499.00", oldPrice: "3,100.00", discount: "19", stars: "★★★★★", reviews: "28", moq: "1 ud" },
+            { title: "Balanzas Analíticas", desc: "Precisión extrema para análisis científico", img: "../../public/categorias/1755374994_68a0e592af054_1.jpg", price: "1,250.00", oldPrice: "1,600.00", discount: "21", stars: "★★★★☆", reviews: "19", moq: "1 ud" },
+            { title: "Microscopía Digital", desc: "Óptica avanzada para biología y clínica", img: "../../public/categorias/1755374994_68a0e592c75c5_0.jpg", price: "950.00", oldPrice: "1,200.00", discount: "20", stars: "★★★★★", reviews: "12", moq: "1 ud" },
+            { title: "Centrífugas de Banco", desc: "Velocidad constante para microplacas y tubos", img: "../../public/categorias/1755374994_68a0e592cf546_1.jpg", price: "780.00", oldPrice: "980.00", discount: "20", stars: "★★★★☆", reviews: "15", moq: "1 ud" },
+            { title: "Agitadores Magnéticos", desc: "Agitación homogénea con placa calefactora", img: "../../public/categorias/1755374994_68a0e592b990e_0.jpg", price: "340.00", oldPrice: "420.00", discount: "19", stars: "★★★★☆", reviews: "8", moq: "2 uds" },
+            { title: "Incubadoras de Cultivo", desc: "Cámaras con control de temperatura", img: "../../public/categorias/1755374994_68a0e592d410c_0.jpg", price: "1,850.00", oldPrice: "2,200.00", discount: "15", stars: "★★★★★", reviews: "6", moq: "1 ud" }
         ]
     },
     medicion: {
@@ -76,10 +76,10 @@ const sectorData = {
         title: "Control de calidad",
         text: "Equipos para ensayo, medición, preparación de muestras y trazabilidad de procesos.",
         items: [
-            { title: "Balanza de precisión", linea: "Laboratorio", price: "720.00", oldPrice: "900.00", discount: "20", stars: "★★★★★", reviews: "14", moq: "1 ud" },
-            { title: "Medición dimensional", linea: "Medición", price: "280.00", oldPrice: "350.00", discount: "20", stars: "★★★★☆", reviews: "9", moq: "3 uds" },
-            { title: "Mufla de calentamiento", linea: "Laboratorio", price: "1,850.00", oldPrice: "2,300.00", discount: "19", stars: "★★★★★", reviews: "7", moq: "1 ud" },
-            { title: "Certificado Calibración", linea: "Servicios", price: "250.00", oldPrice: "300.00", discount: "16", stars: "★★★★☆", reviews: "38", moq: "1 ud" }
+            { title: "Balanza de precisión", linea: "Laboratorio", img: "../../public/categorias/1755374994_68a0e592af054_1.jpg", price: "720.00", oldPrice: "900.00", discount: "20", stars: "★★★★★", reviews: "14", moq: "1 ud" },
+            { title: "Medición dimensional", linea: "Medición", img: "../../public/categorias/1755374994_68a0e592b7892_0.jpg", price: "280.00", oldPrice: "350.00", discount: "20", stars: "★★★★☆", reviews: "9", moq: "3 uds" },
+            { title: "Mufla de calentamiento", linea: "Laboratorio", img: "../../public/categorias/1755374994_68a0e592d9fb3_0.jpg", price: "1,850.00", oldPrice: "2,300.00", discount: "19", stars: "★★★★★", reviews: "7", moq: "1 ud" },
+            { title: "Certificado Calibración", linea: "Servicios", img: "../../public/categorias/1755374994_68a0e592e6a76_0.jpg", price: "250.00", oldPrice: "300.00", discount: "16", stars: "★★★★☆", reviews: "38", moq: "1 ud" }
         ]
     },
     ambiental: {
@@ -158,8 +158,8 @@ function renderMega(key) {
     megaCategories.innerHTML = data.items.map((item) => `
         <article class="mega-card">
             <span class="badge-discount-promo">-${item.discount}%</span>
-            <div style="height: 80px; background: #f1f5f9; border-radius: var(--radius-sm); position: relative; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; color: var(--brand);">
-                <svg class="svg-icon" style="width: 32px; height: 32px;" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            <div class="img-container" style="height: 120px; background: #fff; border-radius: var(--radius-sm); position: relative; margin-bottom: 10px; overflow: hidden; border: 1px solid var(--line);">
+                <img src="${item.img || '../../public/categorias/1755374994_68a0e592aee70_0.jpg'}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; padding: 8px;">
             </div>
             <strong>${item.title}</strong>
             <span>${item.desc}</span>
@@ -195,6 +195,9 @@ function renderSector(key) {
     solutionGrid.innerHTML = data.items.map((item) => `
         <article class="solution-card">
             <span class="badge-discount-promo">-${item.discount}% B2B</span>
+            <div class="img-container" style="height: 120px; background: #fff; border-radius: var(--radius-sm); position: relative; margin-bottom: 12px; overflow: hidden; border: 1px solid var(--line);">
+                <img src="${item.img || '../../public/categorias/1755374994_68a0e592c2a33_0.jpg'}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; padding: 8px;">
+            </div>
             <strong>${item.title}</strong>
             <span>Línea: ${item.linea}</span>
             <div class="rating-stars">${item.stars} <span class="rating-count">(${item.reviews})</span></div>
