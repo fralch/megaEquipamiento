@@ -373,11 +373,13 @@ button {
 
 /* Decision Notes Section (3 columns) */
 .decision-notes {
-    width: min(1200px, calc(100% - 40px));
-    margin: 40px auto 60px;
+    width: 100%;
+    margin: 40px 0 60px;
+    padding: 0 40px;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 16px;
+    box-sizing: border-box;
 }
 
 .decision-notes div {
@@ -459,9 +461,9 @@ button {
 .index-copy {
     position: relative;
     z-index: 5;
-    width: min(1180px, calc(100% - 40px));
-    margin: 0 auto;
-    padding: 48px 0 56px;
+    width: 100%;
+    margin: 0;
+    padding: 48px 40px 56px;
 }
 
 .index-copy h1 {
@@ -486,9 +488,9 @@ button {
 }
 
 .index-container {
-    width: min(1280px, calc(100% - 40px));
-    margin: 0 auto;
-    padding: 48px 0 80px;
+    width: 100%;
+    margin: 0;
+    padding: 48px 40px 80px;
     position: relative;
 }
 
@@ -697,9 +699,10 @@ button {
 }
 
 .screen-header {
-    width: min(1180px, calc(100% - 40px));
-    margin: 0 auto;
-    padding: 48px 0 24px;
+    width: 100%;
+    margin: 0;
+    padding: 48px 40px 24px;
+    box-sizing: border-box;
 }
 
 .screen-header.compact p:not(.eyebrow) {
@@ -850,8 +853,10 @@ button {
     display: grid;
     grid-template-columns: 280px 1fr;
     gap: 24px;
-    width: min(1280px, calc(100% - 40px));
-    margin: 40px auto;
+    width: 100%;
+    margin: 0;
+    padding: 0 40px;
+    box-sizing: border-box;
 }
 
 .b2b-sidebar {
@@ -912,8 +917,10 @@ button {
 }
 
 .hub-header {
-    width: min(1280px, calc(100% - 40px));
-    margin: 40px auto 0;
+    width: 100%;
+    margin: 0;
+    padding: 0 40px;
+    box-sizing: border-box;
     min-height: 580px;
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1017,8 +1024,10 @@ button {
 
 /* Business Lines Cards Grid */
 .business-lines {
-    width: min(1280px, calc(100% - 40px));
-    margin: 48px auto;
+    width: 100%;
+    margin: 48px 0;
+    padding: 0 40px;
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
@@ -1354,17 +1363,27 @@ button {
 
 /* Service Technical Grid */
 .hub-services {
-    width: min(1280px, calc(100% - 40px));
-    margin: 0 auto 48px;
+    width: 100%;
+    margin: 0 0 48px;
+    padding: 0 40px;
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: 0.8fr 1.2fr;
     gap: 40px;
     align-items: center;
-    border-radius: var(--radius-xl);
+    border-radius: 0;
     background: #fff;
     border: 1px solid var(--line);
+    border-left: none;
+    border-right: none;
+}
+
+.hub-services > div:first-child {
     padding: 40px;
-    box-shadow: var(--shadow-md);
+}
+
+.hub-services > div:last-child {
+    padding: 40px;
 }
 
 .hub-services h2 {
@@ -1414,8 +1433,10 @@ button {
    PROPOSAL 2: MEGA MENU
    ========================================== */
 .mega-shell {
-    width: min(1280px, calc(100% - 40px));
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
+    padding: 0 40px;
+    box-sizing: border-box;
 }
 
 .shop-topbar {
@@ -1628,8 +1649,10 @@ button {
 }
 
 .sector-hero {
-    width: min(1280px, calc(100% - 40px));
-    margin: 40px auto 24px;
+    width: 100%;
+    margin: 0;
+    padding: 0 40px;
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: 1fr 340px;
     gap: 32px;
@@ -1673,15 +1696,22 @@ button {
 }
 
 .sector-layout {
-    width: min(1280px, calc(100% - 40px));
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: 260px 1fr;
     border: 1px solid var(--line);
-    border-radius: var(--radius-xl);
+    border-radius: 0;
     overflow: hidden;
     background: #fff;
     box-shadow: var(--shadow-lg);
+}
+
+.sector-layout > .sector-stage {
+    border: none;
+    border-radius: 0;
 }
 
 .sector-tabs {
@@ -1805,8 +1835,10 @@ button {
 
 /* Editorial Block Styling */
 .editorial-band {
-    width: min(1280px, calc(100% - 40px));
-    margin: 28px auto 0;
+    width: 100%;
+    margin: 28px 0 0;
+    padding: 0 40px;
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
@@ -1855,8 +1887,10 @@ button {
 }
 
 .market-shell {
-    width: min(1280px, calc(100% - 40px));
-    margin: 40px auto 0;
+    width: 100%;
+    margin: 0;
+    padding: 0 40px;
+    box-sizing: border-box;
 }
 
 .market-hero-full {
@@ -2106,8 +2140,10 @@ button {
 
 .assistant-hero {
     grid-template-columns: 1fr;
-    max-width: 1080px;
-    margin: 40px auto 28px;
+    width: 100%;
+    margin: 0;
+    padding: 0 40px;
+    box-sizing: border-box;
 }
 
 .assistant-hero h1 {
@@ -2124,15 +2160,25 @@ button {
 }
 
 .assistant-workflow {
-    width: min(1080px, calc(100% - 40px));
-    margin: 0 auto;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;
-    border-radius: var(--radius-xl);
+    border-radius: 0;
     overflow: hidden;
     border: 1px solid var(--line);
     background: #fff;
     box-shadow: var(--shadow-xl);
+}
+
+.assistant-workflow > .assistant-panel {
+    padding: 40px;
+}
+
+.assistant-workflow > .assistant-result {
+    padding: 40px;
 }
 
 .assistant-panel {
@@ -2430,8 +2476,9 @@ button {
     .quick-grid,
     .brand-strip,
     .product-row,
-    .decision-notes {
-        grid-template-columns: repeat(3, 1fr);
+    .decision-notes,
+    .editorial-band {
+        grid-template-columns: 1fr;
     }
 
     .mega-sidebar,
@@ -2452,10 +2499,35 @@ button {
         align-items: flex-start;
         flex-direction: column;
         gap: 16px;
+        padding: 16px 20px;
     }
 
     .nav-links {
         justify-content: flex-start;
+    }
+
+    .index-copy,
+    .index-container,
+    .decision-notes,
+    .screen-header,
+    .hub-header,
+    .business-lines,
+    .hub-services,
+    .mega-shell,
+    .sector-hero,
+    .editorial-band,
+    .market-shell,
+    .assistant-hero,
+    .b2b-layout-with-sidebar,
+    .sector-layout,
+    .assistant-workflow {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .assistant-workflow > .assistant-panel,
+    .assistant-workflow > .assistant-result {
+        padding: 24px;
     }
 
     .index-copy h1,
@@ -2467,7 +2539,7 @@ button {
     }
 
     .index-copy {
-        padding: 36px 0 44px;
+        padding: 36px 20px 44px;
     }
 
     .recommendation,
@@ -2503,11 +2575,15 @@ button {
         min-height: 320px;
     }
 
-    .market-hero-full,
-    .hub-services,
+    .market-hero-full {
+        padding: 24px;
+    }
+
+    .hub-services > div:first-child,
+    .hub-services > div:last-child,
     .sector-stage,
-    .assistant-panel,
-    .assistant-result {
+    .assistant-workflow > .assistant-panel,
+    .assistant-workflow > .assistant-result {
         padding: 24px;
     }
 
