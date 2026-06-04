@@ -831,18 +831,28 @@ button {
     box-shadow: 0 4px 10px rgba(0, 135, 90, 0.3);
 }
 
+.mega-card .btn-add-cart-circle {
+    background: var(--brand-light);
+}
+
+.mega-card .btn-add-cart-circle:hover {
+    background: var(--brand);
+    box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3);
+}
+
 /* Floating promotional discount badge */
 .badge-discount-promo {
     position: absolute;
     top: 14px;
     left: 14px;
-    background: var(--accent);
-    color: #fff;
+    background: var(--accent-soft);
+    color: var(--accent-dark);
+    border: 1px solid rgba(249, 115, 22, 0.2);
     border-radius: var(--radius-sm);
     font-size: 11px;
     font-weight: 800;
-    padding: 4px 8px;
-    box-shadow: var(--shadow-sm);
+    padding: 3px 8px;
+    box-shadow: none;
     z-index: 5;
     letter-spacing: 0.02em;
     text-transform: uppercase;
@@ -1737,21 +1747,34 @@ button {
 }
 
 .sector-tabs button:hover {
-    background: rgba(13, 148, 136, 0.05);
+    background: var(--green-soft);
     color: var(--green);
 }
 
 .sector-tabs button.is-active {
     background: var(--green);
     color: #fff;
-    box-shadow: 0 4px 10px rgba(13, 148, 136, 0.2);
+    box-shadow: 0 4px 12px var(--green-glow);
 }
 
 .sector-stage {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 36px;
-    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: 32px 40px;
+}
+
+.sector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 20px;
+    gap: 32px;
+}
+
+.sector-info {
+    flex: 1;
 }
 
 .sector-stage h2 {
@@ -1786,19 +1809,19 @@ button {
 .sector-actions button:last-child {
     background: #fff;
     color: var(--green);
-    border: 1px solid var(--line);
+    border: 1px solid rgba(0, 135, 90, 0.3);
     box-shadow: none;
 }
 
 .sector-actions button:last-child:hover {
     background: var(--green-soft);
-    border-color: rgba(13, 148, 136, 0.3);
+    border-color: var(--green);
 }
 
 .solution-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
 }
 
 .solution-card {
@@ -2406,9 +2429,7 @@ button {
 .product-row article,
 .market-grid article,
 .product-swiper article,
-.editorial-band article,
-.solution-card,
-.mega-card {
+.editorial-band article {
     position: relative;
     background: #fff;
     border: 1px solid var(--line);
@@ -2424,9 +2445,7 @@ button {
 .product-row article:hover,
 .market-grid article:hover,
 .product-swiper article:hover,
-.editorial-band article:hover,
-.solution-card:hover,
-.mega-card:hover {
+.editorial-band article:hover {
     box-shadow: var(--shadow-md);
     border-color: rgba(30, 58, 138, 0.15);
     transform: translateY(-2px);
@@ -2595,6 +2614,10 @@ button {
     
     .hub-visual {
         min-height: 380px;
+    }
+
+    .solution-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 

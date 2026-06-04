@@ -158,7 +158,7 @@ function renderMega(key) {
     megaCategories.innerHTML = data.items.map((item) => `
         <article class="mega-card">
             <span class="badge-discount-promo">-${item.discount}%</span>
-            <div class="img-container" style="height: 120px; background: #fff; border-radius: var(--radius-sm); position: relative; margin-bottom: 10px; overflow: hidden; border: 1px solid var(--line);">
+            <div class="img-container" style="height: 120px; position: relative; margin-bottom: 10px; overflow: hidden;">
                 <img src="${item.img || '../../public/categorias/1755374994_68a0e592aee70_0.jpg'}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; padding: 8px;">
             </div>
             <strong>${item.title}</strong>
@@ -195,7 +195,7 @@ function renderSector(key) {
     solutionGrid.innerHTML = data.items.map((item) => `
         <article class="solution-card">
             <span class="badge-discount-promo">-${item.discount}% B2B</span>
-            <div class="img-container" style="height: 120px; background: #fff; border-radius: var(--radius-sm); position: relative; margin-bottom: 12px; overflow: hidden; border: 1px solid var(--line);">
+            <div class="img-container" style="height: 120px; position: relative; margin-bottom: 12px; overflow: hidden;">
                 <img src="${item.img || '../../public/categorias/1755374994_68a0e592c2a33_0.jpg'}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; padding: 8px;">
             </div>
             <strong>${item.title}</strong>
