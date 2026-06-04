@@ -23,11 +23,32 @@
         </div>
     </nav>
 
-    <header class="screen-header compact">
-        <p class="eyebrow">Opción 2 / Navegación y Conversión</p>
-        <h1>Mega menú B2B con precios y valoraciones integradas.</h1>
-        <p>Inspirado en Alibaba. Permite al comprador ver especificaciones de precios, MOQ y valoraciones de los equipos desde el menú principal de categorías, agilizando el flujo de compra.</p>
-    </header>
+    <!-- Hero Carousel (Tottus Style) -->
+    <section class="hero-swiper-container">
+        <div class="swiper hero-swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide hero-slide">
+                    <img src="../../public/categorias/1755374994_68a0e592cf546_1.jpg" alt="Laboratorio">
+                    <div class="hero-slide-content">
+                        <h2>Explora todas las categorías con precios en vivo</h2>
+                        <p>Navega a través de nuestro menú inteligente para cotizar tus equipos al instante.</p>
+                        <button class="primary-link" style="width: fit-content;">Iniciar compra</button>
+                    </div>
+                </div>
+                <div class="swiper-slide hero-slide">
+                    <img src="../../public/categorias/1755374994_68a0e592d7833_0.jpg" alt="Medición B2B">
+                    <div class="hero-slide-content">
+                        <h2>Todo para Medición Industrial</h2>
+                        <p>Las mejores marcas con disponibilidad de despacho rápido y garantía certificada.</p>
+                        <button class="primary-link" style="width: fit-content; background: var(--green);">Ver más</button>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </section>
 
     <main class="mega-shell">
         <section class="shop-topbar">
@@ -110,5 +131,17 @@
         </section>
     </main>
     <script src="../script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const heroSwiper = new Swiper('.hero-swiper', {
+                slidesPerView: 1,
+                loop: true,
+                autoplay: { delay: 4000, disableOnInteraction: false },
+                pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
+                navigation: { nextEl: '.hero-swiper .swiper-button-next', prevEl: '.hero-swiper .swiper-button-prev' }
+            });
+        });
+    </script>
 </body>
 </html>

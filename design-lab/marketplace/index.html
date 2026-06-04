@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Opción 4 - Marketplace Compacto</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body class="proposal-page market-page">
@@ -24,71 +25,111 @@
     </nav>
 
     <main class="market-shell">
-        <section class="market-hero-full">
-            <div>
-                <p class="eyebrow">Opción 4 / Conversión Rápida</p>
-                <h1>Una experiencia tipo marketplace, pero sobria para compra técnica B2B.</h1>
-                <p>Categorías top, productos buscados, ofertas por volumen y marcas oficiales desde la primera pantalla.</p>
-                <div class="hero-search">
-                    <input type="search" placeholder="Buscar por producto, SKU o marca..." aria-label="Búsqueda marketplace">
-                    <button style="background: var(--accent);">Buscar</button>
+        <section class="hero-swiper-container">
+            <div class="swiper hero-swiper">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide hero-slide">
+                        <img src="../../public/categorias/1755374994_68a0e592aee70_0.jpg" alt="Equipamiento B2B">
+                        <div class="hero-slide-content">
+                            <h2>ENVÍO GRATIS en lotes seleccionados</h2>
+                            <p>Equipamiento certificado para todas tus operaciones, ahorro del 20% en combos de control de calidad.</p>
+                            <button class="primary-link" style="width: fit-content; background: var(--green);">Ver ofertas</button>
+                        </div>
+                    </div>
+                    <div class="swiper-slide hero-slide">
+                        <img src="../../public/categorias/1755374994_68a0e592b24e7_0.jpg" alt="Equipamiento B2B">
+                        <div class="hero-slide-content">
+                            <h2>Equipos de Laboratorio Profesional</h2>
+                            <p>Autoclaves, centrífugas y balanzas con garantía extendida para compras institucionales.</p>
+                            <button class="primary-link" style="width: fit-content;">Cotizar ahora</button>
+                        </div>
+                    </div>
+                    <div class="swiper-slide hero-slide">
+                        <img src="../../public/categorias/1755374994_68a0e592c2a33_0.jpg" alt="Equipamiento B2B">
+                        <div class="hero-slide-content">
+                            <h2>Soluciones para Industria Alimentaria</h2>
+                            <p>Termómetros infrarrojos, medidores de humedad y esterilizadores de gran capacidad.</p>
+                            <button class="primary-link" style="width: fit-content;">Ver catálogo</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="deal-card">
-                <span>Campaña Especial B2B</span>
-                <strong>Equipos listos para despacho</strong>
-                <p>Productos destacados con ficha técnica, comparación y cotización rápida.</p>
+                <!-- Add Pagination -->
+                <div class="swiper-pagination"></div>
+                <!-- Add Navigation -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
             </div>
         </section>
 
         <!-- Tottus-style Category Circles -->
-        <section class="category-bubble-container" aria-label="Categorías Principales">
-            <div class="category-bubble-card">
+        <section class="swiper category-swiper" aria-label="Categorías Principales" style="margin: 32px 0;">
+            <div class="swiper-wrapper category-bubble-container" style="margin: 0; padding-bottom: 0; display: flex; gap: 0;">
+            <div class="swiper-slide category-bubble-card">
                 <div class="category-bubble-circle">
                     <svg class="svg-icon" style="width: 28px; height: 28px; stroke: var(--brand);" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/></svg>
                 </div>
                 <span>Autoclaves</span>
             </div>
-            <div class="category-bubble-card">
+            <div class="swiper-slide category-bubble-card">
                 <div class="category-bubble-circle">
                     <svg class="svg-icon" style="width: 28px; height: 28px; stroke: var(--brand);" viewBox="0 0 24 24"><path d="M3 6h18M6 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/></svg>
                 </div>
                 <span>Balanzas</span>
             </div>
-            <div class="category-bubble-card">
+            <div class="swiper-slide category-bubble-card">
                 <div class="category-bubble-circle">
                     <svg class="svg-icon" style="width: 28px; height: 28px; stroke: var(--brand);" viewBox="0 0 24 24"><path d="M12 18h.01M8 21h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2z"/></svg>
                 </div>
                 <span>Medidores</span>
             </div>
-            <div class="category-bubble-card">
+            <div class="swiper-slide category-bubble-card">
                 <div class="category-bubble-circle">
                     <svg class="svg-icon" style="width: 28px; height: 28px; stroke: var(--brand);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M14.5 14.5L19 19"/></svg>
                 </div>
                 <span>Microscopios</span>
             </div>
-            <div class="category-bubble-card">
+            <div class="swiper-slide category-bubble-card">
                 <div class="category-bubble-circle">
                     <svg class="svg-icon" style="width: 28px; height: 28px; stroke: var(--brand);" viewBox="0 0 24 24"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
                 </div>
                 <span>Termómetros</span>
             </div>
-            <div class="category-bubble-card">
+            <div class="swiper-slide category-bubble-card">
                 <div class="category-bubble-circle">
                     <svg class="svg-icon" style="width: 28px; height: 28px; stroke: var(--brand);" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <span>Calibración</span>
             </div>
+            <div class="swiper-slide category-bubble-card">
+                <div class="category-bubble-circle">
+                    <svg class="svg-icon" style="width: 28px; height: 28px; stroke: var(--brand);" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                </div>
+                <span>Agitadores</span>
+            </div>
+            <div class="swiper-slide category-bubble-card">
+                <div class="category-bubble-circle">
+                    <svg class="svg-icon" style="width: 28px; height: 28px; stroke: var(--brand);" viewBox="0 0 24 24"><path d="M2 12h4l3-9 5 18 3-9h5"/></svg>
+                </div>
+                <span>Reactivos</span>
+            </div>
+            <div class="swiper-slide category-bubble-card">
+                <div class="category-bubble-circle">
+                    <svg class="svg-icon" style="width: 28px; height: 28px; stroke: var(--brand);" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg>
+                </div>
+                <span>Hornos</span>
+            </div>
+        </div>
         </section>
 
         <!-- Product Grid shelves with Tottus-style Add Buttons -->
-        <section class="product-shelves">
+        <section class="product-shelves" style="position: relative;">
             <div class="shelf-head">
                 <strong>Más buscados esta semana</strong>
                 <a href="#">Ver todo el catálogo</a>
             </div>
-            <div class="product-row">
-                <article>
+            <div class="swiper product-swiper" style="padding-bottom: 20px;">
+            <div class="swiper-wrapper product-row" style="margin-top: 20px; display: flex; gap: 0;">
+                <article class="swiper-slide">
                     <span class="badge-discount-promo">-21% OFF</span>
                     <span>
                         <svg class="svg-icon" style="width: 48px; height: 48px; stroke: var(--brand); opacity: 0.7; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%);" viewBox="0 0 24 24">
@@ -160,6 +201,42 @@
                     <span class="product-moq">Pedido mínimo: 1 unidad</span>
                     <button class="btn-add-cart-circle" onclick="this.textContent='✓'; this.style.background='#00875a'; event.stopPropagation();">+</button>
                 </article>
+                <article>
+                    <span class="badge-discount-promo">-15% OFF</span>
+                    <span>
+                        <svg class="svg-icon" style="width: 48px; height: 48px; stroke: var(--brand); opacity: 0.7; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%);" viewBox="0 0 24 24">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+                        </svg>
+                    </span>
+                    <strong>Monitor Multiparamétrico</strong>
+                    <p>Clínica / Monitoreo paciente</p>
+                    <div class="rating-stars">★★★★★ <span class="rating-count">(45)</span></div>
+                    <div class="price-container">
+                        <span class="price-old">$2,100.00</span>
+                        <span class="price-new">$1,785.00</span>
+                    </div>
+                    <span class="product-moq">Pedido mínimo: 1 unidad</span>
+                    <button class="btn-add-cart-circle" onclick="this.textContent='✓'; this.style.background='#00875a'; event.stopPropagation();">+</button>
+                </article>
+                <article>
+                    <span>
+                        <svg class="svg-icon" style="width: 48px; height: 48px; stroke: var(--brand); opacity: 0.7; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%);" viewBox="0 0 24 24">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </span>
+                    <strong>Analizador Bioquímico</strong>
+                    <p>Reactivos / Sangre / Pruebas</p>
+                    <div class="rating-stars">★★★★☆ <span class="rating-count">(8)</span></div>
+                    <div class="price-container">
+                        <span class="price-old"></span>
+                        <span class="price-new">$5,400.00</span>
+                    </div>
+                    <span class="product-moq">Pedido mínimo: 1 unidad</span>
+                    <button class="btn-add-cart-circle" onclick="this.textContent='✓'; this.style.background='#00875a'; event.stopPropagation();">+</button>
+                </article>
+            </div>
+            <div class="swiper-button-prev" style="color: var(--brand);"></div>
+            <div class="swiper-button-next" style="color: var(--brand);"></div>
             </div>
         </section>
 
@@ -182,5 +259,41 @@
             <p>Excelente para la sección de productos destacados de la home.</p>
         </div>
     </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const heroSwiper = new Swiper('.hero-swiper', {
+                slidesPerView: 1,
+                loop: true,
+                autoplay: {
+                    delay: 4000,
+                    disableOnInteraction: false,
+                },
+                pagination: {
+                    el: '.hero-swiper .swiper-pagination',
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: '.hero-swiper .swiper-button-next',
+                    prevEl: '.hero-swiper .swiper-button-prev',
+                }
+            });
+
+            const catSwiper = new Swiper('.category-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 16,
+                freeMode: true
+            });
+            const prodSwiper = new Swiper('.product-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 16,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                }
+            });
+        });
+    </script>
 </body>
 </html>

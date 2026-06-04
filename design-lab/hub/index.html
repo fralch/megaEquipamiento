@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Opción 1 - Home Hub B2B Profesional</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body class="proposal-page hub-page">
@@ -23,50 +24,32 @@
         </div>
     </nav>
 
-    <header class="hub-header">
-        <div class="hub-copy">
-            <p class="eyebrow">Opción 1 / Hub de Compra B2B</p>
-            <h1>Plataforma comercial para laboratorio, medición industrial y servicios técnicos.</h1>
-            <p>
-                Inspirado en Alibaba. Entrada fuerte con categorías jerárquicas, búsqueda con imagen integrada y cotizaciones rápidas por lote de productos.
-            </p>
-            <div class="hero-search">
-                <input type="search" placeholder="Buscar autoclave, balanza analítica, sonómetro..." aria-label="Búsqueda demo">
-                <button class="btn-camera-search" title="Buscar con imagen">
-                    <svg class="svg-icon" style="width: 18px; height: 18px; stroke: #64748b;" viewBox="0 0 24 24">
-                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                        <circle cx="12" cy="13" r="4"/>
-                    </svg>
-                </button>
-                <button>Buscar</button>
+    <!-- Hero Carousel (Tottus Style) -->
+    <section class="hero-swiper-container">
+        <div class="swiper hero-swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide hero-slide">
+                    <img src="../../public/categorias/1755374994_68a0e592cf546_1.jpg" alt="Laboratorio">
+                    <div class="hero-slide-content">
+                        <h2>Equipamiento Integral para Laboratorios</h2>
+                        <p>Encuentra todo lo que necesitas categorizado de forma inteligente y ágil.</p>
+                        <button class="primary-link" style="width: fit-content;">Explorar equipos</button>
+                    </div>
+                </div>
+                <div class="swiper-slide hero-slide">
+                    <img src="../../public/categorias/1755374994_68a0e592d7833_0.jpg" alt="Medición B2B">
+                    <div class="hero-slide-content">
+                        <h2>Medición Industrial de Alta Precisión</h2>
+                        <p>Soluciones garantizadas para mantenimiento preventivo, control de calidad y seguridad industrial.</p>
+                        <button class="primary-link" style="width: fit-content; background: var(--green);">Conocer más</button>
+                    </div>
+                </div>
             </div>
-            <div class="trust-row">
-                <span>
-                    <svg class="svg-icon" style="margin-right: 6px; width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    Fabricantes Verificados
-                </span>
-                <span>
-                    <svg class="svg-icon" style="margin-right: 6px; width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-7.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    Protección del Pedido
-                </span>
-                <span>
-                    <svg class="svg-icon" style="margin-right: 6px; width: 14px; height: 14px;" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                    Despacho en 24h
-                </span>
-            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
         </div>
-        <div class="hub-visual">
-            <img src="../../public/img/slider-img1.webp" alt="Equipos de laboratorio">
-            <div class="hub-stat stat-a">
-                <strong>+1,200</strong>
-                <span>productos técnicos</span>
-            </div>
-            <div class="hub-stat stat-b">
-                <strong>98.5%</strong>
-                <span>entregas a tiempo</span>
-            </div>
-        </div>
-    </header>
+    </section>
 
     <main>
         <section class="b2b-layout-with-sidebar">
@@ -99,13 +82,14 @@
                 </nav>
             </aside>
 
-            <section class="product-shelves" style="border: 0; padding: 0; box-shadow: none; margin: 0;">
+            <section class="product-shelves" style="border: 0; padding: 0; box-shadow: none; margin: 0; position: relative;">
                 <div class="shelf-head" style="margin-bottom: 20px;">
                     <strong>Destacados en Laboratorio</strong>
                     <a href="#">Ver catálogo completo</a>
                 </div>
-                <div class="product-row" style="grid-template-columns: repeat(3, 1fr);">
-                    <article>
+                <div class="swiper product-swiper" style="padding-bottom: 20px;">
+                <div class="swiper-wrapper product-row" style="margin-top: 10px; display: flex; gap: 0;">
+                    <article class="swiper-slide">
                         <span class="badge-discount-promo">-19% B2B</span>
                         <span>
                             <svg class="svg-icon" style="width: 48px; height: 48px; stroke: var(--brand); opacity: 0.7; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%);" viewBox="0 0 24 24">
@@ -160,6 +144,25 @@
                         <span class="product-moq">Pedido mínimo: 1 unidad</span>
                         <button class="btn-add-cart-circle" onclick="this.textContent='✓'; this.style.background='#00875a'; event.stopPropagation();">+</button>
                     </article>
+                    <article>
+                        <span>
+                            <svg class="svg-icon" style="width: 48px; height: 48px; stroke: var(--brand); opacity: 0.7; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%);" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"/><path d="M14.5 14.5L19 19"/>
+                            </svg>
+                        </span>
+                        <strong>Microscopio Binocular</strong>
+                        <p>Laboratorio clínico / Investigación</p>
+                        <div class="rating-stars">★★★★☆ <span class="rating-count">(34)</span></div>
+                        <div class="price-container">
+                            <span class="price-old">$1,100.00</span>
+                            <span class="price-new">$950.00</span>
+                        </div>
+                        <span class="product-moq">Pedido mínimo: 1 unidad</span>
+                        <button class="btn-add-cart-circle" onclick="this.textContent='✓'; this.style.background='#00875a'; event.stopPropagation();">+</button>
+                    </article>
+                </div>
+                <div class="swiper-button-prev" style="color: var(--brand);"></div>
+                <div class="swiper-button-next" style="color: var(--brand);"></div>
                 </div>
             </section>
         </section>
@@ -218,5 +221,27 @@
             </div>
         </section>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const heroSwiper = new Swiper('.hero-swiper', {
+                slidesPerView: 1,
+                loop: true,
+                autoplay: { delay: 4000, disableOnInteraction: false },
+                pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
+                navigation: { nextEl: '.hero-swiper .swiper-button-next', prevEl: '.hero-swiper .swiper-button-prev' }
+            });
+
+            const prodSwiper = new Swiper('.product-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 16,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                }
+            });
+        });
+    </script>
 </body>
 </html>

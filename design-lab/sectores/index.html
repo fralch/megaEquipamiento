@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Opción 3 - Catálogo por Sectores B2B</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body class="proposal-page sector-page">
@@ -23,17 +24,32 @@
         </div>
     </nav>
 
-    <header class="sector-hero">
-        <div>
-            <p class="eyebrow">Opción 3 / Compra Consultiva</p>
-            <h1>Soluciones llave en mano agrupadas por industria.</h1>
-            <p>Evita buscar componente por componente. Cotiza o añade al carrito lotes completos prediseñados por ingenieros y especialistas para cada sector técnico.</p>
+    <!-- Hero Carousel (Tottus Style) -->
+    <section class="hero-swiper-container">
+        <div class="swiper hero-swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide hero-slide">
+                    <img src="../../public/categorias/1755374994_68a0e592cf546_1.jpg" alt="Laboratorio">
+                    <div class="hero-slide-content">
+                        <h2>Soluciones Llave en Mano para Sectores Técnicos</h2>
+                        <p>Cotiza o añade al carrito lotes completos prediseñados por ingenieros y especialistas para cada sector industrial.</p>
+                        <button class="primary-link" style="width: fit-content;">Ver Catálogos Sectoriales</button>
+                    </div>
+                </div>
+                <div class="swiper-slide hero-slide">
+                    <img src="../../public/categorias/1755374994_68a0e592d7833_0.jpg" alt="Medición B2B">
+                    <div class="hero-slide-content">
+                        <h2>Kits de Lote para Mantenimiento</h2>
+                        <p>Ahorro del 15% al adquirir el equipamiento completo de tu sector para monitoreo y control preventivo.</p>
+                        <button class="primary-link" style="width: fit-content; background: var(--green);">Consultar Beneficios</button>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
         </div>
-        <div class="sector-proof">
-            <strong>Kits de Lote</strong>
-            <span>Ahorro del 15% al adquirir el equipamiento completo de tu sector.</span>
-        </div>
-    </header>
+    </section>
 
     <main class="sector-layout">
         <aside class="sector-tabs" id="sectorTabs">
@@ -62,8 +78,9 @@
         </section>
     </main>
 
-    <section class="editorial-band">
-        <article style="position: relative;">
+    <section class="swiper editorial-swiper" style="width: min(1280px, calc(100% - 40px)); margin: 28px auto 0; padding-bottom: 40px; overflow: hidden; position: relative;">
+        <div class="swiper-wrapper editorial-band" style="margin: 0; width: 100%; display: flex; gap: 0;">
+            <article class="swiper-slide" style="position: relative; width: 450px;">
             <span class="badge-discount-promo">-22% OFF</span>
             <svg class="svg-icon" style="width: 32px; height: 32px; stroke: var(--green); margin-bottom: 12px;" viewBox="0 0 24 24">
                 <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -76,7 +93,7 @@
             </div>
             <button class="primary-link" style="background: var(--green); border: none; width: 100%;" onclick="this.textContent='¡Pack Agregado!';">Añadir Pack</button>
         </article>
-        <article style="position: relative;">
+        <article class="swiper-slide" style="position: relative; width: 450px;">
             <span class="badge-discount-promo">-20% OFF</span>
             <svg class="svg-icon" style="width: 32px; height: 32px; stroke: var(--green); margin-bottom: 12px;" viewBox="0 0 24 24">
                 <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -89,6 +106,36 @@
             </div>
             <button class="primary-link" style="background: var(--green); border: none; width: 100%;" onclick="this.textContent='¡Lote Agregado!';">Añadir Lote</button>
         </article>
+        <article class="swiper-slide" style="position: relative; width: 450px;">
+            <span class="badge-discount-promo">-15% OFF</span>
+            <svg class="svg-icon" style="width: 32px; height: 32px; stroke: var(--green); margin-bottom: 12px;" viewBox="0 0 24 24">
+                <path d="M3 6h18M6 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"/>
+            </svg>
+            <span>Pack Medición Industrial</span>
+            <h3>Sonómetro + Medidor de Gases + Certificación</h3>
+            <div class="price-container" style="margin-bottom: 16px;">
+                <span class="price-old">$2,400.00</span>
+                <span class="price-new">$2,040.00</span>
+            </div>
+            <button class="primary-link" style="background: var(--green); border: none; width: 100%;" onclick="this.textContent='¡Pack Agregado!';">Añadir Pack</button>
+        </article>
+        <article class="swiper-slide" style="position: relative; width: 450px;">
+            <span class="badge-discount-promo">-25% OFF</span>
+            <svg class="svg-icon" style="width: 32px; height: 32px; stroke: var(--green); margin-bottom: 12px;" viewBox="0 0 24 24">
+                <rect x="5" y="3" width="14" height="18" rx="2"/>
+                <line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+            <span>Equipamiento de Esterilización</span>
+            <h3>Autoclave Vertical + Estufa + Incubadora</h3>
+            <div class="price-container" style="margin-bottom: 16px;">
+                <span class="price-old">$5,200.00</span>
+                <span class="price-new">$3,900.00</span>
+            </div>
+            <button class="primary-link" style="background: var(--green); border: none; width: 100%;" onclick="this.textContent='¡Pack Agregado!';">Añadir Pack</button>
+        </article>
+        </div>
+        <div class="swiper-button-prev" style="color: var(--green);"></div>
+        <div class="swiper-button-next" style="color: var(--green);"></div>
     </section>
 
     <section class="decision-notes">
@@ -106,5 +153,26 @@
         </div>
     </section>
     <script src="../script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const heroSwiper = new Swiper('.hero-swiper', {
+                slidesPerView: 1,
+                loop: true,
+                autoplay: { delay: 4000, disableOnInteraction: false },
+                pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
+                navigation: { nextEl: '.hero-swiper .swiper-button-next', prevEl: '.hero-swiper .swiper-button-prev' }
+            });
+
+            const edSwiper = new Swiper('.editorial-swiper', {
+                slidesPerView: 'auto',
+                spaceBetween: 20,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                }
+            });
+        });
+    </script>
 </body>
 </html>
