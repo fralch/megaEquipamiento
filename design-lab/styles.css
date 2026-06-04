@@ -2371,6 +2371,112 @@ button {
 }
 
 /* ==========================================
+   E-COMMERCE GENERAL COMPONENTS (RESTORED)
+   ========================================== */
+
+/* Product Shelves and Headers */
+.product-shelves {
+    margin: 40px 0;
+}
+
+.shelf-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 0 40px;
+}
+
+.shelf-head strong {
+    font-size: clamp(18px, 2vw, 22px);
+    color: var(--brand-dark);
+    font-weight: 800;
+}
+
+.shelf-head a {
+    color: var(--brand);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.shelf-head a:hover {
+    text-decoration: underline;
+}
+
+/* Product Cards */
+.product-row article,
+.market-grid article,
+.product-swiper article,
+.editorial-band article,
+.solution-card,
+.mega-card {
+    position: relative;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.product-row article:hover,
+.market-grid article:hover,
+.product-swiper article:hover,
+.editorial-band article:hover,
+.solution-card:hover,
+.mega-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: rgba(30, 58, 138, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Gray Image Placeholder inside the card */
+.product-row article > span:not(.badge-discount-promo),
+.product-swiper article > span:not(.badge-discount-promo),
+.market-grid article > span:not(.badge-discount-promo) {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #f1f5f9;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    position: relative;
+}
+
+/* Product text styles */
+.product-row article strong,
+.market-grid article strong,
+.product-swiper article strong {
+    font-size: 15px;
+    line-height: 1.3;
+    color: var(--ink);
+    margin-bottom: 4px;
+    display: block;
+}
+
+.product-row article p,
+.market-grid article p,
+.product-swiper article p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+/* Fix for badge overlap on editorial band (Sectores) */
+.editorial-band article svg.svg-icon {
+    margin-top: 20px;
+}
+
+/* Fix for badge overlap on solution card */
+.solution-card strong {
+    margin-top: 16px;
+}
+
+/* ==========================================
    NATIVE CSS CAROUSEL UTILITIES
    ========================================== */
 .carousel-container {
