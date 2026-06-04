@@ -276,7 +276,7 @@ button {
 .category-trigger,
 .mega-feature button,
 .sector-actions button,
-.product-row button,
+.product-row button:not(.btn-add-cart-circle),
 .assistant-cta,
 .assistant-result > button {
     border: 0;
@@ -296,7 +296,7 @@ button {
 .category-trigger:hover,
 .mega-feature button:hover,
 .sector-actions button:hover,
-.product-row button:hover,
+.product-row button:not(.btn-add-cart-circle):hover,
 .assistant-cta:hover,
 .assistant-result > button:hover {
     background: #1d4ed8;
@@ -2095,7 +2095,7 @@ button {
     margin: 0 0 8px;
 }
 
-.product-row button {
+.product-row button:not(.btn-add-cart-circle) {
     width: calc(100% - 44px);
     margin-top: 14px;
 }
@@ -2433,9 +2433,9 @@ button {
 }
 
 /* Gray Image Placeholder inside the card */
-.product-row article > span:not(.badge-discount-promo),
-.product-swiper article > span:not(.badge-discount-promo),
-.market-grid article > span:not(.badge-discount-promo) {
+.product-row article > span.img-placeholder,
+.product-swiper article > span.img-placeholder,
+.market-grid article > span.img-placeholder {
     display: block;
     width: 100%;
     aspect-ratio: 1 / 1;
@@ -2706,4 +2706,106 @@ button {
     .search-icon {
         display: none;
     }
+}
+
+/* ==========================================
+   LAB INDEX - PREMIUM DARK MODE
+   ========================================== */
+body.premium-dark {
+    background: #040814;
+    color: #e2e8f0;
+}
+
+body.premium-dark .index-hero {
+    background: transparent;
+    border: none;
+}
+
+body.premium-dark .ambient-glow {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+    background: 
+        radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(249, 115, 22, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(30, 58, 138, 0.05) 0%, transparent 70%);
+}
+
+body.premium-dark .index-copy h1 {
+    color: #ffffff;
+    font-weight: 800;
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+body.premium-dark .index-copy p {
+    color: #94a3b8;
+}
+
+body.premium-dark .index-container {
+    background: transparent;
+}
+body.premium-dark .index-container::before {
+    display: none;
+}
+
+/* Premium Dark Cards */
+body.premium-dark .options-grid .option-card {
+    background: rgba(20, 27, 45, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    color: #f8fafc;
+}
+
+body.premium-dark .options-grid .option-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(59, 130, 246, 0.3);
+    background: rgba(30, 41, 59, 0.8);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+body.premium-dark .options-grid .option-card h2 {
+    color: #ffffff;
+}
+
+body.premium-dark .options-grid .option-card p {
+    color: #cbd5e1;
+}
+
+body.premium-dark .options-grid .option-card .eyebrow {
+    color: #60a5fa;
+}
+
+body.premium-dark .options-grid .option-card .score-row span {
+    background: rgba(255, 255, 255, 0.05);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+body.premium-dark .options-grid .option-card a {
+    background: rgba(59, 130, 246, 0.15);
+    color: #93c5fd;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+body.premium-dark .options-grid .option-card a:hover {
+    background: var(--brand-light);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* Featured Card Override */
+body.premium-dark .options-grid .option-card.option-featured {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.4), rgba(15, 23, 42, 0.9));
+    border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+body.premium-dark .options-grid .option-card.option-featured:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(59, 130, 246, 0.2);
+}
+
+body.premium-dark .option-number {
+    color: rgba(255, 255, 255, 0.08);
 }

@@ -7,52 +7,23 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="lab-index">
+<body class="lab-index premium-dark">
+    <div class="ambient-glow"></div>
     <header class="index-hero">
         <nav class="design-nav">
             <a class="brand" href="index.html">
                 <img src="../public/img/logo2.jpg" alt="Mega Equipamiento">
             </a>
             <div class="nav-links" aria-label="Propuestas">
-                <a href="hub/index.html">Hub B2B</a>
-                <a href="mega-menu/index.html">Mega menú</a>
-                <a href="sectores/index.html">Sectores B2B</a>
-                <a href="marketplace/index.html">Marketplace</a>
-                <a href="asistente/index.html">Asistente</a>
-                <a href="marketplace/index.html" style="background: var(--green); color:#fff; border-radius: var(--radius-sm);">
-                    <svg class="svg-icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                    <span>Carrito</span>
-                    <span class="cart-badge">3</span>
-                </a>
+                <a href="hub/index.html">Opción 1</a>
+                <a href="mega-menu/index.html">Opción 2</a>
+                <a href="sectores/index.html">Opción 3</a>
+                <a href="marketplace/index.html">Opción 4</a>
+                <a href="asistente/index.html">Opción 5</a>
             </div>
         </nav>
 
-        <!-- Hero Carousel -->
-        <section class="hero-swiper-container">
-            <div class="swiper hero-swiper">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide hero-slide">
-                        <img src="../public/categorias/1755374994_68a0e592cf546_1.jpg" alt="Laboratorio">
-                        <div class="hero-slide-content">
-                            <h2>Design Lab: 5 propuestas B2B</h2>
-                            <p>Inspiradas en gigantes como Alibaba y Tottus. Selecciona la opción que mejor se adapte al flujo comercial.</p>
-                            <a class="primary-link" href="#opciones" style="width: fit-content;">Ver opciones</a>
-                        </div>
-                    </div>
-                    <div class="swiper-slide hero-slide">
-                        <img src="../public/categorias/1755374994_68a0e592d7833_0.jpg" alt="Medición B2B">
-                        <div class="hero-slide-content">
-                            <h2>Experiencia E-commerce Real</h2>
-                            <p>Cada propuesta incorpora doble precio, descuentos por volumen, valoraciones por estrellas y botones de compra directa.</p>
-                            <a class="primary-link" href="#opciones" style="width: fit-content; background: var(--green);">Explorar</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
-            </div>
-        </section>
+        <div style="height: 40px;"></div>
         
         <div class="index-copy" id="opciones">
             <p class="eyebrow">Design lab / decisiones e-commerce</p>
@@ -61,27 +32,13 @@
     </header>
 
     <main class="index-container">
-        <section class="recommendation">
-            <div>
-                <p class="eyebrow">Ruta recomendada para conversión</p>
-                <h2>Implementar Home Hub B2B (con Sidebar de categorías) + Mega Menú Industrial.</h2>
-                <p>
-                    El hub con barra lateral ordena la primera impresión y facilita la búsqueda rápida de Alibaba.
-                    El mega menú resuelve el catálogo grande con fichas de producto directas y accesos a cotización.
-                </p>
-            </div>
-            <a class="primary-link" href="hub/index.html">
-                <span>Abrir propuesta recomendada</span>
-                <svg class="svg-icon" style="margin-left: 8px;" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-        </section>
 
-        <div class="swiper option-swiper">
-            <div class="swiper-wrapper option-board" aria-label="Opciones de diseño" style="display: flex;">
-                <article class="swiper-slide option-card option-featured">
+
+        <div class="options-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 40px;">
+                <article class="option-card option-featured">
                     <span class="option-number">01</span>
                     <p class="eyebrow">Recomendada</p>
-                    <h2>Home Hub B2B Profesional</h2>
+                    <h2>Diseño Opción 1</h2>
                     <p>Home B2B estructurada con buscador con imagen, líneas de negocio, catálogo con precios, marcas destacadas y señales comerciales de Alibaba.</p>
                     <div class="score-row">
                         <span>Conversión B2B 5/5</span>
@@ -94,10 +51,10 @@
                     </a>
                 </article>
 
-                <article class="swiper-slide option-card">
+                <article class="option-card">
                     <span class="option-number">02</span>
                     <p class="eyebrow">Navegación</p>
-                    <h2>Mega Menú de Compra</h2>
+                    <h2>Diseño Opción 2</h2>
                     <p>Menú desplegable ancho que incluye fichas de producto con precio y estrellas directo en las columnas para conversión instantánea.</p>
                     <div class="score-row">
                         <span>Escala Catálogo 5/5</span>
@@ -109,10 +66,10 @@
                     </a>
                 </article>
 
-                <article class="swiper-slide option-card">
+                <article class="option-card">
                     <span class="option-number">03</span>
                     <p class="eyebrow">Curaduría Editorial</p>
-                    <h2>Catálogo por Sectores B2B</h2>
+                    <h2>Diseño Opción 3</h2>
                     <p>Presenta soluciones indexables agrupadas en packs y kits de equipos con precio global de descuento por volumen.</p>
                     <div class="score-row">
                         <span>Valor de Lote 5/5</span>
@@ -124,10 +81,10 @@
                     </a>
                 </article>
 
-                <article class="swiper-slide option-card">
+                <article class="option-card">
                     <span class="option-number">04</span>
                     <p class="eyebrow">Conversión Rápida</p>
-                    <h2>Marketplace Tottus Style</h2>
+                    <h2>Diseño Opción 4</h2>
                     <p>Home de retail optimizada con burbujas de categoría, carrusel de ofertas, productos con precios tachados y botones de carrito directo.</p>
                     <div class="score-row">
                         <span>Venta Directa 5/5</span>
@@ -139,10 +96,10 @@
                     </a>
                 </article>
 
-                <article class="swiper-slide option-card">
+                <article class="option-card">
                     <span class="option-number">05</span>
                     <p class="eyebrow">Asistencia / Lead</p>
-                    <h2>Asistente de Compra Técnico</h2>
+                    <h2>Diseño Opción 5</h2>
                     <p>Cuestionario dinámico de conversión que muestra y cotiza productos reales con precios en base a las variables técnicas seleccionadas.</p>
                     <div class="score-row">
                         <span>Captación Leads 5/5</span>
@@ -154,41 +111,10 @@
                     </a>
                 </article>
             </div>
-            <div class="swiper-button-prev" style="color: var(--brand); --swiper-navigation-size: 18px;"></div>
-            <div class="swiper-button-next" style="color: var(--brand); --swiper-navigation-size: 18px;"></div>
-            <div class="swiper-pagination"></div>
         </div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const heroSwiper = new Swiper('.hero-swiper', {
-                slidesPerView: 1,
-                loop: true,
-                autoplay: { delay: 4000, disableOnInteraction: false },
-                pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
-                navigation: { nextEl: '.hero-swiper .swiper-button-next', prevEl: '.hero-swiper .swiper-button-prev' }
-            });
 
-            const optionSwiper = new Swiper('.option-swiper', {
-                slidesPerView: 'auto',
-                spaceBetween: 20,
-                navigation: {
-                    nextEl: '.swiper-button-next',
-                    prevEl: '.swiper-button-prev',
-                },
-                pagination: {
-                    el: '.swiper-pagination',
-                    clickable: true,
-                },
-                breakpoints: {
-                    320: { slidesPerView: 1 },
-                    768: { slidesPerView: 2 },
-                    1024: { slidesPerView: 'auto' }
-                }
-            });
-        });
-    </script>
 </body>
 </html>
