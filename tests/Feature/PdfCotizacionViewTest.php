@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use Illuminate\Support\Carbon;
+use Tests\TestCase;
 
 class PdfCotizacionViewTest extends TestCase
 {
@@ -37,7 +37,7 @@ class PdfCotizacionViewTest extends TestCase
             ],
         ];
 
-        $empresa = [ 'nombre' => 'Mi Empresa S.A.' ];
+        $empresa = ['nombre' => 'Mi Empresa S.A.'];
         $cliente = (object) [
             'tipo' => 'persona',
             'nombre' => 'Juan Pérez',
@@ -46,7 +46,7 @@ class PdfCotizacionViewTest extends TestCase
             'email' => 'juan@example.com',
             'direccion' => 'Calle Falsa 123',
         ];
-        $vendedor = (object) [ 'nombre' => 'Vendedor', 'correo' => 'vend@example.com' ];
+        $vendedor = (object) ['nombre' => 'Vendedor', 'correo' => 'vend@example.com'];
 
         $html = view('pdf.cotizacion', compact('cotizacion', 'productos', 'productos_adicionales', 'empresa', 'cliente', 'vendedor'))
             ->render();
@@ -88,9 +88,9 @@ class PdfCotizacionViewTest extends TestCase
             ],
         ];
 
-        $empresa = [ 'nombre' => 'Mi Empresa S.A.' ];
-        $cliente = (object) [ 'tipo' => 'persona', 'nombre' => 'Cliente', 'email' => 'c@example.com' ];
-        $vendedor = (object) [ 'nombre' => 'Vendedor', 'correo' => 'vend@example.com' ];
+        $empresa = ['nombre' => 'Mi Empresa S.A.'];
+        $cliente = (object) ['tipo' => 'persona', 'nombre' => 'Cliente', 'email' => 'c@example.com'];
+        $vendedor = (object) ['nombre' => 'Vendedor', 'correo' => 'vend@example.com'];
 
         $html = view('pdf.cotizacion', compact('cotizacion', 'productos', 'productos_adicionales', 'empresa', 'cliente', 'vendedor'))
             ->render();

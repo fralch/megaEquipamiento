@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
-use Illuminate\Support\Facades\Log;
 
 class FirebaseNotificationService
 {
@@ -28,10 +28,12 @@ class FirebaseNotificationService
 
             $this->messaging->send($message);
 
-            Log::info('Firebase notification sent', ['token' => substr($token, 0, 20) . '...', 'title' => $title]);
+            Log::info('Firebase notification sent', ['token' => substr($token, 0, 20).'...', 'title' => $title]);
+
             return true;
         } catch (\Exception $e) {
-            Log::error('Firebase notification failed', ['error' => $e->getMessage(), 'token' => substr($token, 0, 20) . '...']);
+            Log::error('Firebase notification failed', ['error' => $e->getMessage(), 'token' => substr($token, 0, 20).'...']);
+
             return false;
         }
     }

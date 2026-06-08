@@ -38,7 +38,7 @@ return new class extends Migration
             // Índices
             $table->index(['slug']);
             $table->index(['id_tag_parent']);
-            
+
             // Relación con tag_parents
             $table->foreign('id_tag_parent')->references('id_tag_parent')->on('tag_parents')->onDelete('set null');
         });

@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class SubcategoriaFiltro extends Model
 {
     protected $table = 'subcategoria_filtros';
-    
+
     protected $fillable = [
         'id_subcategoria',
         'id_filtro',
         'orden',
-        'activo'
+        'activo',
     ];
 
     protected $casts = [
-        'activo' => 'boolean'
+        'activo' => 'boolean',
     ];
 
     public function subcategoria()

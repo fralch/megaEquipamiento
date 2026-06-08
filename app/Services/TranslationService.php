@@ -11,16 +11,28 @@ class TranslationService
 
     public static function translateArray($items, string $to = 'es', string $from = 'auto'): array
     {
-        if ($items === null) return [];
-        if (is_string($items)) return [$items];
-        if (!is_array($items)) return [];
+        if ($items === null) {
+            return [];
+        }
+        if (is_string($items)) {
+            return [$items];
+        }
+        if (! is_array($items)) {
+            return [];
+        }
+
         return $items;
     }
 
     public static function translateTables($tables, string $to = 'es', string $from = 'auto'): array
     {
-        if ($tables === null) return [];
-        if (!is_array($tables)) return [];
+        if ($tables === null) {
+            return [];
+        }
+        if (! is_array($tables)) {
+            return [];
+        }
+
         return $tables;
     }
 }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('productos_externos')) {
+        if (! Schema::hasTable('productos_externos')) {
             Schema::create('productos_externos', function (Blueprint $table) {
                 // Table options
                 $table->engine = 'InnoDB';

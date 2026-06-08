@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 use App\Models\Tag;
 use App\Models\TagParent;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class TagSeeder extends Seeder
 {
@@ -50,7 +50,7 @@ class TagSeeder extends Seeder
                 ['nombre' => 'Pintura', 'color' => '#BE185D'],
                 ['nombre' => 'Metalurgia', 'color' => '#374151'],
             ],
-            
+
             // Extracción
             'Extracción' => [
                 ['nombre' => 'Gas Natural', 'color' => '#1F2937'],
@@ -59,7 +59,7 @@ class TagSeeder extends Seeder
                 ['nombre' => 'Pesca', 'color' => '#0C4A6E'],
                 ['nombre' => 'Agua', 'color' => '#0EA5E9'],
             ],
-            
+
             // Educación
             'Educación' => [
                 ['nombre' => 'Universidades', 'color' => '#5B21B6'],
@@ -68,7 +68,7 @@ class TagSeeder extends Seeder
                 ['nombre' => 'Escuelas', 'color' => '#8B5CF6'],
                 ['nombre' => 'Centros de investigación', 'color' => '#A855F7'],
             ],
-            
+
             // Industria Alimentaria
             'Ind. Alimentaria' => [
                 ['nombre' => 'Lácteos', 'color' => '#FED7D7'],
@@ -77,7 +77,7 @@ class TagSeeder extends Seeder
                 ['nombre' => 'Agroindustria', 'color' => '#16A34A'],
                 ['nombre' => 'Harina y derivados', 'color' => '#EAB308'],
             ],
-            
+
             // Sector Salud
             'Sector Salud' => [
                 ['nombre' => 'Hospitales', 'color' => '#DB2777'],
@@ -86,7 +86,7 @@ class TagSeeder extends Seeder
                 ['nombre' => 'Ocupacionales', 'color' => '#86198F'],
                 ['nombre' => 'Dentales', 'color' => '#701A75'],
             ],
-            
+
             // Farmacéutica
             'Farmacéutica' => [
                 ['nombre' => 'Perfumerías', 'color' => '#0891B2'],
@@ -100,7 +100,7 @@ class TagSeeder extends Seeder
         // Crear subsectores con id_tag_parent
         foreach ($subsectores as $sectorNombre => $subTags) {
             $parentId = $sectorIds[$sectorNombre];
-            
+
             foreach ($subTags as $subTag) {
                 $slug = Str::slug($subTag['nombre']);
                 Tag::firstOrCreate(
@@ -137,4 +137,3 @@ class TagSeeder extends Seeder
         }
     }
 }
-

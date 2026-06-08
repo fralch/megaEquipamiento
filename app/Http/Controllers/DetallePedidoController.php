@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\DetallePedido;
 use App\Models\Pedido;
 use App\Models\Producto;
+use Illuminate\Http\Request;
 
 class DetallePedidoController extends Controller
 {
@@ -15,6 +15,7 @@ class DetallePedidoController extends Controller
     public function index()
     {
         $detallesPedidos = DetallePedido::with(['pedido', 'producto'])->get();
+
         return view('detalles_pedidos.index', compact('detallesPedidos'));
     }
 
@@ -25,6 +26,7 @@ class DetallePedidoController extends Controller
     {
         $pedidos = Pedido::all();
         $productos = Producto::all();
+
         return view('detalles_pedidos.create', compact('pedidos', 'productos'));
     }
 
@@ -43,7 +45,7 @@ class DetallePedidoController extends Controller
         DetallePedido::create($request->all());
 
         return redirect()->route('detalles-pedidos.index')
-                         ->with('success', 'Detalle de Pedido creado exitosamente.');
+            ->with('success', 'Detalle de Pedido creado exitosamente.');
     }
 
     /**
@@ -61,6 +63,7 @@ class DetallePedidoController extends Controller
     {
         $pedidos = Pedido::all();
         $productos = Producto::all();
+
         return view('detalles_pedidos.edit', compact('detallePedido', 'pedidos', 'productos'));
     }
 
@@ -79,7 +82,7 @@ class DetallePedidoController extends Controller
         $detallePedido->update($request->all());
 
         return redirect()->route('detalles-pedidos.index')
-                         ->with('success', 'Detalle de Pedido actualizado exitosamente.');
+            ->with('success', 'Detalle de Pedido actualizado exitosamente.');
     }
 
     /**
@@ -90,6 +93,6 @@ class DetallePedidoController extends Controller
         $detallePedido->delete();
 
         return redirect()->route('detalles-pedidos.index')
-                         ->with('success', 'Detalle de Pedido eliminado exitosamente.');
+            ->with('success', 'Detalle de Pedido eliminado exitosamente.');
     }
 }

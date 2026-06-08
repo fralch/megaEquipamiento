@@ -13,19 +13,19 @@ class TagController extends Controller
     public function index(Request $request)
     {
         $tags = Tag::with('tagParent')
-                   ->orderBy('id_tag_parent', 'asc')
-                   ->orderBy('nombre')
-                   ->get();
-        
+            ->orderBy('id_tag_parent', 'asc')
+            ->orderBy('nombre')
+            ->get();
+
         $tagParents = TagParent::orderBy('nombre')->get();
-        
+
         if ($request->expectsJson()) {
             return response()->json([
                 'tags' => $tags,
                 'tagParents' => $tagParents,
             ]);
         }
-        
+
         return Inertia::render('AdminTags', [
             'tags' => $tags,
             'tagParents' => $tagParents,
@@ -54,7 +54,7 @@ class TagController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => 'Tag creado exitosamente',
-                'tag' => $tag->load('tagParent')
+                'tag' => $tag->load('tagParent'),
             ], 201);
         }
 
@@ -80,7 +80,7 @@ class TagController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => 'Tag actualizado exitosamente',
-                'tag' => $tag->load('tagParent')
+                'tag' => $tag->load('tagParent'),
             ]);
         }
 
@@ -94,11 +94,10 @@ class TagController extends Controller
 
         if ($request->expectsJson()) {
             return response()->json([
-                'message' => 'Tag eliminado exitosamente'
+                'message' => 'Tag eliminado exitosamente',
             ]);
         }
 
         return redirect()->back()->with('success', 'Tag eliminado');
     }
 }
-

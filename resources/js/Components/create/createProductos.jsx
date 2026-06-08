@@ -5,6 +5,7 @@ import EspecificacionesTecnicas from './assets/especificacionesTecnicas';
 import { countryOptions } from '../countrys';
 import ImageBankModal from './ImageBankModal';
 import TagInput from '../TagInput';
+import CsvImportWizard from './assets/CsvImportWizard';
 
 const URL_API = import.meta.env.VITE_API_URL;
 
@@ -419,6 +420,7 @@ const Productos = ({ onSubmit }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [porcentajeGanancia, setPorcentajeGanancia] = useState('');
   const [showImageBank, setShowImageBank] = useState(false);
+  const [showCsvWizard, setShowCsvWizard] = useState(false);
   const especificacionesRef = useRef(null);
 
 
@@ -908,6 +910,20 @@ const Productos = ({ onSubmit }) => {
       <h1 className={`text-xl sm:text-2xl font-bold mb-4 text-center lg:text-left transition-colors duration-300 ${
         isDarkMode ? 'text-white' : 'text-gray-900'
       }`}>Crear Producto</h1>
+
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2">
+        <button
+          type="button"
+          onClick={() => setShowCsvWizard(true)}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-colors min-h-[40px] ${
+            isDarkMode
+              ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+              : 'bg-emerald-500 text-white hover:bg-emerald-600'
+          }`}
+        >
+          Importar desde CSV
+        </button>
+      </div>
       
       <form onSubmit={handleSubmit}>
         <div className={`flex flex-col lg:flex-row shadow-md rounded-lg p-4 sm:p-6 mb-6 sm:mb-8 w-full transition-colors duration-300 ${
@@ -1087,6 +1103,16 @@ const Productos = ({ onSubmit }) => {
           isOpen={showImageBank}
           onClose={() => setShowImageBank(false)}
           onSelectImages={handleImageBankSelect}
+        />
+      )}
+
+      {showCsvWizard && (
+        <CsvImportWizard
+          open={showCsvWizard}
+          onClose={() => setShowCsvWizard(false)}
+          categorias={categorias}
+          subcategorias={subcategorias}
+          marcas={marcas}
         />
       )}
     </div>

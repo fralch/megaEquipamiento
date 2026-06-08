@@ -48,13 +48,12 @@ class Subcategoria extends Model
     {
         return $this->hasMany(Producto::class, 'id_subcategoria');
     }
-    
+
     // Definir la relación con el modelo Filtro
     public function filtros()
     {
         return $this->belongsToMany(Filtro::class, 'subcategoria_filtros', 'id_subcategoria', 'id_filtro')
-                    ->withPivot('orden', 'activo')
-                    ->withTimestamps();
+            ->withPivot('orden', 'activo')
+            ->withTimestamps();
     }
 }
-

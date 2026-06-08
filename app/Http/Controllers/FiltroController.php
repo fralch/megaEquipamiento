@@ -1,14 +1,14 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Filtro;
 use App\Models\OpcionFiltro;
-use App\Models\SubcategoriaFiltro;
-use App\Models\Subcategoria;
 use App\Models\Producto;
+use App\Models\Subcategoria;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class FiltroController extends Controller
 {
@@ -17,6 +17,7 @@ class FiltroController extends Controller
         $filtros = Filtro::with(['opciones', 'subcategorias'])
             ->orderBy('orden')
             ->get();
+
         return response()->json($filtros);
     }
 
@@ -38,13 +39,13 @@ class FiltroController extends Controller
                 'opciones.*.color' => 'nullable|string|max:7',
                 'opciones.*.orden' => 'nullable|integer',
                 'subcategorias' => 'array',
-                'subcategorias.*' => 'exists:subcategorias,id_subcategoria'
+                'subcategorias.*' => 'exists:subcategorias,id_subcategoria',
             ]);
 
             if (in_array($validatedData['tipo_input'], ['checkbox', 'select', 'radio'])) {
-                if (!isset($validatedData['opciones']) || count($validatedData['opciones']) < 1) {
+                if (! isset($validatedData['opciones']) || count($validatedData['opciones']) < 1) {
                     return response()->json([
-                        'error' => 'Los filtros de tipo checkbox, select y radio requieren al menos una opción'
+                        'error' => 'Los filtros de tipo checkbox, select y radio requieren al menos una opción',
                     ], 422);
                 }
             }
@@ -63,17 +64,17 @@ class FiltroController extends Controller
                 'orden' => $validatedData['orden'] ?? 0,
                 'obligatorio' => $validatedData['obligatorio'] ?? false,
                 'max_value' => $validatedData['max_value'] ?? null,
-                'min_value' => $validatedData['min_value'] ?? null
+                'min_value' => $validatedData['min_value'] ?? null,
             ]);
 
             if (isset($validatedData['opciones']) && is_array($validatedData['opciones'])) {
                 foreach ($validatedData['opciones'] as $index => $opcion) {
-                    if (!empty($opcion['valor']) && !empty($opcion['etiqueta'])) {
+                    if (! empty($opcion['valor']) && ! empty($opcion['etiqueta'])) {
                         $filtro->opciones()->create([
                             'valor' => $opcion['valor'],
                             'etiqueta' => $opcion['etiqueta'],
                             'color' => $opcion['color'] ?? null,
-                            'orden' => $opcion['orden'] ?? $index
+                            'orden' => $opcion['orden'] ?? $index,
                         ]);
                     }
                 }
@@ -89,17 +90,19 @@ class FiltroController extends Controller
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'error' => 'Error de validación',
-                'details' => $e->errors()
+                'details' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Error al crear el filtro: ' . $e->getMessage()], 500);
+
+            return response()->json(['error' => 'Error al crear el filtro: '.$e->getMessage()], 500);
         }
     }
 
     public function show($id)
     {
         $filtro = Filtro::with(['opciones', 'subcategorias'])->findOrFail($id);
+
         return response()->json($filtro);
     }
 
@@ -123,7 +126,7 @@ class FiltroController extends Controller
             'opciones.*.color' => 'nullable|string|max:7',
             'opciones.*.orden' => 'nullable|integer',
             'subcategorias' => 'array',
-            'subcategorias.*' => 'exists:subcategorias,id_subcategoria'
+            'subcategorias.*' => 'exists:subcategorias,id_subcategoria',
         ]);
 
         try {
@@ -143,13 +146,13 @@ class FiltroController extends Controller
                 'orden' => $request->orden ?? $filtro->orden,
                 'obligatorio' => $request->obligatorio ?? $filtro->obligatorio,
                 'max_value' => $request->max_value,
-                'min_value' => $request->min_value
+                'min_value' => $request->min_value,
             ]);
 
             if ($request->has('opciones')) {
                 $opcionesExistentes = $filtro->opciones()->pluck('id_opcion')->toArray();
                 $opcionesEnviadas = collect($request->opciones)
-                    ->filter(function($opcion) {
+                    ->filter(function ($opcion) {
                         return isset($opcion['id_opcion']);
                     })
                     ->pluck('id_opcion')
@@ -157,12 +160,12 @@ class FiltroController extends Controller
 
                 $opcionesAEliminar = array_diff($opcionesExistentes, $opcionesEnviadas);
 
-                if (!empty($opcionesAEliminar)) {
+                if (! empty($opcionesAEliminar)) {
                     OpcionFiltro::whereIn('id_opcion', $opcionesAEliminar)->delete();
                 }
 
                 foreach ($request->opciones as $index => $opcionData) {
-                    if (!empty($opcionData['valor']) && !empty($opcionData['etiqueta'])) {
+                    if (! empty($opcionData['valor']) && ! empty($opcionData['etiqueta'])) {
                         if (isset($opcionData['id_opcion']) && $opcionData['id_opcion']) {
                             $opcion = OpcionFiltro::find($opcionData['id_opcion']);
                             if ($opcion && $opcion->id_filtro === $filtro->id_filtro) {
@@ -170,7 +173,7 @@ class FiltroController extends Controller
                                     'valor' => $opcionData['valor'],
                                     'etiqueta' => $opcionData['etiqueta'],
                                     'color' => $opcionData['color'] ?? null,
-                                    'orden' => $opcionData['orden'] ?? $index
+                                    'orden' => $opcionData['orden'] ?? $index,
                                 ]);
                             }
                         } else {
@@ -178,7 +181,7 @@ class FiltroController extends Controller
                                 'valor' => $opcionData['valor'],
                                 'etiqueta' => $opcionData['etiqueta'],
                                 'color' => $opcionData['color'] ?? null,
-                                'orden' => $opcionData['orden'] ?? $index
+                                'orden' => $opcionData['orden'] ?? $index,
                             ]);
                         }
                     }
@@ -194,6 +197,7 @@ class FiltroController extends Controller
             return response()->json($filtro->load(['opciones', 'subcategorias']));
         } catch (\Exception $e) {
             DB::rollBack();
+
             return response()->json(['error' => 'Error al actualizar el filtro'], 500);
         }
     }
@@ -203,6 +207,7 @@ class FiltroController extends Controller
         try {
             $filtro = Filtro::findOrFail($id);
             $filtro->delete();
+
             return response()->json(null, 204);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al eliminar el filtro'], 500);
@@ -216,6 +221,7 @@ class FiltroController extends Controller
             ->with('opciones')
             ->orderBy('orden')
             ->get();
+
         return response()->json($filtros);
     }
 
@@ -227,9 +233,10 @@ class FiltroController extends Controller
             'etiqueta' => 'string|max:100',
             'color' => 'nullable|string|max:7',
             'orden' => 'integer',
-            'activo' => 'boolean'
+            'activo' => 'boolean',
         ]);
         $opcion->update($request->all());
+
         return response()->json($opcion);
     }
 
@@ -237,6 +244,7 @@ class FiltroController extends Controller
     {
         $opcion = OpcionFiltro::findOrFail($id);
         $opcion->delete();
+
         return response()->json(null, 204);
     }
 
@@ -244,44 +252,46 @@ class FiltroController extends Controller
     {
         $request->validate([
             'subcategoria_id' => 'required|exists:subcategorias,id_subcategoria',
-            'filtros' => 'array'
+            'filtros' => 'array',
         ]);
 
         $subcategoriaId = $request->subcategoria_id;
 
         \Log::info('=== INICIO FILTRADO ===');
-        \Log::info('Subcategoria ID: ' . $subcategoriaId);
+        \Log::info('Subcategoria ID: '.$subcategoriaId);
         \Log::info('Filtros recibidos: ', $request->filtros ?? []);
 
         // Contar productos totales en la subcategoría
         $totalProductos = Producto::where('id_subcategoria', $subcategoriaId)->count();
-        \Log::info('Total productos en subcategoría: ' . $totalProductos);
+        \Log::info('Total productos en subcategoría: '.$totalProductos);
 
         $query = Producto::where('id_subcategoria', $subcategoriaId);
 
         // Si hay filtros seleccionados, aplicarlos a la consulta con OR
-        if ($request->has('filtros') && !empty($request->filtros)) {
+        if ($request->has('filtros') && ! empty($request->filtros)) {
             // Usar orWhere para combinar los filtros con OR en lugar de AND
-            $query->where(function($mainQuery) use ($request, $subcategoriaId) {
+            $query->where(function ($mainQuery) use ($request, $subcategoriaId) {
                 $isFirstFilter = true;
 
                 foreach ($request->filtros as $filtroId => $valorSeleccionado) {
                     // Obtener el filtro para conocer su tipo
                     $filtro = Filtro::find($filtroId);
 
-                    if (!$filtro) continue;
+                    if (! $filtro) {
+                        continue;
+                    }
 
                     // Para el primer filtro usar where, para los siguientes usar orWhere
                     $whereMethod = $isFirstFilter ? 'where' : 'orWhere';
                     $isFirstFilter = false;
 
                     // Aplicar el filtro según su tipo usando OR entre filtros diferentes
-                    $mainQuery->$whereMethod(function($subQuery) use ($filtro, $valorSeleccionado, $subcategoriaId) {
+                    $mainQuery->$whereMethod(function ($subQuery) use ($filtro, $valorSeleccionado, $subcategoriaId) {
                         switch ($filtro->tipo_input) {
                             case 'checkbox':
                                 // Para checkbox, valorSeleccionado es un array de IDs de opciones
-                                if (is_array($valorSeleccionado) && !empty($valorSeleccionado)) {
-                                    $subQuery->where(function($q) use ($filtro, $valorSeleccionado, $subcategoriaId) {
+                                if (is_array($valorSeleccionado) && ! empty($valorSeleccionado)) {
+                                    $subQuery->where(function ($q) use ($valorSeleccionado, $subcategoriaId) {
                                         foreach ($valorSeleccionado as $opcionId) {
                                             $opcion = OpcionFiltro::find($opcionId);
                                             if ($opcion) {
@@ -327,7 +337,7 @@ class FiltroController extends Controller
                             case 'radio':
                             case 'select':
                                 // Para radio y select, valorSeleccionado es un único ID de opción
-                                if (!empty($valorSeleccionado)) {
+                                if (! empty($valorSeleccionado)) {
                                     $opcion = OpcionFiltro::find($valorSeleccionado);
                                     if ($opcion) {
                                         $valorOriginal = trim($opcion->valor);
@@ -337,7 +347,7 @@ class FiltroController extends Controller
                                         // Búsqueda insensible a acentos y case usando COLLATE
                                         $subQuery->whereRaw(
                                             'caracteristicas COLLATE utf8mb4_general_ci LIKE ?',
-                                            ['%' . $valorOriginal . '%']
+                                            ['%'.$valorOriginal.'%']
                                         );
                                     }
                                 }
@@ -346,7 +356,7 @@ class FiltroController extends Controller
                             case 'range':
                                 // Para range, valorSeleccionado es un objeto con min y max
                                 if (is_array($valorSeleccionado) && (isset($valorSeleccionado['min']) || isset($valorSeleccionado['max']))) {
-                                    $subQuery->where(function($q) use ($filtro, $valorSeleccionado) {
+                                    $subQuery->where(function ($q) use ($filtro, $valorSeleccionado) {
                                         // Extraer valores numéricos de las características usando regex
                                         // Busca patrones como "5kg", "10.5 cm", "100 watts", etc.
                                         $campoNombre = strtolower($filtro->nombre);
@@ -384,12 +394,12 @@ class FiltroController extends Controller
         // Logs para debugging
         $sql = $query->toSql();
         $bindings = $query->getBindings();
-        \Log::info('SQL Query: ' . $sql);
+        \Log::info('SQL Query: '.$sql);
         \Log::info('Bindings: ', $bindings);
 
         $productos = $query->with('marca')->get();
 
-        \Log::info('Total productos encontrados: ' . $productos->count());
+        \Log::info('Total productos encontrados: '.$productos->count());
         if ($productos->count() > 0) {
             \Log::info('Productos IDs: ', $productos->pluck('id_producto')->toArray());
         }

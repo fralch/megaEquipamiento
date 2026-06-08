@@ -23,7 +23,7 @@ class GenerarNotificacionesCotizaciones
         } catch (\Exception $e) {
             // Si falla, no bloqueamos el acceso al CRM
             // Solo registramos el error en los logs
-            \Log::error('Error al generar notificaciones de cotizaciones: ' . $e->getMessage());
+            \Log::error('Error al generar notificaciones de cotizaciones: '.$e->getMessage());
         }
 
         return $next($request);

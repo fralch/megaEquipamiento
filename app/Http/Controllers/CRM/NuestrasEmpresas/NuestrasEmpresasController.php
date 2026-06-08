@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use Inertia\Inertia;
 
 class NuestrasEmpresasController extends Controller
 {
@@ -65,7 +64,7 @@ class NuestrasEmpresasController extends Controller
                 'empresas_sin_usuario' => $empresasSinUsuario,
                 'nuevas_este_mes' => $nuevasEsteMes,
             ],
-            'filters' => $request->only(['search', 'id_usuario', 'sort_by', 'sort_order', 'per_page'])
+            'filters' => $request->only(['search', 'id_usuario', 'sort_by', 'sort_order', 'per_page']),
         ]);
     }
 
@@ -104,7 +103,7 @@ class NuestrasEmpresasController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -114,17 +113,17 @@ class NuestrasEmpresasController extends Controller
             // Manejar la subida del logo
             if ($request->hasFile('imagen_logo')) {
                 $logo = $request->file('imagen_logo');
-                $logoName = time() . '_logo_' . $logo->getClientOriginalName();
+                $logoName = time().'_logo_'.$logo->getClientOriginalName();
                 $logo->move(public_path('img/empresas/logos'), $logoName);
-                $data['imagen_logo'] = 'img/empresas/logos/' . $logoName;
+                $data['imagen_logo'] = 'img/empresas/logos/'.$logoName;
             }
 
             // Manejar la subida de la firma
             if ($request->hasFile('imagen_firma')) {
                 $firma = $request->file('imagen_firma');
-                $firmaName = time() . '_firma_' . $firma->getClientOriginalName();
+                $firmaName = time().'_firma_'.$firma->getClientOriginalName();
                 $firma->move(public_path('img/empresas/firmas'), $firmaName);
-                $data['imagen_firma'] = 'img/empresas/firmas/' . $firmaName;
+                $data['imagen_firma'] = 'img/empresas/firmas/'.$firmaName;
             }
 
             $empresa = NuestraEmpresa::create($data);
@@ -133,13 +132,13 @@ class NuestrasEmpresasController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Empresa creada exitosamente',
-                'empresa' => $empresa
+                'empresa' => $empresa,
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear la empresa: ' . $e->getMessage()
+                'message' => 'Error al crear la empresa: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -159,13 +158,13 @@ class NuestrasEmpresasController extends Controller
 
             return response()->json([
                 'success' => true,
-                'empresa' => $empresaData
+                'empresa' => $empresaData,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Empresa no encontrada'
+                'message' => 'Empresa no encontrada',
             ], 404);
         }
     }
@@ -186,7 +185,7 @@ class NuestrasEmpresasController extends Controller
                     'nullable',
                     'string',
                     'max:11',
-                    Rule::unique('nuestras_empresas', 'ruc')->ignore($empresa->id)
+                    Rule::unique('nuestras_empresas', 'ruc')->ignore($empresa->id),
                 ],
                 'id_usuario' => 'nullable|exists:usuarios,id_usuario',
                 'codigo_cotizacion' => 'nullable|string|max:10',
@@ -213,7 +212,7 @@ class NuestrasEmpresasController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -227,9 +226,9 @@ class NuestrasEmpresasController extends Controller
                 }
 
                 $logo = $request->file('imagen_logo');
-                $logoName = time() . '_logo_' . $logo->getClientOriginalName();
+                $logoName = time().'_logo_'.$logo->getClientOriginalName();
                 $logo->move(public_path('img/empresas/logos'), $logoName);
-                $data['imagen_logo'] = 'img/empresas/logos/' . $logoName;
+                $data['imagen_logo'] = 'img/empresas/logos/'.$logoName;
             }
 
             // Manejar la subida de la nueva firma
@@ -240,9 +239,9 @@ class NuestrasEmpresasController extends Controller
                 }
 
                 $firma = $request->file('imagen_firma');
-                $firmaName = time() . '_firma_' . $firma->getClientOriginalName();
+                $firmaName = time().'_firma_'.$firma->getClientOriginalName();
                 $firma->move(public_path('img/empresas/firmas'), $firmaName);
-                $data['imagen_firma'] = 'img/empresas/firmas/' . $firmaName;
+                $data['imagen_firma'] = 'img/empresas/firmas/'.$firmaName;
             }
 
             $empresa->update($data);
@@ -251,13 +250,13 @@ class NuestrasEmpresasController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Empresa actualizada exitosamente',
-                'empresa' => $empresa
+                'empresa' => $empresa,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al actualizar la empresa: ' . $e->getMessage()
+                'message' => 'Error al actualizar la empresa: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -284,13 +283,13 @@ class NuestrasEmpresasController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Empresa eliminada exitosamente'
+                'message' => 'Empresa eliminada exitosamente',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar la empresa: ' . $e->getMessage()
+                'message' => 'Error al eliminar la empresa: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -302,13 +301,13 @@ class NuestrasEmpresasController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'ids' => 'required|array',
-            'ids.*' => 'exists:nuestras_empresas,id'
+            'ids.*' => 'exists:nuestras_empresas,id',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -329,13 +328,13 @@ class NuestrasEmpresasController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Empresas eliminadas exitosamente'
+                'message' => 'Empresas eliminadas exitosamente',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar las empresas: ' . $e->getMessage()
+                'message' => 'Error al eliminar las empresas: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -353,13 +352,13 @@ class NuestrasEmpresasController extends Controller
 
             return response()->json([
                 'success' => true,
-                'usuarios' => $usuarios
+                'usuarios' => $usuarios,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener usuarios: ' . $e->getMessage()
+                'message' => 'Error al obtener usuarios: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -370,13 +369,13 @@ class NuestrasEmpresasController extends Controller
     public function search(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'query' => 'required|string|min:2'
+            'query' => 'required|string|min:2',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -390,13 +389,13 @@ class NuestrasEmpresasController extends Controller
 
             return response()->json([
                 'success' => true,
-                'empresas' => $empresas
+                'empresas' => $empresas,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error en la búsqueda: ' . $e->getMessage()
+                'message' => 'Error en la búsqueda: '.$e->getMessage(),
             ], 500);
         }
     }

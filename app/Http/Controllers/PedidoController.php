@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\PedidoConfirmacion;
 use App\Models\Pedido;
 use App\Models\Usuario;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class PedidoController extends Controller
@@ -17,6 +17,7 @@ class PedidoController extends Controller
     public function index()
     {
         $pedidos = Pedido::with('usuario')->get();
+
         return view('pedidos.index', compact('pedidos'));
     }
 
@@ -26,6 +27,7 @@ class PedidoController extends Controller
     public function create()
     {
         $usuarios = Usuario::all();
+
         return view('pedidos.create', compact('usuarios'));
     }
 
@@ -43,7 +45,7 @@ class PedidoController extends Controller
         Pedido::create($request->all());
 
         return redirect()->route('pedidos.index')
-                         ->with('success', 'Pedido creado exitosamente.');
+            ->with('success', 'Pedido creado exitosamente.');
     }
 
     /**
@@ -60,6 +62,7 @@ class PedidoController extends Controller
     public function edit(Pedido $pedido)
     {
         $usuarios = Usuario::all();
+
         return view('pedidos.edit', compact('pedido', 'usuarios'));
     }
 
@@ -77,7 +80,7 @@ class PedidoController extends Controller
         $pedido->update($request->all());
 
         return redirect()->route('pedidos.index')
-                         ->with('success', 'Pedido actualizado exitosamente.');
+            ->with('success', 'Pedido actualizado exitosamente.');
     }
 
     /**
@@ -88,7 +91,7 @@ class PedidoController extends Controller
         $pedido->delete();
 
         return redirect()->route('pedidos.index')
-                         ->with('success', 'Pedido eliminado exitosamente.');
+            ->with('success', 'Pedido eliminado exitosamente.');
     }
 
     /**
@@ -102,14 +105,14 @@ class PedidoController extends Controller
                 'orderData' => 'required|array',
                 'checkoutState' => 'required|array',
                 'totals' => 'required|array',
-                'orderNumber' => 'required|string'
+                'orderNumber' => 'required|string',
             ]);
 
             // Extraer datos del cliente
             $customerData = $validated['checkoutState']['customerData'] ?? [];
             $shippingData = $validated['checkoutState']['shippingData'] ?? [];
             $paymentData = $validated['checkoutState']['paymentData'] ?? [];
-            
+
             // Preparar datos para el correo
             $datosCorreo = [
                 'orderNumber' => $validated['orderNumber'],
@@ -125,25 +128,25 @@ class PedidoController extends Controller
                     'cuentaInterbancaria' => '002-194-002345678012-34',
                     'ruc' => '20123456789',
                     'email' => 'ventas@megaequipamiento.com',
-                    'telefono' => '+51 1 234-5678'
-                ]
+                    'telefono' => '+51 1 234-5678',
+                ],
             ];
 
             // Enviar correo de confirmación
-            if (isset($customerData['email']) && !empty($customerData['email'])) {
+            if (isset($customerData['email']) && ! empty($customerData['email'])) {
                 Mail::to($customerData['email'])->send(new PedidoConfirmacion($datosCorreo));
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Pedido confirmado y correo enviado exitosamente',
-                'orderNumber' => $validated['orderNumber']
+                'orderNumber' => $validated['orderNumber'],
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al procesar el pedido: ' . $e->getMessage()
+                'message' => 'Error al procesar el pedido: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -154,7 +157,7 @@ class PedidoController extends Controller
     public function verPedido($orderNumber)
     {
         return Inertia::render('Pedido/Detalle', [
-            'orderNumber' => $orderNumber
+            'orderNumber' => $orderNumber,
         ]);
     }
 }

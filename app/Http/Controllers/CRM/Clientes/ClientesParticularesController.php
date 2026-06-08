@@ -4,8 +4,8 @@ namespace App\Http\Controllers\CRM\Clientes;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
-use App\Models\Usuario;
 use App\Models\EmpresaCliente;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -74,7 +74,7 @@ class ClientesParticularesController extends Controller
             'usuarios' => $usuarios,
             'empresas' => $empresas,
             'areas' => [], // Por ahora vacío, se puede agregar si existe el modelo Area
-            'filters' => $request->only(['search', 'vendedor_id', 'sort_field', 'sort_direction'])
+            'filters' => $request->only(['search', 'vendedor_id', 'sort_field', 'sort_direction']),
         ]);
     }
 
@@ -113,7 +113,7 @@ class ClientesParticularesController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $cliente
+            'data' => $cliente,
         ]);
     }
 
@@ -155,7 +155,7 @@ class ClientesParticularesController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Cliente eliminado exitosamente'
+            'message' => 'Cliente eliminado exitosamente',
         ]);
     }
 
@@ -172,7 +172,7 @@ class ClientesParticularesController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -180,7 +180,7 @@ class ClientesParticularesController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Clientes eliminados exitosamente'
+            'message' => 'Clientes eliminados exitosamente',
         ]);
     }
 
@@ -196,7 +196,7 @@ class ClientesParticularesController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $vendedores
+            'data' => $vendedores,
         ]);
     }
 }

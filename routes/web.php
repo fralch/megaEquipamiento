@@ -1,34 +1,33 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\UsuarioController;
-use App\Http\Controllers\ProductoController;
-use App\Http\Controllers\ProductoExternoController;
-use App\Http\Controllers\CategoriaController;
-use App\Http\Controllers\SubcategoriaController;
-use App\Http\Controllers\MarcaController;
-use App\Http\Controllers\FiltroController;
-use App\Http\Controllers\TiposRelacionProductosController;
-use App\Http\Controllers\MarcaCategoriaController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\BancoImagenesController;
-use App\Http\Controllers\TagController;
-use App\Http\Controllers\TagParentController;
-use App\Http\Controllers\ProductoTagController;
-use App\Http\Controllers\SectorController;
-use App\Http\Controllers\CRM\UsuariosRoles\UsuariosGestionController;
-use App\Http\Controllers\CRM\UsuariosRoles\RolesUsuariosController;
-use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
+use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\CRM\Clientes\ClientesParticularesController;
 use App\Http\Controllers\CRM\Clientes\EmpresasClientesController;
-use App\Http\Controllers\CRM\SectorController as CRMSectorController;
-use App\Http\Controllers\CRM\Productos\ProductoGestionController;
-use App\Http\Controllers\CRM\Productos\ProductoTemporalController;
 use App\Http\Controllers\CRM\Cotizaciones\CotizacionesController;
 use App\Http\Controllers\CRM\DashboardController;
+use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
+use App\Http\Controllers\CRM\Productos\ProductoGestionController;
+use App\Http\Controllers\CRM\Productos\ProductoTemporalController;
+use App\Http\Controllers\CRM\SectorController as CRMSectorController;
+use App\Http\Controllers\CRM\UsuariosRoles\RolesUsuariosController;
+use App\Http\Controllers\CRM\UsuariosRoles\UsuariosGestionController;
+use App\Http\Controllers\FiltroController;
+use App\Http\Controllers\MarcaCategoriaController;
+use App\Http\Controllers\MarcaController;
 use App\Http\Controllers\NotificacionCotizacionController;
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\ProductoExternoController;
+use App\Http\Controllers\ProductoImportController;
+use App\Http\Controllers\ProductoTagController;
+use App\Http\Controllers\SectorController;
+use App\Http\Controllers\SubcategoriaController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\TagParentController;
+use App\Http\Controllers\TiposRelacionProductosController;
+use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -37,20 +36,35 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/carrito',function () { return Inertia::render('Carrito');})->name('carrito.view');
-
+Route::get('/carrito', function () {
+    return Inertia::render('Carrito');
+})->name('carrito.view');
 
 // Rutas que retornan vistas
-Route::get('/', function () { return Inertia::render('Welcome'); })->name('welcome');
+Route::get('/', function () {
+    return Inertia::render('Welcome');
+})->name('welcome');
 Route::get('/categorias/{id_categoria?}', [CategoriaController::class, 'CategoriasWiew'])->name('categorias.view');
 Route::get('/subcategoria/{id}/{marca_id?}', [ProductoController::class, 'subCategoriaView'])->name('subcategoria.view');
 Route::get('/producto/{productoSlug}', [ProductoController::class, 'ProductView'])->name('producto.view');
 Route::get('/marcas/{id}', [ProductoController::class, 'ProductViewByMarca'])->name('marcas.view');
 Route::get('/sector/{id_tag_parent}', [SectorController::class, 'show'])->name('sector.view');
 Route::get('/sectores', [SectorController::class, 'index'])->name('sectores.index');
-Route::get('/contacto', function () { return Inertia::render('Contacto'); })->name('contacto.view');
-Route::get('/crear', function () { return Inertia::render('Crear');})->name('crear.view')->middleware(['auth', \App\Http\Middleware\CheckAdminRole::class]);
+Route::get('/contacto', function () {
+    return Inertia::render('Contacto');
+})->name('contacto.view');
+Route::get('/crear', function () {
+    return Inertia::render('Crear');
+})->name('crear.view')->middleware(['auth', \App\Http\Middleware\CheckAdminRole::class]);
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
+
+Route::middleware(['auth', \App\Http\Middleware\CheckAdminRole::class])->group(function () {
+    Route::post('/admin/products/preview-csv', [ProductoImportController::class, 'previewCsv'])->name('admin.products.preview-csv');
+    Route::post('/admin/products/import-csv', [ProductoImportController::class, 'importCsv'])->name('admin.products.import-csv');
+    Route::post('/admin/categorias/quick', [ProductoImportController::class, 'quickCategoria'])->name('admin.categorias.quick');
+    Route::post('/admin/subcategorias/quick', [ProductoImportController::class, 'quickSubcategoria'])->name('admin.subcategorias.quick');
+    Route::post('/admin/marcas/quick', [ProductoImportController::class, 'quickMarca'])->name('admin.marcas.quick');
+});
 
 // Ruta pública para previsualizar la vista HTML de cotización (solo entorno local)
 Route::get('/preview/pdf/cotizacion/{id?}', [CotizacionesController::class, 'previewPdfHtml'])->name('preview.pdf.cotizacion');
@@ -66,12 +80,12 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
     Route::get('/dashboard/graficos', [DashboardController::class, 'getGraficos'])->name('dashboard.graficos');
 
     Route::prefix('clientes')->name('clientes.')->group(function () {
-                // Rutas principales que cargan las vistas con datos
-                Route::get('/empresas', [EmpresasClientesController::class, 'index'])->name('empresas.index');
-                Route::get('/particulares', [ClientesParticularesController::class, 'index'])->name('particulares.index');
-                Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');
-                // Vista de gestión de sectores (Inertia)
-                Route::get('/sectores/gestionar', fn () => Inertia::render('CRM/Clientes/Sectores'))->name('sectores.gestionar');
+        // Rutas principales que cargan las vistas con datos
+        Route::get('/empresas', [EmpresasClientesController::class, 'index'])->name('empresas.index');
+        Route::get('/particulares', [ClientesParticularesController::class, 'index'])->name('particulares.index');
+        Route::get('/crear-empresa', fn () => Inertia::render('CRM/Clientes/CrearEmpresaCliente'))->name('crear-empresa');
+        // Vista de gestión de sectores (Inertia)
+        Route::get('/sectores/gestionar', fn () => Inertia::render('CRM/Clientes/Sectores'))->name('sectores.gestionar');
 
         // API routes para clientes particulares
         Route::prefix('particulares')->name('particulares.')->group(function () {
@@ -134,7 +148,7 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
 
     Route::prefix('empresas')->name('empresas.')->group(function () {
         Route::get('/', fn () => Inertia::render('CRM/Empresas/VerEmpresas'))->name('index');
-        
+
         // API routes for empresas CRUD operations
         Route::get('/data', [NuestrasEmpresasController::class, 'index'])->name('data');
         Route::post('/store', [NuestrasEmpresasController::class, 'store'])->name('store');
@@ -202,7 +216,6 @@ Route::middleware('auth')->prefix('crm')->name('crm.')->group(function () {
     });
 });
 
-
 // Rutas para crear y mostrar productos
 Route::get('/product/todo', [ProductoController::class, 'getProductosAll']);
 Route::post('/product/create', [ProductoController::class, 'createProduct'])->name('product.create');
@@ -265,7 +278,6 @@ Route::get('/categoria/{id}/subcategorias', [CategoriaController::class, 'getSub
 Route::post('/subcategoria/edit/{subcategoria}', [SubcategoriaController::class, 'update'])->name('subcategoria.update');
 Route::post('/subcategoria_post/create', [SubcategoriaController::class, 'store'])->name('subcategoria.create');
 
-
 Route::get('/subcategoria-all', [SubcategoriaController::class, 'getSubcategorias'])->name('subcategoria.all');
 Route::get('/subcategoria_get/categoria/{id}', [SubcategoriaController::class, 'getSubcategoriasCategoria'])->name('subcategoria.by-categoria');
 Route::get('/subcategoria_id/{id}', [SubcategoriaController::class, 'getSubcategoriaById'])->name('subcategoria.show');
@@ -288,7 +300,7 @@ Route::prefix('filtros')->group(function () {
     Route::put('/opcion/{id}', [FiltroController::class, 'updateOpcion'])->name('filtros.update-opcion');
     Route::delete('/opcion/{id}', [FiltroController::class, 'deleteOpcion'])->name('filtros.delete-opcion');
     Route::post('/filtrar-productos', [FiltroController::class, 'filtrarProductos'])->name('filtros.filtrar-productos');
-    
+
     // Rutas generales después
     Route::get('/', [FiltroController::class, 'index'])->name('filtros.index');
     Route::post('/', [FiltroController::class, 'store'])->name('filtros.store');
@@ -374,12 +386,12 @@ Route::middleware('auth')->prefix('banco-imagenes')->group(function () {
     Route::delete('/{id}', [BancoImagenesController::class, 'destroy'])->name('banco-imagenes.destroy');
 });
 
-
-use Illuminate\Support\Facades\Mail;
 use App\Mail\TestMail;
+use Illuminate\Support\Facades\Mail;
 
 Route::get('/test-email', function () {
-    Mail::to('test@example.com')->send(new TestMail());
+    Mail::to('test@example.com')->send(new TestMail);
+
     return 'Email sent!';
 });
 
@@ -392,36 +404,36 @@ Route::get('/test-pedido-email', function () {
             'email' => 'juan.perez@example.com',
             'phone' => '+51 987 654 321',
             'documentType' => 'DNI',
-            'documentNumber' => '12345678'
+            'documentNumber' => '12345678',
         ],
         'shippingData' => [
             'address' => 'Av. Ejemplo 123, Dpto 456',
             'city' => 'Lima',
             'state' => 'Lima',
-            'zipCode' => '15001'
+            'zipCode' => '15001',
         ],
         'paymentData' => [
-            'method' => 'transfer'
+            'method' => 'transfer',
         ],
         'orderData' => [
             'cartItems' => [
                 [
                     'title' => 'Producto de Prueba 1',
                     'price' => 150.00,
-                    'quantity' => 2
+                    'quantity' => 2,
                 ],
                 [
                     'title' => 'Producto de Prueba 2',
                     'price' => 75.50,
-                    'quantity' => 1
-                ]
-            ]
+                    'quantity' => 1,
+                ],
+            ],
         ],
         'totals' => [
             'subtotal' => 375.50,
             'shipping' => 25.00,
             'tax' => 67.59,
-            'total' => 468.09
+            'total' => 468.09,
         ],
         'datosBancarios' => [
             'banco' => 'Banco de Crédito del Perú (BCP)',
@@ -430,16 +442,18 @@ Route::get('/test-pedido-email', function () {
             'cuentaInterbancaria' => '002-194-002345678012-34',
             'ruc' => '20123456789',
             'email' => 'ventas@megaequipamiento.com',
-            'telefono' => '+51 1 234-5678'
-        ]
+            'telefono' => '+51 1 234-5678',
+        ],
     ];
-    
+
     Mail::to('test@example.com')->send(new \App\Mail\PedidoConfirmacion($datosPrueba));
+
     return 'Email de pedido enviado!';
 });
 
 // Ruta para sitemap
 use App\Http\Controllers\SitemapController;
+
 Route::get('/sitemap.xml', [SitemapController::class, 'show'])->name('sitemap.show');
 
 // Ruta para robots.txt dinámico
@@ -450,10 +464,9 @@ Route::get('/robots.txt', function () {
     $content .= "Disallow: /crear\n";
     $content .= "Disallow: /api/\n";
     $content .= "\n";
-    $content .= "Sitemap: " . url('/sitemap.xml') . "\n";
-    
+    $content .= 'Sitemap: '.url('/sitemap.xml')."\n";
+
     return response($content, 200, [
-        'Content-Type' => 'text/plain'
+        'Content-Type' => 'text/plain',
     ]);
 })->name('robots.txt');
-

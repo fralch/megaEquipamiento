@@ -14,6 +14,7 @@ class SectorController extends Controller
     public function index()
     {
         $sectores = Sector::orderBy('nombre', 'asc')->get();
+
         return response()->json($sectores);
     }
 
@@ -25,6 +26,7 @@ class SectorController extends Controller
         $sectores = Sector::where('activo', true)
             ->orderBy('nombre', 'asc')
             ->get();
+
         return response()->json($sectores);
     }
 
@@ -47,7 +49,7 @@ class SectorController extends Controller
 
         return response()->json([
             'message' => 'Sector creado exitosamente',
-            'sector' => $sector
+            'sector' => $sector,
         ], 201);
     }
 
@@ -57,6 +59,7 @@ class SectorController extends Controller
     public function show($id)
     {
         $sector = Sector::with(['clientes', 'empresasClientes'])->findOrFail($id);
+
         return response()->json($sector);
     }
 
@@ -68,7 +71,7 @@ class SectorController extends Controller
         $sector = Sector::findOrFail($id);
 
         $request->validate([
-            'nombre' => 'required|string|max:100|unique:sectores,nombre,' . $id . ',id_sector',
+            'nombre' => 'required|string|max:100|unique:sectores,nombre,'.$id.',id_sector',
             'descripcion' => 'nullable|string',
             'activo' => 'nullable|boolean',
         ]);
@@ -81,7 +84,7 @@ class SectorController extends Controller
 
         return response()->json([
             'message' => 'Sector actualizado exitosamente',
-            'sector' => $sector
+            'sector' => $sector,
         ]);
     }
 
@@ -100,14 +103,14 @@ class SectorController extends Controller
             return response()->json([
                 'message' => 'No se puede eliminar el sector porque tiene clientes o empresas asociados',
                 'clientes_count' => $clientesCount,
-                'empresas_count' => $empresasCount
+                'empresas_count' => $empresasCount,
             ], 400);
         }
 
         $sector->delete();
 
         return response()->json([
-            'message' => 'Sector eliminado exitosamente'
+            'message' => 'Sector eliminado exitosamente',
         ]);
     }
 
@@ -117,12 +120,12 @@ class SectorController extends Controller
     public function toggleActivo($id)
     {
         $sector = Sector::findOrFail($id);
-        $sector->activo = !$sector->activo;
+        $sector->activo = ! $sector->activo;
         $sector->save();
 
         return response()->json([
             'message' => 'Estado del sector actualizado',
-            'sector' => $sector
+            'sector' => $sector,
         ]);
     }
 }

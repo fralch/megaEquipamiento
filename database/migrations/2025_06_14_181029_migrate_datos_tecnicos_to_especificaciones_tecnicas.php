@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -23,22 +23,22 @@ return new class extends Migration
             try {
                 // Decodificar datos_tecnicos
                 $datosTecnicos = json_decode($producto->datos_tecnicos, true);
-                
-                if (!$datosTecnicos || !is_array($datosTecnicos)) {
+
+                if (! $datosTecnicos || ! is_array($datosTecnicos)) {
                     continue;
                 }
 
                 // Decodificar especificaciones_tecnicas existentes o crear estructura vacía
                 $especificaciones = [];
-                if (!empty($producto->especificaciones_tecnicas)) {
+                if (! empty($producto->especificaciones_tecnicas)) {
                     $especificaciones = json_decode($producto->especificaciones_tecnicas, true);
                 }
-                
+
                 // Si no existe la estructura, crearla
-                if (!isset($especificaciones['secciones'])) {
+                if (! isset($especificaciones['secciones'])) {
                     $especificaciones = [
                         'secciones' => [],
-                        'textoActual' => ''
+                        'textoActual' => '',
                     ];
                 }
 
@@ -46,8 +46,8 @@ return new class extends Migration
                 $datosTecnicosTabla = [
                     'tipo' => 'tabla',
                     'datos' => [
-                        ['Especificación', 'Valor'] // Header
-                    ]
+                        ['Especificación', 'Valor'], // Header
+                    ],
                 ];
 
                 // Agregar cada dato técnico como fila
@@ -64,12 +64,12 @@ return new class extends Migration
                 DB::table('productos')
                     ->where('id_producto', $producto->id_producto)
                     ->update([
-                        'especificaciones_tecnicas' => json_encode($especificaciones, JSON_UNESCAPED_UNICODE)
+                        'especificaciones_tecnicas' => json_encode($especificaciones, JSON_UNESCAPED_UNICODE),
                     ]);
 
             } catch (Exception $e) {
                 // Log del error pero continúa con el siguiente producto
-                \Log::error("Error procesando producto {$producto->id_producto}: " . $e->getMessage());
+                \Log::error("Error procesando producto {$producto->id_producto}: ".$e->getMessage());
             }
         }
 
@@ -98,8 +98,8 @@ return new class extends Migration
         foreach ($productos as $producto) {
             try {
                 $especificaciones = json_decode($producto->especificaciones_tecnicas, true);
-                
-                if (!isset($especificaciones['secciones']) || !is_array($especificaciones['secciones'])) {
+
+                if (! isset($especificaciones['secciones']) || ! is_array($especificaciones['secciones'])) {
                     continue;
                 }
 
@@ -109,13 +109,13 @@ return new class extends Migration
                 $encontroTablaEspecificaciones = false;
 
                 foreach ($especificaciones['secciones'] as $seccion) {
-                    if ($seccion['tipo'] === 'tabla' && !$encontroTablaEspecificaciones) {
+                    if ($seccion['tipo'] === 'tabla' && ! $encontroTablaEspecificaciones) {
                         // Verificar si es la tabla de especificaciones técnicas
-                        if (isset($seccion['datos'][0]) && 
-                            count($seccion['datos'][0]) === 2 && 
-                            ($seccion['datos'][0][0] === 'Especificación' || 
+                        if (isset($seccion['datos'][0]) &&
+                            count($seccion['datos'][0]) === 2 &&
+                            ($seccion['datos'][0][0] === 'Especificación' ||
                              $seccion['datos'][0][0] === 'Especificacion')) {
-                            
+
                             // Extraer datos técnicos
                             for ($i = 1; $i < count($seccion['datos']); $i++) {
                                 if (count($seccion['datos'][$i]) === 2) {
@@ -135,26 +135,26 @@ return new class extends Migration
 
                 // Actualizar ambos campos
                 $updates = [];
-                
-                if (!empty($datosTecnicos)) {
+
+                if (! empty($datosTecnicos)) {
                     $updates['datos_tecnicos'] = json_encode($datosTecnicos, JSON_UNESCAPED_UNICODE);
                 }
 
-                if (!empty($seccionesRestantes) || !$encontroTablaEspecificaciones) {
+                if (! empty($seccionesRestantes) || ! $encontroTablaEspecificaciones) {
                     $especificaciones['secciones'] = $seccionesRestantes;
                     $updates['especificaciones_tecnicas'] = json_encode($especificaciones, JSON_UNESCAPED_UNICODE);
                 } else {
                     $updates['especificaciones_tecnicas'] = null;
                 }
 
-                if (!empty($updates)) {
+                if (! empty($updates)) {
                     DB::table('productos')
                         ->where('id_producto', $producto->id_producto)
                         ->update($updates);
                 }
 
             } catch (Exception $e) {
-                \Log::error("Error revirtiendo producto {$producto->id_producto}: " . $e->getMessage());
+                \Log::error("Error revirtiendo producto {$producto->id_producto}: ".$e->getMessage());
             }
         }
     }
@@ -167,6 +167,7 @@ return new class extends Migration
         // Convertir snake_case a título
         $palabras = explode('_', $clave);
         $palabras = array_map('ucfirst', $palabras);
+
         return implode(' ', $palabras);
     }
 
@@ -178,6 +179,7 @@ return new class extends Migration
         // Convertir título a snake_case
         $clave = strtolower($claveFormateada);
         $clave = str_replace(' ', '_', $clave);
+
         return $clave;
     }
 };

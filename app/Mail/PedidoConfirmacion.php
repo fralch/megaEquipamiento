@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -29,7 +28,7 @@ class PedidoConfirmacion extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Confirmación de Pedido - ' . $this->datosPedido['orderNumber'],
+            subject: 'Confirmación de Pedido - '.$this->datosPedido['orderNumber'],
         );
     }
 
@@ -41,7 +40,7 @@ class PedidoConfirmacion extends Mailable
         return new Content(
             view: 'emails.pedido-confirmacion',
             with: [
-                'datosPedido' => $this->datosPedido
+                'datosPedido' => $this->datosPedido,
             ]
         );
     }

@@ -10,6 +10,7 @@ class Cotizacion extends Model
     use HasFactory;
 
     protected $table = 'cotizaciones';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -58,7 +59,7 @@ class Cotizacion extends Model
         parent::boot();
 
         static::creating(function ($cotizacion) {
-            if (!$cotizacion->numero) {
+            if (! $cotizacion->numero) {
                 $cotizacion->numero = self::generarNumeroCotizacion($cotizacion);
             }
         });
@@ -71,33 +72,33 @@ class Cotizacion extends Model
     {
         // Obtener la empresa emisora
         $miEmpresa = NuestraEmpresa::find($cotizacion->miempresa_id);
-        
+
         if ($miEmpresa) {
             $prefix = $miEmpresa->codigo_cotizacion ?: 'COT';
             $nextNumber = ($miEmpresa->contador_cotizacion ?: 0) + 1;
-            
+
             // Determinar el año: usar configuración de empresa si existe, sino año de fecha cotización
             if ($miEmpresa->anio_cotizacion) {
                 $year = $miEmpresa->anio_cotizacion;
             } else {
-                $date = $cotizacion->fecha_cotizacion 
-                    ? \Carbon\Carbon::parse($cotizacion->fecha_cotizacion) 
+                $date = $cotizacion->fecha_cotizacion
+                    ? \Carbon\Carbon::parse($cotizacion->fecha_cotizacion)
                     : now();
                 $year = $date->format('Y');
             }
-            
+
             // Actualizar el contador de la empresa
             $miEmpresa->contador_cotizacion = $nextNumber;
             $miEmpresa->save();
-            
+
             // Formato: PREFIJO-NUMERO(8 digitos)-AÑO
             // Ejemplo: EIIL-00000123-2025
             return sprintf('%s-%08d-%s', $prefix, $nextNumber, $year);
         }
-        
+
         // Fallback si no hay empresa o configuración (comportamiento anterior)
-        $date = $cotizacion->fecha_cotizacion 
-            ? \Carbon\Carbon::parse($cotizacion->fecha_cotizacion) 
+        $date = $cotizacion->fecha_cotizacion
+            ? \Carbon\Carbon::parse($cotizacion->fecha_cotizacion)
             : now();
         $year = $date->format('Y');
 
@@ -242,7 +243,7 @@ class Cotizacion extends Model
      */
     public function getDiasVencimientoAttribute()
     {
-        if (!$this->fecha_vencimiento) {
+        if (! $this->fecha_vencimiento) {
             return null;
         }
 
@@ -290,6 +291,7 @@ class Cotizacion extends Model
         } elseif ($this->cliente_tipo === 'particular' && $this->clienteParticular) {
             return $this->clienteParticular->nombrecompleto;
         }
+
         return 'Sin cliente';
     }
 
@@ -303,6 +305,7 @@ class Cotizacion extends Model
         } elseif ($this->cliente_tipo === 'particular' && $this->clienteParticular) {
             return $this->clienteParticular->nombrecompleto;
         }
+
         return '';
     }
 
@@ -316,6 +319,7 @@ class Cotizacion extends Model
         } elseif ($this->cliente_tipo === 'particular' && $this->clienteParticular) {
             return $this->clienteParticular->email;
         }
+
         return '';
     }
 
@@ -329,6 +333,7 @@ class Cotizacion extends Model
         } elseif ($this->cliente_tipo === 'particular' && $this->clienteParticular) {
             return $this->clienteParticular->telefono;
         }
+
         return '';
     }
 

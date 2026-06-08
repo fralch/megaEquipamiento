@@ -28,15 +28,15 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Desactivar protección CSRF para todas las rutas
         $middleware->validateCsrfTokens(except: [
-            '*'
+            '*',
         ]);
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         // Ejecutar el comando de notificaciones cada hora
         $schedule->command('cotizaciones:generar-notificaciones')
-                 ->hourly()
-                 ->withoutOverlapping()
-                 ->runInBackground();
+            ->hourly()
+            ->withoutOverlapping()
+            ->runInBackground();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

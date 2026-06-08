@@ -10,6 +10,7 @@ class NuestraEmpresa extends Model
     use HasFactory;
 
     protected $table = 'nuestras_empresas';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -46,6 +47,7 @@ class NuestraEmpresa extends Model
         if ($this->imagen_logo) {
             return asset($this->imagen_logo);
         }
+
         return null;
     }
 
@@ -57,6 +59,7 @@ class NuestraEmpresa extends Model
         if ($this->imagen_firma) {
             return asset($this->imagen_firma);
         }
+
         return null;
     }
 
@@ -65,7 +68,7 @@ class NuestraEmpresa extends Model
      */
     public function scopeBuscarPorNombre($query, $nombre)
     {
-        return $query->where('nombre', 'like', '%' . $nombre . '%');
+        return $query->where('nombre', 'like', '%'.$nombre.'%');
     }
 
     /**

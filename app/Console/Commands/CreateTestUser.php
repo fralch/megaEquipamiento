@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Usuario;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
 class CreateTestUser extends Command
@@ -29,7 +29,7 @@ class CreateTestUser extends Command
     {
         // Delete existing test user if exists
         Usuario::where('correo', 'admin@megaequipamiento.com')->delete();
-        
+
         // Create new test user
         $user = Usuario::create([
             'nombre' => 'Admin Test',
@@ -42,7 +42,7 @@ class CreateTestUser extends Command
         $this->info('Test user created successfully!');
         $this->info('Email: admin@megaequipamiento.com');
         $this->info('Password: password');
-        
+
         return 0;
     }
 }

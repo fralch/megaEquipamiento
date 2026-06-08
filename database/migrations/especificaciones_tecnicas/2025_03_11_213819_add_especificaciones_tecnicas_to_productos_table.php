@@ -7,12 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations. 
+     * Run the migrations.
      ALTER TABLE mega_equipamiento.productos ADD especificaciones_tecnicas LONGTEXT NULL;
 
      php artisan make:migration add_especificaciones_tecnicas_to_productos_table --table=productos
      php artisan migrate
-     
      */
     public function up()
     {
@@ -20,7 +19,6 @@ return new class extends Migration
             $table->longText('especificaciones_tecnicas')->nullable();
         });
     }
-
 
     /**
      * Reverse the migrations.

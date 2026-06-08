@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\DetalleCarrito;
 use App\Models\CarritoCompra;
+use App\Models\DetalleCarrito;
 use App\Models\Producto;
+use Illuminate\Http\Request;
 
 class DetalleCarritoController extends Controller
 {
@@ -15,6 +15,7 @@ class DetalleCarritoController extends Controller
     public function index()
     {
         $detallesCarrito = DetalleCarrito::with(['carrito', 'producto'])->get();
+
         return view('detalles_carrito.index', compact('detallesCarrito'));
     }
 
@@ -25,6 +26,7 @@ class DetalleCarritoController extends Controller
     {
         $carritos = CarritoCompra::all();
         $productos = Producto::all();
+
         return view('detalles_carrito.create', compact('carritos', 'productos'));
     }
 
@@ -42,7 +44,7 @@ class DetalleCarritoController extends Controller
         DetalleCarrito::create($request->all());
 
         return redirect()->route('detalles-carrito.index')
-                         ->with('success', 'Detalle de Carrito creado exitosamente.');
+            ->with('success', 'Detalle de Carrito creado exitosamente.');
     }
 
     /**
@@ -60,6 +62,7 @@ class DetalleCarritoController extends Controller
     {
         $carritos = CarritoCompra::all();
         $productos = Producto::all();
+
         return view('detalles_carrito.edit', compact('detalleCarrito', 'carritos', 'productos'));
     }
 
@@ -77,7 +80,7 @@ class DetalleCarritoController extends Controller
         $detalleCarrito->update($request->all());
 
         return redirect()->route('detalles-carrito.index')
-                         ->with('success', 'Detalle de Carrito actualizado exitosamente.');
+            ->with('success', 'Detalle de Carrito actualizado exitosamente.');
     }
 
     /**
@@ -88,6 +91,6 @@ class DetalleCarritoController extends Controller
         $detalleCarrito->delete();
 
         return redirect()->route('detalles-carrito.index')
-                         ->with('success', 'Detalle de Carrito eliminado exitosamente.');
+            ->with('success', 'Detalle de Carrito eliminado exitosamente.');
     }
 }

@@ -35,7 +35,7 @@ class HandleInertiaRequests extends Middleware
         $notificationStats = [
             'warningCount' => 0,
             'dangerCount' => 0,
-            'totalCount' => 0
+            'totalCount' => 0,
         ];
 
         if ($usuario) {
@@ -50,7 +50,7 @@ class HandleInertiaRequests extends Middleware
             // Warning: Vencimiento entre 3 y 4 días atrás
             $warningDateStart = $now->copy()->subDays(4)->startOfDay();
             $warningDateEnd = $now->copy()->subDays(3)->endOfDay();
-            
+
             // Danger: Vencimiento hace 5 días o más
             $dangerDateEnd = $now->copy()->subDays(5)->endOfDay();
 
@@ -65,7 +65,7 @@ class HandleInertiaRequests extends Middleware
             $notificationStats = [
                 'warningCount' => $warningCount,
                 'dangerCount' => $dangerCount,
-                'totalCount' => $warningCount + $dangerCount
+                'totalCount' => $warningCount + $dangerCount,
             ];
         }
 

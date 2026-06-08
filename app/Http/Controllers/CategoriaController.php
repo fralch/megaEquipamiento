@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\Categoria;
-use App\Models\Subcategoria;
 use App\Models\Producto;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class CategoriaController extends Controller
 {
-   
     public function CategoriasWiew($id_categoria = null)
     {
         // Cache para todas las categorías por 1 hora
@@ -26,6 +24,7 @@ class CategoriaController extends Controller
             $categoria = null;
             $subcategorias = [];
             $marcas = [];
+
             return Inertia::render('Categoria', [
                 'productos' => $productos,
                 'categoria' => $categoria,
@@ -38,7 +37,7 @@ class CategoriaController extends Controller
         // Obtener la categoría por su ID con subcategorías y marcas precargadas
         $categoria = Categoria::with(['subcategorias', 'marcas'])->find($id_categoria);
 
-        if (!$categoria) {
+        if (! $categoria) {
             // Manejar el caso en que la categoría no se encuentre
             return response()->json(['error' => 'Categoría no encontrada'], 404);
         }
@@ -63,11 +62,8 @@ class CategoriaController extends Controller
         ]);
     }
 
-
-
-
     /*
-     * obtener todas las categorias  em json 
+     * obtener todas las categorias  em json
     */
     public function getCategorias()
     {
@@ -76,9 +72,6 @@ class CategoriaController extends Controller
 
         return response()->json($categorias);
     }
-
-
-   
 
     /**
      * crear una nueva categoría y devolver el id
@@ -92,21 +85,21 @@ class CategoriaController extends Controller
             'imagen' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
             'imagenes.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
         ]);
-    
+
         // Procesar las imágenes si se proporcionan
         $imagenesArray = [];
 
         if ($request->has('imagenesDelBanco')) {
             $imagenesDelBanco = json_decode($request->input('imagenesDelBanco'), true);
-            $imagenesArray = array_map(function($imagen) {
+            $imagenesArray = array_map(function ($imagen) {
                 return $imagen['url'];
             }, $imagenesDelBanco);
         } elseif ($request->hasFile('imagenes')) {
             try {
                 $imagenes = $request->file('imagenes');
                 foreach ($imagenes as $index => $imagen) {
-                    $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
-                    $imagePath = 'categorias/' . $imageName;
+                    $imageName = time().'_'.$index.'.'.$imagen->getClientOriginalExtension();
+                    $imagePath = 'categorias/'.$imageName;
                     $imagen->move(public_path('categorias'), $imageName);
                     $imagenesArray[] = $imagePath;
                 }
@@ -117,35 +110,34 @@ class CategoriaController extends Controller
             // Mantener compatibilidad con imagen única
             try {
                 $image = $request->file('imagen');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = 'categorias/' . $imageName;
+                $imageName = time().'.'.$image->getClientOriginalExtension();
+                $imagePath = 'categorias/'.$imageName;
                 $image->move(public_path('categorias'), $imageName);
                 $imagenesArray[] = $imagePath;
             } catch (\Exception $e) {
                 return response()->json(['error' => 'Error al subir la imagen.'], 500);
             }
         }
-    
+
         // Crear directorio de categorías si no existe
         $categoriasDir = public_path('categorias');
-        if (!file_exists($categoriasDir)) {
+        if (! file_exists($categoriasDir)) {
             mkdir($categoriasDir, 0777, true);
         }
-        
+
         // Crear la categoría
         $categoria = Categoria::create(array_merge($request->except(['imagen', 'imagenes', 'imagenesDelBanco']), [
             'img' => $imagenesArray,
         ]));
-        
+
         // Ejecutar la lógica de la migración para actualizar relaciones marca-categoria
         $this->actualizarRelacionesMarcaCategoria();
-    
+
         // Invalidar cache de categorías
         Cache::forget('todas_categorias');
-    
+
         return response()->json($categoria);
     }
-
 
     /**
      * Actualizar una categoría y devolver el id
@@ -162,20 +154,20 @@ class CategoriaController extends Controller
 
         // Buscar la categoría por ID
         $categoria = Categoria::find($id);
-        
-        if (!$categoria) {
+
+        if (! $categoria) {
             return response()->json(['error' => 'Categoría no encontrada'], 404);
         }
-        
+
         // Preparar datos para actualización
         $dataToUpdate = $request->except(['imagen', 'imagenes', 'imagenesDelBanco']);
-        
+
         // Solo procesar imágenes si se envían nuevas imágenes
         if ($request->hasFile('imagen') || $request->hasFile('imagenes') || $request->has('imagenesDelBanco')) {
             try {
                 // Crear directorio de categorías si no existe
                 $categoriasDir = public_path('categorias');
-                if (!file_exists($categoriasDir)) {
+                if (! file_exists($categoriasDir)) {
                     mkdir($categoriasDir, 0777, true);
                 }
                 // Eliminar las imágenes anteriores si existen
@@ -187,43 +179,43 @@ class CategoriaController extends Controller
                         }
                     }
                 }
-                
+
                 $imagenesArray = [];
-                
+
                 // Procesar las imágenes si se proporcionan
                 if ($request->has('imagenesDelBanco')) {
                     $imagenesDelBanco = json_decode($request->input('imagenesDelBanco'), true);
-                    $imagenesArray = array_map(function($imagen) {
+                    $imagenesArray = array_map(function ($imagen) {
                         return $imagen['url'];
                     }, $imagenesDelBanco);
                 } elseif ($request->hasFile('imagenes')) {
                     $imagenes = $request->file('imagenes');
                     foreach ($imagenes as $index => $imagen) {
-                        $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
-                        $imagePath = 'categorias/' . $imageName;
+                        $imageName = time().'_'.$index.'.'.$imagen->getClientOriginalExtension();
+                        $imagePath = 'categorias/'.$imageName;
                         $imagen->move(public_path('categorias'), $imageName);
                         $imagenesArray[] = $imagePath;
                     }
                 } elseif ($request->hasFile('imagen')) {
                     // Mantener compatibilidad con imagen única
                     $image = $request->file('imagen');
-                    $imageName = time() . '.' . $image->getClientOriginalExtension();
-                    $imagePath = 'categorias/' . $imageName;
+                    $imageName = time().'.'.$image->getClientOriginalExtension();
+                    $imagePath = 'categorias/'.$imageName;
                     $image->move(public_path('categorias'), $imageName);
                     $imagenesArray[] = $imagePath;
                 }
-                
+
                 // Agregar las imágenes a los datos de actualización
                 $dataToUpdate['img'] = $imagenesArray;
-                
+
             } catch (\Exception $e) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'Error al actualizar las imágenes: ' . $e->getMessage()
+                    'error' => 'Error al actualizar las imágenes: '.$e->getMessage(),
                 ], 500);
             }
         }
-        
+
         // Actualizar la categoría
         $categoria->update($dataToUpdate);
 
@@ -243,17 +235,17 @@ class CategoriaController extends Controller
             'imagen.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'imagenes.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
-        
+
         // Buscar la categoría por ID
         $categoria = Categoria::find($request->id_categoria);
-        
+
         try {
             // Crear directorio de categorías si no existe
             $categoriasDir = public_path('categorias');
-            if (!file_exists($categoriasDir)) {
+            if (! file_exists($categoriasDir)) {
                 mkdir($categoriasDir, 0777, true);
             }
-            
+
             // Eliminar las imágenes anteriores si existen
             if ($categoria->img) {
                 $imagenesAnteriores = is_array($categoria->img) ? $categoria->img : [$categoria->img];
@@ -263,16 +255,16 @@ class CategoriaController extends Controller
                     }
                 }
             }
-            
+
             $imagenesArray = [];
-            
+
             // Procesar múltiples imágenes con formato imagen[0], imagen[1], etc.
             if ($request->has('imagen') && is_array($request->file('imagen'))) {
                 $imagenes = $request->file('imagen');
                 foreach ($imagenes as $index => $imagen) {
                     if ($imagen && $imagen->isValid()) {
-                        $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
-                        $imagePath = 'categorias/' . $imageName;
+                        $imageName = time().'_'.$index.'.'.$imagen->getClientOriginalExtension();
+                        $imagePath = 'categorias/'.$imageName;
                         $imagen->move(public_path('categorias'), $imageName);
                         $imagenesArray[] = $imagePath;
                     }
@@ -282,46 +274,46 @@ class CategoriaController extends Controller
             elseif ($request->hasFile('imagenes')) {
                 $imagenes = $request->file('imagenes');
                 foreach ($imagenes as $index => $imagen) {
-                    $imageName = time() . '_' . $index . '.' . $imagen->getClientOriginalExtension();
-                    $imagePath = 'categorias/' . $imageName;
+                    $imageName = time().'_'.$index.'.'.$imagen->getClientOriginalExtension();
+                    $imagePath = 'categorias/'.$imageName;
                     $imagen->move(public_path('categorias'), $imageName);
                     $imagenesArray[] = $imagePath;
                 }
             }
             // Mantener compatibilidad con imagen única
-            elseif ($request->hasFile('imagen') && !is_array($request->file('imagen'))) {
+            elseif ($request->hasFile('imagen') && ! is_array($request->file('imagen'))) {
                 $image = $request->file('imagen');
-                $imageName = time() . '.' . $image->getClientOriginalExtension();
-                $imagePath = 'categorias/' . $imageName;
+                $imageName = time().'.'.$image->getClientOriginalExtension();
+                $imagePath = 'categorias/'.$imageName;
                 $image->move(public_path('categorias'), $imageName);
                 $imagenesArray[] = $imagePath;
             }
-            
+
             // Actualizar el campo de imágenes
             $categoria->img = $imagenesArray;
             $categoria->save();
-            
+
             // Invalidar cache de categorías
             Cache::forget('todas_categorias');
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Imágenes actualizadas correctamente',
                 'img' => $imagenesArray,
-                'categoria' => $categoria->fresh()
+                'categoria' => $categoria->fresh(),
             ]);
-            
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Error al actualizar las imágenes: ' . $e->getMessage()
+                'error' => 'Error al actualizar las imágenes: '.$e->getMessage(),
             ], 500);
         }
     }
 
     /**
      * Eliminar una categoría y devolver el id
-     */ 
+     */
     public function destroy($id)
     {
         try {
@@ -349,16 +341,15 @@ class CategoriaController extends Controller
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Categoría no encontrada'
+                'message' => 'Categoría no encontrada',
             ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar la categoría: ' . $e->getMessage()
+                'message' => 'Error al eliminar la categoría: '.$e->getMessage(),
             ], 500);
         }
     }
-
 
     // obtener  las categorias y las sub categorias con sus ids y sus nombres
     public function getCategoriasConSubcategoriasIds()
@@ -367,9 +358,9 @@ class CategoriaController extends Controller
         $categorias = Categoria::with('subcategorias:id_subcategoria,nombre,id_categoria')->get(['id_categoria', 'nombre', 'img']);
 
         // Debug: agregar información sobre las imágenes
-        $categorias->each(function($categoria) {
+        $categorias->each(function ($categoria) {
             $rawImg = $categoria->getAttributes()['img'] ?? null;
-            \Log::info("Categoria {$categoria->nombre}: raw_img = " . ($rawImg ? $rawImg : 'NULL') . ", processed_img = " . json_encode($categoria->img));
+            \Log::info("Categoria {$categoria->nombre}: raw_img = ".($rawImg ? $rawImg : 'NULL').', processed_img = '.json_encode($categoria->img));
         });
 
         // Devolver las categorías como respuesta JSON
@@ -382,22 +373,22 @@ class CategoriaController extends Controller
     public function debugCategoryImages()
     {
         $categorias = Categoria::all(['id_categoria', 'nombre', 'img']);
-        
+
         $debug = [];
         foreach ($categorias as $categoria) {
             $rawImg = $categoria->getAttributes()['img'] ?? null;
             $processedImg = $categoria->img;
-            
+
             $debug[] = [
                 'id' => $categoria->id_categoria,
                 'nombre' => $categoria->nombre,
                 'raw_img' => $rawImg,
                 'processed_img' => $processedImg,
                 'is_array' => is_array($processedImg),
-                'count' => is_array($processedImg) ? count($processedImg) : null
+                'count' => is_array($processedImg) ? count($processedImg) : null,
             ];
         }
-        
+
         return response()->json($debug);
     }
 
@@ -407,13 +398,13 @@ class CategoriaController extends Controller
     public function getSubcategorias($id_categoria)
     {
         $categoria = Categoria::find($id_categoria);
-        
-        if (!$categoria) {
+
+        if (! $categoria) {
             return response()->json(['error' => 'Categoría no encontrada'], 404);
         }
-        
+
         $subcategorias = $categoria->subcategorias;
-        
+
         return response()->json($subcategorias);
     }
 
@@ -423,7 +414,7 @@ class CategoriaController extends Controller
     private function actualizarRelacionesMarcaCategoria()
     {
         // Insertar las relaciones marca-categoria basadas en los productos existentes
-        $query = "
+        $query = '
             INSERT INTO marca_categoria (marca_id, categoria_id, created_at, updated_at)
             SELECT DISTINCT 
                 p.marca_id,
@@ -435,8 +426,8 @@ class CategoriaController extends Controller
             WHERE p.marca_id IS NOT NULL 
             AND s.id_categoria IS NOT NULL
             ON DUPLICATE KEY UPDATE updated_at = NOW()
-        ";
-        
+        ';
+
         DB::statement($query);
     }
 }

@@ -13,8 +13,11 @@ class Producto extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
 
     protected $table = 'productos';
+
     protected $primaryKey = 'id_producto';
+
     public $incrementing = true;
+
     public $timestamps = true;
 
     protected $fillable = [
@@ -118,6 +121,7 @@ class Producto extends Model implements HasMedia
         $imagenes = $this->imagenes;
         $imagenes[] = $nuevaImagen;
         $this->imagen = $imagenes;
+
         return $this;
     }
 
@@ -128,6 +132,7 @@ class Producto extends Model implements HasMedia
             unset($imagenes[$indice]);
             $this->imagen = array_values($imagenes);
         }
+
         return $this;
     }
 
@@ -146,7 +151,7 @@ class Producto extends Model implements HasMedia
             ->acceptsMimeTypes([
                 'application/pdf',
                 'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             ])
             ->singleFile(false);
 
@@ -181,6 +186,7 @@ class Producto extends Model implements HasMedia
         if ($media) {
             $this->addMediaFromUrl($media->getUrl())->toMediaCollection($coleccion);
         }
+
         return $this;
     }
 }

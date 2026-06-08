@@ -7,19 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 class OpcionFiltro extends Model
 {
     protected $table = 'opciones_filtros';
+
     protected $primaryKey = 'id_opcion';
-    
+
     protected $fillable = [
         'id_filtro',
         'valor',
         'etiqueta',
         'color',
         'orden',
-        'activo'
+        'activo',
     ];
 
     protected $casts = [
-        'activo' => 'boolean'
+        'activo' => 'boolean',
     ];
 
     public function filtro()

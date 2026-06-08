@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Usuario;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -26,7 +26,7 @@ class AuthController extends Controller
 
         $usuario = Usuario::where('correo', $request->email)->first();
 
-        if (!$usuario || !Hash::check($request->password, $usuario->contraseña)) {
+        if (! $usuario || ! Hash::check($request->password, $usuario->contraseña)) {
             throw ValidationException::withMessages([
                 'email' => ['Las credenciales proporcionadas son incorrectas.'],
             ]);

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Subcategoria;
 use App\Models\Categoria;
-use Illuminate\Support\Facades\DB;
+use App\Models\Subcategoria;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class SubcategoriaController extends Controller
 {
@@ -19,9 +19,9 @@ class SubcategoriaController extends Controller
             'nombre' => 'required|max:100',
             'descripcion' => 'nullable|string',
             'id_categoria' => 'required|exists:categorias,id_categoria',
-            'img' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048'
+            'img' => 'nullable|file|mimes:jpeg,png,jpg,gif,webp,webm|max:2048',
         ]);
-    
+
         // Preparar datos para la creación
         $data = [
             'nombre' => $request->nombre,
@@ -29,54 +29,54 @@ class SubcategoriaController extends Controller
             'id_categoria' => $request->id_categoria,
             'img' => null,
         ];
-        
+
         // Crear la subcategoría primero
         $subcategoria = Subcategoria::create($data);
-        
+
         // Obtener la categoría relacionada para crear una estructura organizada
         $categoria = Categoria::find($request->id_categoria);
-        
+
         // Sanitize the subcategory name for the folder path
         $subcategoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($request->nombre));
         $subcategoryNameSanitized = preg_replace('/_+/', '_', $subcategoryNameSanitized);
-        
+
         // Sanitize the category name as well for the parent folder
         $categoryNameSanitized = preg_replace('/[^A-Za-z0-9\-_\.]/', '_', strtolower($categoria->nombre));
         $categoryNameSanitized = preg_replace('/_+/', '_', $categoryNameSanitized);
-        
+
         // Crear directorio específico para esta subcategoría
-        $subcategoryFolder = 'img/subcategorias/' . $subcategoryNameSanitized;
+        $subcategoryFolder = 'img/subcategorias/'.$subcategoryNameSanitized;
         $fullPath = public_path($subcategoryFolder);
-        
+
         // Crear el directorio si no existe
-        if (!file_exists($fullPath)) {
+        if (! file_exists($fullPath)) {
             mkdir($fullPath, 0777, true);
         }
-        
+
         // Procesar imagen si existe
         if ($request->hasFile('img')) {
             $file = $request->file('img');
             // Use a unique name for the file, keeping the original extension
-            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $destinationPath = $fullPath . '/' . $fileName;
-            
+            $fileName = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+            $destinationPath = $fullPath.'/'.$fileName;
+
             if (move_uploaded_file($file->getPathname(), $destinationPath)) {
                 // Actualizar la ruta de la imagen
-                $subcategoria->img = '/' . $subcategoryFolder . '/' . $fileName;
+                $subcategoria->img = '/'.$subcategoryFolder.'/'.$fileName;
                 $subcategoria->save();
             }
         }
-    
+
         // Invalidar cache de categorías
         Cache::forget('todas_categorias');
 
         return response()->json([
             'success' => true,
             'message' => 'Subcategoría creada exitosamente.',
-            'data' => $subcategoria
+            'data' => $subcategoria,
         ]);
     }
-    
+
     public function update(Request $request, Subcategoria $subcategoria)
     {
         $request->validate([
@@ -116,18 +116,18 @@ class SubcategoriaController extends Controller
             $subcategoryNameSanitized = preg_replace('/_+/', '_', $subcategoryNameSanitized);
 
             // Crear la ruta del directorio
-            $subcategoryFolder = 'img/subcategorias/' . $subcategoryNameSanitized;
+            $subcategoryFolder = 'img/subcategorias/'.$subcategoryNameSanitized;
             $fullPath = public_path($subcategoryFolder);
 
             // Crear el directorio si no existe
-            if (!file_exists($fullPath)) {
+            if (! file_exists($fullPath)) {
                 mkdir($fullPath, 0777, true);
             }
 
             // Mover el archivo
-            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $fileName = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
             $file->move($fullPath, $fileName);
-            $subcategoria->img = '/' . $subcategoryFolder . '/' . $fileName;
+            $subcategoria->img = '/'.$subcategoryFolder.'/'.$fileName;
         } elseif ($request->img_url) {
             // Eliminar imagen anterior si existe
             if ($subcategoria->img && file_exists(public_path($subcategoria->img))) {
@@ -144,30 +144,30 @@ class SubcategoriaController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Subcategoría actualizada exitosamente.',
-            'data' => $subcategoria
+            'data' => $subcategoria,
         ]);
     }
-    
+
     // eliminar una subcategoria
     public function destroy($id)
     {
         $subcategoria = Subcategoria::find($id);
-        
-        if (!$subcategoria) {
+
+        if (! $subcategoria) {
             return response()->json(['error' => 'Subcategoría no encontrada'], 404);
         }
-        
+
         // Eliminar la imagen si existe
         if ($subcategoria->img && file_exists(public_path($subcategoria->img))) {
             // Eliminar el archivo
             unlink(public_path($subcategoria->img));
-            
+
             // Intentar eliminar el directorio si está vacío
             $dirPath = dirname(public_path($subcategoria->img));
-            
+
             if (is_dir($dirPath) && count(glob("$dirPath/*")) === 0) {
                 rmdir($dirPath);
-                
+
                 // Verificar si el directorio padre (subcategorias) está vacío y eliminarlo
                 $parentDir = dirname($dirPath);
                 if (is_dir($parentDir) && count(glob("$parentDir/*")) === 0) {
@@ -175,12 +175,12 @@ class SubcategoriaController extends Controller
                 }
             }
         }
-        
+
         $subcategoria->delete();
-        
+
         // Invalidar cache de categorías
         Cache::forget('todas_categorias');
-        
+
         return response()->json($id);
     }
 
@@ -188,6 +188,7 @@ class SubcategoriaController extends Controller
     public function getSubcategorias()
     {
         $subcategorias = Subcategoria::select('id_subcategoria', 'nombre', 'descripcion', 'id_categoria', 'img')->get();
+
         return response()->json($subcategorias);
     }
 
@@ -195,6 +196,7 @@ class SubcategoriaController extends Controller
     public function getSubcategoriasCategoria(Categoria $categoria)
     {
         $subcategorias = $categoria->subcategorias;
+
         return response()->json($subcategorias);
     }
 
@@ -202,9 +204,10 @@ class SubcategoriaController extends Controller
     public function getSubcategoriaById($id_subcategoria)
     {
         $subcategoria = Subcategoria::find($id_subcategoria);
+
         return response()->json($subcategoria);
     }
-  
+
     // obtener nombre categoria de una subcategoria
     public function getCatBySub($idSubcategoria)
     {
@@ -212,7 +215,7 @@ class SubcategoriaController extends Controller
         $subcategoria = Subcategoria::find($idSubcategoria);
 
         // Verificar si la subcategoría existe
-        if (!$subcategoria) {
+        if (! $subcategoria) {
             return response()->json(['error' => 'Subcategoría no encontrada'], 404);
         }
 
@@ -234,7 +237,7 @@ class SubcategoriaController extends Controller
                             $subQuery->select(\DB::raw(1))
                                 ->from('productos')
                                 ->whereColumn('productos.id_subcategoria', 'subcategorias.id_subcategoria');
-                            
+
                             if ($marca_id) {
                                 $subQuery->where('productos.marca_id', $marca_id);
                             }
@@ -248,7 +251,7 @@ class SubcategoriaController extends Controller
                             $subQuery->select(\DB::raw(1))
                                 ->from('productos')
                                 ->whereColumn('productos.id_subcategoria', 'subcategorias.id_subcategoria');
-                            
+
                             if ($marca_id) {
                                 $subQuery->where('productos.marca_id', $marca_id);
                             }
@@ -262,7 +265,7 @@ class SubcategoriaController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Error al obtener las categorías optimizadas',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -291,9 +294,9 @@ class SubcategoriaController extends Controller
     {
         // Limpiar relaciones existentes
         DB::table('marca_categoria')->delete();
-        
+
         // Insertar las relaciones marca-categoria basadas en los productos existentes
-        $query = "
+        $query = '
             INSERT INTO marca_categoria (marca_id, categoria_id, created_at, updated_at)
             SELECT DISTINCT 
                 p.marca_id,
@@ -304,8 +307,8 @@ class SubcategoriaController extends Controller
             INNER JOIN subcategorias s ON p.id_subcategoria = s.id_subcategoria
             WHERE p.marca_id IS NOT NULL 
             AND s.id_categoria IS NOT NULL
-        ";
-        
+        ';
+
         DB::statement($query);
     }
 }

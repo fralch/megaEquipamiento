@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\NotificacionCotizacion;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 
 class NotificacionCotizacionController extends Controller
 {
@@ -17,7 +17,7 @@ class NotificacionCotizacionController extends Controller
         try {
             Artisan::call('cotizaciones:generar-notificaciones');
         } catch (\Exception $e) {
-            \Log::error('Error al generar notificaciones: ' . $e->getMessage());
+            \Log::error('Error al generar notificaciones: '.$e->getMessage());
         }
     }
 
@@ -36,7 +36,7 @@ class NotificacionCotizacionController extends Controller
         // Filtrar por estado de visualización si se especifica
         if ($request->has('visualizado')) {
             $visualizado = filter_var($request->visualizado, FILTER_VALIDATE_BOOLEAN);
-            if (!$visualizado) {
+            if (! $visualizado) {
                 $query->noVisualizadas();
             } else {
                 $query->where('visualizado', true);

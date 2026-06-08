@@ -2,13 +2,13 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
+use App\Models\Cliente;
 use App\Models\Cotizacion;
 use App\Models\DetalleCotizacion;
-use App\Models\Cliente;
-use App\Models\Usuario;
 use App\Models\NuestraEmpresa;
+use App\Models\Usuario;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class CreateTestCotizacion extends Command
 {
@@ -35,8 +35,9 @@ class CreateTestCotizacion extends Command
 
         // Get or create test user (admin)
         $usuario = Usuario::where('correo', 'admin@megaequipamiento.com')->first();
-        if (!$usuario) {
+        if (! $usuario) {
             $this->error('Admin user not found. Please run php artisan app:create-test-user first.');
+
             return;
         }
 
@@ -48,7 +49,7 @@ class CreateTestCotizacion extends Command
                 'telefono' => '+51 999 888 777',
                 'direccion' => 'Av. Test 123, Lima, Perú',
                 'ruc_dni' => '12345678',
-                'usuario_id' => $usuario->id_usuario
+                'usuario_id' => $usuario->id_usuario,
             ]
         );
 
@@ -83,7 +84,7 @@ class CreateTestCotizacion extends Command
             'total_adicionales_monto' => 2500.00,
             'total' => 18000.00,
             'estado' => 'pendiente',
-            'notas' => 'Esta es una cotización de prueba para verificar el formato PDF. Incluye múltiples productos y servicios adicionales para probar el diseño completo.'
+            'notas' => 'Esta es una cotización de prueba para verificar el formato PDF. Incluye múltiples productos y servicios adicionales para probar el diseño completo.',
         ]);
 
         // Create product details
@@ -95,7 +96,7 @@ class CreateTestCotizacion extends Command
             'descripcion' => 'Microscopio binocular con objetivos 4x, 10x, 40x y 100x. Incluye iluminación LED y condensador Abbe.',
             'cantidad' => 2,
             'precio_unitario' => 4500.00,
-            'subtotal' => 9000.00
+            'subtotal' => 9000.00,
         ]);
 
         DetalleCotizacion::create([
@@ -106,7 +107,7 @@ class CreateTestCotizacion extends Command
             'descripcion' => 'Balanza de precisión 0.1mg, capacidad 220g. Calibración interna automática.',
             'cantidad' => 1,
             'precio_unitario' => 3200.00,
-            'subtotal' => 3200.00
+            'subtotal' => 3200.00,
         ]);
 
         DetalleCotizacion::create([
@@ -117,7 +118,7 @@ class CreateTestCotizacion extends Command
             'descripcion' => 'Centrífuga para tubos de 15ml y 50ml. Velocidad máxima 4000 RPM.',
             'cantidad' => 1,
             'precio_unitario' => 3300.00,
-            'subtotal' => 3300.00
+            'subtotal' => 3300.00,
         ]);
 
         // Create additional services
@@ -129,7 +130,7 @@ class CreateTestCotizacion extends Command
             'descripcion' => 'Servicio de instalación profesional y capacitación básica del personal.',
             'cantidad' => 1,
             'precio_unitario' => 1500.00,
-            'subtotal' => 1500.00
+            'subtotal' => 1500.00,
         ]);
 
         DetalleCotizacion::create([
@@ -140,10 +141,10 @@ class CreateTestCotizacion extends Command
             'descripcion' => 'Programa de mantenimiento preventivo con 4 visitas anuales.',
             'cantidad' => 1,
             'precio_unitario' => 1000.00,
-            'subtotal' => 1000.00
+            'subtotal' => 1000.00,
         ]);
 
-        $this->info("Test quotation created successfully!");
+        $this->info('Test quotation created successfully!');
         $this->info("Quotation ID: {$cotizacion->id}");
         $this->info("Quotation Number: {$cotizacion->numero}");
         $this->info("You can now test the PDF at: /crm/cotizaciones/{$cotizacion->id}/export-pdf");

@@ -10,8 +10,11 @@ class Tag extends Model
     use HasFactory;
 
     protected $table = 'tags';
+
     protected $primaryKey = 'id_tag';
+
     public $incrementing = true;
+
     public $timestamps = true;
 
     protected $fillable = [
@@ -34,7 +37,7 @@ class Tag extends Model
 
     public function hasParent()
     {
-        return !is_null($this->id_tag_parent);
+        return ! is_null($this->id_tag_parent);
     }
 
     public function scopeWithParent($query)
@@ -47,4 +50,3 @@ class Tag extends Model
         return $query->whereNull('id_tag_parent');
     }
 }
-

@@ -6,8 +6,8 @@ use App\Models\Producto;
 use App\Models\Tag;
 use App\Models\TagParent;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class ProductoTagController extends Controller
 {
@@ -17,19 +17,19 @@ class ProductoTagController extends Controller
     public function index(Request $request)
     {
         $query = Producto::with(['tags.tagParent', 'subcategoria.categoria', 'marca'])
-                         ->orderBy('nombre');
+            ->orderBy('nombre');
 
         // Filtros opcionales
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%{$search}%")
-                  ->orWhere('sku', 'like', "%{$search}%");
+                    ->orWhere('sku', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('tag_id')) {
-            $query->whereHas('tags', function($q) use ($request) {
+            $query->whereHas('tags', function ($q) use ($request) {
                 $q->where('tags.id_tag', $request->get('tag_id'));
             });
         }
@@ -50,7 +50,7 @@ class ProductoTagController extends Controller
             'productos' => $productos,
             'tags' => $tags,
             'tagParents' => $tagParents,
-            'filters' => $request->only(['search', 'tag_id'])
+            'filters' => $request->only(['search', 'tag_id']),
         ]);
     }
 
@@ -60,10 +60,10 @@ class ProductoTagController extends Controller
     public function getProductTags($id)
     {
         $producto = Producto::with('tags.tagParent')->findOrFail($id);
-        
+
         return response()->json([
             'producto' => $producto,
-            'tags' => $producto->tags
+            'tags' => $producto->tags,
         ]);
     }
 
@@ -74,7 +74,7 @@ class ProductoTagController extends Controller
     {
         $request->validate([
             'tag_ids' => 'array',
-            'tag_ids.*' => 'exists:tags,id_tag'
+            'tag_ids.*' => 'exists:tags,id_tag',
         ]);
 
         $producto = Producto::findOrFail($id);
@@ -88,7 +88,7 @@ class ProductoTagController extends Controller
             return response()->json([
                 'message' => 'Tags actualizados exitosamente',
                 'producto' => $producto,
-                'tags' => $producto->tags
+                'tags' => $producto->tags,
             ]);
         }
 
@@ -101,14 +101,14 @@ class ProductoTagController extends Controller
     public function attachTag(Request $request, $id)
     {
         $request->validate([
-            'tag_id' => 'required|exists:tags,id_tag'
+            'tag_id' => 'required|exists:tags,id_tag',
         ]);
 
         $producto = Producto::findOrFail($id);
         $tagId = $request->get('tag_id');
 
         // Check if tag is already attached
-        if (!$producto->tags()->where('id_tag', $tagId)->exists()) {
+        if (! $producto->tags()->where('id_tag', $tagId)->exists()) {
             $producto->tags()->attach($tagId);
         }
 
@@ -118,7 +118,7 @@ class ProductoTagController extends Controller
             return response()->json([
                 'message' => 'Tag agregado exitosamente',
                 'producto' => $producto,
-                'tags' => $producto->tags
+                'tags' => $producto->tags,
             ]);
         }
 
@@ -131,7 +131,7 @@ class ProductoTagController extends Controller
     public function detachTag(Request $request, $id)
     {
         $request->validate([
-            'tag_id' => 'required|exists:tags,id_tag'
+            'tag_id' => 'required|exists:tags,id_tag',
         ]);
 
         $producto = Producto::findOrFail($id);
@@ -144,7 +144,7 @@ class ProductoTagController extends Controller
             return response()->json([
                 'message' => 'Tag removido exitosamente',
                 'producto' => $producto,
-                'tags' => $producto->tags
+                'tags' => $producto->tags,
             ]);
         }
 
@@ -158,13 +158,13 @@ class ProductoTagController extends Controller
     {
         $tag = Tag::with('tagParent')->findOrFail($tagId);
         $productos = $tag->productos()
-                         ->with(['subcategoria.categoria', 'marca'])
-                         ->orderBy('nombre')
-                         ->paginate(20);
+            ->with(['subcategoria.categoria', 'marca'])
+            ->orderBy('nombre')
+            ->paginate(20);
 
         return response()->json([
             'tag' => $tag,
-            'productos' => $productos
+            'productos' => $productos,
         ]);
     }
 
@@ -178,7 +178,7 @@ class ProductoTagController extends Controller
             'producto_ids.*' => 'exists:productos,id_producto',
             'tag_ids' => 'required|array',
             'tag_ids.*' => 'exists:tags,id_tag',
-            'action' => 'required|in:attach,detach,sync'
+            'action' => 'required|in:attach,detach,sync',
         ]);
 
         $productoIds = $request->get('producto_ids');
@@ -208,7 +208,7 @@ class ProductoTagController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => "Operación completada en {$affected} productos",
-                'affected' => $affected
+                'affected' => $affected,
             ]);
         }
 
@@ -236,7 +236,7 @@ class ProductoTagController extends Controller
             ->get();
 
         return response()->json([
-            'stats' => $stats
+            'stats' => $stats,
         ]);
     }
 }

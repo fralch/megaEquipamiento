@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\CRM\Cotizaciones;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cliente;
 use App\Models\Cotizacion;
 use App\Models\DetalleCotizacion;
-use App\Models\Cliente;
 use App\Models\EmpresaCliente;
-use App\Models\Usuario;
 use App\Models\NuestraEmpresa;
 use App\Models\Producto;
 use App\Models\ProductoTemporal;
+use App\Models\Usuario;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
-use Barryvdh\DomPDF\Facade\Pdf;
 use setasign\Fpdi\Fpdi;
 
 class CotizacionesController extends Controller
@@ -31,7 +31,7 @@ class CotizacionesController extends Controller
                 'vendedor:id_usuario,nombre,apellido',
                 'miEmpresa:id,nombre',
                 'detallesProductos',
-                'detallesAdicionales'
+                'detallesAdicionales',
             ]);
 
             // Limitar resultados a las cotizaciones del usuario autenticado
@@ -85,9 +85,9 @@ class CotizacionesController extends Controller
                 }
 
                 $cotizacion->vendedor_nombre = $cotizacion->vendedor
-                    ? $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido
+                    ? $cotizacion->vendedor->nombre.' '.$cotizacion->vendedor->apellido
                     : 'N/A';
-                
+
                 // Cargar miEmpresa
                 $cotizacion->mi_empresa = $cotizacion->miEmpresa;
 
@@ -110,15 +110,15 @@ class CotizacionesController extends Controller
 
             // Warning: Vencimiento entre 3 y 4 días atrás
             // Fecha vencimiento <= hoy - 3 dias AND Fecha vencimiento > hoy - 5 dias
-            // Ejemplo: Hoy es 10. 
+            // Ejemplo: Hoy es 10.
             // 3 días atrás: 7. 4 días atrás: 6.
             // Si vence el 7 (hace 3 días) -> Warning.
             // Si vence el 6 (hace 4 días) -> Warning.
             // Si vence el 5 (hace 5 días) -> Danger.
-            
+
             $warningDateStart = $now->copy()->subDays(4)->startOfDay();
             $warningDateEnd = $now->copy()->subDays(3)->endOfDay();
-            
+
             $dangerDateEnd = $now->copy()->subDays(5)->endOfDay();
 
             $warningCount = (clone $baseQuery)
@@ -132,14 +132,14 @@ class CotizacionesController extends Controller
             $notificationStats = [
                 'warningCount' => $warningCount,
                 'dangerCount' => $dangerCount,
-                'totalCount' => $warningCount + $dangerCount
+                'totalCount' => $warningCount + $dangerCount,
             ];
 
             // Si es una petición AJAX, retornar JSON
             if ($request->expectsJson() || $request->wantsJson()) {
                 return response()->json([
                     'cotizaciones' => $cotizaciones,
-                    'notificationStats' => $notificationStats
+                    'notificationStats' => $notificationStats,
                 ]);
             }
 
@@ -155,13 +155,14 @@ class CotizacionesController extends Controller
                     'to' => $cotizaciones->lastItem(),
                 ],
                 'filters' => $request->only(['search', 'estado', 'vendedor_id', 'sort_field', 'sort_direction']),
-                'notificationStats' => $notificationStats
+                'notificationStats' => $notificationStats,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener cotizaciones: ' . $e->getMessage());
+            Log::error('Error al obtener cotizaciones: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al obtener cotizaciones',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -205,7 +206,7 @@ class CotizacionesController extends Controller
                                 'email' => $contacto->email,
                                 'telefono' => $contacto->telefono,
                                 'cargo' => $contacto->cargo,
-                                'es_principal' => $contacto->es_principal
+                                'es_principal' => $contacto->es_principal,
                             ];
                         }),
                     ];
@@ -221,7 +222,7 @@ class CotizacionesController extends Controller
                 ->map(function ($vendedor) {
                     return [
                         'id' => $vendedor->id,
-                        'nombre' => $vendedor->nombre . ' ' . $vendedor->apellido,
+                        'nombre' => $vendedor->nombre.' '.$vendedor->apellido,
                         'email' => $vendedor->correo,
                     ];
                 });
@@ -236,13 +237,14 @@ class CotizacionesController extends Controller
                     'clientes' => $todosClientes,
                     'vendedores' => $vendedores,
                     'empresas' => $misEmpresas,
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener datos para crear cotización: ' . $e->getMessage());
+            Log::error('Error al obtener datos para crear cotización: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al obtener datos',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -280,7 +282,7 @@ class CotizacionesController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -359,15 +361,16 @@ class CotizacionesController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Cotización creada exitosamente',
-                'data' => $cotizacion
+                'data' => $cotizacion,
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error al crear cotización: ' . $e->getMessage());
+            Log::error('Error al crear cotización: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al crear cotización',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -382,13 +385,13 @@ class CotizacionesController extends Controller
                 'vendedor:id_usuario,nombre,apellido,correo,telefono',
                 'miEmpresa:id,nombre,ruc,email,telefono,imagen_logo,imagen_firma',
                 'detallesProductos.producto',
-                'detallesAdicionales'
+                'detallesAdicionales',
             ])->findOrFail($id);
 
             // Cargar información del cliente y mapear a objeto
             if ($cotizacion->cliente_tipo === 'empresa') {
                 $cliente = EmpresaCliente::find($cotizacion->cliente_id);
-                $cotizacion->cliente = (object)[
+                $cotizacion->cliente = (object) [
                     'tipo' => 'empresa',
                     'nombre' => $cliente->razon_social ?? 'N/A',
                     'contacto' => $cliente->contacto_principal ?? 'N/A',
@@ -399,7 +402,7 @@ class CotizacionesController extends Controller
                 ];
             } else {
                 $cliente = Cliente::find($cotizacion->cliente_id);
-                $cotizacion->cliente = (object)[
+                $cotizacion->cliente = (object) [
                     'tipo' => 'particular',
                     'nombre' => $cliente->nombrecompleto ?? 'N/A',
                     'contacto' => $cliente->nombrecompleto ?? 'N/A',
@@ -413,8 +416,8 @@ class CotizacionesController extends Controller
             // Mapear nombre del vendedor
             $vendedorData = null;
             if ($cotizacion->vendedor) {
-                $vendedorData = (object)[
-                    'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
+                $vendedorData = (object) [
+                    'nombre' => $cotizacion->vendedor->nombre.' '.$cotizacion->vendedor->apellido,
                     'correo' => $cotizacion->vendedor->correo ?? '',
                     'telefono' => $cotizacion->vendedor->telefono ?? '',
                 ];
@@ -423,7 +426,7 @@ class CotizacionesController extends Controller
 
             // Mapear nombre de mi empresa
             if ($cotizacion->miEmpresa) {
-                $cotizacion->mi_empresa = (object)[
+                $cotizacion->mi_empresa = (object) [
                     'nombre' => $cotizacion->miEmpresa->nombre,
                     'ruc' => $cotizacion->miEmpresa->ruc ?? '',
                     'email' => $cotizacion->miEmpresa->email ?? '',
@@ -454,14 +457,15 @@ class CotizacionesController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $cotizacion
+                'data' => $cotizacion,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener cotización: ' . $e->getMessage());
+            Log::error('Error al obtener cotización: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Cotización no encontrada',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 404);
         }
     }
@@ -500,7 +504,7 @@ class CotizacionesController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -581,15 +585,16 @@ class CotizacionesController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Cotización actualizada exitosamente',
-                'data' => $cotizacion
+                'data' => $cotizacion,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error al actualizar cotización: ' . $e->getMessage());
+            Log::error('Error al actualizar cotización: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al actualizar cotización',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -614,15 +619,16 @@ class CotizacionesController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Cotización eliminada exitosamente'
+                'message' => 'Cotización eliminada exitosamente',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error al eliminar cotización: ' . $e->getMessage());
+            Log::error('Error al eliminar cotización: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al eliminar cotización',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -639,7 +645,7 @@ class CotizacionesController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -655,14 +661,15 @@ class CotizacionesController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Estado actualizado exitosamente',
-                'data' => $cotizacion
+                'data' => $cotizacion,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al cambiar estado de cotización: ' . $e->getMessage());
+            Log::error('Error al cambiar estado de cotización: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al cambiar estado',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -696,7 +703,7 @@ class CotizacionesController extends Controller
             }
 
             $now = \Carbon\Carbon::now();
-            
+
             // Diario (Hoy)
             $diarioQuery = (clone $personalQuery)->whereDate('created_at', $now->today());
             $diarioCount = $diarioQuery->count();
@@ -704,8 +711,8 @@ class CotizacionesController extends Controller
 
             // Semanal (Esta semana)
             $semanalQuery = (clone $personalQuery)->whereBetween('created_at', [
-                $now->copy()->startOfWeek(), 
-                $now->copy()->endOfWeek()
+                $now->copy()->startOfWeek(),
+                $now->copy()->endOfWeek(),
             ]);
             $semanalCount = $semanalQuery->count();
             $semanalMonto = $semanalQuery->sum('total');
@@ -727,24 +734,25 @@ class CotizacionesController extends Controller
                     // Indicadores Agregados
                     'diario' => [
                         'count' => $diarioCount,
-                        'monto' => $diarioMonto
+                        'monto' => $diarioMonto,
                     ],
                     'semanal' => [
                         'count' => $semanalCount,
-                        'monto' => $semanalMonto
+                        'monto' => $semanalMonto,
                     ],
                     'mensual' => [
                         'count' => $mensualCount,
-                        'monto' => $mensualMonto
-                    ]
-                ]
+                        'monto' => $mensualMonto,
+                    ],
+                ],
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener estadísticas: ' . $e->getMessage());
+            Log::error('Error al obtener estadísticas: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al obtener estadísticas',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -760,13 +768,13 @@ class CotizacionesController extends Controller
                 'vendedor:id_usuario,nombre,apellido,correo',
                 'miEmpresa',
                 'detallesProductos',
-                'detallesAdicionales'
+                'detallesAdicionales',
             ])->findOrFail($id);
 
             // Obtener IDs de productos de los detalles
             $productosIds = $cotizacion->detallesProductos
-                ->filter(function($detalle) {
-                    return !is_null($detalle->producto_id);
+                ->filter(function ($detalle) {
+                    return ! is_null($detalle->producto_id);
                 })
                 ->pluck('producto_id')
                 ->unique()
@@ -780,13 +788,13 @@ class CotizacionesController extends Controller
                 'cotizacion_numero' => $cotizacion->numero,
                 'productos_ids' => $productosIds,
                 'productos_count' => $productosCompletos->count(),
-                'productos_completos' => $productosCompletos->map(function($p) {
+                'productos_completos' => $productosCompletos->map(function ($p) {
                     return [
                         'id' => $p->id_producto,
                         'nombre' => $p->nombre,
                         'sku' => $p->sku,
-                        'descripcion' => $p->descripcion ? substr($p->descripcion, 0, 100) . '...' : 'NULL',
-                        'tiene_especificaciones' => !empty($p->especificaciones_tecnicas),
+                        'descripcion' => $p->descripcion ? substr($p->descripcion, 0, 100).'...' : 'NULL',
+                        'tiene_especificaciones' => ! empty($p->especificaciones_tecnicas),
                         'especificaciones_type' => gettype($p->especificaciones_tecnicas),
                         'especificaciones_raw' => $p->especificaciones_tecnicas,
                         'especificaciones_count' => is_array($p->especificaciones_tecnicas) ? count($p->especificaciones_tecnicas) : 0,
@@ -794,21 +802,21 @@ class CotizacionesController extends Controller
                         'imagen_count' => is_array($p->imagen) ? count($p->imagen) : 0,
                     ];
                 }),
-                'detalles' => $cotizacion->detallesProductos->map(function($d) {
+                'detalles' => $cotizacion->detallesProductos->map(function ($d) {
                     return [
                         'id' => $d->id,
                         'producto_id' => $d->producto_id,
                         'nombre' => $d->nombre,
-                        'descripcion' => $d->descripcion ? substr($d->descripcion, 0, 50) . '...' : 'NULL',
+                        'descripcion' => $d->descripcion ? substr($d->descripcion, 0, 50).'...' : 'NULL',
                     ];
-                })
+                }),
             ];
 
             return response()->json($debug, 200, [], JSON_PRETTY_PRINT);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ], 500);
         }
     }
@@ -827,13 +835,13 @@ class CotizacionesController extends Controller
                 'vendedor:id_usuario,nombre,apellido,correo,telefono',
                 'miEmpresa',
                 'detallesProductos',
-                'detallesAdicionales'
+                'detallesAdicionales',
             ])->findOrFail($id);
 
             // Cargar información del cliente
             if ($cotizacion->cliente_tipo === 'empresa') {
                 $cliente = EmpresaCliente::find($cotizacion->cliente_id);
-                $cotizacion->cliente = (object)[
+                $cotizacion->cliente = (object) [
                     'tipo' => 'empresa',
                     'nombre' => $cliente->razon_social ?? 'N/A',
                     'contacto' => $cliente->contacto_principal ?? 'N/A',
@@ -844,7 +852,7 @@ class CotizacionesController extends Controller
                 ];
             } else {
                 $cliente = Cliente::find($cotizacion->cliente_id);
-                $cotizacion->cliente = (object)[
+                $cotizacion->cliente = (object) [
                     'tipo' => 'particular',
                     'nombre' => $cliente->nombrecompleto ?? 'N/A',
                     'contacto' => $cliente->nombrecompleto ?? 'N/A',
@@ -857,8 +865,8 @@ class CotizacionesController extends Controller
 
             // Obtener IDs de productos regulares de los detalles
             $productosIds = $cotizacion->detallesProductos
-                ->filter(function($detalle) {
-                    return !is_null($detalle->producto_id);
+                ->filter(function ($detalle) {
+                    return ! is_null($detalle->producto_id);
                 })
                 ->pluck('producto_id')
                 ->unique()
@@ -866,8 +874,8 @@ class CotizacionesController extends Controller
 
             // Obtener IDs de productos temporales de los detalles
             $productosTemporalesIds = $cotizacion->detallesProductos
-                ->filter(function($detalle) {
-                    return !is_null($detalle->producto_temporal_id);
+                ->filter(function ($detalle) {
+                    return ! is_null($detalle->producto_temporal_id);
                 })
                 ->pluck('producto_temporal_id')
                 ->unique()
@@ -879,20 +887,20 @@ class CotizacionesController extends Controller
             // Cargar productos temporales completos
             $productosTemporalesCompletos = ProductoTemporal::whereIn('id', $productosTemporalesIds)->get()->keyBy('id');
 
-            Log::info("=== DEBUG COTIZACION PDF ===");
-            Log::info("Productos IDs: " . json_encode($productosIds));
-            Log::info("Productos completos count: " . $productosCompletos->count());
-            Log::info("Productos temporales IDs: " . json_encode($productosTemporalesIds));
-            Log::info("Productos temporales completos count: " . $productosTemporalesCompletos->count());
+            Log::info('=== DEBUG COTIZACION PDF ===');
+            Log::info('Productos IDs: '.json_encode($productosIds));
+            Log::info('Productos completos count: '.$productosCompletos->count());
+            Log::info('Productos temporales IDs: '.json_encode($productosTemporalesIds));
+            Log::info('Productos temporales completos count: '.$productosTemporalesCompletos->count());
 
             // Log de cada producto para ver sus especificaciones
             foreach ($productosCompletos as $p) {
                 Log::info("Producto ID: {$p->id_producto}, Nombre: {$p->nombre}");
-                Log::info("  - Tiene especificaciones: " . (!empty($p->especificaciones_tecnicas) ? 'SI' : 'NO'));
-                Log::info("  - Tipo especificaciones: " . gettype($p->especificaciones_tecnicas));
-                if (!empty($p->especificaciones_tecnicas)) {
-                    Log::info("  - Especificaciones RAW: " . json_encode($p->especificaciones_tecnicas));
-                    Log::info("  - Count: " . (is_array($p->especificaciones_tecnicas) ? count($p->especificaciones_tecnicas) : 0));
+                Log::info('  - Tiene especificaciones: '.(! empty($p->especificaciones_tecnicas) ? 'SI' : 'NO'));
+                Log::info('  - Tipo especificaciones: '.gettype($p->especificaciones_tecnicas));
+                if (! empty($p->especificaciones_tecnicas)) {
+                    Log::info('  - Especificaciones RAW: '.json_encode($p->especificaciones_tecnicas));
+                    Log::info('  - Count: '.(is_array($p->especificaciones_tecnicas) ? count($p->especificaciones_tecnicas) : 0));
                 }
             }
 
@@ -908,12 +916,12 @@ class CotizacionesController extends Controller
                     $productoTemporal = $productosTemporalesCompletos[$detalle->producto_temporal_id];
 
                     // Descripción - usar la del producto temporal si existe
-                    if (!empty($productoTemporal->descripcion)) {
+                    if (! empty($productoTemporal->descripcion)) {
                         $descripcion = $productoTemporal->descripcion;
                     }
 
                     // Imagen - obtener la primera imagen del producto temporal
-                    if (!empty($productoTemporal->imagenes)) {
+                    if (! empty($productoTemporal->imagenes)) {
                         $imagenes = $productoTemporal->imagenes; // Ya es array gracias al cast
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
@@ -930,7 +938,7 @@ class CotizacionesController extends Controller
                     }
 
                     // Especificaciones técnicas - pasarlas tal cual están
-                    if (!empty($productoTemporal->especificaciones_tecnicas)) {
+                    if (! empty($productoTemporal->especificaciones_tecnicas)) {
                         $specs = $productoTemporal->especificaciones_tecnicas;
                         if (is_string($specs)) {
                             $decoded = json_decode($specs, true);
@@ -948,12 +956,12 @@ class CotizacionesController extends Controller
                     $sku = $producto->sku;
 
                     // Descripción - usar la del producto si existe
-                    if (!empty($producto->descripcion)) {
+                    if (! empty($producto->descripcion)) {
                         $descripcion = $producto->descripcion;
                     }
 
                     // Imagen - obtener la primera imagen del producto
-                    if (!empty($producto->imagen)) {
+                    if (! empty($producto->imagen)) {
                         $imagenes = $producto->imagen; // Ya es array gracias al cast
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
@@ -970,7 +978,7 @@ class CotizacionesController extends Controller
                     }
 
                     // Especificaciones técnicas - pasarlas tal cual están (array de arrays o con secciones)
-                    if (!empty($producto->especificaciones_tecnicas)) {
+                    if (! empty($producto->especificaciones_tecnicas)) {
                         $specs = $producto->especificaciones_tecnicas;
                         if (is_string($specs)) {
                             $decoded = json_decode($specs, true);
@@ -994,21 +1002,21 @@ class CotizacionesController extends Controller
             });
 
             // Log de productos mapeados
-            Log::info("=== PRODUCTOS MAPEADOS PARA PDF ===");
+            Log::info('=== PRODUCTOS MAPEADOS PARA PDF ===');
             foreach ($productos as $index => $prod) {
                 Log::info("Producto #{$index}: {$prod['nombre']}");
-                Log::info("  - SKU: " . ($prod['sku'] ?? 'NULL'));
-                Log::info("  - Tiene especificaciones: " . (!empty($prod['especificaciones']) ? 'SI' : 'NO'));
-                Log::info("  - Count especificaciones: " . count($prod['especificaciones']));
-                if (!empty($prod['especificaciones'])) {
-                    Log::info("  - Especificaciones: " . json_encode($prod['especificaciones']));
+                Log::info('  - SKU: '.($prod['sku'] ?? 'NULL'));
+                Log::info('  - Tiene especificaciones: '.(! empty($prod['especificaciones']) ? 'SI' : 'NO'));
+                Log::info('  - Count especificaciones: '.count($prod['especificaciones']));
+                if (! empty($prod['especificaciones'])) {
+                    Log::info('  - Especificaciones: '.json_encode($prod['especificaciones']));
                 }
             }
 
             // Obtener IDs de productos adicionales regulares
             $adicionalesIds = $cotizacion->detallesAdicionales
-                ->filter(function($detalle) {
-                    return !is_null($detalle->producto_id);
+                ->filter(function ($detalle) {
+                    return ! is_null($detalle->producto_id);
                 })
                 ->pluck('producto_id')
                 ->unique()
@@ -1016,8 +1024,8 @@ class CotizacionesController extends Controller
 
             // Obtener IDs de productos adicionales temporales
             $adicionalesTemporalesIds = $cotizacion->detallesAdicionales
-                ->filter(function($detalle) {
-                    return !is_null($detalle->producto_temporal_id);
+                ->filter(function ($detalle) {
+                    return ! is_null($detalle->producto_temporal_id);
                 })
                 ->pluck('producto_temporal_id')
                 ->unique()
@@ -1040,12 +1048,12 @@ class CotizacionesController extends Controller
                     $productoTemporal = $adicionalesTemporalesCompletos[$detalle->producto_temporal_id];
 
                     // Descripción
-                    if (!empty($productoTemporal->descripcion)) {
+                    if (! empty($productoTemporal->descripcion)) {
                         $descripcion = $productoTemporal->descripcion;
                     }
 
                     // Imagen
-                    if (!empty($productoTemporal->imagenes)) {
+                    if (! empty($productoTemporal->imagenes)) {
                         $imagenes = $productoTemporal->imagenes;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
@@ -1061,7 +1069,7 @@ class CotizacionesController extends Controller
                     }
 
                     // Especificaciones técnicas - pasarlas tal cual están
-                    if (!empty($productoTemporal->especificaciones_tecnicas)) {
+                    if (! empty($productoTemporal->especificaciones_tecnicas)) {
                         $specs = $productoTemporal->especificaciones_tecnicas;
                         if (is_string($specs)) {
                             $decoded = json_decode($specs, true);
@@ -1076,12 +1084,12 @@ class CotizacionesController extends Controller
                     $producto = $adicionalesCompletos[$detalle->producto_id];
 
                     // Descripción
-                    if (!empty($producto->descripcion)) {
+                    if (! empty($producto->descripcion)) {
                         $descripcion = $producto->descripcion;
                     }
 
                     // Imagen
-                    if (!empty($producto->imagen)) {
+                    if (! empty($producto->imagen)) {
                         $imagenes = $producto->imagen;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
@@ -1097,7 +1105,7 @@ class CotizacionesController extends Controller
                     }
 
                     // Especificaciones técnicas - pasarlas tal cual están
-                    if (!empty($producto->especificaciones_tecnicas)) {
+                    if (! empty($producto->especificaciones_tecnicas)) {
                         $specs = $producto->especificaciones_tecnicas;
                         if (is_string($specs)) {
                             $decoded = json_decode($specs, true);
@@ -1108,16 +1116,16 @@ class CotizacionesController extends Controller
                     }
                 } else {
                     // Si no tiene producto vinculado, intentar buscar por nombre en productos regulares
-                    $productoMatch = Producto::where('nombre', 'like', '%' . $detalle->nombre . '%')->first();
+                    $productoMatch = Producto::where('nombre', 'like', '%'.$detalle->nombre.'%')->first();
 
                     if ($productoMatch) {
                         // Descripción
-                        if (!empty($productoMatch->descripcion)) {
+                        if (! empty($productoMatch->descripcion)) {
                             $descripcion = $productoMatch->descripcion;
                         }
 
                         // Imagen
-                        if (!empty($productoMatch->imagen)) {
+                        if (! empty($productoMatch->imagen)) {
                             $imagenes = $productoMatch->imagen;
                             if (is_array($imagenes) && count($imagenes) > 0) {
                                 $primeraImagen = $imagenes[0];
@@ -1132,7 +1140,7 @@ class CotizacionesController extends Controller
                         }
 
                         // Especificaciones técnicas - pasarlas tal cual están
-                        if (!empty($productoMatch->especificaciones_tecnicas)) {
+                        if (! empty($productoMatch->especificaciones_tecnicas)) {
                             $specs = $productoMatch->especificaciones_tecnicas;
                             if (is_string($specs)) {
                                 $decoded = json_decode($specs, true);
@@ -1143,31 +1151,31 @@ class CotizacionesController extends Controller
                         }
                     } else {
                         // Si tampoco se encuentra, intentar buscar en productos temporales
-                        $productoTemporalMatch = ProductoTemporal::where('titulo', 'like', '%' . $detalle->nombre . '%')->first();
+                        $productoTemporalMatch = ProductoTemporal::where('titulo', 'like', '%'.$detalle->nombre.'%')->first();
 
                         if ($productoTemporalMatch) {
                             // Descripción
-                            if (!empty($productoTemporalMatch->descripcion)) {
+                            if (! empty($productoTemporalMatch->descripcion)) {
                                 $descripcion = $productoTemporalMatch->descripcion;
                             }
 
                             // Imagen
-                            if (!empty($productoTemporalMatch->imagenes)) {
+                            if (! empty($productoTemporalMatch->imagenes)) {
                                 $imagenes = $productoTemporalMatch->imagenes;
                                 if (is_array($imagenes) && count($imagenes) > 0) {
                                     $primeraImagen = $imagenes[0];
                                     if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
-                                    $imagen = $primeraImagen;
-                                } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
-                                    $imagen = $primeraImagen;
-                                } else {
-                                    $imagen = public_path($primeraImagen);
-                                }
+                                        $imagen = $primeraImagen;
+                                    } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
+                                        $imagen = $primeraImagen;
+                                    } else {
+                                        $imagen = public_path($primeraImagen);
+                                    }
                                 }
                             }
 
                             // Especificaciones técnicas - pasarlas tal cual están
-                            if (!empty($productoTemporalMatch->especificaciones_tecnicas)) {
+                            if (! empty($productoTemporalMatch->especificaciones_tecnicas)) {
                                 $specs = $productoTemporalMatch->especificaciones_tecnicas;
                                 if (is_string($specs)) {
                                     $decoded = json_decode($specs, true);
@@ -1194,8 +1202,8 @@ class CotizacionesController extends Controller
             // Preparar vendedor
             $vendedor = null;
             if ($cotizacion->vendedor) {
-                $vendedor = (object)[
-                    'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
+                $vendedor = (object) [
+                    'nombre' => $cotizacion->vendedor->nombre.' '.$cotizacion->vendedor->apellido,
                     'correo' => $cotizacion->vendedor->correo ?? '',
                     'telefono' => $cotizacion->vendedor->telefono ?? '',
                 ];
@@ -1231,11 +1239,11 @@ class CotizacionesController extends Controller
             $pdf->setPaper('a4', 'portrait');
 
             // Nombre del archivo
-            $filename = 'Cotizacion_' . $cotizacion->numero . '.pdf';
+            $filename = 'Cotizacion_'.$cotizacion->numero.'.pdf';
 
             // Obtener tipo de condiciones del request
             $tipoCondiciones = $request->query('tipo_condiciones', 'ventas');
-            
+
             // Determinar archivo a usar
             $condicionesFilename = null;
             if ($tipoCondiciones === 'ventas') {
@@ -1243,23 +1251,23 @@ class CotizacionesController extends Controller
             } elseif ($tipoCondiciones === 'calibracion') {
                 $condicionesFilename = 'CALIBRACION_CONDICIONES.pdf';
             }
-            
+
             // Ruta del archivo de condiciones
-            $condicionesPath = $condicionesFilename ? public_path('docs/' . $condicionesFilename) : null;
-            
+            $condicionesPath = $condicionesFilename ? public_path('docs/'.$condicionesFilename) : null;
+
             // Variable para el path temporal, para poder eliminarlo en finally o después
             $tempPath = null;
 
             if ($condicionesPath && file_exists($condicionesPath)) {
                 try {
                     Log::info("Fusionando con archivo de condiciones: {$condicionesPath}");
-                    
+
                     // Guardar el PDF generado temporalmente
-                    $tempPath = tempnam(sys_get_temp_dir(), 'cotizacion_temp_' . $id . '_');
+                    $tempPath = tempnam(sys_get_temp_dir(), 'cotizacion_temp_'.$id.'_');
                     file_put_contents($tempPath, $pdf->output());
 
                     // Iniciar FPDI
-                    $fpdi = new Fpdi();
+                    $fpdi = new Fpdi;
 
                     // Importar páginas del PDF generado (Cotización)
                     $pageCount = $fpdi->setSourceFile($tempPath);
@@ -1280,14 +1288,15 @@ class CotizacionesController extends Controller
                     }
 
                     Log::info("PDF fusionado correctamente para cotización ID: {$id}. Nombre: {$filename}");
-                    
+
                     return response($fpdi->Output('S'), 200, [
                         'Content-Type' => 'application/pdf',
-                        'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+                        'Content-Disposition' => 'attachment; filename="'.$filename.'"',
                     ]);
 
                 } catch (\Exception $e) {
-                    Log::error("Error al fusionar PDFs: " . $e->getMessage());
+                    Log::error('Error al fusionar PDFs: '.$e->getMessage());
+
                     // Si falla la fusión, intentar devolver al menos la cotización sola
                     return $pdf->download($filename);
                 } finally {
@@ -1299,16 +1308,18 @@ class CotizacionesController extends Controller
             }
 
             Log::info("PDF generado correctamente para cotización ID: {$id}. Nombre: {$filename} (Sin condiciones)");
+
             return $pdf->download($filename);
         } catch (\Exception $e) {
             Log::error('Error al exportar cotización a PDF en CotizacionesController@exportPdf');
-            Log::error('ID: ' . $id);
-            Log::error('Mensaje: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
+            Log::error('ID: '.$id);
+            Log::error('Mensaje: '.$e->getMessage());
+            Log::error('Stack trace: '.$e->getTraceAsString());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al exportar cotización',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -1324,7 +1335,7 @@ class CotizacionesController extends Controller
                 'vendedor:id_usuario,nombre,apellido,correo,telefono',
                 'miEmpresa',
                 'detallesProductos',
-                'detallesAdicionales'
+                'detallesAdicionales',
             ]);
 
             $cotizacion = $id ? $cotizacionQuery->findOrFail($id) : $cotizacionQuery->firstOrFail();
@@ -1332,7 +1343,7 @@ class CotizacionesController extends Controller
             // Cargar información del cliente
             if ($cotizacion->cliente_tipo === 'empresa') {
                 $cliente = EmpresaCliente::find($cotizacion->cliente_id);
-                $cotizacion->cliente = (object)[
+                $cotizacion->cliente = (object) [
                     'tipo' => 'empresa',
                     'nombre' => $cliente->razon_social ?? 'N/A',
                     'contacto' => $cliente->contacto_principal ?? 'N/A',
@@ -1343,7 +1354,7 @@ class CotizacionesController extends Controller
                 ];
             } else {
                 $cliente = Cliente::find($cotizacion->cliente_id);
-                $cotizacion->cliente = (object)[
+                $cotizacion->cliente = (object) [
                     'tipo' => 'particular',
                     'nombre' => $cliente->nombrecompleto ?? 'N/A',
                     'contacto' => $cliente->nombrecompleto ?? 'N/A',
@@ -1356,13 +1367,13 @@ class CotizacionesController extends Controller
 
             // IDs productos y temporales
             $productosIds = $cotizacion->detallesProductos
-                ->filter(fn($detalle) => !is_null($detalle->producto_id))
+                ->filter(fn ($detalle) => ! is_null($detalle->producto_id))
                 ->pluck('producto_id')
                 ->unique()
                 ->toArray();
 
             $productosTemporalesIds = $cotizacion->detallesProductos
-                ->filter(fn($detalle) => !is_null($detalle->producto_temporal_id))
+                ->filter(fn ($detalle) => ! is_null($detalle->producto_temporal_id))
                 ->pluck('producto_temporal_id')
                 ->unique()
                 ->toArray();
@@ -1379,10 +1390,10 @@ class CotizacionesController extends Controller
 
                 if ($detalle->producto_temporal_id && isset($productosTemporalesCompletos[$detalle->producto_temporal_id])) {
                     $productoTemporal = $productosTemporalesCompletos[$detalle->producto_temporal_id];
-                    if (!empty($productoTemporal->descripcion)) {
+                    if (! empty($productoTemporal->descripcion)) {
                         $descripcion = $productoTemporal->descripcion;
                     }
-                    if (!empty($productoTemporal->imagenes)) {
+                    if (! empty($productoTemporal->imagenes)) {
                         $imagenes = $productoTemporal->imagenes;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
@@ -1390,7 +1401,7 @@ class CotizacionesController extends Controller
                             $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : public_path($primeraImagen);
                         }
                     }
-                    if (!empty($productoTemporal->especificaciones_tecnicas)) {
+                    if (! empty($productoTemporal->especificaciones_tecnicas)) {
                         $specs = $productoTemporal->especificaciones_tecnicas;
                         if (is_string($specs)) {
                             $decoded = json_decode($specs, true);
@@ -1402,10 +1413,10 @@ class CotizacionesController extends Controller
                 } elseif ($detalle->producto_id && isset($productosCompletos[$detalle->producto_id])) {
                     $producto = $productosCompletos[$detalle->producto_id];
                     $sku = $producto->sku;
-                    if (!empty($producto->descripcion)) {
+                    if (! empty($producto->descripcion)) {
                         $descripcion = $producto->descripcion;
                     }
-                    if (!empty($producto->imagen)) {
+                    if (! empty($producto->imagen)) {
                         $imagenes = $producto->imagen;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
@@ -1413,7 +1424,7 @@ class CotizacionesController extends Controller
                             $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : public_path($primeraImagen);
                         }
                     }
-                    if (!empty($producto->especificaciones_tecnicas)) {
+                    if (! empty($producto->especificaciones_tecnicas)) {
                         $specs = $producto->especificaciones_tecnicas;
                         if (is_string($specs)) {
                             $decoded = json_decode($specs, true);
@@ -1438,13 +1449,13 @@ class CotizacionesController extends Controller
 
             // Productos adicionales
             $adicionalesIds = $cotizacion->detallesAdicionales
-                ->filter(fn($detalle) => !is_null($detalle->producto_id))
+                ->filter(fn ($detalle) => ! is_null($detalle->producto_id))
                 ->pluck('producto_id')
                 ->unique()
                 ->toArray();
 
             $adicionalesTemporalesIds = $cotizacion->detallesAdicionales
-                ->filter(fn($detalle) => !is_null($detalle->producto_temporal_id))
+                ->filter(fn ($detalle) => ! is_null($detalle->producto_temporal_id))
                 ->pluck('producto_temporal_id')
                 ->unique()
                 ->toArray();
@@ -1459,10 +1470,10 @@ class CotizacionesController extends Controller
 
                 if ($detalle->producto_temporal_id && isset($adicionalesTemporalesCompletos[$detalle->producto_temporal_id])) {
                     $productoTemporal = $adicionalesTemporalesCompletos[$detalle->producto_temporal_id];
-                    if (!empty($productoTemporal->descripcion)) {
+                    if (! empty($productoTemporal->descripcion)) {
                         $descripcion = $productoTemporal->descripcion;
                     }
-                    if (!empty($productoTemporal->imagenes)) {
+                    if (! empty($productoTemporal->imagenes)) {
                         $imagenes = $productoTemporal->imagenes;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
@@ -1470,7 +1481,7 @@ class CotizacionesController extends Controller
                             $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : public_path($primeraImagen);
                         }
                     }
-                    if (!empty($productoTemporal->especificaciones_tecnicas)) {
+                    if (! empty($productoTemporal->especificaciones_tecnicas)) {
                         $specs = $productoTemporal->especificaciones_tecnicas;
                         if (is_string($specs)) {
                             $decoded = json_decode($specs, true);
@@ -1481,10 +1492,10 @@ class CotizacionesController extends Controller
                     }
                 } elseif ($detalle->producto_id && isset($adicionalesCompletos[$detalle->producto_id])) {
                     $producto = $adicionalesCompletos[$detalle->producto_id];
-                    if (!empty($producto->descripcion)) {
+                    if (! empty($producto->descripcion)) {
                         $descripcion = $producto->descripcion;
                     }
-                    if (!empty($producto->imagen)) {
+                    if (! empty($producto->imagen)) {
                         $imagenes = $producto->imagen;
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
@@ -1492,7 +1503,7 @@ class CotizacionesController extends Controller
                             $imagen = filter_var($primeraImagen, FILTER_VALIDATE_URL) ? $primeraImagen : public_path($primeraImagen);
                         }
                     }
-                    if (!empty($producto->especificaciones_tecnicas)) {
+                    if (! empty($producto->especificaciones_tecnicas)) {
                         $specs = $producto->especificaciones_tecnicas;
                         if (is_string($specs)) {
                             $decoded = json_decode($specs, true);
@@ -1517,8 +1528,8 @@ class CotizacionesController extends Controller
             // Vendedor
             $vendedor = null;
             if ($cotizacion->vendedor) {
-                $vendedor = (object)[
-                    'nombre' => $cotizacion->vendedor->nombre . ' ' . $cotizacion->vendedor->apellido,
+                $vendedor = (object) [
+                    'nombre' => $cotizacion->vendedor->nombre.' '.$cotizacion->vendedor->apellido,
                     'correo' => $cotizacion->vendedor->correo ?? '',
                     'telefono' => $cotizacion->vendedor->telefono ?? '',
                 ];
@@ -1553,7 +1564,7 @@ class CotizacionesController extends Controller
             return response()->json([
                 'success' => false,
                 'error' => 'Error al previsualizar cotización',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }

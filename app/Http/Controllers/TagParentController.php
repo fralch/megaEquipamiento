@@ -12,13 +12,13 @@ class TagParentController extends Controller
     public function index(Request $request)
     {
         $tagParents = TagParent::with('tags')->orderBy('nombre')->get();
-        
+
         if ($request->expectsJson()) {
             return response()->json([
                 'tagParents' => $tagParents,
             ]);
         }
-        
+
         return Inertia::render('AdminTagParents', [
             'tagParents' => $tagParents,
         ]);
@@ -48,7 +48,7 @@ class TagParentController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => 'Sector creado exitosamente',
-                'tagParent' => $tagParent->load('tags')
+                'tagParent' => $tagParent->load('tags'),
             ], 201);
         }
 
@@ -75,7 +75,7 @@ class TagParentController extends Controller
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => 'Sector actualizado exitosamente',
-                'tagParent' => $tagParent->load('tags')
+                'tagParent' => $tagParent->load('tags'),
             ]);
         }
 
@@ -89,7 +89,7 @@ class TagParentController extends Controller
 
         if ($request->expectsJson()) {
             return response()->json([
-                'message' => 'Sector eliminado exitosamente'
+                'message' => 'Sector eliminado exitosamente',
             ]);
         }
 
@@ -101,11 +101,11 @@ class TagParentController extends Controller
      */
     public function getPublicTagParents()
     {
-        $tagParents = TagParent::with(['tags' => function($query) {
-                                    $query->orderBy('nombre');
-                                }])
-                                ->orderBy('nombre')
-                                ->get();
+        $tagParents = TagParent::with(['tags' => function ($query) {
+            $query->orderBy('nombre');
+        }])
+            ->orderBy('nombre')
+            ->get();
 
         return response()->json($tagParents);
     }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\CRM\Productos;
 
 use App\Http\Controllers\Controller;
-use App\Models\Producto;
 use App\Models\Marca;
+use App\Models\Producto;
 use App\Models\Subcategoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -34,53 +34,54 @@ class ProductoGestionController extends Controller
             $marcaId = $request->input('marca_id');
             $subcategoriaId = $request->input('subcategoria_id');
             $categoriaId = $request->input('categoria_id');
-            
+
             // Validar per_page
-            $perPage = max(1, min(100, (int)$perPage));
-            
+            $perPage = max(1, min(100, (int) $perPage));
+
             $query = Producto::with(['marca', 'subcategoria.categoria']);
-            
+
             // Aplicar filtro de búsqueda
-            if (!empty($search)) {
-                $query->where(function($q) use ($search) {
-                    $q->where('nombre', 'LIKE', '%' . $search . '%')
-                      ->orWhere('sku', 'LIKE', '%' . $search . '%')
-                      ->orWhere('descripcion', 'LIKE', '%' . $search . '%')
-                      ->orWhereHas('marca', function($subQuery) use ($search) {
-                          $subQuery->where('nombre', 'LIKE', '%' . $search . '%');
-                      });
+            if (! empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nombre', 'LIKE', '%'.$search.'%')
+                        ->orWhere('sku', 'LIKE', '%'.$search.'%')
+                        ->orWhere('descripcion', 'LIKE', '%'.$search.'%')
+                        ->orWhereHas('marca', function ($subQuery) use ($search) {
+                            $subQuery->where('nombre', 'LIKE', '%'.$search.'%');
+                        });
                 });
             }
-            
+
             // Filtro por marca
             if ($marcaId) {
                 $query->where('marca_id', $marcaId);
             }
-            
+
             // Filtro por subcategoría
             if ($subcategoriaId) {
                 $query->where('id_subcategoria', $subcategoriaId);
             }
-            
+
             // Filtro por categoría
             if ($categoriaId) {
-                $query->whereHas('subcategoria', function($subQuery) use ($categoriaId) {
+                $query->whereHas('subcategoria', function ($subQuery) use ($categoriaId) {
                     $subQuery->where('id_categoria', $categoriaId);
                 });
             }
-            
+
             // Ordenar por fecha de creación descendente
             $query->orderBy('created_at', 'desc');
-            
+
             $productos = $query->paginate($perPage, ['*'], 'page', $page);
-            
+
             return response()->json($productos);
-            
+
         } catch (\Exception $e) {
-            Log::error('Error al obtener productos CRM: ' . $e->getMessage());
+            Log::error('Error al obtener productos CRM: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al obtener productos',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -95,44 +96,45 @@ class ProductoGestionController extends Controller
             $perPage = $request->input('per_page', 20);
             $page = $request->input('page', 1);
             $search = $request->input('search', '');
-            
+
             // Validar per_page
-            $perPage = max(1, min(100, (int)$perPage));
-            
+            $perPage = max(1, min(100, (int) $perPage));
+
             $query = Producto::with(['marca', 'subcategoria.categoria']);
-            
+
             // Excluir productos que sean servicios (asumiendo que los servicios tienen una característica específica)
             // Puedes ajustar esta lógica según cómo identifiques los servicios en tu sistema
-            $query->where(function($q) {
+            $query->where(function ($q) {
                 $q->whereNull('caracteristicas')
-                  ->orWhere('caracteristicas', 'not like', '%servicio%')
-                  ->orWhere('caracteristicas', 'not like', '%service%');
+                    ->orWhere('caracteristicas', 'not like', '%servicio%')
+                    ->orWhere('caracteristicas', 'not like', '%service%');
             });
-            
+
             // Aplicar filtro de búsqueda
-            if (!empty($search)) {
-                $query->where(function($q) use ($search) {
-                    $q->where('nombre', 'LIKE', '%' . $search . '%')
-                      ->orWhere('sku', 'LIKE', '%' . $search . '%')
-                      ->orWhere('descripcion', 'LIKE', '%' . $search . '%')
-                      ->orWhereHas('marca', function($subQuery) use ($search) {
-                          $subQuery->where('nombre', 'LIKE', '%' . $search . '%');
-                      });
+            if (! empty($search)) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nombre', 'LIKE', '%'.$search.'%')
+                        ->orWhere('sku', 'LIKE', '%'.$search.'%')
+                        ->orWhere('descripcion', 'LIKE', '%'.$search.'%')
+                        ->orWhereHas('marca', function ($subQuery) use ($search) {
+                            $subQuery->where('nombre', 'LIKE', '%'.$search.'%');
+                        });
                 });
             }
-            
+
             // Ordenar por fecha de creación descendente
             $query->orderBy('created_at', 'desc');
-            
+
             $productos = $query->paginate($perPage, ['*'], 'page', $page);
-            
+
             return response()->json($productos);
-            
+
         } catch (\Exception $e) {
-            Log::error('Error al obtener productos excluyendo servicios: ' . $e->getMessage());
+            Log::error('Error al obtener productos excluyendo servicios: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al obtener productos',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -144,15 +146,16 @@ class ProductoGestionController extends Controller
     {
         try {
             $producto = Producto::with(['marca', 'subcategoria.categoria', 'tags.tagParent'])
-                               ->findOrFail($id);
-            
+                ->findOrFail($id);
+
             return response()->json($producto);
-            
+
         } catch (\Exception $e) {
-            Log::error('Error al obtener producto: ' . $e->getMessage());
+            Log::error('Error al obtener producto: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Producto no encontrado',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 404);
         }
     }
@@ -165,7 +168,7 @@ class ProductoGestionController extends Controller
     {
         try {
             $producto = Producto::findOrFail($id);
-            
+
             // Validar los datos de entrada
             $validatedData = $request->validate([
                 'nombre' => 'sometimes|string|max:255',
@@ -183,33 +186,34 @@ class ProductoGestionController extends Controller
                 'especificaciones_tecnicas' => 'sometimes|string',
                 'video' => 'sometimes|string',
             ]);
-            
+
             // Actualizar el producto
             $producto->update($validatedData);
-            
+
             // Invalidar cache relacionado
             Cache::forget("producto_{$producto->id_producto}");
             Cache::forget('todas_categorias');
-            
+
             // Recargar el producto con relaciones
             $producto = $producto->fresh(['marca', 'subcategoria.categoria']);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Producto actualizado correctamente',
-                'producto' => $producto
+                'producto' => $producto,
             ]);
-            
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'error' => 'Datos de validación incorrectos',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
-            Log::error('Error al actualizar producto CRM: ' . $e->getMessage());
+            Log::error('Error al actualizar producto CRM: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al actualizar producto',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -221,12 +225,14 @@ class ProductoGestionController extends Controller
     {
         try {
             $marcas = Marca::orderBy('nombre')->get();
+
             return response()->json($marcas);
         } catch (\Exception $e) {
-            Log::error('Error al obtener marcas: ' . $e->getMessage());
+            Log::error('Error al obtener marcas: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al obtener marcas',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -238,14 +244,16 @@ class ProductoGestionController extends Controller
     {
         try {
             $subcategorias = Subcategoria::with('categoria')
-                                        ->orderBy('nombre')
-                                        ->get();
+                ->orderBy('nombre')
+                ->get();
+
             return response()->json($subcategorias);
         } catch (\Exception $e) {
-            Log::error('Error al obtener subcategorías: ' . $e->getMessage());
+            Log::error('Error al obtener subcategorías: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al obtener subcategorías',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -257,12 +265,14 @@ class ProductoGestionController extends Controller
     {
         try {
             $categorias = \App\Models\Categoria::orderBy('nombre')->get();
+
             return response()->json($categorias);
         } catch (\Exception $e) {
-            Log::error('Error al obtener categorías: ' . $e->getMessage());
+            Log::error('Error al obtener categorías: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al obtener categorías',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -274,45 +284,46 @@ class ProductoGestionController extends Controller
     {
         try {
             $producto = Producto::findOrFail($id);
-            
+
             // Eliminar las imágenes si existen
             if ($producto->imagen) {
                 $imagenes = is_array($producto->imagen) ? $producto->imagen : [$producto->imagen];
                 foreach ($imagenes as $imagen) {
-                    if ($imagen && !str_starts_with($imagen, 'http') && file_exists(public_path($imagen))) {
+                    if ($imagen && ! str_starts_with($imagen, 'http') && file_exists(public_path($imagen))) {
                         unlink(public_path($imagen));
                     }
                 }
             }
-            
+
             // Eliminar las relaciones bidireccionales
             $producto->productosRelacionados()->detach();
-            Producto::whereHas('productosRelacionados', function($query) use ($id) {
+            Producto::whereHas('productosRelacionados', function ($query) use ($id) {
                 $query->where('relacionado_id', $id);
-            })->each(function($p) use ($id) {
+            })->each(function ($p) use ($id) {
                 $p->productosRelacionados()->detach($id);
             });
-            
+
             // Eliminar tags
             $producto->tags()->detach();
-            
+
             // Eliminar el producto
             $producto->delete();
-            
+
             // Invalidar cache
             Cache::forget("producto_{$id}");
             Cache::forget('todas_categorias');
-            
+
             return response()->json([
                 'success' => true,
-                'message' => 'Producto eliminado correctamente'
+                'message' => 'Producto eliminado correctamente',
             ]);
-            
+
         } catch (\Exception $e) {
-            Log::error('Error al eliminar producto CRM: ' . $e->getMessage());
+            Log::error('Error al eliminar producto CRM: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al eliminar producto',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -340,32 +351,33 @@ class ProductoGestionController extends Controller
                 'especificaciones_tecnicas' => 'nullable|string',
                 'video' => 'nullable|string',
             ]);
-            
+
             // Crear el producto
             $producto = Producto::create($validatedData);
-            
+
             // Invalidar cache
             Cache::forget('todas_categorias');
-            
+
             // Cargar relaciones
             $producto->load(['marca', 'subcategoria.categoria']);
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Producto creado correctamente',
-                'producto' => $producto
+                'producto' => $producto,
             ], 201);
-            
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'error' => 'Datos de validación incorrectos',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
-            Log::error('Error al crear producto CRM: ' . $e->getMessage());
+            Log::error('Error al crear producto CRM: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al crear producto',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -384,10 +396,11 @@ class ProductoGestionController extends Controller
             return response()->json($subcategorias);
 
         } catch (\Exception $e) {
-            Log::error('Error al obtener subcategorías por categoría: ' . $e->getMessage());
+            Log::error('Error al obtener subcategorías por categoría: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al obtener subcategorías',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -403,41 +416,41 @@ class ProductoGestionController extends Controller
             $limit = $request->input('limit', 20);
 
             // Validar limit
-            $limit = max(1, min(50, (int)$limit));
+            $limit = max(1, min(50, (int) $limit));
 
             if (empty($search) || strlen($search) < 2) {
                 return response()->json([
                     'success' => true,
-                    'data' => []
+                    'data' => [],
                 ]);
             }
 
             $productos = Producto::with(['marca', 'subcategoria.categoria'])
-                ->where(function($query) use ($search) {
-                    $query->where('nombre', 'LIKE', '%' . $search . '%')
-                          ->orWhere('sku', 'LIKE', '%' . $search . '%')
-                          ->orWhere('descripcion', 'LIKE', '%' . $search . '%')
-                          ->orWhereHas('marca', function($subQuery) use ($search) {
-                              $subQuery->where('nombre', 'LIKE', '%' . $search . '%');
-                          });
+                ->where(function ($query) use ($search) {
+                    $query->where('nombre', 'LIKE', '%'.$search.'%')
+                        ->orWhere('sku', 'LIKE', '%'.$search.'%')
+                        ->orWhere('descripcion', 'LIKE', '%'.$search.'%')
+                        ->orWhereHas('marca', function ($subQuery) use ($search) {
+                            $subQuery->where('nombre', 'LIKE', '%'.$search.'%');
+                        });
                 })
                 // Excluir servicios si es necesario
-                ->where(function($q) {
+                ->where(function ($q) {
                     $q->whereNull('caracteristicas')
-                      ->orWhere('caracteristicas', 'not like', '%servicio%')
-                      ->orWhere('caracteristicas', 'not like', '%service%');
+                        ->orWhere('caracteristicas', 'not like', '%servicio%')
+                        ->orWhere('caracteristicas', 'not like', '%service%');
                 })
                 ->limit($limit)
-                ->orderByRaw("
+                ->orderByRaw('
                     CASE
                         WHEN nombre LIKE ? THEN 1
                         WHEN sku LIKE ? THEN 2
                         WHEN nombre LIKE ? THEN 3
                         ELSE 4
                     END
-                ", [$search . '%', $search . '%', '%' . $search . '%'])
+                ', [$search.'%', $search.'%', '%'.$search.'%'])
                 ->get()
-                ->map(function($producto) {
+                ->map(function ($producto) {
                     return [
                         'id' => $producto->id_producto,
                         'nombre' => $producto->nombre,
@@ -455,15 +468,16 @@ class ProductoGestionController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $productos
+                'data' => $productos,
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error al buscar productos: ' . $e->getMessage());
+            Log::error('Error al buscar productos: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al buscar productos',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }

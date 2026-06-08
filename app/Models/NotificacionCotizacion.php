@@ -10,6 +10,7 @@ class NotificacionCotizacion extends Model
     use HasFactory;
 
     protected $table = 'notificaciones_cotizacion';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [

@@ -10,6 +10,7 @@ class DetalleCotizacion extends Model
     use HasFactory;
 
     protected $table = 'detalles_cotizacion';
+
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -91,6 +92,4 @@ class DetalleCotizacion extends Model
     {
         return $query->where('tipo', 'adicional');
     }
-
-
 }
