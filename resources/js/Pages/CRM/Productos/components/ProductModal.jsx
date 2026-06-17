@@ -285,25 +285,58 @@ export default function ProductModal({ producto, isOpen, onClose }) {
                                 )}
 
                                 {/* Características */}
-                                {producto.caracteristicas && Array.isArray(producto.caracteristicas) && producto.caracteristicas.length > 0 && (
-                                    <div>
-                                        <h4 className={`text-lg font-semibold mb-2 ${
-                                            isDarkMode ? 'text-white' : 'text-gray-900'
-                                        }`}>
-                                            Características
-                                        </h4>
-                                        <ul className={`space-y-1 text-sm ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                        }`}>
-                                            {producto.caracteristicas.map((caracteristica, index) => (
-                                                <li key={index} className="flex items-start gap-2">
-                                                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
-                                                    {caracteristica}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
+                                {(() => {
+                                    if (!producto.caracteristicas) return null;
+                                    
+                                    let normalizedList = [];
+                                    let features = producto.caracteristicas;
+                                    if (typeof features === 'string') {
+                                        try {
+                                            features = JSON.parse(features);
+                                        } catch (e) {
+                                            console.error("Error al parsear caracteristicas en ProductModal:", e);
+                                            return null;
+                                        }
+                                    }
+                                    
+                                    if (Array.isArray(features)) {
+                                        features.forEach((item, index) => {
+                                            if (item && typeof item === 'object') {
+                                                const name = item.name || item.Key || `Característica ${index + 1}`;
+                                                const value = item.value || item.Value || '';
+                                                normalizedList.push(`${name}: ${value}`);
+                                            } else if (typeof item === 'string') {
+                                                normalizedList.push(item);
+                                            }
+                                        });
+                                    } else if (typeof features === 'object' && features !== null) {
+                                        Object.entries(features).forEach(([key, val]) => {
+                                            normalizedList.push(`${key}: ${val}`);
+                                        });
+                                    }
+                                    
+                                    if (normalizedList.length === 0) return null;
+                                    
+                                    return (
+                                        <div>
+                                            <h4 className={`text-lg font-semibold mb-2 ${
+                                                isDarkMode ? 'text-white' : 'text-gray-900'
+                                            }`}>
+                                                Características
+                                            </h4>
+                                            <ul className={`space-y-1 text-sm ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>
+                                                {normalizedList.map((caracteristica, index) => (
+                                                    <li key={index} className="flex items-start gap-2">
+                                                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
+                                                        {caracteristica}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </div>

@@ -217,7 +217,7 @@ class CsvProductoParser
                 if ($name === '' || mb_strtolower($name) === 'marca' || mb_strtolower($name) === 'procedencia') {
                     continue;
                 }
-                $caracteristicas[] = ['name' => $name, 'value' => trim($attr['value'])];
+                $caracteristicas[$name] = trim($attr['value']);
             }
 
             $result->productos[] = [

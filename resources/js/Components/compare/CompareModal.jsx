@@ -243,12 +243,25 @@ const DynamicCharacteristics = ({ compareList, isDarkMode }) => {
     compareList.forEach((product) => {
       characteristicsByProduct[product.id] = {};
 
-      if (product.caracteristicas && typeof product.caracteristicas === 'object') {
-        Object.keys(product.caracteristicas).forEach(key => {
+      let features = product.caracteristicas;
+      if (Array.isArray(features)) {
+        const normalized = {};
+        features.forEach((item, index) => {
+          if (item && typeof item === 'object') {
+            const name = item.name || item.Key || `Característica ${index + 1}`;
+            const value = item.value || item.Value || '';
+            normalized[name] = value;
+          }
+        });
+        features = normalized;
+      }
+
+      if (features && typeof features === 'object') {
+        Object.keys(features).forEach(key => {
           const normalizedKey = key.toLowerCase().trim().replace(/\s+/g, '_');
-          const cleanValue = typeof product.caracteristicas[key] === 'string'
-            ? product.caracteristicas[key].trim()
-            : product.caracteristicas[key];
+          const cleanValue = typeof features[key] === 'string'
+            ? features[key].trim()
+            : features[key];
           const cleanOriginalKey = key.trim();
 
           allCharacteristics.add(normalizedKey);
