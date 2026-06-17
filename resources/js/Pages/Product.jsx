@@ -30,6 +30,11 @@ import { getProductUrl } from "../utils/productUrl";
 // Currency formatting function moved to CurrencyContext
 // probando github actions
 
+const stripHtml = (html) => {
+    if (!html) return '';
+    return html.replace(/<\/?[^>]+(>|$)/g, "");
+};
+
 const ProductPage = ({ producto }) => {
     console.log("producto", producto);
 
@@ -50,6 +55,7 @@ const ProductPage = ({ producto }) => {
     }
 
     const { isDarkMode } = useTheme();
+    const cleanDescription = stripHtml(producto.descripcion);
     const { formatPrice } = useCurrency();
     const { addRecentlyViewed, getRecentlyViewed } = useRecentlyViewed();
     const { dispatch } = useContext(CartContext);
@@ -1176,7 +1182,7 @@ const ProductPage = ({ producto }) => {
                 <title>{`${producto.nombre} ${producto.marca?.nombre ? `- ${producto.marca.nombre}` : ''} | Comprar Online | SKU: ${producto.sku}`}</title>
                 
                 {/* Meta descripción optimizada */}
-                <meta name="description" content={`${producto.descripcion?.substring(0, 145) || `Compra ${producto.nombre} ${producto.marca?.nombre ? `de ${producto.marca.nombre}` : ''} al mejor precio`}. SKU: ${producto.sku}. Precio desde ${formatPrice(producto.precio_ganancia)}.`} />
+                <meta name="description" content={`${cleanDescription?.substring(0, 145) || `Compra ${producto.nombre} ${producto.marca?.nombre ? `de ${producto.marca.nombre}` : ''} al mejor precio`}. SKU: ${producto.sku}. Precio desde ${formatPrice(producto.precio_ganancia)}.`} />
                 
                 {/* Meta tags básicos mejorados */}
                 <meta name="keywords" content={`${producto.nombre}, ${producto.marca?.nombre || ''}, ${producto.sku}, ${categoriaCurrent?.nombre_categoria || ''}, ${subcategoriaCurrent?.nombre || ''}, comprar online, precio, oferta, equipamiento`} />
@@ -1195,7 +1201,7 @@ const ProductPage = ({ producto }) => {
                 
                 {/* Open Graph mejorado para redes sociales */}
                 <meta property="og:title" content={`${producto.nombre} ${producto.marca?.nombre ? `- ${producto.marca.nombre}` : ''} | Mega Equipamiento`} />
-                <meta property="og:description" content={`${producto.descripcion?.substring(0, 155) || `Compra ${producto.nombre} al mejor precio en Mega Equipamiento`}. SKU: ${producto.sku}`} />
+                <meta property="og:description" content={`${cleanDescription?.substring(0, 155) || `Compra ${producto.nombre} al mejor precio en Mega Equipamiento`}. SKU: ${producto.sku}`} />
                 <meta property="og:image" content={Array.isArray(producto.imagen) ? (producto.imagen[0]?.startsWith('http') ? producto.imagen[0] : `${window.location.origin}/${producto.imagen[0]}`) : (producto.imagen?.startsWith('http') ? producto.imagen : `${window.location.origin}/${producto.imagen}`)} />
                 <meta property="og:image:width" content="1200" />
                 <meta property="og:image:height" content="630" />
@@ -1215,7 +1221,7 @@ const ProductPage = ({ producto }) => {
                 <meta name="twitter:site" content="@MegaEquipamiento" />
                 <meta name="twitter:creator" content="@MegaEquipamiento" />
                 <meta name="twitter:title" content={`${producto.nombre} ${producto.marca?.nombre ? `- ${producto.marca.nombre}` : ''}`} />
-                <meta name="twitter:description" content={`${producto.descripcion?.substring(0, 155) || `Compra ${producto.nombre} al mejor precio`}. SKU: ${producto.sku}`} />
+                <meta name="twitter:description" content={`${cleanDescription?.substring(0, 155) || `Compra ${producto.nombre} al mejor precio`}. SKU: ${producto.sku}`} />
                 <meta name="twitter:image" content={Array.isArray(producto.imagen) ? (producto.imagen[0]?.startsWith('http') ? producto.imagen[0] : `${window.location.origin}/${producto.imagen[0]}`) : (producto.imagen?.startsWith('http') ? producto.imagen : `${window.location.origin}/${producto.imagen}`)} />
                 <meta name="twitter:image:alt" content={`${producto.nombre} - ${producto.marca?.nombre || 'Producto de calidad'}`} />
                 
@@ -1228,7 +1234,7 @@ const ProductPage = ({ producto }) => {
                         "image": Array.isArray(producto.imagen) 
                             ? producto.imagen.map(img => img?.startsWith('http') ? img : `${window.location.origin}/${img}`)
                             : [producto.imagen?.startsWith('http') ? producto.imagen : `${window.location.origin}/${producto.imagen}`],
-                        "description": producto.descripcion || `${producto.nombre} - Producto de alta calidad disponible en Mega Equipamiento`,
+                        "description": cleanDescription || `${producto.nombre} - Producto de alta calidad disponible en Mega Equipamiento`,
                         "sku": producto.sku,
                         "mpn": producto.sku,
                         "gtin": producto.sku,
@@ -2098,7 +2104,7 @@ const ProductPage = ({ producto }) => {
                                                                     }`}>Descripción</h3>
                                                                     <p className={`text-sm transition-colors duration-300 ${
                                                                         isDarkMode ? 'text-gray-100' : 'text-gray-200'
-                                                                    }`}>{product.descripcion}</p>
+                                                                    }`}>{stripHtml(product.descripcion)}</p>
                                                                 </div>
                                                             )}
                                                         </div>                                                       

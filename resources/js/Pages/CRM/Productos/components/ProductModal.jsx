@@ -276,11 +276,20 @@ export default function ProductModal({ producto, isOpen, onClose }) {
                                         }`}>
                                             Descripción
                                         </h4>
-                                        <p className={`text-sm leading-relaxed ${
-                                            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-                                        }`}>
-                                            {producto.descripcion}
-                                        </p>
+                                        {/<\/?[a-z][\s\S]*>/i.test(producto.descripcion) ? (
+                                            <div 
+                                                className={`text-sm leading-relaxed ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                }`}
+                                                dangerouslySetInnerHTML={{ __html: producto.descripcion }}
+                                            />
+                                        ) : (
+                                            <p className={`text-sm leading-relaxed ${
+                                                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                            }`}>
+                                                {producto.descripcion}
+                                            </p>
+                                        )}
                                     </div>
                                 )}
 

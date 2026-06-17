@@ -32,10 +32,17 @@ const ProductDescription = ({ description, editMode, tempInputs, handleInputChan
                         </div>
                     ) : (
                         <div>
-                            <div className="w-full p-2 bg-transparent overflow-y-auto max-h-96" 
-                                style={{ whiteSpace: 'pre-wrap' }}>
-                                {description}
-                            </div>
+                            {/<\/?[a-z][\s\S]*>/i.test(description) ? (
+                                <div 
+                                    className="w-full p-2 bg-transparent overflow-y-auto max-h-96"
+                                    dangerouslySetInnerHTML={{ __html: description }}
+                                />
+                            ) : (
+                                <div className="w-full p-2 bg-transparent overflow-y-auto max-h-96" 
+                                    style={{ whiteSpace: 'pre-wrap' }}>
+                                    {description}
+                                </div>
+                            )}
                             {auth.user && (
                                 <button 
                                     onClick={toggleEditMode}

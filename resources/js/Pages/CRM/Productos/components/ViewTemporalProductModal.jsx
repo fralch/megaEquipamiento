@@ -186,9 +186,16 @@ export default function ViewTemporalProductModal({ isOpen, onClose, producto }) 
                                     <h3 className={`text-lg font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                                         Descripción
                                     </h3>
-                                    <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                        {producto.descripcion}
-                                    </p>
+                                    {/<\/?[a-z][\s\S]*>/i.test(producto.descripcion) ? (
+                                        <div 
+                                            className={`${isDarkMode ? 'text-gray-300' : 'text-gray-750'}`}
+                                            dangerouslySetInnerHTML={{ __html: producto.descripcion }}
+                                        />
+                                    ) : (
+                                        <p className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                            {producto.descripcion}
+                                        </p>
+                                    )}
                                 </div>
                             )}
 
