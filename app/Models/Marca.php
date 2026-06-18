@@ -15,8 +15,8 @@ class Marca extends Model
     // Definir la clave primaria si no es 'id'
     protected $primaryKey = 'id_marca';
 
-    // Indicar que la clave primaria no es un entero incremental
-    public $incrementing = false;
+    // Indicar que la clave primaria es un entero incremental
+    public $incrementing = true;
 
     // Definir los campos que se pueden asignar en masa
     protected $fillable = [

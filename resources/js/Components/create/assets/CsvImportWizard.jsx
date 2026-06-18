@@ -13,6 +13,12 @@ const Steps = {
   DONE: 'done',
 };
 
+const norm = (s) => (s == null ? '' : String(s).trim().toLowerCase().replace(/\s+/g, ' '));
+const catEffective = (s) => {
+  const n = norm(s);
+  return n === '' ? 'sin categoría' : n;
+};
+
 const PendingRow = ({ label, value, onCreate, busy, error }) => {
   const { isDarkMode } = useTheme();
   return (
@@ -59,6 +65,12 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
     subcategorias: [],
     marcas: [],
   });
+  const [newCategorias, setNewCategorias] = useState([]);
+  const [newSubcategorias, setNewSubcategorias] = useState([]);
+  const [newMarcas, setNewMarcas] = useState([]);
+  const allCategorias = [...(categorias || []), ...newCategorias];
+  const allSubcategorias = [...(subcategorias || []), ...newSubcategorias];
+  const allMarcas = [...(marcas || []), ...newMarcas];
   const [busyKey, setBusyKey] = useState(null);
   const [error, setError] = useState(null);
   const [importing, setImporting] = useState(false);
@@ -73,6 +85,9 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
     setPreview(null);
     setCacheKey(null);
     setPending({ categorias: [], subcategorias: [], marcas: [] });
+    setNewCategorias([]);
+    setNewSubcategorias([]);
+    setNewMarcas([]);
     setBusyKey(null);
     setError(null);
     setImporting(false);
@@ -163,7 +178,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         const updated = [...pending.categorias];
         updated.splice(idx, 1);
         setPending((p) => ({ ...p, categorias: updated }));
-        if (data.categoria && categorias) categorias.push(data.categoria);
+        if (data.categoria) setNewCategorias((prev) => [...prev, data.categoria]);
       }
     } catch (e) {
       setError(e?.response?.data?.message || e.message);
@@ -186,7 +201,23 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         const updated = [...pending.marcas];
         updated.splice(idx, 1);
         setPending((p) => ({ ...p, marcas: updated }));
-        if (data.marca && marcas) marcas.push(data.marca);
+        if (data.marca) {
+          setNewMarcas((prev) => [...prev, data.marca]);
+          const marcaId = data.marca.id_marca;
+          const targetName = norm(item.nombre);
+          setOverrides((prev) => {
+            const next = { ...prev };
+            (preview?.productos || []).forEach((p) => {
+              if (norm(p.marca_nombre) === targetName && norm(p.marca_nombre) !== '') {
+                const existing = next[p.sku] || {};
+                if (existing.marca_id === undefined) {
+                  next[p.sku] = { ...existing, marca_id: marcaId };
+                }
+              }
+            });
+            return next;
+          });
+        }
       }
     } catch (e) {
       setError(e?.response?.data?.message || e.message);
@@ -200,8 +231,8 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
     setBusyKey(`sub-${idx}`);
     setError(null);
     try {
-      const idCategoria = (categorias || []).find(
-        (c) => (c.nombre || '').trim().toLowerCase() === item.categoria.trim().toLowerCase(),
+      const idCategoria = allCategorias.find(
+        (c) => norm(c.nombre) === catEffective(item.categoria),
       )?.id_categoria;
       if (!idCategoria) {
         setError(`Primero crea la categoría "${item.categoria}".`);
@@ -216,7 +247,28 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         const updated = [...pending.subcategorias];
         updated.splice(idx, 1);
         setPending((p) => ({ ...p, subcategorias: updated }));
-        if (data.subcategoria && subcategorias) subcategorias.push(data.subcategoria);
+        if (data.subcategoria) {
+          setNewSubcategorias((prev) => [...prev, data.subcategoria]);
+          const subId = data.subcategoria.id_subcategoria;
+          const targetCat = catEffective(item.categoria);
+          const targetSub = norm(item.nombre);
+          setOverrides((prev) => {
+            const next = { ...prev };
+            (preview?.productos || []).forEach((p) => {
+              if (
+                catEffective(p.categoria_nombre) === targetCat &&
+                norm(p.subcategoria_nombre) === targetSub &&
+                targetSub !== ''
+              ) {
+                const existing = next[p.sku] || {};
+                if (existing.id_subcategoria === undefined) {
+                  next[p.sku] = { ...existing, id_subcategoria: subId };
+                }
+              }
+            });
+            return next;
+          });
+        }
       }
     } catch (e) {
       setError(e?.response?.data?.message || e.message);
@@ -495,12 +547,17 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                             } border px-1 py-0.5`}
                           >
                             <option value="">(sin resolver)</option>
-                            {(subcategorias || []).map((s) => (
+                            {(allSubcategorias || []).map((s) => (
                               <option key={s.id_subcategoria} value={s.id_subcategoria}>
                                 {s.nombre}
                               </option>
                             ))}
                           </select>
+                          {p.subcategoria_nombre && (
+                            <div className={`text-[10px] mt-0.5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                              CSV: {p.subcategoria_nombre}
+                            </div>
+                          )}
                         </td>
                         <td className="px-2 py-1">
                           <select
@@ -511,12 +568,17 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                             } border px-1 py-0.5`}
                           >
                             <option value="">(sin marca)</option>
-                            {(marcas || []).map((m) => (
+                            {(allMarcas || []).map((m) => (
                               <option key={m.id_marca} value={m.id_marca}>
                                 {m.nombre}
                               </option>
                             ))}
                           </select>
+                          {p.marca_nombre && (
+                            <div className={`text-[10px] mt-0.5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                              CSV: {p.marca_nombre}
+                            </div>
+                          )}
                         </td>
                         <td className="px-2 py-1 text-right font-mono">
                           {Number(p.precio_igv).toFixed(2)}
