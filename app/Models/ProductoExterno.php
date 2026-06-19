@@ -10,8 +10,11 @@ class ProductoExterno extends Model
     use HasFactory;
 
     protected $table = 'productos_externos';
+
     protected $primaryKey = 'id';
+
     public $incrementing = true;
+
     public $timestamps = true;
 
     protected $fillable = [

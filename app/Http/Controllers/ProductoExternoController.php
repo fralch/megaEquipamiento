@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 use App\Models\ProductoExterno;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
 
 class ProductoExternoController extends Controller
 {
@@ -52,7 +52,7 @@ class ProductoExternoController extends Controller
             'filters' => [
                 'search' => $search,
                 'per_page' => $perPage,
-            ]
+            ],
         ]);
     }
 
@@ -63,14 +63,12 @@ class ProductoExternoController extends Controller
     {
         $productoExterno = ProductoExterno::find($id);
 
-        if (!$productoExterno) {
+        if (! $productoExterno) {
             return response()->json(['error' => 'Producto externo no encontrado'], 404);
         }
 
         return response()->json($productoExterno);
     }
-
-    
 
     /**
      * Store a newly created producto externo in storage.
@@ -97,7 +95,8 @@ class ProductoExternoController extends Controller
 
             return response()->json($productoExterno, 201);
         } catch (\Exception $e) {
-            Log::error('Error al crear producto externo: ' . $e->getMessage());
+            Log::error('Error al crear producto externo: '.$e->getMessage());
+
             return response()->json(['error' => 'Error al crear el producto externo'], 500);
         }
     }
@@ -110,7 +109,7 @@ class ProductoExternoController extends Controller
         try {
             $productoExterno = ProductoExterno::find($id);
 
-            if (!$productoExterno) {
+            if (! $productoExterno) {
                 return response()->json(['error' => 'Producto externo no encontrado'], 404);
             }
 
@@ -141,7 +140,8 @@ class ProductoExternoController extends Controller
 
             return response()->json($productoExterno);
         } catch (\Exception $e) {
-            Log::error('Error al actualizar producto externo: ' . $e->getMessage());
+            Log::error('Error al actualizar producto externo: '.$e->getMessage());
+
             return response()->json(['error' => 'Error al actualizar el producto externo'], 500);
         }
     }
@@ -154,7 +154,7 @@ class ProductoExternoController extends Controller
         try {
             $productoExterno = ProductoExterno::find($id);
 
-            if (!$productoExterno) {
+            if (! $productoExterno) {
                 return response()->json(['error' => 'Producto externo no encontrado'], 404);
             }
 
@@ -162,7 +162,8 @@ class ProductoExternoController extends Controller
 
             return response()->json(['message' => 'Producto externo eliminado exitosamente']);
         } catch (\Exception $e) {
-            Log::error('Error al eliminar producto externo: ' . $e->getMessage());
+            Log::error('Error al eliminar producto externo: '.$e->getMessage());
+
             return response()->json(['error' => 'Error al eliminar el producto externo'], 500);
         }
     }

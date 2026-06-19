@@ -20,6 +20,6 @@ class MiCorreo extends Mailable
     public function build()
     {
         return $this->subject('Mi asunto del correo')
-                    ->view('emails.mi-template');
+            ->view('emails.mi-template');
     }
 }

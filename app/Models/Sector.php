@@ -10,6 +10,7 @@ class Sector extends Model
     use HasFactory;
 
     protected $table = 'sectores';
+
     protected $primaryKey = 'id_sector';
 
     protected $fillable = [

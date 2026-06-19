@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\Models\Cotizacion;
 use App\Models\NotificacionCotizacion;
-use Illuminate\Console\Command;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 
 class GenerarNotificacionesCotizaciones extends Command
 {
@@ -34,7 +34,7 @@ class GenerarNotificacionesCotizaciones extends Command
         $deletedCount = NotificacionCotizacion::whereHas('cotizacion', function ($query) {
             $query->whereIn('estado', ['aprobada', 'rechazada']);
         })->delete();
-        
+
         if ($deletedCount > 0) {
             $this->info("Se eliminaron {$deletedCount} notificaciones de cotizaciones aprobadas/rechazadas.");
         }
@@ -69,7 +69,7 @@ class GenerarNotificacionesCotizaciones extends Command
 
             if ($notificacionExistente) {
                 // Actualizar la notificación existente si no ha sido visualizada
-                if (!$notificacionExistente->visualizado) {
+                if (! $notificacionExistente->visualizado) {
                     $notificacionExistente->update([
                         'dias_vencimiento' => $diasVencimiento,
                         'nivel_urgencia' => $nivelUrgencia,
@@ -92,7 +92,7 @@ class GenerarNotificacionesCotizaciones extends Command
             }
         }
 
-        $this->info("Proceso completado:");
+        $this->info('Proceso completado:');
         $this->info("- Notificaciones creadas: {$notificacionesCreadas}");
         $this->info("- Notificaciones actualizadas: {$notificacionesActualizadas}");
 

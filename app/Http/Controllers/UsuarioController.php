@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
 {
-   /**
+    /**
      * Display a listing of the resource.
      */
     public function index()
     {
         $usuarios = Usuario::all();
+
         return response()->json($usuarios);
     }
 
@@ -31,7 +31,7 @@ class UsuarioController extends Controller
             'telefono' => 'nullable|string|max:20',
         ]);
 
-        $usuario = new Usuario();
+        $usuario = new Usuario;
         $usuario->nombre_usuario = $request->nombre_usuario;
         $usuario->contraseña = bcrypt($request->contraseña);
         $usuario->correo = $request->correo;
@@ -40,6 +40,7 @@ class UsuarioController extends Controller
         $usuario->direccion = $request->direccion;
         $usuario->telefono = $request->telefono;
         $usuario->save();
+
         return response()->json($usuario);
     }
 
@@ -73,11 +74,13 @@ class UsuarioController extends Controller
         $usuario->apellido = $request->apellido;
         $usuario->direccion = $request->direccion;
         $usuario->telefono = $request->telefono;
-        $usuario->save();        
+        $usuario->save();
+
         return response()->json($usuario);
     }
+
     /**
-     * Login the user  
+     * Login the user
      */
     public function login(Request $request)
     {
@@ -90,14 +93,15 @@ class UsuarioController extends Controller
 
         if ($usuario && Hash::check($request->contraseña, $usuario->contraseña)) {
             $token = JWTAuth::fromUser($usuario);
+
             return response()->json([
                 'token' => $token->token,
-                'usuario' => $usuario
+                'usuario' => $usuario,
             ]);
         }
+
         return response()->json(null, 401);
     }
-
 
     /**
      * Remove the specified resource from storage.
@@ -105,6 +109,7 @@ class UsuarioController extends Controller
     public function destroy(Usuario $usuario)
     {
         $usuario->delete();
+
         return response()->json(null, 204);
     }
 }

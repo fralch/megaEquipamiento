@@ -38,7 +38,7 @@ class RolesUsuariosController extends Controller
 
         return Inertia::render('CRM/UsuariosRoles/Roles', [
             'roles' => $roles,
-            'filters' => $request->only(['search', 'sort_by', 'sort_order'])
+            'filters' => $request->only(['search', 'sort_by', 'sort_order']),
         ]);
     }
 
@@ -84,7 +84,7 @@ class RolesUsuariosController extends Controller
 
         return response()->json([
             'rol' => $rol,
-            'usuarios_ejemplo' => $usuariosEjemplo
+            'usuarios_ejemplo' => $usuariosEjemplo,
         ]);
     }
 
@@ -100,7 +100,7 @@ class RolesUsuariosController extends Controller
                 'required',
                 'string',
                 'max:50',
-                Rule::unique('roles', 'nombre_rol')->ignore($rol->id_rol, 'id_rol')
+                Rule::unique('roles', 'nombre_rol')->ignore($rol->id_rol, 'id_rol'),
             ],
             'descripcion' => 'nullable|string|max:255',
         ], [
@@ -134,7 +134,7 @@ class RolesUsuariosController extends Controller
 
         if ($usuariosCount > 0) {
             return back()->withErrors([
-                'error' => "No se puede eliminar el rol porque tiene {$usuariosCount} usuario(s) asignado(s). Primero reasigna o elimina esos usuarios."
+                'error' => "No se puede eliminar el rol porque tiene {$usuariosCount} usuario(s) asignado(s). Primero reasigna o elimina esos usuarios.",
             ]);
         }
 
@@ -151,7 +151,7 @@ class RolesUsuariosController extends Controller
         $rolesCounts = Rol::withCount('usuarios')->get();
 
         return response()->json([
-            'roles' => $rolesCounts
+            'roles' => $rolesCounts,
         ]);
     }
 
@@ -207,6 +207,7 @@ class RolesUsuariosController extends Controller
             ->update(['id_rol' => $request->id_rol]);
 
         $count = count($request->ids_usuarios);
+
         return back()->with('success', "Rol asignado a {$count} usuario(s) exitosamente");
     }
 }

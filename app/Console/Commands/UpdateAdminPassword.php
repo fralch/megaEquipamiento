@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Usuario;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
 class UpdateAdminPassword extends Command
@@ -31,17 +31,19 @@ class UpdateAdminPassword extends Command
 
         $user = Usuario::where('nombre_usuario', 'admin')->first();
 
-        if (!$user) {
+        if (! $user) {
             $this->error('Usuario with nombre_usuario="admin" not found.');
+
             return 1;
         }
 
-        $this->info('Found Usuario with ID: ' . $user->id_usuario);
-        
+        $this->info('Found Usuario with ID: '.$user->id_usuario);
+
         $user->contraseña = Hash::make('206002061E');
         $user->save();
 
         $this->info('Password updated successfully for user admin.');
+
         return 0;
     }
 }

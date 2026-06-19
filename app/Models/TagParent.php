@@ -10,8 +10,11 @@ class TagParent extends Model
     use HasFactory;
 
     protected $table = 'tag_parents';
+
     protected $primaryKey = 'id_tag_parent';
+
     public $incrementing = true;
+
     public $timestamps = true;
 
     protected $fillable = [

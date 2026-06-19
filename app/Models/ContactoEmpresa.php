@@ -12,7 +12,7 @@ class ContactoEmpresa extends Model
         'email',
         'telefono',
         'cargo',
-        'es_principal'
+        'es_principal',
     ];
 
     protected $casts = [

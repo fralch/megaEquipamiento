@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Marca;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class MarcaController extends Controller
 {
-   
-   
     public function create(Request $request)
     {
         $request->validate([
@@ -29,23 +27,23 @@ class MarcaController extends Controller
 
         if ($request->hasFile('imagen')) {
             $image = $request->file('imagen');
-            
+
             // Sanitizar el nombre de la marca para usarlo como nombre de archivo
             $nombreSanitizado = preg_replace('/[^a-z0-9]+/', '_', strtolower($request->nombre));
             // Añadir timestamp para evitar colisiones si hay marcas con nombres similares
-            $nombreArchivo = $nombreSanitizado ;
+            $nombreArchivo = $nombreSanitizado;
             // Obtener la extensión original del archivo
             $extension = $image->getClientOriginalExtension();
             // Generar el nombre completo del archivo
-            $imagePath = $nombreArchivo . '.' . $extension;
-            
+            $imagePath = $nombreArchivo.'.'.$extension;
+
             // Set destination path
-            $destinationPath = public_path('img/marcas') . '/' . $imagePath;
-            
+            $destinationPath = public_path('img/marcas').'/'.$imagePath;
+
             // Move the uploaded file
             if (move_uploaded_file($image->getPathname(), $destinationPath)) {
                 // Add the correct image path to the data array
-                $data['imagen'] = '/img/marcas/' . $imagePath;
+                $data['imagen'] = '/img/marcas/'.$imagePath;
             } else {
                 return response()->json(['error' => 'Error al mover el archivo.'], 500);
             }
@@ -75,21 +73,21 @@ class MarcaController extends Controller
         if ($marca->imagen) {
             $imagePath = public_path(ltrim($marca->imagen, '/'));
             if (file_exists($imagePath)) {
-                if (!@unlink($imagePath)) {
+                if (! @unlink($imagePath)) {
                     // Registrar el error si no se puede eliminar, pero continuar
-                    \Log::warning('No se pudo eliminar la imagen de la marca: ' . $imagePath);
+                    \Log::warning('No se pudo eliminar la imagen de la marca: '.$imagePath);
                 }
             }
         }
         // Eliminar la marca
         $marca->delete();
-        
+
         // Invalidar cache de categorías
         Cache::forget('todas_categorias');
-        
+
         return response()->json(['message' => 'Marca eliminada correctamente']);
     }
-   
+
     /**
      * Update the specified resource in storage.
      */
@@ -111,20 +109,20 @@ class MarcaController extends Controller
             $image = $request->file('imagen');
             $nombreSanitizado = preg_replace('/[^a-z0-9]+/', '_', strtolower($request->nombre));
             $extension = $image->getClientOriginalExtension();
-            $imagePath = $nombreSanitizado . '.' . $extension;
+            $imagePath = $nombreSanitizado.'.'.$extension;
             $destino = public_path('img/marcas');
-            if (!file_exists($destino)) {
+            if (! file_exists($destino)) {
                 mkdir($destino, 0755, true);
             }
             $image->move($destino, $imagePath);
-            $nuevaImagen = '/img/marcas/' . $imagePath;
+            $nuevaImagen = '/img/marcas/'.$imagePath;
         } elseif ($request->filled('imagen_url')) {
             $nuevaImagen = $request->input('imagen_url');
         }
 
         // Si hay nueva imagen y la anterior era local, eliminarla
         if ($nuevaImagen) {
-            if ($marca->imagen && !str_starts_with($marca->imagen, 'http')) {
+            if ($marca->imagen && ! str_starts_with($marca->imagen, 'http')) {
                 $rutaAnterior = public_path(ltrim($marca->imagen, '/'));
                 if (file_exists($rutaAnterior)) {
                     @unlink($rutaAnterior);
@@ -146,22 +144,23 @@ class MarcaController extends Controller
         if ($request->expectsJson() || $request->ajax()) {
             return response()->json([
                 'message' => 'Marca actualizada exitosamente.',
-                'marca' => $marca
+                'marca' => $marca,
             ]);
         }
 
         return redirect()->route('marcas.index')
-                         ->with('success', 'Marca actualizada exitosamente.');
+            ->with('success', 'Marca actualizada exitosamente.');
     }
 
     // obtener todos los marcas en json ordenadas alfabéticamente de A a Z
-    public function getMarcas ()
+    public function getMarcas()
     {
         $marcas = Marca::orderBy('nombre', 'asc')->get();
+
         return response()->json($marcas);
     }
 
-    /*  
+    /*
       Crea una busqueda por nombre de marca donde el texto sea similar al nombre de la marca
       y devuelve un json con una marca con el nombre similar al texto
       @param  \Illuminate\Http\Request  $request
@@ -173,16 +172,15 @@ class MarcaController extends Controller
         // $texto = str_replace(['-', '_'], ' ', strtolower($texto));
         // Modificado para devolver solo la marca más similar al texto
         // Ordenamos por similitud (las que empiezan con el texto tienen prioridad)
-        $marca = Marca::where('nombre', 'like', $texto . '%') // Primero busca los que empiezan exactamente con el texto
-                    ->orWhere('nombre', 'like', '%' . $texto . '%') // Luego busca cualquier coincidencia
-                    ->orderByRaw("CASE 
+        $marca = Marca::where('nombre', 'like', $texto.'%') // Primero busca los que empiezan exactamente con el texto
+            ->orWhere('nombre', 'like', '%'.$texto.'%') // Luego busca cualquier coincidencia
+            ->orderByRaw("CASE 
                         WHEN nombre LIKE '{$texto}%' THEN 1 
                         WHEN nombre LIKE '%{$texto}%' THEN 2 
                         ELSE 3 
                     END") // Prioriza coincidencias exactas
-                    ->first(); // Devuelve solo el primer resultado (el más similar)
-        
+            ->first(); // Devuelve solo el primer resultado (el más similar)
+
         return response()->json($marca);
     }
-    
 }

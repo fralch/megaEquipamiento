@@ -15,8 +15,8 @@ class Marca extends Model
     // Definir la clave primaria si no es 'id'
     protected $primaryKey = 'id_marca';
 
-    // Indicar que la clave primaria no es un entero incremental
-    public $incrementing = false;
+    // Indicar que la clave primaria es un entero incremental
+    public $incrementing = true;
 
     // Definir los campos que se pueden asignar en masa
     protected $fillable = [
@@ -59,7 +59,7 @@ class Marca extends Model
     public function getImagenUrlAttribute()
     {
         $value = $this->attributes['imagen'] ?? null;
-        if (!$value) {
+        if (! $value) {
             return null;
         }
 
@@ -73,7 +73,7 @@ class Marca extends Model
 
         // Si el valor proviene de storage (antiguo formato 'marcas/...'), apuntar a 'storage/marcas/...'
         if (str_starts_with($path, 'marcas/')) {
-            return asset('storage/' . $path);
+            return asset('storage/'.$path);
         }
 
         // Para rutas en 'img/marcas/...'

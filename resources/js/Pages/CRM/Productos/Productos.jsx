@@ -198,7 +198,8 @@ export default function Productos() {
 
     const truncateText = (text, maxLength = 30) => {
         if (!text) return '';
-        return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        const cleanText = text.replace(/<\/?[^>]+(>|$)/g, "");
+        return cleanText.length > maxLength ? cleanText.substring(0, maxLength) + '...' : cleanText;
     };
 
 
@@ -499,13 +500,13 @@ export default function Productos() {
                                                     <td className={`px-4 py-4 text-sm ${
                                                         isDarkMode ? 'text-white' : 'text-gray-900'
                                                     }`}>
-                                                        <div className="font-medium" title={producto.nombre}>
+                                                        <div className="font-medium" title={producto.nombre.replace(/<\/?[^>]+(>|$)/g, "")}>
                                                             {truncateText(producto.nombre, 40)}
                                                         </div>
                                                         {producto.descripcion && (
                                                             <div className={`text-xs mt-1 ${
                                                                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                                                            }`} title={producto.descripcion}>
+                                                            }`} title={producto.descripcion.replace(/<\/?[^>]+(>|$)/g, "")}>
                                                                 {truncateText(producto.descripcion, 50)}
                                                             </div>
                                                         )}

@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -21,7 +21,7 @@ return new class extends Migration
         $jsonPath = database_path('data/categoria_sin_id_updated.json');
         if (file_exists($jsonPath)) {
             $jsonData = json_decode(file_get_contents($jsonPath), true);
-            
+
             foreach ($jsonData as $item) {
                 if (isset($item['video_link']) && $item['video_link'] !== null && isset($item['id_categoria'])) {
                     // Update category by exact ID match

@@ -15,8 +15,8 @@ class Subcategoria extends Model
     // Definir la clave primaria si no es 'id'
     protected $primaryKey = 'id_subcategoria';
 
-    // Indicar que la clave primaria no es un entero incremental
-    public $incrementing = false;
+    // Indicar que la clave primaria es un entero incremental
+    public $incrementing = true;
 
     // Definir los campos que se pueden asignar en masa
     protected $fillable = [
@@ -48,13 +48,12 @@ class Subcategoria extends Model
     {
         return $this->hasMany(Producto::class, 'id_subcategoria');
     }
-    
+
     // Definir la relación con el modelo Filtro
     public function filtros()
     {
         return $this->belongsToMany(Filtro::class, 'subcategoria_filtros', 'id_subcategoria', 'id_filtro')
-                    ->withPivot('orden', 'activo')
-                    ->withTimestamps();
+            ->withPivot('orden', 'activo')
+            ->withTimestamps();
     }
 }
-

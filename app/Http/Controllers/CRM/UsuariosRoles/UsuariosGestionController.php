@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\CRM\UsuariosRoles;
 
 use App\Http\Controllers\Controller;
-use App\Models\Usuario;
 use App\Models\Rol;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -74,7 +74,7 @@ class UsuariosGestionController extends Controller
                 'usuarios_inactivos' => $usuariosInactivos,
                 'nuevos_este_mes' => $nuevosEsteMes,
             ],
-            'filters' => $request->only(['search', 'id_rol', 'activo', 'sort_by', 'sort_order', 'per_page'])
+            'filters' => $request->only(['search', 'id_rol', 'activo', 'sort_by', 'sort_order', 'per_page']),
         ]);
     }
 
@@ -93,7 +93,7 @@ class UsuariosGestionController extends Controller
             'telefono' => 'nullable|string|max:20',
             'id_rol' => 'nullable|exists:roles,id_rol',
             'activo' => 'sometimes|boolean',
-            'ultima_conexion' => 'nullable|date'
+            'ultima_conexion' => 'nullable|date',
         ], [
             'nombre_usuario.required' => 'El nombre de usuario es obligatorio',
             'nombre_usuario.unique' => 'Este nombre de usuario ya esta en uso',
@@ -104,7 +104,7 @@ class UsuariosGestionController extends Controller
             'correo.unique' => 'Este correo electronico ya esta registrado',
             'id_rol.exists' => 'El rol seleccionado no existe',
             'activo.boolean' => 'El estado seleccionado no es valido',
-            'ultima_conexion.date' => 'La fecha de ultima conexion no es valida'
+            'ultima_conexion.date' => 'La fecha de ultima conexion no es valida',
         ]);
 
         if ($validator->fails()) {
@@ -135,7 +135,7 @@ class UsuariosGestionController extends Controller
         $usuario = Usuario::with('rol')->findOrFail($id);
 
         return response()->json([
-            'usuario' => $usuario
+            'usuario' => $usuario,
         ]);
     }
 
@@ -151,13 +151,13 @@ class UsuariosGestionController extends Controller
                 'required',
                 'string',
                 'max:50',
-                Rule::unique('usuarios', 'nombre_usuario')->ignore($usuario->id_usuario, 'id_usuario')
+                Rule::unique('usuarios', 'nombre_usuario')->ignore($usuario->id_usuario, 'id_usuario'),
             ],
             'correo' => [
                 'required',
                 'email',
                 'max:100',
-                Rule::unique('usuarios', 'correo')->ignore($usuario->id_usuario, 'id_usuario')
+                Rule::unique('usuarios', 'correo')->ignore($usuario->id_usuario, 'id_usuario'),
             ],
             'contraseña' => 'nullable|string|min:8',
             'nombre' => 'nullable|string|max:50',
@@ -166,7 +166,7 @@ class UsuariosGestionController extends Controller
             'telefono' => 'nullable|string|max:20',
             'id_rol' => 'nullable|exists:roles,id_rol',
             'activo' => 'sometimes|boolean',
-            'ultima_conexion' => 'nullable|date'
+            'ultima_conexion' => 'nullable|date',
         ], [
             'nombre_usuario.required' => 'El nombre de usuario es obligatorio',
             'nombre_usuario.unique' => 'Este nombre de usuario ya esta en uso',
@@ -176,7 +176,7 @@ class UsuariosGestionController extends Controller
             'contraseña.min' => 'La contraseña debe tener al menos 8 caracteres',
             'id_rol.exists' => 'El rol seleccionado no existe',
             'activo.boolean' => 'El estado seleccionado no es valido',
-            'ultima_conexion.date' => 'La fecha de ultima conexion no es valida'
+            'ultima_conexion.date' => 'La fecha de ultima conexion no es valida',
         ]);
 
         if ($validator->fails()) {
@@ -190,7 +190,7 @@ class UsuariosGestionController extends Controller
             'apellido' => $request->apellido,
             'direccion' => $request->direccion,
             'telefono' => $request->telefono,
-            'id_rol' => $request->id_rol
+            'id_rol' => $request->id_rol,
         ];
 
         if ($request->has('activo')) {
@@ -202,7 +202,6 @@ class UsuariosGestionController extends Controller
                 ? $request->ultima_conexion
                 : null;
         }
-
 
         // Solo actualizar contraseña si se proporciona una nueva
         if ($request->filled('contraseña')) {
@@ -240,10 +239,11 @@ class UsuariosGestionController extends Controller
 
         // Si existe un campo activo en la tabla
         if (isset($usuario->activo)) {
-            $usuario->activo = !$usuario->activo;
+            $usuario->activo = ! $usuario->activo;
             $usuario->save();
 
             $status = $usuario->activo ? 'activado' : 'desactivado';
+
             return back()->with('success', "Usuario {$status} exitosamente");
         }
 
@@ -271,12 +271,12 @@ class UsuariosGestionController extends Controller
         $usuario = Usuario::findOrFail($id);
 
         // Verificar contraseña actual
-        if (!Hash::check($request->contraseña_actual, $usuario->contraseña)) {
+        if (! Hash::check($request->contraseña_actual, $usuario->contraseña)) {
             return back()->withErrors(['contraseña_actual' => 'La contraseña actual es incorrecta']);
         }
 
         $usuario->update([
-            'contraseña' => Hash::make($request->contraseña_nueva)
+            'contraseña' => Hash::make($request->contraseña_nueva),
         ]);
 
         return back()->with('success', 'Contraseña cambiada exitosamente');
@@ -301,7 +301,7 @@ class UsuariosGestionController extends Controller
         $usuario = Usuario::findOrFail($id);
 
         $usuario->update([
-            'contraseña' => Hash::make($request->contraseña_nueva)
+            'contraseña' => Hash::make($request->contraseña_nueva),
         ]);
 
         return back()->with('success', 'Contraseña restablecida exitosamente');
@@ -314,7 +314,7 @@ class UsuariosGestionController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'ids' => 'required|array',
-            'ids.*' => 'exists:usuarios,id_usuario'
+            'ids.*' => 'exists:usuarios,id_usuario',
         ]);
 
         if ($validator->fails()) {
@@ -328,6 +328,7 @@ class UsuariosGestionController extends Controller
         Usuario::whereIn('id_usuario', $idsToDelete)->delete();
 
         $count = count($idsToDelete);
+
         return back()->with('success', "{$count} usuario(s) eliminado(s) exitosamente");
     }
 
@@ -354,7 +355,7 @@ class UsuariosGestionController extends Controller
 
         $usuarios = $query->get();
 
-        $filename = 'usuarios_' . date('Y-m-d_H-i-s') . '.csv';
+        $filename = 'usuarios_'.date('Y-m-d_H-i-s').'.csv';
         $handle = fopen('php://output', 'w');
 
         ob_start();
@@ -372,7 +373,7 @@ class UsuariosGestionController extends Controller
                 $usuario->telefono,
                 $usuario->direccion,
                 $usuario->rol?->nombre_rol ?? 'Sin rol',
-                $usuario->created_at?->format('Y-m-d H:i:s')
+                $usuario->created_at?->format('Y-m-d H:i:s'),
             ]);
         }
 

@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Producto;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Database\Seeder;
 
 class BancoImagenesSeeder extends Seeder
 {
@@ -26,7 +24,7 @@ class BancoImagenesSeeder extends Seeder
             'precio_igv' => 0,
             'descripcion' => 'Producto temporal para poblar banco de imágenes',
             'envio' => 'No',
-            'soporte_tecnico' => 'No'
+            'soporte_tecnico' => 'No',
         ]);
 
         // Crear algunas imágenes de ejemplo en el banco
@@ -34,49 +32,49 @@ class BancoImagenesSeeder extends Seeder
             [
                 'nombre' => 'Logo Empresa',
                 'coleccion' => 'banco_imagenes',
-                'contenido' => $this->crearImagenSVG('Logo', '#3B82F6')
+                'contenido' => $this->crearImagenSVG('Logo', '#3B82F6'),
             ],
             [
                 'nombre' => 'Banner Principal',
                 'coleccion' => 'banco_imagenes',
-                'contenido' => $this->crearImagenSVG('Banner', '#10B981')
+                'contenido' => $this->crearImagenSVG('Banner', '#10B981'),
             ],
             [
                 'nombre' => 'Icono Producto',
                 'coleccion' => 'iconos',
-                'contenido' => $this->crearImagenSVG('Icono', '#F59E0B')
+                'contenido' => $this->crearImagenSVG('Icono', '#F59E0B'),
             ],
             [
                 'nombre' => 'Imagen Categoría',
                 'coleccion' => 'categorias',
-                'contenido' => $this->crearImagenSVG('Categoría', '#EF4444')
+                'contenido' => $this->crearImagenSVG('Categoría', '#EF4444'),
             ],
             [
                 'nombre' => 'Placeholder Producto',
                 'coleccion' => 'productos',
-                'contenido' => $this->crearImagenSVG('Producto', '#8B5CF6')
-            ]
+                'contenido' => $this->crearImagenSVG('Producto', '#8B5CF6'),
+            ],
         ];
 
         foreach ($imagenesEjemplo as $imagen) {
             // Crear archivo temporal
-            $nombreArchivo = str_replace(' ', '_', strtolower($imagen['nombre'])) . '.svg';
-            $rutaTemporal = storage_path('app/temp/' . $nombreArchivo);
-            
+            $nombreArchivo = str_replace(' ', '_', strtolower($imagen['nombre'])).'.svg';
+            $rutaTemporal = storage_path('app/temp/'.$nombreArchivo);
+
             // Crear directorio si no existe
-            if (!file_exists(dirname($rutaTemporal))) {
+            if (! file_exists(dirname($rutaTemporal))) {
                 mkdir(dirname($rutaTemporal), 0755, true);
             }
-            
+
             // Escribir contenido SVG
             file_put_contents($rutaTemporal, $imagen['contenido']);
-            
+
             // Agregar al banco de imágenes
             $productoTemporal->addMedia($rutaTemporal)
                 ->usingName($imagen['nombre'])
                 ->usingFileName($nombreArchivo)
                 ->toMediaCollection($imagen['coleccion']);
-            
+
             // Limpiar archivo temporal si aún existe
             if (file_exists($rutaTemporal)) {
                 unlink($rutaTemporal);
@@ -86,7 +84,7 @@ class BancoImagenesSeeder extends Seeder
         // No eliminamos el producto temporal para mantener las imágenes
         // Las imágenes quedan disponibles en el banco independientemente del modelo
 
-        $this->command->info('Banco de imágenes poblado con ' . count($imagenesEjemplo) . ' imágenes de ejemplo.');
+        $this->command->info('Banco de imágenes poblado con '.count($imagenesEjemplo).' imágenes de ejemplo.');
     }
 
     /**
@@ -96,8 +94,8 @@ class BancoImagenesSeeder extends Seeder
     {
         return '<?xml version="1.0" encoding="UTF-8"?>
 <svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
-  <rect width="400" height="300" fill="' . $color . '" rx="8"/>
-  <text x="200" y="150" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="white">' . $texto . '</text>
+  <rect width="400" height="300" fill="'.$color.'" rx="8"/>
+  <text x="200" y="150" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="white">'.$texto.'</text>
   <text x="200" y="180" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="white" opacity="0.8">Imagen de ejemplo</text>
 </svg>';
     }

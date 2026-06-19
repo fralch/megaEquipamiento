@@ -272,7 +272,7 @@ const SubcategoryProducts = ({ productId, currentProductSubcategoryId }) => {
                                     }`}>Descripción</h3>
                                     <p className={`text-sm transition-colors duration-300 ${
                                         isDarkMode ? 'text-gray-100' : 'text-gray-200'
-                                    }`}>{product.descripcion}</p>
+                                    }`}>{product.descripcion.replace(/<\/?[^>]+(>|$)/g, "")}</p>
                                 </div>
                             )}
                         </div>

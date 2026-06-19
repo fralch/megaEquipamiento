@@ -2,10 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Media;
 use App\Models\Producto;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Console\Command;
 
 class GestionarBancoImagenes extends Command
 {
@@ -48,6 +47,7 @@ class GestionarBancoImagenes extends Command
                 break;
             default:
                 $this->error('Acción no válida. Usa: list, add, delete, clean, stats');
+
                 return 1;
         }
 
@@ -63,6 +63,7 @@ class GestionarBancoImagenes extends Command
 
         if ($imagenes->isEmpty()) {
             $this->info('No hay imágenes en el banco.');
+
             return;
         }
 
@@ -77,7 +78,7 @@ class GestionarBancoImagenes extends Command
                     $imagen->collection_name,
                     $imagen->mime_type,
                     $this->formatearTamano($imagen->size),
-                    $imagen->created_at->format('Y-m-d H:i:s')
+                    $imagen->created_at->format('Y-m-d H:i:s'),
                 ];
             })
         );
@@ -92,18 +93,20 @@ class GestionarBancoImagenes extends Command
         $nombre = $this->option('name');
         $coleccion = $this->option('collection');
 
-        if (!$archivo) {
+        if (! $archivo) {
             $this->error('Debes especificar un archivo con --file=ruta/al/archivo');
+
             return;
         }
 
-        if (!file_exists($archivo)) {
-            $this->error('El archivo no existe: ' . $archivo);
+        if (! file_exists($archivo)) {
+            $this->error('El archivo no existe: '.$archivo);
+
             return;
         }
 
         // Crear producto temporal
-        $productoTemporal = new Producto();
+        $productoTemporal = new Producto;
         $productoTemporal->save();
 
         try {
@@ -112,13 +115,13 @@ class GestionarBancoImagenes extends Command
                 ->toMediaCollection($coleccion);
 
             $this->info('Imagen agregada exitosamente:');
-            $this->line('ID: ' . $media->id);
-            $this->line('Nombre: ' . $media->name);
-            $this->line('Archivo: ' . $media->file_name);
-            $this->line('Colección: ' . $media->collection_name);
-            $this->line('URL: ' . $media->getUrl());
+            $this->line('ID: '.$media->id);
+            $this->line('Nombre: '.$media->name);
+            $this->line('Archivo: '.$media->file_name);
+            $this->line('Colección: '.$media->collection_name);
+            $this->line('URL: '.$media->getUrl());
         } catch (\Exception $e) {
-            $this->error('Error al agregar la imagen: ' . $e->getMessage());
+            $this->error('Error al agregar la imagen: '.$e->getMessage());
         } finally {
             // Eliminar producto temporal
             $productoTemporal->delete();
@@ -132,22 +135,24 @@ class GestionarBancoImagenes extends Command
     {
         $id = $this->ask('¿Cuál es el ID de la imagen a eliminar?');
 
-        if (!$id || !is_numeric($id)) {
+        if (! $id || ! is_numeric($id)) {
             $this->error('ID no válido.');
+
             return;
         }
 
         $media = Media::find($id);
 
-        if (!$media) {
+        if (! $media) {
             $this->error('Imagen no encontrada.');
+
             return;
         }
 
         $this->info('Imagen a eliminar:');
-        $this->line('Nombre: ' . $media->name);
-        $this->line('Archivo: ' . $media->file_name);
-        $this->line('Colección: ' . $media->collection_name);
+        $this->line('Nombre: '.$media->name);
+        $this->line('Archivo: '.$media->file_name);
+        $this->line('Colección: '.$media->collection_name);
 
         if ($this->confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
             $media->delete();
@@ -169,11 +174,12 @@ class GestionarBancoImagenes extends Command
 
         if ($huerfanas->isEmpty()) {
             $this->info('No se encontraron imágenes huérfanas.');
+
             return;
         }
 
-        $this->info('Se encontraron ' . $huerfanas->count() . ' imágenes huérfanas:');
-        
+        $this->info('Se encontraron '.$huerfanas->count().' imágenes huérfanas:');
+
         $this->table(
             ['ID', 'Nombre', 'Archivo', 'Colección'],
             $huerfanas->map(function ($imagen) {
@@ -181,7 +187,7 @@ class GestionarBancoImagenes extends Command
                     $imagen->id,
                     $imagen->name,
                     $imagen->file_name,
-                    $imagen->collection_name
+                    $imagen->collection_name,
                 ];
             })
         );
@@ -214,11 +220,11 @@ class GestionarBancoImagenes extends Command
 
         $this->info('=== ESTADÍSTICAS DEL BANCO DE IMÁGENES ===');
         $this->line('');
-        $this->line('Total de archivos: ' . $total);
-        $this->line('Imágenes: ' . $imagenes);
-        $this->line('Videos: ' . $videos);
-        $this->line('Documentos: ' . $documentos);
-        $this->line('Tamaño total: ' . $this->formatearTamano($tamanoTotal));
+        $this->line('Total de archivos: '.$total);
+        $this->line('Imágenes: '.$imagenes);
+        $this->line('Videos: '.$videos);
+        $this->line('Documentos: '.$documentos);
+        $this->line('Tamaño total: '.$this->formatearTamano($tamanoTotal));
         $this->line('');
 
         if ($colecciones->isNotEmpty()) {
@@ -229,7 +235,7 @@ class GestionarBancoImagenes extends Command
                     return [
                         $coleccion->collection_name,
                         $coleccion->total,
-                        $this->formatearTamano($coleccion->tamano)
+                        $this->formatearTamano($coleccion->tamano),
                     ];
                 })
             );
@@ -242,11 +248,11 @@ class GestionarBancoImagenes extends Command
     private function formatearTamano($bytes)
     {
         $units = ['B', 'KB', 'MB', 'GB'];
-        
+
         for ($i = 0; $bytes > 1024; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 }

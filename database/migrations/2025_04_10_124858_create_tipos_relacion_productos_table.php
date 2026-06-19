@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('descripcion')->nullable();
             $table->timestamps();
         });
-        
+
         // Insertar datos iniciales
         DB::table('tipos_relacion_productos')->insert([
             ['nombre' => 'accesorio', 'descripcion' => 'Accesorios generales'],

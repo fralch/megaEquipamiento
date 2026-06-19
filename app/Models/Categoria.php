@@ -48,6 +48,7 @@ class Categoria extends Model
 
     // Configurar incrementing timestamps
     const UPDATED_AT = 'updated_at';
+
     const CREATED_AT = 'created_at';
 
     // En el modelo Categoria.php

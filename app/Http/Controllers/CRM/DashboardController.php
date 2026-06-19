@@ -5,14 +5,11 @@ namespace App\Http\Controllers\CRM;
 use App\Http\Controllers\Controller;
 use App\Models\Cotizacion;
 use App\Models\Producto;
-use App\Models\Cliente;
-use App\Models\EmpresaCliente;
 use App\Models\Usuario;
-use App\Models\Pedido;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -32,7 +29,7 @@ class DashboardController extends Controller
 
             // Cotizaciones activas (pendientes, enviadas, negociacion) del usuario o todas si es admin
             $cotizacionesQuery = Cotizacion::whereIn('estado', ['pendiente', 'enviada', 'negociacion']);
-            if (!$isAdmin) {
+            if (! $isAdmin) {
                 $cotizacionesQuery->where('usuario_id', $usuario->id_usuario);
             }
             $cotizacionesActivas = $cotizacionesQuery->count();
@@ -44,7 +41,7 @@ class DashboardController extends Controller
             $ventasMesQuery = Cotizacion::where('estado', 'aprobada')
                 ->whereBetween('fecha_cotizacion', [$inicioMes, $finMes]);
 
-            if (!$isAdmin) {
+            if (! $isAdmin) {
                 $ventasMesQuery->where('usuario_id', $usuario->id_usuario);
             }
 
@@ -52,7 +49,7 @@ class DashboardController extends Controller
 
             // Cotizaciones pendientes del usuario o todas si es admin
             $cotizacionesPendientesQuery = Cotizacion::where('estado', 'pendiente');
-            if (!$isAdmin) {
+            if (! $isAdmin) {
                 $cotizacionesPendientesQuery->where('usuario_id', $usuario->id_usuario);
             }
             $cotizacionesPendientes = $cotizacionesPendientesQuery->count();
@@ -64,7 +61,7 @@ class DashboardController extends Controller
             // Cambio en cotizaciones activas
             $cotizacionesActivasMesAnteriorQuery = Cotizacion::whereIn('estado', ['pendiente', 'enviada', 'negociacion'])
                 ->whereBetween('created_at', [$inicioMesAnterior, $finMesAnterior]);
-            if (!$isAdmin) {
+            if (! $isAdmin) {
                 $cotizacionesActivasMesAnteriorQuery->where('usuario_id', $usuario->id_usuario);
             }
             $cotizacionesActivasMesAnterior = $cotizacionesActivasMesAnteriorQuery->count();
@@ -77,7 +74,7 @@ class DashboardController extends Controller
             $ventasMesAnteriorQuery = Cotizacion::where('estado', 'aprobada')
                 ->whereBetween('fecha_cotizacion', [$inicioMesAnterior, $finMesAnterior]);
 
-            if (!$isAdmin) {
+            if (! $isAdmin) {
                 $ventasMesAnteriorQuery->where('usuario_id', $usuario->id_usuario);
             }
 
@@ -91,7 +88,7 @@ class DashboardController extends Controller
             $cotizacionesPendientesMesAnteriorQuery = Cotizacion::where('estado', 'pendiente')
                 ->whereBetween('created_at', [$inicioMesAnterior, $finMesAnterior]);
 
-            if (!$isAdmin) {
+            if (! $isAdmin) {
                 $cotizacionesPendientesMesAnteriorQuery->where('usuario_id', $usuario->id_usuario);
             }
 
@@ -106,7 +103,7 @@ class DashboardController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->limit(5);
 
-            if (!$isAdmin) {
+            if (! $isAdmin) {
                 $actividadRecienteQuery->where('usuario_id', $usuario->id_usuario);
             }
 
@@ -117,7 +114,7 @@ class DashboardController extends Controller
 
                 return [
                     'id' => $cotizacion->id,
-                    'action' => 'Cotización ' . $cotizacion->numero . ' creada',
+                    'action' => 'Cotización '.$cotizacion->numero.' creada',
                     'client' => $nombreCliente,
                     'time' => $cotizacion->created_at->diffForHumans(),
                     'estado' => $cotizacion->estado,
@@ -132,7 +129,7 @@ class DashboardController extends Controller
                 ->orderBy('fecha_vencimiento', 'asc')
                 ->limit(5);
 
-            if (!$isAdmin) {
+            if (! $isAdmin) {
                 $tareasProximasQuery->where('usuario_id', $usuario->id_usuario);
             }
 
@@ -146,11 +143,11 @@ class DashboardController extends Controller
 
                 $dueText = $diasRestantes == 0
                     ? 'Hoy'
-                    : ($diasRestantes == 1 ? 'Mañana' : 'En ' . $diasRestantes . ' días');
+                    : ($diasRestantes == 1 ? 'Mañana' : 'En '.$diasRestantes.' días');
 
                 return [
                     'id' => $cotizacion->id,
-                    'task' => 'Seguimiento cotización ' . $cotizacion->numero,
+                    'task' => 'Seguimiento cotización '.$cotizacion->numero,
                     'client' => $nombreCliente,
                     'due' => $dueText,
                     'priority' => $prioridad,
@@ -171,17 +168,17 @@ class DashboardController extends Controller
                     ],
                     'actividad_reciente' => $actividadReciente,
                     'tareas_proximas' => $tareasProximas,
-                ]
+                ],
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error al obtener estadísticas del dashboard: ' . $e->getMessage());
-            Log::error('Stack trace: ' . $e->getTraceAsString());
+            Log::error('Error al obtener estadísticas del dashboard: '.$e->getMessage());
+            Log::error('Stack trace: '.$e->getTraceAsString());
 
             return response()->json([
                 'success' => false,
                 'error' => 'Error al obtener estadísticas',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -207,7 +204,7 @@ class DashboardController extends Controller
                 $ventasQuery = Cotizacion::where('estado', 'aprobada')
                     ->whereBetween('fecha_cotizacion', [$inicioMes, $finMes]);
 
-                if (!$isAdmin) {
+                if (! $isAdmin) {
                     $ventasQuery->where('usuario_id', $usuario->id_usuario);
                 }
 
@@ -222,7 +219,7 @@ class DashboardController extends Controller
             // Cotizaciones por estado
             $cotizacionesPorEstadoQuery = Cotizacion::select('estado', DB::raw('count(*) as total'));
 
-            if (!$isAdmin) {
+            if (! $isAdmin) {
                 $cotizacionesPorEstadoQuery->where('usuario_id', $usuario->id_usuario);
             }
 
@@ -239,7 +236,7 @@ class DashboardController extends Controller
             // --- Gráficos de evolución temporal (Diario, Semanal, Mensual) ---
             $now = Carbon::now();
             $baseQuery = Cotizacion::query();
-            if (!$isAdmin) {
+            if (! $isAdmin) {
                 $baseQuery->where('usuario_id', $usuario->id_usuario);
             }
 
@@ -247,7 +244,7 @@ class DashboardController extends Controller
             $dailyRaw = (clone $baseQuery)
                 ->where('created_at', '>=', $now->copy()->subDays(6)->startOfDay())
                 ->get()
-                ->groupBy(function($date) {
+                ->groupBy(function ($date) {
                     return Carbon::parse($date->created_at)->format('Y-m-d');
                 });
 
@@ -259,7 +256,7 @@ class DashboardController extends Controller
                     'name' => Carbon::parse($date)->locale('es')->isoFormat('dddd D'),
                     'full_date' => $date,
                     'count' => $dayData ? $dayData->count() : 0,
-                    'monto' => $dayData ? $dayData->sum('total') : 0
+                    'monto' => $dayData ? $dayData->sum('total') : 0,
                 ];
             }
 
@@ -268,16 +265,16 @@ class DashboardController extends Controller
             for ($i = 3; $i >= 0; $i--) {
                 $startOfWeek = $now->copy()->subWeeks($i)->startOfWeek();
                 $endOfWeek = $now->copy()->subWeeks($i)->endOfWeek();
-                
+
                 $weekData = (clone $baseQuery)
                     ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
                     ->get();
 
                 $weeklyChart[] = [
-                    'name' => 'Sem ' . $startOfWeek->format('d/m'),
-                    'range' => $startOfWeek->format('d/m') . ' - ' . $endOfWeek->format('d/m'),
+                    'name' => 'Sem '.$startOfWeek->format('d/m'),
+                    'range' => $startOfWeek->format('d/m').' - '.$endOfWeek->format('d/m'),
                     'count' => $weekData->count(),
-                    'monto' => $weekData->sum('total')
+                    'monto' => $weekData->sum('total'),
                 ];
             }
 
@@ -297,7 +294,7 @@ class DashboardController extends Controller
                     'name' => $monthDate->locale('es')->isoFormat('MMM YY'),
                     'full_date' => $monthDate->format('Y-m'),
                     'count' => $monthData->count(),
-                    'monto' => $monthData->sum('total')
+                    'monto' => $monthData->sum('total'),
                 ];
             }
 
@@ -309,18 +306,18 @@ class DashboardController extends Controller
                     'evolution_charts' => [
                         'daily' => $dailyChart,
                         'weekly' => $weeklyChart,
-                        'monthly' => $monthlyChart
-                    ]
-                ]
+                        'monthly' => $monthlyChart,
+                    ],
+                ],
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Error al obtener gráficos del dashboard: ' . $e->getMessage());
+            Log::error('Error al obtener gráficos del dashboard: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
                 'error' => 'Error al obtener gráficos',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }

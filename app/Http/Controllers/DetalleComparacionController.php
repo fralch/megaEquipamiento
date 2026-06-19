@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\DetalleComparacion;
 use App\Models\ComparacionProducto;
+use App\Models\DetalleComparacion;
 use App\Models\Producto;
+use Illuminate\Http\Request;
 
 class DetalleComparacionController extends Controller
 {
@@ -15,6 +15,7 @@ class DetalleComparacionController extends Controller
     public function index()
     {
         $detallesComparaciones = DetalleComparacion::with(['comparacion', 'producto'])->get();
+
         return view('detalles_comparaciones.index', compact('detallesComparaciones'));
     }
 
@@ -25,6 +26,7 @@ class DetalleComparacionController extends Controller
     {
         $comparaciones = ComparacionProducto::all();
         $productos = Producto::all();
+
         return view('detalles_comparaciones.create', compact('comparaciones', 'productos'));
     }
 
@@ -42,7 +44,7 @@ class DetalleComparacionController extends Controller
         DetalleComparacion::create($request->all());
 
         return redirect()->route('detalles-comparaciones.index')
-                         ->with('success', 'Detalle de Comparación creado exitosamente.');
+            ->with('success', 'Detalle de Comparación creado exitosamente.');
     }
 
     /**
@@ -60,6 +62,7 @@ class DetalleComparacionController extends Controller
     {
         $comparaciones = ComparacionProducto::all();
         $productos = Producto::all();
+
         return view('detalles_comparaciones.edit', compact('detalleComparacion', 'comparaciones', 'productos'));
     }
 
@@ -77,7 +80,7 @@ class DetalleComparacionController extends Controller
         $detalleComparacion->update($request->all());
 
         return redirect()->route('detalles-comparaciones.index')
-                         ->with('success', 'Detalle de Comparación actualizado exitosamente.');
+            ->with('success', 'Detalle de Comparación actualizado exitosamente.');
     }
 
     /**
@@ -88,6 +91,6 @@ class DetalleComparacionController extends Controller
         $detalleComparacion->delete();
 
         return redirect()->route('detalles-comparaciones.index')
-                         ->with('success', 'Detalle de Comparación eliminado exitosamente.');
+            ->with('success', 'Detalle de Comparación eliminado exitosamente.');
     }
 }

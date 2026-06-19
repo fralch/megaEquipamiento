@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\MarcaCategoria;
-use App\Models\Marca;
 use App\Models\Categoria;
-use Illuminate\Support\Facades\DB;
+use App\Models\Marca;
+use App\Models\MarcaCategoria;
+use Illuminate\Http\Request;
 
 class MarcaCategoriaController extends Controller
 {
@@ -42,6 +41,7 @@ class MarcaCategoriaController extends Controller
     {
         try {
             $marcas = Marca::orderBy('nombre', 'asc')->get();
+
             return response()->json($marcas);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al obtener las marcas'], 500);
@@ -55,6 +55,7 @@ class MarcaCategoriaController extends Controller
     {
         try {
             $categorias = Categoria::orderBy('nombre', 'asc')->get();
+
             return response()->json($categorias);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Error al obtener las categorías'], 500);
@@ -79,7 +80,7 @@ class MarcaCategoriaController extends Controller
 
             if ($exists) {
                 return response()->json([
-                    'message' => 'Esta relación ya existe.'
+                    'message' => 'Esta relación ya existe.',
                 ], 409);
             }
 
@@ -100,16 +101,16 @@ class MarcaCategoriaController extends Controller
                     'categoria_nombre' => $relacion->categoria->nombre ?? 'N/A',
                     'marca_imagen' => $relacion->marca->imagen ?? null,
                     'categoria_imagen' => $relacion->categoria->imagen ?? null,
-                ]
+                ],
             ], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
                 'message' => 'Error de validación',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al crear la relación: ' . $e->getMessage()
+                'message' => 'Error al crear la relación: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -124,20 +125,20 @@ class MarcaCategoriaController extends Controller
                 ->where('categoria_id', $categoria_id)
                 ->first();
 
-            if (!$relacion) {
+            if (! $relacion) {
                 return response()->json([
-                    'message' => 'Relación no encontrada.'
+                    'message' => 'Relación no encontrada.',
                 ], 404);
             }
 
             $relacion->delete();
 
             return response()->json([
-                'message' => 'Relación eliminada exitosamente.'
+                'message' => 'Relación eliminada exitosamente.',
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al eliminar la relación: ' . $e->getMessage()
+                'message' => 'Error al eliminar la relación: '.$e->getMessage(),
             ], 500);
         }
     }

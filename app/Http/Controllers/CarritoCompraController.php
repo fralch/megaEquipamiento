@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\CarritoCompra;
 use App\Models\Usuario;
+use Illuminate\Http\Request;
 
 class CarritoCompraController extends Controller
 {
@@ -14,6 +14,7 @@ class CarritoCompraController extends Controller
     public function index()
     {
         $carritos = CarritoCompra::with('usuario')->get();
+
         return view('carrito_compras.index', compact('carritos'));
     }
 
@@ -23,6 +24,7 @@ class CarritoCompraController extends Controller
     public function create()
     {
         $usuarios = Usuario::all();
+
         return view('carrito_compras.create', compact('usuarios'));
     }
 
@@ -38,7 +40,7 @@ class CarritoCompraController extends Controller
         CarritoCompra::create($request->all());
 
         return redirect()->route('carrito-compras.index')
-                         ->with('success', 'Carrito de compras creado exitosamente.');
+            ->with('success', 'Carrito de compras creado exitosamente.');
     }
 
     /**
@@ -55,6 +57,7 @@ class CarritoCompraController extends Controller
     public function edit(CarritoCompra $carritoCompra)
     {
         $usuarios = Usuario::all();
+
         return view('carrito_compras.edit', compact('carritoCompra', 'usuarios'));
     }
 
@@ -70,7 +73,7 @@ class CarritoCompraController extends Controller
         $carritoCompra->update($request->all());
 
         return redirect()->route('carrito-compras.index')
-                         ->with('success', 'Carrito de compras actualizado exitosamente.');
+            ->with('success', 'Carrito de compras actualizado exitosamente.');
     }
 
     /**
@@ -81,6 +84,6 @@ class CarritoCompraController extends Controller
         $carritoCompra->delete();
 
         return redirect()->route('carrito-compras.index')
-                         ->with('success', 'Carrito de compras eliminado exitosamente.');
+            ->with('success', 'Carrito de compras eliminado exitosamente.');
     }
 }

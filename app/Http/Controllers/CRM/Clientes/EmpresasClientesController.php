@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\CRM\Clientes;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cliente;
 use App\Models\EmpresaCliente;
 use App\Models\Usuario;
-use App\Models\Cliente;
-use App\Models\ContactoEmpresa;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
 class EmpresasClientesController extends Controller
@@ -72,7 +71,7 @@ class EmpresasClientesController extends Controller
             'empresas' => $empresas,
             'usuarios' => $usuarios,
             'clientes' => $clientes,
-            'filters' => $request->only(['search', 'vendedor_id', 'activo', 'sort_field', 'sort_direction'])
+            'filters' => $request->only(['search', 'vendedor_id', 'activo', 'sort_field', 'sort_direction']),
         ]);
     }
 
@@ -127,11 +126,13 @@ class EmpresasClientesController extends Controller
             }
 
             DB::commit();
+
             return redirect()->route('crm.clientes.empresas.index')->with('success', 'Empresa cliente creada exitosamente');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Error al crear la empresa cliente: ' . $e->getMessage()]);
+
+            return back()->withErrors(['error' => 'Error al crear la empresa cliente: '.$e->getMessage()]);
         }
     }
 
@@ -144,7 +145,7 @@ class EmpresasClientesController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $empresa
+            'data' => $empresa,
         ]);
     }
 
@@ -157,7 +158,7 @@ class EmpresasClientesController extends Controller
 
         $validator = Validator::make($request->all(), [
             'razon_social' => 'required|string|max:255',
-            'ruc' => 'required|string|size:11|unique:empresasclientes,ruc,' . $id,
+            'ruc' => 'required|string|size:11|unique:empresasclientes,ruc,'.$id,
             'direccion' => 'required|string|max:500',
             'usuario_id' => 'required|exists:usuarios,id_usuario',
             'contactos' => 'required|array|min:1',
@@ -204,11 +205,13 @@ class EmpresasClientesController extends Controller
             }
 
             DB::commit();
+
             return redirect()->route('crm.clientes.empresas.index')->with('success', 'Empresa cliente actualizada exitosamente');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Error al actualizar la empresa cliente: ' . $e->getMessage()]);
+
+            return back()->withErrors(['error' => 'Error al actualizar la empresa cliente: '.$e->getMessage()]);
         }
     }
 
@@ -237,7 +240,7 @@ class EmpresasClientesController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -245,7 +248,7 @@ class EmpresasClientesController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Empresas eliminadas exitosamente'
+            'message' => 'Empresas eliminadas exitosamente',
         ]);
     }
 
@@ -255,7 +258,7 @@ class EmpresasClientesController extends Controller
     public function toggleActivo($id)
     {
         $empresa = EmpresaCliente::findOrFail($id);
-        $empresa->activo = !$empresa->activo;
+        $empresa->activo = ! $empresa->activo;
         $empresa->save();
 
         $estadoTexto = $empresa->activo ? 'activada' : 'desactivada';
@@ -275,7 +278,7 @@ class EmpresasClientesController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $vendedores
+            'data' => $vendedores,
         ]);
     }
 }

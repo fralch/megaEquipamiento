@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\ComparacionProducto;
 use App\Models\Usuario;
+use Illuminate\Http\Request;
 
 class ComparacionProductoController extends Controller
 {
@@ -14,6 +14,7 @@ class ComparacionProductoController extends Controller
     public function index()
     {
         $comparaciones = ComparacionProducto::with('usuario')->get();
+
         return view('comparaciones_productos.index', compact('comparaciones'));
     }
 
@@ -23,6 +24,7 @@ class ComparacionProductoController extends Controller
     public function create()
     {
         $usuarios = Usuario::all();
+
         return view('comparaciones_productos.create', compact('usuarios'));
     }
 
@@ -38,7 +40,7 @@ class ComparacionProductoController extends Controller
         ComparacionProducto::create($request->all());
 
         return redirect()->route('comparaciones-productos.index')
-                         ->with('success', 'Comparación de Productos creada exitosamente.');
+            ->with('success', 'Comparación de Productos creada exitosamente.');
     }
 
     /**
@@ -55,6 +57,7 @@ class ComparacionProductoController extends Controller
     public function edit(ComparacionProducto $comparacionProducto)
     {
         $usuarios = Usuario::all();
+
         return view('comparaciones_productos.edit', compact('comparacionProducto', 'usuarios'));
     }
 
@@ -70,7 +73,7 @@ class ComparacionProductoController extends Controller
         $comparacionProducto->update($request->all());
 
         return redirect()->route('comparaciones-productos.index')
-                         ->with('success', 'Comparación de Productos actualizada exitosamente.');
+            ->with('success', 'Comparación de Productos actualizada exitosamente.');
     }
 
     /**
@@ -81,6 +84,6 @@ class ComparacionProductoController extends Controller
         $comparacionProducto->delete();
 
         return redirect()->route('comparaciones-productos.index')
-                         ->with('success', 'Comparación de Productos eliminada exitosamente.');
+            ->with('success', 'Comparación de Productos eliminada exitosamente.');
     }
 }

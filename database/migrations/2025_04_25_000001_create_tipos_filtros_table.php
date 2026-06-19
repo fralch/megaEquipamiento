@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('activo')->default(true);
             $table->boolean('obligatorio')->default(false); // Si es requerido al crear producto
             $table->timestamps();
-            
+
             $table->index(['activo', 'orden']);
         });
 
@@ -34,7 +34,7 @@ return new class extends Migration
             $table->integer('orden')->default(0);
             $table->boolean('activo')->default(true);
             $table->timestamps();
-            
+
             $table->foreign('id_filtro')->references('id_filtro')->on('filtros')->onDelete('cascade');
             $table->index(['id_filtro', 'activo', 'orden']);
         });
@@ -47,10 +47,10 @@ return new class extends Migration
             $table->integer('orden')->default(0); // Orden específico para esta subcategoría
             $table->boolean('activo')->default(true);
             $table->timestamps();
-            
+
             $table->foreign('id_subcategoria')->references('id_subcategoria')->on('subcategorias')->onDelete('cascade');
             $table->foreign('id_filtro')->references('id_filtro')->on('filtros')->onDelete('cascade');
-            
+
             $table->unique(['id_subcategoria', 'id_filtro']);
             $table->index(['id_subcategoria', 'activo', 'orden']);
         });

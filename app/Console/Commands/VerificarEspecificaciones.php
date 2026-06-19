@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Producto;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
 class VerificarEspecificaciones extends Command
@@ -47,8 +47,9 @@ class VerificarEspecificaciones extends Command
         // Consulta directa a la base de datos
         $productoDB = DB::table('productos')->where('id_producto', $id)->first();
 
-        if (!$productoDB) {
-            $this->error("Producto no encontrado");
+        if (! $productoDB) {
+            $this->error('Producto no encontrado');
+
             return;
         }
 
@@ -57,37 +58,37 @@ class VerificarEspecificaciones extends Command
 
         // Verificar especificaciones técnicas directamente de la BD
         $this->line("\n--- ESPECIFICACIONES TÉCNICAS (RAW desde BD) ---");
-        $this->line("Tipo: " . gettype($productoDB->especificaciones_tecnicas));
-        $this->line("Contenido: " . ($productoDB->especificaciones_tecnicas ?? 'NULL'));
+        $this->line('Tipo: '.gettype($productoDB->especificaciones_tecnicas));
+        $this->line('Contenido: '.($productoDB->especificaciones_tecnicas ?? 'NULL'));
 
         // Ahora con Eloquent
         $producto = Producto::find($id);
 
         $this->line("\n--- ESPECIFICACIONES TÉCNICAS (Eloquent con cast) ---");
-        $this->line("Tipo: " . gettype($producto->especificaciones_tecnicas));
+        $this->line('Tipo: '.gettype($producto->especificaciones_tecnicas));
 
         if (is_array($producto->especificaciones_tecnicas)) {
-            $this->line("Count: " . count($producto->especificaciones_tecnicas));
-            $this->line("Contenido:");
+            $this->line('Count: '.count($producto->especificaciones_tecnicas));
+            $this->line('Contenido:');
             foreach ($producto->especificaciones_tecnicas as $key => $value) {
                 $this->line("  - {$key}: {$value}");
             }
         } else {
-            $this->line("Contenido: " . json_encode($producto->especificaciones_tecnicas));
+            $this->line('Contenido: '.json_encode($producto->especificaciones_tecnicas));
         }
 
         // Verificar imagen
         $this->line("\n--- IMAGEN ---");
-        $this->line("Tipo (BD): " . gettype($productoDB->imagen));
-        $this->line("Tipo (Eloquent): " . gettype($producto->imagen));
+        $this->line('Tipo (BD): '.gettype($productoDB->imagen));
+        $this->line('Tipo (Eloquent): '.gettype($producto->imagen));
         if (is_array($producto->imagen)) {
-            $this->line("Count: " . count($producto->imagen));
+            $this->line('Count: '.count($producto->imagen));
         }
     }
 
     private function verificarTodos()
     {
-        $this->info("=== Verificando todos los productos ===");
+        $this->info('=== Verificando todos los productos ===');
 
         // Contar productos con especificaciones técnicas
         $total = Producto::count();
@@ -112,13 +113,13 @@ class VerificarEspecificaciones extends Command
 
         foreach ($productos as $p) {
             $this->line("\nID: {$p->id_producto} - {$p->nombre}");
-            $this->line("Tipo: " . gettype($p->especificaciones_tecnicas));
+            $this->line('Tipo: '.gettype($p->especificaciones_tecnicas));
             if (is_array($p->especificaciones_tecnicas)) {
-                $this->line("Count: " . count($p->especificaciones_tecnicas));
+                $this->line('Count: '.count($p->especificaciones_tecnicas));
                 $keys = array_keys($p->especificaciones_tecnicas);
-                $this->line("Keys: " . implode(', ', array_slice($keys, 0, 5)));
+                $this->line('Keys: '.implode(', ', array_slice($keys, 0, 5)));
             } else {
-                $this->line("Valor: " . substr(json_encode($p->especificaciones_tecnicas), 0, 100));
+                $this->line('Valor: '.substr(json_encode($p->especificaciones_tecnicas), 0, 100));
             }
         }
     }

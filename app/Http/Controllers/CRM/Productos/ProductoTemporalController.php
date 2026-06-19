@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\CRM\Productos;
 
 use App\Http\Controllers\Controller;
-use App\Models\ProductoTemporal;
 use App\Models\Marca;
+use App\Models\ProductoTemporal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProductoTemporalController extends Controller
@@ -26,8 +25,8 @@ class ProductoTemporalController extends Controller
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('titulo', 'like', "%{$search}%")
-                      ->orWhere('descripcion', 'like', "%{$search}%")
-                      ->orWhere('procedencia', 'like', "%{$search}%");
+                        ->orWhere('descripcion', 'like', "%{$search}%")
+                        ->orWhere('procedencia', 'like', "%{$search}%");
                 });
             }
 
@@ -61,13 +60,14 @@ class ProductoTemporalController extends Controller
                     'from' => $productos->firstItem(),
                     'to' => $productos->lastItem(),
                 ],
-                'filters' => $request->only(['search', 'marca_id', 'sort_field', 'sort_direction'])
+                'filters' => $request->only(['search', 'marca_id', 'sort_field', 'sort_direction']),
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener productos temporales: ' . $e->getMessage());
+            Log::error('Error al obtener productos temporales: '.$e->getMessage());
+
             return response()->json([
                 'error' => 'Error al obtener productos temporales',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -90,7 +90,7 @@ class ProductoTemporalController extends Controller
             }
         }
 
-        $lines = array_filter(explode("\n", (string)$text), fn($line) => !empty(trim($line)));
+        $lines = array_filter(explode("\n", (string) $text), fn ($line) => ! empty(trim($line)));
 
         if (empty($lines)) {
             return null;
@@ -114,17 +114,18 @@ class ProductoTemporalController extends Controller
                 // Saltar posible cabecera
                 if ($isFirstLine && (stripos($line, 'especificación') !== false || stripos($line, 'specification') !== false)) {
                     $isFirstLine = false;
+
                     continue;
                 }
 
                 // Dividir por tab o múltiples espacios
                 $parts = preg_split('/\t|\s{2,}/', $line, 2);
                 $parts = array_map('trim', $parts);
-                $parts = array_filter($parts, fn($p) => !empty($p));
+                $parts = array_filter($parts, fn ($p) => ! empty($p));
 
                 if (count($parts) >= 2) {
                     $result[$parts[0]] = $parts[1];
-                } elseif (count($parts) === 1 && !$isFirstLine) {
+                } elseif (count($parts) === 1 && ! $isFirstLine) {
                     $result['Info'] = $parts[0];
                 }
 
@@ -151,8 +152,8 @@ class ProductoTemporalController extends Controller
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
                     $q->where('titulo', 'like', "%{$search}%")
-                      ->orWhere('descripcion', 'like', "%{$search}%")
-                      ->orWhere('procedencia', 'like', "%{$search}%");
+                        ->orWhere('descripcion', 'like', "%{$search}%")
+                        ->orWhere('procedencia', 'like', "%{$search}%");
                 });
             }
 
@@ -165,14 +166,15 @@ class ProductoTemporalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'productos' => $productos
+                'productos' => $productos,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener productos temporales para cotización: ' . $e->getMessage());
+            Log::error('Error al obtener productos temporales para cotización: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al obtener productos temporales',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -191,13 +193,13 @@ class ProductoTemporalController extends Controller
                 'procedencia' => 'nullable|string|max:255',
                 'especificaciones_tecnicas' => 'nullable|string',
                 'imagenes' => 'nullable|array',
-                'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048'
+                'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -207,11 +209,11 @@ class ProductoTemporalController extends Controller
                 'descripcion',
                 'procedencia',
                 'precio',
-                'especificaciones_tecnicas'
+                'especificaciones_tecnicas',
             ]);
 
             // Process technical specifications
-            if ($request->has('especificaciones_tecnicas') && !empty($request->especificaciones_tecnicas)) {
+            if ($request->has('especificaciones_tecnicas') && ! empty($request->especificaciones_tecnicas)) {
                 $especificacionesText = $request->especificaciones_tecnicas;
 
                 // Parse the text to create a structured format
@@ -228,14 +230,14 @@ class ProductoTemporalController extends Controller
                 $uploadPath = public_path('img/productos_temporales');
 
                 // Create directory if it doesn't exist
-                if (!file_exists($uploadPath)) {
+                if (! file_exists($uploadPath)) {
                     mkdir($uploadPath, 0755, true);
                 }
 
                 foreach ($request->file('imagenes') as $imagen) {
-                    $filename = time() . '_' . uniqid() . '.' . $imagen->getClientOriginalExtension();
+                    $filename = time().'_'.uniqid().'.'.$imagen->getClientOriginalExtension();
                     $imagen->move($uploadPath, $filename);
-                    $imagenes[] = 'img/productos_temporales/' . $filename;
+                    $imagenes[] = 'img/productos_temporales/'.$filename;
                 }
                 $data['imagenes'] = $imagenes;
             }
@@ -246,14 +248,15 @@ class ProductoTemporalController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Producto temporal creado exitosamente',
-                'producto' => $producto
+                'producto' => $producto,
             ], 201);
         } catch (\Exception $e) {
-            Log::error('Error al crear producto temporal: ' . $e->getMessage());
+            Log::error('Error al crear producto temporal: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al crear producto temporal',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -268,14 +271,15 @@ class ProductoTemporalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'producto' => $producto
+                'producto' => $producto,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener producto temporal: ' . $e->getMessage());
+            Log::error('Error al obtener producto temporal: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Producto temporal no encontrado',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 404);
         }
     }
@@ -297,13 +301,13 @@ class ProductoTemporalController extends Controller
                 'especificaciones_tecnicas' => 'nullable|string',
                 'imagenes' => 'nullable|array',
                 'imagenes.*' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-                'imagenes_eliminadas' => 'nullable|string'
+                'imagenes_eliminadas' => 'nullable|string',
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -312,11 +316,11 @@ class ProductoTemporalController extends Controller
                 'marca_id',
                 'descripcion',
                 'procedencia',
-                'precio'
+                'precio',
             ]);
 
             // Process technical specifications
-            if ($request->has('especificaciones_tecnicas') && !empty($request->especificaciones_tecnicas)) {
+            if ($request->has('especificaciones_tecnicas') && ! empty($request->especificaciones_tecnicas)) {
                 $especificacionesText = $request->especificaciones_tecnicas;
 
                 // Parse the text to create a structured format
@@ -349,14 +353,14 @@ class ProductoTemporalController extends Controller
                 $uploadPath = public_path('img/productos_temporales');
 
                 // Create directory if it doesn't exist
-                if (!file_exists($uploadPath)) {
+                if (! file_exists($uploadPath)) {
                     mkdir($uploadPath, 0755, true);
                 }
 
                 foreach ($request->file('imagenes') as $imagen) {
-                    $filename = time() . '_' . uniqid() . '.' . $imagen->getClientOriginalExtension();
+                    $filename = time().'_'.uniqid().'.'.$imagen->getClientOriginalExtension();
                     $imagen->move($uploadPath, $filename);
-                    $imagenesActuales[] = 'img/productos_temporales/' . $filename;
+                    $imagenesActuales[] = 'img/productos_temporales/'.$filename;
                 }
                 $data['imagenes'] = $imagenesActuales;
             }
@@ -367,14 +371,15 @@ class ProductoTemporalController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Producto temporal actualizado exitosamente',
-                'producto' => $producto
+                'producto' => $producto,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al actualizar producto temporal: ' . $e->getMessage());
+            Log::error('Error al actualizar producto temporal: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al actualizar producto temporal',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -401,14 +406,15 @@ class ProductoTemporalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Producto temporal eliminado exitosamente'
+                'message' => 'Producto temporal eliminado exitosamente',
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al eliminar producto temporal: ' . $e->getMessage());
+            Log::error('Error al eliminar producto temporal: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al eliminar producto temporal',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -421,13 +427,13 @@ class ProductoTemporalController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'ids' => 'required|array',
-                'ids.*' => 'required|exists:productos_temporales,id'
+                'ids.*' => 'required|exists:productos_temporales,id',
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'errors' => $validator->errors()
+                    'errors' => $validator->errors(),
                 ], 422);
             }
 
@@ -450,14 +456,15 @@ class ProductoTemporalController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Productos temporales eliminados exitosamente',
-                'count' => count($request->ids)
+                'count' => count($request->ids),
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al eliminar productos temporales: ' . $e->getMessage());
+            Log::error('Error al eliminar productos temporales: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al eliminar productos temporales',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -474,14 +481,15 @@ class ProductoTemporalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'marcas' => $marcas
+                'marcas' => $marcas,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al obtener marcas: ' . $e->getMessage());
+            Log::error('Error al obtener marcas: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al obtener marcas',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -498,22 +506,23 @@ class ProductoTemporalController extends Controller
             $productos = ProductoTemporal::with('marca:id_marca,nombre')
                 ->where(function ($query) use ($search) {
                     $query->where('titulo', 'like', "%{$search}%")
-                          ->orWhere('descripcion', 'like', "%{$search}%")
-                          ->orWhere('procedencia', 'like', "%{$search}%");
+                        ->orWhere('descripcion', 'like', "%{$search}%")
+                        ->orWhere('procedencia', 'like', "%{$search}%");
                 })
                 ->limit($limit)
                 ->get();
 
             return response()->json([
                 'success' => true,
-                'productos' => $productos
+                'productos' => $productos,
             ]);
         } catch (\Exception $e) {
-            Log::error('Error al buscar productos temporales: ' . $e->getMessage());
+            Log::error('Error al buscar productos temporales: '.$e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'error' => 'Error al buscar productos temporales',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }

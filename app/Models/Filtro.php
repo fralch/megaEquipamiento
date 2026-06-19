@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Filtro extends Model
 {
     protected $table = 'filtros';
+
     protected $primaryKey = 'id_filtro';
-    
+
     protected $fillable = [
         'nombre',
         'slug',
@@ -19,12 +20,12 @@ class Filtro extends Model
         'activo',
         'obligatorio',
         'max_value',
-        'min_value'
+        'min_value',
     ];
 
     protected $casts = [
         'activo' => 'boolean',
-        'obligatorio' => 'boolean'
+        'obligatorio' => 'boolean',
     ];
 
     public function opciones()
@@ -35,7 +36,7 @@ class Filtro extends Model
     public function subcategorias()
     {
         return $this->belongsToMany(Subcategoria::class, 'subcategoria_filtros', 'id_filtro', 'id_subcategoria')
-                    ->withPivot('orden', 'activo')
-                    ->withTimestamps();
+            ->withPivot('orden', 'activo')
+            ->withTimestamps();
     }
 }

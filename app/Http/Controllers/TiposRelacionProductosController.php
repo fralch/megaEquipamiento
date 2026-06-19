@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\TiposRelacionProductos;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 class TiposRelacionProductosController extends Controller
 {
+    /* obtener todos los registros de la tabla */
+    public function get_all()
+    {
+        $tipos = TiposRelacionProductos::all();
 
-        /* obtener todos los registros de la tabla */
-    function get_all()  {
-            $tipos = TiposRelacionProductos::all();
-            return response()->json($tipos, 200);
+        return response()->json($tipos, 200);
     }
-    
-   
+
     /**
      * Store a newly created resource in storage. es para una api
      */
@@ -26,7 +25,7 @@ class TiposRelacionProductosController extends Controller
             'descripcion' => 'nullable|string|max:255',
         ]);
 
-        $tipoRelacionProducto = new TiposRelacionProductos();
+        $tipoRelacionProducto = new TiposRelacionProductos;
         $tipoRelacionProducto->nombre = $request->nombre;
         $tipoRelacionProducto->descripcion = $request->descripcion;
         $tipoRelacionProducto->save();
@@ -34,7 +33,6 @@ class TiposRelacionProductosController extends Controller
         return response()->json($tipoRelacionProducto, 201);
     }
 
-   
     /**
      * Update the specified resource in storage.s es para una api
      */

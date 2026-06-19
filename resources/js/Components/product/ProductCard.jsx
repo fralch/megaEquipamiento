@@ -58,7 +58,7 @@ const ProductCard = ({ product }) => {
           <p className={`text-sm mb-3 line-clamp-3 ${
             isDarkMode ? 'text-gray-300' : 'text-gray-700'
           }`}>
-            {product.descripcion}
+            {product.descripcion.replace(/<\/?[^>]+(>|$)/g, "")}
           </p>
         )}
 

@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -20,12 +20,12 @@ return new class extends Migration
             AND imagen != '' 
             AND (imagen LIKE '%\\%' OR imagen LIKE '%\"%' OR imagen LIKE '%\n%' OR imagen LIKE '%\r%')
         ");
-        
+
         // Crear una columna temporal para almacenar los datos
         Schema::table('productos', function (Blueprint $table) {
             $table->json('imagen_temp')->nullable();
         });
-        
+
         // Migrar los datos válidos a la columna temporal
         DB::statement("
             UPDATE productos 
@@ -35,12 +35,12 @@ return new class extends Migration
                 ELSE NULL 
             END
         ");
-        
+
         // Eliminar la columna original
         Schema::table('productos', function (Blueprint $table) {
             $table->dropColumn('imagen');
         });
-        
+
         // Renombrar la columna temporal
         Schema::table('productos', function (Blueprint $table) {
             $table->renameColumn('imagen_temp', 'imagen');
@@ -56,7 +56,7 @@ return new class extends Migration
         Schema::table('productos', function (Blueprint $table) {
             $table->string('imagen_temp', 255)->nullable();
         });
-        
+
         // Revertir los datos JSON a string (tomar solo la primera imagen)
         DB::statement("
             UPDATE productos 
@@ -66,12 +66,12 @@ return new class extends Migration
                 ELSE NULL 
             END
         ");
-        
+
         // Eliminar la columna JSON
         Schema::table('productos', function (Blueprint $table) {
             $table->dropColumn('imagen');
         });
-        
+
         // Renombrar la columna temporal
         Schema::table('productos', function (Blueprint $table) {
             $table->renameColumn('imagen_temp', 'imagen');
