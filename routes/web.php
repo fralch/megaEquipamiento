@@ -64,6 +64,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckAdminRole::class])->group(f
     Route::post('/admin/categorias/quick', [ProductoImportController::class, 'quickCategoria'])->name('admin.categorias.quick');
     Route::post('/admin/subcategorias/quick', [ProductoImportController::class, 'quickSubcategoria'])->name('admin.subcategorias.quick');
     Route::post('/admin/marcas/quick', [ProductoImportController::class, 'quickMarca'])->name('admin.marcas.quick');
+    Route::post('/admin/products/create-pending-dependencies', [ProductoImportController::class, 'createPendingDependencies'])->name('admin.products.create-pending-dependencies');
 });
 
 // Ruta pública para previsualizar la vista HTML de cotización (solo entorno local)

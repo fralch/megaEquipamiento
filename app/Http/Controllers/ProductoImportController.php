@@ -7,6 +7,7 @@ use App\Models\Marca;
 use App\Models\Producto;
 use App\Models\Subcategoria;
 use App\Services\Csv\CsvProductoParser;
+use App\Services\Csv\ParseResultDto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -329,6 +330,57 @@ class ProductoImportController extends Controller
             'omitidos' => $omitidos,
             'errores_previos' => $payload['errores'] ?? [],
         ]);
+    }
+
+    /**
+     * Crea todas las dependencias pendientes de una sola vez.
+     */
+    public function createPendingDependencies(Request $request)
+    {
+        $data = $request->validate([
+            'cache_key' => 'required|string',
+        ]);
+
+        $cacheKey = self::CACHE_KEY.':'.$data['cache_key'];
+        $cached = Cache::get($cacheKey);
+        if (! $cached) {
+            return response()->json([
+                'success' => false,
+                'error' => 'La sesión de importación expiró. Vuelve a subir el CSV.',
+            ], 410);
+        }
+
+        $payload = $cached['result'];
+        $result = new ParseResultDto(
+            categoriasPendientes: $payload['categorias_pendientes'] ?? [],
+            subcategoriasPendientes: $payload['subcategorias_pendientes'] ?? [],
+            marcasPendientes: $payload['marcas_pendientes'] ?? []
+        );
+
+        try {
+            $categoriasMap = $this->resolveCategorias($result);
+            $this->resolveSubcategorias($result, $categoriasMap);
+            $this->resolveMarcas($result);
+
+            // Borrar archivos temporales y cache
+            $pathsToDelete = $cached['stored_paths']
+                ?? (! empty($cached['stored_path']) ? [$cached['stored_path']] : []);
+            foreach ($pathsToDelete as $path) {
+                Storage::disk('local')->delete($path);
+            }
+            Cache::forget($cacheKey);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Todas las dependencias creadas correctamente.',
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error creando dependencias en importación: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al crear dependencias: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     private function cacheId(Request $request): string

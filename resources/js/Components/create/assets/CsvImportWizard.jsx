@@ -73,6 +73,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
   const allMarcas = [...(marcas || []), ...newMarcas];
   const [busyKey, setBusyKey] = useState(null);
   const [error, setError] = useState(null);
+  const [infoMessage, setInfoMessage] = useState(null);
   const [importing, setImporting] = useState(false);
   const [result, setResult] = useState(null);
   const [selected, setSelected] = useState(() => new Set());
@@ -90,11 +91,17 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
     setNewMarcas([]);
     setBusyKey(null);
     setError(null);
+    setInfoMessage(null);
     setImporting(false);
     setResult(null);
     setSelected(new Set());
     setOverrides({});
     if (inputRef.current) inputRef.current.value = '';
+  };
+
+  const resetWithInfo = (msg) => {
+    reset();
+    setInfoMessage(msg);
   };
 
   const close = () => {
@@ -124,6 +131,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
     if (files.length === 0) return;
     setBusyKey('upload');
     setError(null);
+    setInfoMessage(null);
     try {
       const fd = new FormData();
       if (files.length === 1) {
@@ -176,6 +184,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
     const item = pending.categorias[idx];
     setBusyKey(`cat-${idx}`);
     setError(null);
+    setInfoMessage(null);
     try {
       const { data } = await axios.post(
         `${URL_API}/admin/categorias/quick`,
@@ -183,10 +192,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         { headers: { 'X-CSRF-TOKEN': csrf() } },
       );
       if (data.success) {
-        const updated = [...pending.categorias];
-        updated.splice(idx, 1);
-        setPending((p) => ({ ...p, categorias: updated }));
-        if (data.categoria) setNewCategorias((prev) => [...prev, data.categoria]);
+        resetWithInfo(`Categoría "${item.nombre}" creada con éxito. Por favor, vuelve a subir el CSV.`);
       }
     } catch (e) {
       setError(e?.response?.data?.message || e.message);
@@ -199,6 +205,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
     const item = pending.marcas[idx];
     setBusyKey(`marca-${idx}`);
     setError(null);
+    setInfoMessage(null);
     try {
       const { data } = await axios.post(
         `${URL_API}/admin/marcas/quick`,
@@ -206,26 +213,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         { headers: { 'X-CSRF-TOKEN': csrf() } },
       );
       if (data.success) {
-        const updated = [...pending.marcas];
-        updated.splice(idx, 1);
-        setPending((p) => ({ ...p, marcas: updated }));
-        if (data.marca) {
-          setNewMarcas((prev) => [...prev, data.marca]);
-          const marcaId = data.marca.id_marca;
-          const targetName = norm(item.nombre);
-          setOverrides((prev) => {
-            const next = { ...prev };
-            (preview?.productos || []).forEach((p) => {
-              if (norm(p.marca_nombre) === targetName && norm(p.marca_nombre) !== '') {
-                const existing = next[p.sku] || {};
-                if (existing.marca_id === undefined) {
-                  next[p.sku] = { ...existing, marca_id: marcaId };
-                }
-              }
-            });
-            return next;
-          });
-        }
+        resetWithInfo(`Marca "${item.nombre}" creada con éxito. Por favor, vuelve a subir el CSV.`);
       }
     } catch (e) {
       setError(e?.response?.data?.message || e.message);
@@ -238,6 +226,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
     const item = pending.subcategorias[idx];
     setBusyKey(`sub-${idx}`);
     setError(null);
+    setInfoMessage(null);
     try {
       const idCategoria = allCategorias.find(
         (c) => norm(c.nombre) === catEffective(item.categoria),
@@ -252,34 +241,35 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         { headers: { 'X-CSRF-TOKEN': csrf() } },
       );
       if (data.success) {
-        const updated = [...pending.subcategorias];
-        updated.splice(idx, 1);
-        setPending((p) => ({ ...p, subcategorias: updated }));
-        if (data.subcategoria) {
-          setNewSubcategorias((prev) => [...prev, data.subcategoria]);
-          const subId = data.subcategoria.id_subcategoria;
-          const targetCat = catEffective(item.categoria);
-          const targetSub = norm(item.nombre);
-          setOverrides((prev) => {
-            const next = { ...prev };
-            (preview?.productos || []).forEach((p) => {
-              if (
-                catEffective(p.categoria_nombre) === targetCat &&
-                norm(p.subcategoria_nombre) === targetSub &&
-                targetSub !== ''
-              ) {
-                const existing = next[p.sku] || {};
-                if (existing.id_subcategoria === undefined) {
-                  next[p.sku] = { ...existing, id_subcategoria: subId };
-                }
-              }
-            });
-            return next;
-          });
-        }
+        resetWithInfo(`Subcategoría "${item.nombre}" creada con éxito. Por favor, vuelve a subir el CSV.`);
       }
     } catch (e) {
       setError(e?.response?.data?.message || e.message);
+    } finally {
+      setBusyKey(null);
+    }
+  };
+
+  const createAllPending = async () => {
+    if (!cacheKey) return;
+    setBusyKey('create-all');
+    setError(null);
+    setInfoMessage(null);
+    try {
+      const { data } = await axios.post(
+        `${URL_API}/admin/products/create-pending-dependencies`,
+        { cache_key: cacheKey },
+        { headers: { 'X-CSRF-TOKEN': csrf() } }
+      );
+      if (data.success) {
+        resetWithInfo(
+          'Se han creado todas las categorías, subcategorías y marcas pendientes con éxito. Por favor, selecciona y carga el archivo CSV nuevamente.'
+        );
+      } else {
+        setError(data.error || 'Ocurrió un error al crear las dependencias.');
+      }
+    } catch (e) {
+      setError(e?.response?.data?.error || e?.response?.data?.message || e.message);
     } finally {
       setBusyKey(null);
     }
@@ -362,6 +352,10 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {error && (
             <div className="mb-4 p-3 rounded-md bg-red-100 text-red-800 text-sm">{error}</div>
+          )}
+
+          {infoMessage && (
+            <div className="mb-4 p-3 rounded-md bg-green-100 text-green-800 text-sm">{infoMessage}</div>
           )}
 
           {step === Steps.UPLOAD && (
@@ -495,6 +489,18 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                 >
                   Volver
                 </button>
+                {(pending.categorias.length > 0 ||
+                  pending.subcategorias.length > 0 ||
+                  pending.marcas.length > 0) && (
+                  <button
+                    type="button"
+                    disabled={busyKey !== null}
+                    onClick={createAllPending}
+                    className="px-4 py-2 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 min-h-[40px]"
+                  >
+                    {busyKey === 'create-all' ? 'Creando todo...' : 'Crear todo y volver a cargar CSV'}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={goToConfirm}
