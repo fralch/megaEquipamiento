@@ -60,6 +60,7 @@ Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])-
 
 Route::middleware(['auth', \App\Http\Middleware\CheckAdminRole::class])->group(function () {
     Route::post('/admin/products/preview-csv', [ProductoImportController::class, 'previewCsv'])->name('admin.products.preview-csv');
+    Route::post('/admin/products/refresh-preview', [ProductoImportController::class, 'refreshPreview'])->name('admin.products.refresh-preview');
     Route::post('/admin/products/import-csv', [ProductoImportController::class, 'importCsv'])->name('admin.products.import-csv');
     Route::post('/admin/categorias/quick', [ProductoImportController::class, 'quickCategoria'])->name('admin.categorias.quick');
     Route::post('/admin/subcategorias/quick', [ProductoImportController::class, 'quickSubcategoria'])->name('admin.subcategorias.quick');

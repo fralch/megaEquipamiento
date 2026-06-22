@@ -11,6 +11,8 @@ class CsvProductoParser
 {
     public const IGV_PORCENTAJE = 18.0;
 
+    public function __construct(private readonly ImportDependencyResolver $dependencyResolver) {}
+
     /**
      * Cabeceras esperadas (case-insensitive, tolerante a espacios/encoding).
      *
@@ -582,81 +584,33 @@ class CsvProductoParser
     }
 
     /**
-     * Crea las marcas pendientes y devuelve un mapa [nombre => id_marca].
+     * @see ImportDependencyResolver::resolveMarcas()
      *
      * @return array<string, int>
      */
     public function resolveMarcas(ParseResultDto $result): array
     {
-        $map = Marca::pluck('id_marca', 'nombre')
-            ->mapWithKeys(fn ($id, $nombre) => [$this->normalizeName($nombre) => $id])
-            ->all();
-        foreach ($result->marcasPendientes as $pendiente) {
-            $nombre = $pendiente['nombre'];
-            $key = $this->normalizeName($nombre);
-            if (isset($map[$key])) {
-                continue;
-            }
-            $map[$key] = Marca::create(['nombre' => $nombre])->id_marca;
-        }
-
-        return $map;
+        return $this->dependencyResolver->resolveMarcas($result);
     }
 
     /**
-     * Crea las categorías pendientes y devuelve un mapa [nombre_normalizado => id_categoria].
+     * @see ImportDependencyResolver::resolveCategorias()
      *
      * @return array<string, int>
      */
     public function resolveCategorias(ParseResultDto $result): array
     {
-        $map = Categoria::pluck('id_categoria', 'nombre')
-            ->mapWithKeys(fn ($id, $nombre) => [$this->normalizeName($nombre) => $id])
-            ->all();
-        foreach ($result->categoriasPendientes as $pendiente) {
-            $nombre = $pendiente['nombre'];
-            $key = $this->normalizeName($nombre);
-            if (isset($map[$key])) {
-                continue;
-            }
-            $map[$key] = Categoria::create(['nombre' => $nombre])->id_categoria;
-        }
-
-        return $map;
+        return $this->dependencyResolver->resolveCategorias($result);
     }
 
     /**
-     * Crea las subcategorías pendientes (requiere que las categorías ya estén
-     * en $categoriasMap) y devuelve un mapa [key => id_subcategoria]
-     * donde la key es `categoria|subcategoria` en minúsculas.
+     * @see ImportDependencyResolver::resolveSubcategorias()
      *
      * @param  array<string, int>  $categoriasMap
      * @return array<string, int>
      */
     public function resolveSubcategorias(ParseResultDto $result, array $categoriasMap): array
     {
-        $map = Subcategoria::with('categoria')->get()
-            ->mapWithKeys(fn (Subcategoria $s) => [
-                $this->normalizeName($s->categoria->nombre.'|'.$s->nombre) => $s->id_subcategoria,
-            ])->all();
-
-        foreach ($result->subcategoriasPendientes as $pendiente) {
-            $catNombre = $pendiente['categoria'];
-            $subNombre = $pendiente['nombre'];
-            $key = $this->normalizeName($catNombre.'|'.$subNombre);
-            if (isset($map[$key])) {
-                continue;
-            }
-            $idCategoria = $categoriasMap[$this->normalizeName($catNombre)] ?? null;
-            if ($idCategoria === null) {
-                continue;
-            }
-            $map[$key] = Subcategoria::create([
-                'nombre' => $subNombre,
-                'id_categoria' => $idCategoria,
-            ])->id_subcategoria;
-        }
-
-        return $map;
+        return $this->dependencyResolver->resolveSubcategorias($result, $categoriasMap);
     }
 }

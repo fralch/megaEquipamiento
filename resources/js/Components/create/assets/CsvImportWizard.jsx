@@ -180,6 +180,94 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
     }
   };
 
+  const updateFromPreview = (previewData, createdEntities = null) => {
+    setPreview(previewData);
+    setPending({
+      categorias: previewData.categorias_pendientes || [],
+      subcategorias: previewData.subcategorias_pendientes || [],
+      marcas: previewData.marcas_pendientes || [],
+    });
+
+    // Reconstruir listas locales de entidades recién resueltas en la BD
+    const existingCatIds = new Set((categorias || []).map((c) => c.id_categoria));
+    const existingSubIds = new Set((subcategorias || []).map((s) => s.id_subcategoria));
+    const existingMarcaIds = new Set((marcas || []).map((m) => m.id_marca));
+
+    const newCats = [];
+    const newSubs = [];
+    const newMs = [];
+
+    for (const p of previewData.productos || []) {
+      if (p.id_categoria && !existingCatIds.has(p.id_categoria)) {
+        if (!newCats.find((c) => c.id_categoria === p.id_categoria)) {
+          newCats.push({ id_categoria: p.id_categoria, nombre: p.categoria_nombre || '' });
+        }
+      }
+      if (p.id_subcategoria && !existingSubIds.has(p.id_subcategoria)) {
+        if (!newSubs.find((s) => s.id_subcategoria === p.id_subcategoria)) {
+          newSubs.push({
+            id_subcategoria: p.id_subcategoria,
+            nombre: p.subcategoria_nombre || '',
+            id_categoria: p.id_categoria,
+          });
+        }
+      }
+      if (p.marca_id && !existingMarcaIds.has(p.marca_id)) {
+        if (!newMs.find((m) => m.id_marca === p.marca_id)) {
+          newMs.push({ id_marca: p.marca_id, nombre: p.marca_nombre || '' });
+        }
+      }
+    }
+
+    // Incluir explícitamente entidades creadas en esta acción (por si el
+    // preview aún no las refleja o no tienen productos asociados).
+    if (createdEntities) {
+      if (createdEntities.categoria && !existingCatIds.has(createdEntities.categoria.id_categoria)) {
+        if (!newCats.find((c) => c.id_categoria === createdEntities.categoria.id_categoria)) {
+          newCats.push(createdEntities.categoria);
+        }
+      }
+      if (createdEntities.subcategoria && !existingSubIds.has(createdEntities.subcategoria.id_subcategoria)) {
+        if (!newSubs.find((s) => s.id_subcategoria === createdEntities.subcategoria.id_subcategoria)) {
+          newSubs.push(createdEntities.subcategoria);
+        }
+      }
+      if (createdEntities.marca && !existingMarcaIds.has(createdEntities.marca.id_marca)) {
+        if (!newMs.find((m) => m.id_marca === createdEntities.marca.id_marca)) {
+          newMs.push(createdEntities.marca);
+        }
+      }
+    }
+
+    setNewCategorias(newCats);
+    setNewSubcategorias(newSubs);
+    setNewMarcas(newMs);
+  };
+
+  const refreshPreview = async (createdEntities = null) => {
+    if (!cacheKey) return null;
+    setBusyKey('refresh');
+    setError(null);
+    setInfoMessage(null);
+    try {
+      const { data } = await axios.post(
+        `${URL_API}/admin/products/refresh-preview`,
+        { cache_key: cacheKey },
+        { headers: { 'X-CSRF-TOKEN': csrf() } }
+      );
+      if (data.success) {
+        updateFromPreview(data.data, createdEntities);
+        return data.data;
+      }
+      setError(data.error || 'No se pudo actualizar la vista previa.');
+    } catch (e) {
+      setError(e?.response?.data?.error || e?.response?.data?.message || e.message);
+    } finally {
+      setBusyKey(null);
+    }
+    return null;
+  };
+
   const createCategoria = async (idx) => {
     const item = pending.categorias[idx];
     setBusyKey(`cat-${idx}`);
@@ -192,7 +280,11 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         { headers: { 'X-CSRF-TOKEN': csrf() } },
       );
       if (data.success) {
-        resetWithInfo(`Categoría "${item.nombre}" creada con éxito. Por favor, vuelve a subir el CSV.`);
+        if (data.created) {
+          setNewCategorias((prev) => [...prev, data.categoria]);
+        }
+        setInfoMessage(`Categoría "${item.nombre}" ${data.created ? 'creada' : 'ya existía'}.`);
+        await refreshPreview(data.created ? { categoria: data.categoria } : null);
       }
     } catch (e) {
       setError(e?.response?.data?.message || e.message);
@@ -213,7 +305,11 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         { headers: { 'X-CSRF-TOKEN': csrf() } },
       );
       if (data.success) {
-        resetWithInfo(`Marca "${item.nombre}" creada con éxito. Por favor, vuelve a subir el CSV.`);
+        if (data.created) {
+          setNewMarcas((prev) => [...prev, data.marca]);
+        }
+        setInfoMessage(`Marca "${item.nombre}" ${data.created ? 'creada' : 'ya existía'}.`);
+        await refreshPreview(data.created ? { marca: data.marca } : null);
       }
     } catch (e) {
       setError(e?.response?.data?.message || e.message);
@@ -241,7 +337,11 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         { headers: { 'X-CSRF-TOKEN': csrf() } },
       );
       if (data.success) {
-        resetWithInfo(`Subcategoría "${item.nombre}" creada con éxito. Por favor, vuelve a subir el CSV.`);
+        if (data.created) {
+          setNewSubcategorias((prev) => [...prev, data.subcategoria]);
+        }
+        setInfoMessage(`Subcategoría "${item.nombre}" ${data.created ? 'creada' : 'ya existía'}.`);
+        await refreshPreview(data.created ? { subcategoria: data.subcategoria } : null);
       }
     } catch (e) {
       setError(e?.response?.data?.message || e.message);
@@ -262,9 +362,15 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
         { headers: { 'X-CSRF-TOKEN': csrf() } }
       );
       if (data.success) {
-        resetWithInfo(
-          'Se han creado todas las categorías, subcategorías y marcas pendientes con éxito. Por favor, selecciona y carga el archivo CSV nuevamente.'
-        );
+        updateFromPreview(data.data);
+        setInfoMessage(data.message || 'Dependencias creadas correctamente.');
+        const sinPendientes =
+          (data.data.categorias_pendientes || []).length === 0 &&
+          (data.data.subcategorias_pendientes || []).length === 0 &&
+          (data.data.marcas_pendientes || []).length === 0;
+        if (sinPendientes) {
+          setStep(Steps.CONFIRM);
+        }
       } else {
         setError(data.error || 'Ocurrió un error al crear las dependencias.');
       }
@@ -317,9 +423,10 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
   };
 
   const setOverride = (sku, field, value) => {
+    const normalizedValue = value === '' ? null : value;
     setOverrides((prev) => ({
       ...prev,
-      [sku]: { ...(prev[sku] || {}), [field]: value },
+      [sku]: { ...(prev[sku] || {}), [field]: normalizedValue },
     }));
   };
 
@@ -427,7 +534,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                         key={`cat-${idx}-${c.nombre}`}
                         label={c.nombre}
                         value={`${c.ocurrencias} producto(s) la necesitan`}
-                        busy={busyKey === `cat-${idx}`}
+                        busy={busyKey !== null}
                         onCreate={() => createCategoria(idx)}
                       />
                     ))}
@@ -446,7 +553,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                         key={`sub-${idx}-${s.nombre}`}
                         label={s.nombre}
                         value={`Categoría: ${s.categoria} · ${s.ocurrencias} producto(s)`}
-                        busy={busyKey === `sub-${idx}`}
+                        busy={busyKey !== null}
                         onCreate={() => createSubcategoria(idx)}
                       />
                     ))}
@@ -463,7 +570,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                         key={`marca-${idx}-${m.nombre}`}
                         label={m.nombre}
                         value={`${m.ocurrencias} producto(s) la necesitan`}
-                        busy={busyKey === `marca-${idx}`}
+                        busy={busyKey !== null}
                         onCreate={() => createMarca(idx)}
                       />
                     ))}
@@ -498,13 +605,32 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                     onClick={createAllPending}
                     className="px-4 py-2 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 min-h-[40px]"
                   >
-                    {busyKey === 'create-all' ? 'Creando todo...' : 'Crear todo y volver a cargar CSV'}
+                    {busyKey === 'create-all' ? 'Creando todo...' : 'Crear todo'}
                   </button>
                 )}
                 <button
                   type="button"
+                  disabled={busyKey !== null}
+                  onClick={() => refreshPreview()}
+                  className={`px-4 py-2 rounded-md text-sm font-medium min-h-[40px] ${
+                    busyKey !== null
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : isDarkMode
+                      ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                  }`}
+                >
+                  {busyKey === 'refresh' ? 'Actualizando…' : 'Actualizar vista previa'}
+                </button>
+                <button
+                  type="button"
+                  disabled={busyKey !== null || pending.categorias.length > 0 || pending.subcategorias.length > 0 || pending.marcas.length > 0}
                   onClick={goToConfirm}
-                  className="px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 min-h-[40px]"
+                  className={`px-4 py-2 rounded-md text-white text-sm font-medium min-h-[40px] ${
+                    busyKey !== null || pending.categorias.length > 0 || pending.subcategorias.length > 0 || pending.marcas.length > 0
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-indigo-600 hover:bg-indigo-700'
+                  }`}
                 >
                   Continuar a previsualización
                 </button>
@@ -580,6 +706,9 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                             } border px-1 py-0.5`}
                           >
                             <option value="">(sin resolver)</option>
+                            {p.id_subcategoria && !allSubcategorias.some((s) => String(s.id_subcategoria) === String(p.id_subcategoria)) && (
+                              <option value={p.id_subcategoria}>{p.subcategoria_nombre || 'Subcategoría resuelta'}</option>
+                            )}
                             {(allSubcategorias || []).map((s) => (
                               <option key={s.id_subcategoria} value={s.id_subcategoria}>
                                 {s.nombre}
@@ -589,6 +718,9 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                           {p.subcategoria_nombre && (
                             <div className={`text-[10px] mt-0.5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                               CSV: {p.subcategoria_nombre}
+                              {!p.id_subcategoria && (
+                                <span className="ml-1 text-red-500 font-medium">(no resuelta)</span>
+                              )}
                             </div>
                           )}
                         </td>
@@ -601,6 +733,9 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                             } border px-1 py-0.5`}
                           >
                             <option value="">(sin marca)</option>
+                            {p.marca_id && !allMarcas.some((m) => String(m.id_marca) === String(p.marca_id)) && (
+                              <option value={p.marca_id}>{p.marca_nombre || 'Marca resuelta'}</option>
+                            )}
                             {(allMarcas || []).map((m) => (
                               <option key={m.id_marca} value={m.id_marca}>
                                 {m.nombre}
@@ -610,6 +745,9 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                           {p.marca_nombre && (
                             <div className={`text-[10px] mt-0.5 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                               CSV: {p.marca_nombre}
+                              {!p.marca_id && (
+                                <span className="ml-1 text-red-500 font-medium">(no resuelta)</span>
+                              )}
                             </div>
                           )}
                         </td>
