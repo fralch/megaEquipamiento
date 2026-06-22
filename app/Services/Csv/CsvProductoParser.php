@@ -38,12 +38,66 @@ class CsvProductoParser
     ];
 
     /**
+     * Parsea múltiples CSVs y fusiona los resultados en un solo DTO.
+     * Detecta SKUs duplicados entre archivos.
+     *
+     * @param  array<int, array{path: string, name: string}>  $files  [{path, name}, ...]
+     */
+    public function parseMultiple(array $files): ParseResultDto
+    {
+        $combined = new ParseResultDto;
+        $globalSkus = []; // sku => archivo de origen
+
+        foreach ($files as $fileInfo) {
+            $filePath = $fileInfo['path'];
+            $fileName = $fileInfo['name'];
+
+            $result = $this->parse($filePath, $fileName);
+            $combined->merge($result);
+        }
+
+        // Detectar SKUs duplicados entre archivos
+        $skuMap = [];
+        $cleanProductos = [];
+        foreach ($combined->productos as $producto) {
+            $sku = $producto['sku'];
+            if (isset($skuMap[$sku])) {
+                $combined->errores[] = [
+                    'fila' => $producto['fila'],
+                    'sku' => $sku,
+                    'archivo' => $producto['archivo_origen'] ?? null,
+                    'motivo' => "SKU duplicado entre archivos (también en \"{$skuMap[$sku]}\")",
+                ];
+
+                continue;
+            }
+            $skuMap[$sku] = $producto['archivo_origen'] ?? 'desconocido';
+            $cleanProductos[] = $producto;
+        }
+        $combined->productos = $cleanProductos;
+
+        Log::info('CsvProductoParser::parseMultiple finalizado', [
+            'archivos' => count($files),
+            'productos' => count($combined->productos),
+            'errores' => count($combined->errores),
+        ]);
+
+        return $combined;
+    }
+
+    /**
      * Parsea un CSV de productos y devuelve el resultado de la primera fase
      * (sin tocar la BD más allá de lecturas para resolver FKs existentes).
+     *
+     * @param  string|null  $archivoOrigen  Nombre del archivo original para trazabilidad
      */
-    public function parse(string $filePath): ParseResultDto
+    public function parse(string $filePath, ?string $archivoOrigen = null): ParseResultDto
     {
         $result = new ParseResultDto;
+
+        if ($archivoOrigen !== null) {
+            $result->archivosOrigen = [$archivoOrigen];
+        }
 
         if (! is_readable($filePath)) {
             $result->errores[] = ['fila' => 0, 'sku' => null, 'motivo' => 'Archivo no legible: '.$filePath];
@@ -234,6 +288,7 @@ class CsvProductoParser
                 'pais' => $pais,
                 'envio' => trim((string) ($data['envio'] ?? '')) ?: null,
                 'soporte_tecnico' => trim((string) ($data['soporte_tecnico'] ?? '')) ?: null,
+                'documentos' => trim((string) ($data['documentos'] ?? '')) ?: null,
                 'especificaciones_tecnicas' => $especificaciones,
                 'caracteristicas' => $caracteristicas,
                 'categoria_nombre' => $categoriaNombre !== '' ? $categoriaNombre : null,
@@ -243,6 +298,7 @@ class CsvProductoParser
                 'marca_nombre' => $marcaNombre,
                 'marca_id' => $marcaId,
                 'subcategoria_pendiente_key' => $subcategoriaPendienteKey,
+                'archivo_origen' => $archivoOrigen,
             ];
         }
 

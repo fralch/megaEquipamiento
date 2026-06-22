@@ -1,0 +1,665 @@
+SKU,Nombre,Precio Base,% Ganancia,Video YouTube,Descripción,Attribute 1 name,Attribute 1 value(s),Attribute 2 name,Attribute 2 value(s),Attribute 3 name,Attribute 3 value(s),Attribute 4 name,Attribute 4 value(s),Attribute 5 name,Attribute 5 value(s),Attribute 6 name,Attribute 6 value(s),Especificaciones Técnicas,Documentos/Descargas,Contenido de Envío,Soporte Técnico,Categorías,SubCategorías
+JIT 100,Termómetro Infrarrojo JIT 100 - SAUTER PERÚ,,,,"<p>El <strong>Termómetro Infrarrojo SAUTER JIT 100</strong> es un instrumento profesional diseñado para la medición rápida y sin contacto de la temperatura superficial en aplicaciones industriales, medioambientales y de mantenimiento. Gracias a su amplio rango de medición desde -32 °C hasta 420 °C, este equipo permite controlar de manera segura la temperatura de motores, sistemas eléctricos, componentes mecánicos, equipos de climatización, procesos industriales y superficies de difícil acceso. Su óptica con relación distancia punto de medición de 12:1 garantiza mediciones precisas a distancia, mientras que su rápido tiempo de respuesta de tan solo 250 ms permite obtener resultados instantáneos durante trabajos de inspección, diagnóstico y mantenimiento preventivo. Además, dispone de emisividad ajustable entre 0,1 y 1, lo que permite adaptar el instrumento a diferentes tipos de materiales y mejorar significativamente la exactitud de las mediciones.</p>
+
+<br><br>
+
+<p>El <strong>SAUTER JIT 100</strong> incorpora múltiples funciones avanzadas que optimizan las tareas de análisis térmico, entre ellas función de promedio, función estadística y función de valores límite para facilitar la supervisión de procesos y la detección rápida de desviaciones térmicas. El equipo cuenta con puntero láser de clase 2 que permite identificar con precisión el área de medición, así como una robusta carcasa de plástico diseñada para soportar el uso diario en entornos industriales. Su diseño ergonómico y compacto facilita un manejo cómodo durante largas jornadas de trabajo. Además, dispone de apagado automático tras 15 segundos de inactividad para optimizar la duración de la batería de 9 V suministrada con el equipo. Gracias a su precisión, rapidez y facilidad de uso, el Termómetro Infrarrojo SAUTER JIT 100 constituye una solución confiable para profesionales de mantenimiento industrial, técnicos de servicio, inspectores de instalaciones y especialistas en control de procesos.</p>
+",Tipo,Infrarrojo,Rango de Temperatura,-32 a 420 °C,Resolución,,Precisión,"±1,5 °C ",Marca,SAUTER,Procedencia,Alemania,"<table>
+ <tr>
+ <td><strong>Especificación</strong></td>
+ <td><strong>Valor</strong></td>
+ </tr>
+ <tr>
+ <td>Marca</td>
+ <td>SAUTER</td>
+ </tr>
+ <tr>
+ <td>Modelo</td>
+ <td>JIT 200</td>
+ </tr>
+ <tr>
+ <td>Tipo de equipo</td>
+ <td>Termómetro infrarrojo industrial</td>
+ </tr>
+ <tr>
+ <td>Rango de temperatura</td>
+ <td>-32 a 1100 °C</td>
+ </tr>
+ <tr>
+ <td>Precisión</td>
+ <td>±1,5 °C (-32 a 100 °C), ±1,5 % (100 a 1020 °C)</td>
+ </tr>
+ <tr>
+ <td>Repetibilidad</td>
+ <td>±0,7 °C o ±0,7 %</td>
+ </tr>
+ <tr>
+ <td>Relación distancia/punto (D:S)</td>
+ <td>20:1</td>
+ </tr>
+ <tr>
+ <td>Tiempo de respuesta</td>
+ <td>250 ms</td>
+ </tr>
+ <tr>
+ <td>Emisividad</td>
+ <td>Ajustable de 0,1 a 1,0</td>
+ </tr>
+ <tr>
+ <td>Unidades de medición</td>
+ <td>°C, °F</td>
+ </tr>
+ <tr>
+ <td>Unidad predefinida</td>
+ <td>°C</td>
+ </tr>
+ <tr>
+ <td>Potencia del láser</td>
+ <td>0,001 W</td>
+ </tr>
+ <tr>
+ <td>Clase de láser</td>
+ <td>Clase 2</td>
+ </tr>
+ <tr>
+ <td>Funciones</td>
+ <td>Promediado, valor límite, Hold, Peak, memoria y estadísticas</td>
+ </tr>
+ <tr>
+ <td>Auto apagado</td>
+ <td>15 s</td>
+ </tr>
+ <tr>
+ <td>Montaje en soporte</td>
+ <td>Sí</td>
+ </tr>
+ <tr>
+ <td>Dimensiones</td>
+ <td>179 × 127 × 53 mm</td>
+ </tr>
+ <tr>
+ <td>Material de carcasa</td>
+ <td>Plástico</td>
+ </tr>
+ <tr>
+ <td>Alimentación</td>
+ <td>Batería de 9 V</td>
+ </tr>
+ <tr>
+ <td>Autonomía de la batería</td>
+ <td>9 h</td>
+ </tr>
+ <tr>
+ <td>Certificación</td>
+ <td>CE</td>
+ </tr>
+ <tr>
+ <td>Temperatura de operación</td>
+ <td>No especificada</td>
+ </tr>
+ <tr>
+ <td>Número de calibración de fábrica</td>
+ <td>961-296</td>
+ </tr>
+ <tr>
+ <td>Número de calibración DAkkS</td>
+ <td>963-296</td>
+ </tr>
+ <tr>
+ <td>Peso neto</td>
+ <td>0,35 kg</td>
+ </tr>
+ <tr>
+ <td>Peso bruto</td>
+ <td>0,50 kg</td>
+ </tr>
+ <tr>
+ <td>GTIN / EAN</td>
+ <td>4045761367753</td>
+ </tr>
+ <tr>
+ <td>Código arancelario</td>
+ <td>90251900</td>
+ </tr>
+ <tr>
+ <td>Procedencia</td>
+ <td>Alemania</td>
+ </tr>
+ </table>","<strong>Manual</strong><br>
+https://coqc.kern-sohn.com/WebDocs/Download?fileID=117503&fileName=HMM-BA-es-2020.pdf
+<br>
+<strong>Ficha Técnica</strong><br>
+https://www.kern-sohn.com/cosmoshop/default/pix/a/media/HMM-NP/TD_HMM-NP_es.pdf
+<br>
+<strong>Certificados</strong><br>
+https://coqc.kern-sohn.com/WebDocs/Download?fileID=86764&fileName=QXPCE-ST-283-HMM-2019.09.26.00-ES.pdf",<ul><li>01 x Termómetro Infrarrojo JIT 100</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros
+JIT 200,Termómetro Infrarrojo JIT 200 - SAUTER PERÚ,,,,"<p>El <strong>Termómetro Infrarrojo SAUTER JIT 200</strong> es un instrumento profesional diseñado para la medición rápida, segura y sin contacto de temperaturas superficiales en aplicaciones industriales, mantenimiento preventivo y tecnología medioambiental. Su amplio rango de medición desde -32 grados Celsius hasta 1100 grados Celsius permite controlar la temperatura de motores, sistemas eléctricos, hornos, equipos mecánicos, instalaciones HVAC, procesos industriales y superficies de difícil acceso. Gracias a su relación óptica de 20:1, el equipo puede realizar mediciones precisas a mayores distancias, permitiendo inspeccionar objetos calientes o zonas peligrosas sin comprometer la seguridad del operador. Asimismo, su rápido tiempo de respuesta de tan solo 250 ms proporciona resultados instantáneos, optimizando significativamente las labores de mantenimiento, diagnóstico y control de procesos industriales.</p>
+
+<br><br>
+
+<p>El <strong>SAUTER JIT 200</strong> incorpora funciones avanzadas que incrementan la eficiencia durante las inspecciones térmicas, entre las que destacan las funciones de promedio, retención de lectura Hold, captura de valores máximos Peak, memoria interna, análisis estadístico y configuración de valores límite para la supervisión continua de procesos críticos. El instrumento dispone además de emisividad ajustable entre 0,1 y 1, permitiendo adaptar las mediciones a distintos materiales y mejorar la precisión de los resultados. Su puntero láser de clase 2 facilita la localización exacta del punto de medición, mientras que su diseño ergonómico y robusta carcasa plástica garantizan una larga vida útil en entornos industriales exigentes. Alimentado mediante una batería de 9 V y equipado con función de apagado automático después de 15 segundos de inactividad, el SAUTER JIT 200 constituye una solución confiable y de alto rendimiento para técnicos de mantenimiento, profesionales industriales y especialistas en control térmico.</p>
+",Tipo,Infrarrojo,Rango de Temperatura,-32 a 1100 °C,Resolución,,Precisión,"±1,5 °C ",Marca,SAUTER,Procedencia,Alemania,"<table class=""tabla-especificaciones""> 
+ <tbody> 
+ <tr> 
+ <th>Especificación</th> 
+ <th>Detalle</th> 
+ </tr> 
+ <tr> 
+ <td>Marca</td> 
+ <td>SAUTER</td> 
+ </tr> 
+ <tr> 
+ <td>Modelo</td> 
+ <td>JIT 200</td> 
+ </tr> 
+ <tr> 
+ <td>Tipo de equipo</td> 
+ <td>Termómetro infrarrojo industrial</td> 
+ </tr> 
+ <tr> 
+ <td>Rango de medición</td> 
+ <td>-32 °C a 1100 °C</td> 
+ </tr> 
+ <tr> 
+ <td>Precisión</td> 
+ <td>±1,5 °C o ±1,5 % según el rango de medición</td> 
+ </tr> 
+ <tr> 
+ <td>Repetibilidad</td> 
+ <td>±0,7 °C o ±0,7 % según el rango de medición</td> 
+ </tr> 
+ <tr> 
+ <td>Relación distancia/punto (D:S)</td> 
+ <td>20:1</td> 
+ </tr> 
+ <tr> 
+ <td>Tiempo de respuesta</td> 
+ <td>250 ms</td> 
+ </tr> 
+ <tr> 
+ <td>Emisividad</td> 
+ <td>Ajustable de 0,1 a 1</td> 
+ </tr> 
+ <tr> 
+ <td>Unidades de medición</td> 
+ <td>°C, °F</td> 
+ </tr> 
+ <tr> 
+ <td>Láser</td> 
+ <td>Clase 2, potencia 0,001 W</td> 
+ </tr> 
+ <tr> 
+ <td>Funciones</td> 
+ <td>Promediado, valor límite, Hold, Peak, memoria y estadísticas</td> 
+ </tr> 
+ <tr> 
+ <td>Montaje en soporte</td> 
+ <td>Sí</td> 
+ </tr> 
+ <tr> 
+ <td>Auto apagado</td> 
+ <td>15 s</td> 
+ </tr> 
+ <tr> 
+ <td>Alimentación</td> 
+ <td>Batería de 9 V</td> 
+ </tr> 
+ <tr> 
+ <td>Tipo de batería</td> 
+ <td>Alcalina de 9 V</td> 
+ </tr> 
+ <tr> 
+ <td>Autonomía de la batería</td> 
+ <td>9 h</td> 
+ </tr> 
+ <tr> 
+ <td>Dimensiones</td> 
+ <td>179 × 127 × 53 mm</td> 
+ </tr> 
+ <tr> 
+ <td>Material de la carcasa</td> 
+ <td>Plástico</td> 
+ </tr> 
+ <tr> 
+ <td>Certificación</td> 
+ <td>Marcado CE</td> 
+ </tr> 
+ <tr> 
+ <td>Peso neto</td> 
+ <td>0,35 kg</td> 
+ </tr> 
+ <tr> 
+ <td>GTIN / EAN</td> 
+ <td>4045761367753</td> 
+ </tr> 
+ </tbody> 
+ </table>","<strong>Manual</strong><br>
+https://coqc.kern-sohn.com/WebDocs/Download?fileID=117503&fileName=HMM-BA-es-2020.pdf
+<br>
+<strong>Ficha Técnica</strong><br>
+https://www.kern-sohn.com/cosmoshop/default/pix/a/media/HMM-NP/TD_HMM-NP_es.pdf
+<br>
+<strong>Certificados</strong><br>
+https://coqc.kern-sohn.com/WebDocs/Download?fileID=86764&fileName=QXPCE-ST-283-HMM-2019.09.26.00-ES.pdf",<ul><li>01 x Termómetro Infrarrojo JIT 200</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros
+0560 1805,Termómetro por Infrarrojos con App para Smartphone/Tablet testo 805i - TESTO PERÚ,,,https://youtu.be/0oJfZD5U_Dk?si=jdeTzzQ9gOWNx4E5,"<p>El <strong>Termómetro por Infrarrojos testo 805i</strong> es un instrumento de medición compacto e inteligente diseñado para la medición sin contacto de temperaturas superficiales mediante tecnología infrarroja. Este equipo forma parte de la gama Smart Probes de Testo y se maneja directamente desde un smartphone o tablet mediante la aplicación gratuita testo Smart para dispositivos iOS y Android. Gracias a su conectividad Bluetooth y a su reducido tamaño, el instrumento resulta ideal para aplicaciones de climatización, refrigeración, mantenimiento e inspección de instalaciones, permitiendo medir cómodamente la temperatura de paredes, radiadores, suelos radiantes, fusibles, componentes eléctricos y otros elementos de difícil acceso. El termómetro incorpora un innovador sistema de puntería mediante un círculo láser de ocho puntos que delimita con precisión la zona de medición, proporcionando resultados fiables y minimizando errores durante las inspecciones.</p>
+
+<br><br>
+
+<p>El <strong>testo 805i</strong> se integra completamente con la aplicación testo Smart, permitiendo visualizar los valores medidos en tiempo real, registrar datos, generar gráficas y elaborar informes en formato PDF o Excel para compartirlos directamente por correo electrónico. Además, la aplicación facilita la configuración de la emisividad mediante una lista predefinida de materiales, mejorando la exactitud de las mediciones por infrarrojos. También es posible capturar fotografías del punto de medición incorporando automáticamente el valor registrado y el indicador láser sobre la imagen, simplificando la documentación de los trabajos realizados. El equipo es compatible con dispositivos que dispongan de iOS 11 o superior, Android 6.0 o superior y Bluetooth 4.0, constituyendo una solución profesional, portátil y eficiente para la medición y documentación de temperaturas superficiales en aplicaciones industriales y de mantenimiento.</p>",Tipo,Infrarrojo,Rango de Temperatura,-30 a 250 °C,Resolución,"0,1 °C",Precisión,"±1,5 °C ",Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 805i</td></tr>
+<tr><td>Tipo de equipo</td><td>Termómetro por infrarrojos con App para smartphone/tablet</td></tr>
+<tr><td>Rango de medición</td><td>No especificado</td></tr>
+<tr><td>Tipo de medición</td><td>Temperatura superficial sin contacto</td></tr>
+<tr><td>Relación distancia/punto</td><td>No especificado</td></tr>
+<tr><td>Puntero láser</td><td>Círculo láser de 8 puntos</td></tr>
+<tr><td>Emisividad</td><td>Ajustable mediante la App</td></tr>
+<tr><td>Conectividad</td><td>Bluetooth 4.0</td></tr>
+<tr><td>Compatibilidad</td><td>iOS 11 o superior, Android 6.0 o superior</td></tr>
+<tr><td>Aplicación móvil</td><td>testo Smart App</td></tr>
+<tr><td>Funciones</td><td>Visualización de datos, creación de gráficos y tablas, generación de informes PDF y Excel, documentación fotográfica, detección de riesgo de condensación</td></tr>
+<tr><td>Visualización</td><td>Mediante smartphone o tablet</td></tr>
+<tr><td>Medios de exportación</td><td>Correo electrónico, PDF y Excel</td></tr>
+<tr><td>Aplicaciones</td><td>Medición de temperatura en paredes, radiadores, suelos radiantes, fusibles y componentes de sistemas de climatización</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+</table>","<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Termómetro por Infrarrojos con App para Smartphone/Tablet testo 805i</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros
+0560 1045 60,Termómetro Profesional para Cocina con Bluetooth y Conectividad a App testo 104-IR BT - TESTO PERÚ,,,https://youtu.be/0oJfZD5U_Dk?si=jdeTzzQ9gOWNx4E5,"<p>El <strong>Termómetro Profesional para Cocina testo 104-IR BT</strong> es un instrumento dual diseñado específicamente para el control de temperatura en el sector alimentario, combinando la medición por infrarrojos y mediante sonda de penetración en un único equipo. Gracias a esta doble funcionalidad, permite medir tanto la temperatura superficial como la temperatura interna de los alimentos de forma rápida, precisa y segura. El instrumento ha sido desarrollado para aplicaciones en cocinas profesionales, restaurantes, industria alimentaria, comercios de alimentación e inspecciones sanitarias, facilitando el control de los puntos críticos de control (PC/PCC) dentro de los sistemas de aseguramiento de la calidad. Además, dispone de conectividad Bluetooth para la transferencia automática de los valores medidos a la App testo Smart, eliminando errores asociados a la anotación manual y garantizando una completa trazabilidad de los datos. El equipo cuenta con homologación ICT 155/2020, cumpliendo los requisitos necesarios para aplicaciones de control alimentario.</p>
+
+<br><br>
+
+<p>El <strong>testo 104-IR BT</strong> incorpora una robusta sonda de penetración plegable que permanece protegida dentro de la carcasa cuando no está en uso, aumentando la seguridad durante el transporte y la manipulación. El despliegue de la sonda activa automáticamente el instrumento, mientras que la medición por infrarrojos se realiza de manera sencilla mediante una tecla específica. Su gran pantalla facilita la visualización de los resultados y su interfaz intuitiva permite que sea utilizado tanto por personal experimentado como por usuarios ocasionales. Además, el instrumento dispone de protección IP65 contra suciedad y salpicaduras de líquidos, garantizando una elevada durabilidad en entornos exigentes. Mediante la App testo Smart es posible documentar digitalmente todas las mediciones, almacenar los resultados y realizar un seguimiento eficiente de los puntos críticos de control, convirtiendo al testo 104-IR BT en una solución profesional, precisa y eficiente para la medición de temperatura en aplicaciones alimentarias.</p>
+",Tipo,Infrarrojo,Rango de Temperatura,-30 a 250 °C,Resolución,"0,1 °C",Precisión,"±1,5 °C ",Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 104-IR BT</td></tr>
+<tr><td>Tipo de equipo</td><td>Termómetro profesional dual para alimentos con Bluetooth</td></tr>
+<tr><td>Tipo de medición</td><td>Temperatura superficial por infrarrojos y temperatura interna mediante sonda de penetración</td></tr>
+<tr><td>Sensor</td><td>Infrarrojo y sonda de pincho plegable</td></tr>
+<tr><td>Conectividad</td><td>Bluetooth</td></tr>
+<tr><td>Aplicación móvil</td><td>testo Smart App</td></tr>
+<tr><td>Funciones</td><td>Documentación digital, medición de puntos críticos de control (PC/PCC), transmisión automática de datos, almacenamiento de mediciones</td></tr>
+<tr><td>Protección</td><td>IP65</td></tr>
+<tr><td>Activación automática</td><td>Sí, mediante despliegue de la sonda</td></tr>
+<tr><td>Pantalla</td><td>Pantalla de gran tamaño</td></tr>
+<tr><td>Homologación</td><td>ICT 155/2020</td></tr>
+<tr><td>Exportación de datos</td><td>Mediante la App testo Smart</td></tr>
+<tr><td>Aplicaciones</td><td>Control de temperatura en el sector alimentario, inspecciones de calidad y control HACCP</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+</table>","<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Termómetro Profesional para Cocina con Bluetooth y Conectividad a App testo 104-IR BT</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros
+0560 1040,Termómetro por Infrarrojos con Punta de Penetración para Alimentos testo 104 IR - TESTO PERÚ,,,https://youtu.be/0oJfZD5U_Dk?si=jdeTzzQ9gOWNx4E5,"<p>El <strong>Termómetro Profesional para Cocina testo 104-IR BT</strong> es un instrumento dual diseñado específicamente para el control de temperatura en el sector alimentario, combinando la medición por infrarrojos y mediante sonda de penetración en un único equipo. Gracias a esta doble funcionalidad, permite medir tanto la temperatura superficial como la temperatura interna de los alimentos de forma rápida, precisa y segura. El instrumento ha sido desarrollado para aplicaciones en cocinas profesionales, restaurantes, industria alimentaria, comercios de alimentación e inspecciones sanitarias, facilitando el control de los puntos críticos de control (PC/PCC) dentro de los sistemas de aseguramiento de la calidad. Además, dispone de conectividad Bluetooth para la transferencia automática de los valores medidos a la App testo Smart, eliminando errores asociados a la anotación manual y garantizando una completa trazabilidad de los datos. El equipo cuenta con homologación ICT 155/2020, cumpliendo los requisitos necesarios para aplicaciones de control alimentario.</p>
+
+<br><br>
+
+<p>El <strong>testo 104-IR BT</strong> incorpora una robusta sonda de penetración plegable que permanece protegida dentro de la carcasa cuando no está en uso, aumentando la seguridad durante el transporte y la manipulación. El despliegue de la sonda activa automáticamente el instrumento, mientras que la medición por infrarrojos se realiza de manera sencilla mediante una tecla específica. Su gran pantalla facilita la visualización de los resultados y su interfaz intuitiva permite que sea utilizado tanto por personal experimentado como por usuarios ocasionales. Además, el instrumento dispone de protección IP65 contra suciedad y salpicaduras de líquidos, garantizando una elevada durabilidad en entornos exigentes. Mediante la App testo Smart es posible documentar digitalmente todas las mediciones, almacenar los resultados y realizar un seguimiento eficiente de los puntos críticos de control, convirtiendo al testo 104-IR BT en una solución profesional, precisa y eficiente para la medición de temperatura en aplicaciones alimentarias.</p>",Tipo,Infrarrojo,Rango de Temperatura,-30 a 250 °C,Resolución,"0,1 °C",Precisión,"±1,5 °C ",Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 104-IR</td></tr>
+<tr><td>Tipo de equipo</td><td>Termómetro profesional para alimentos con infrarrojos y sonda de penetración</td></tr>
+<tr><td>Tipo de medición</td><td>Temperatura superficial por infrarrojos y temperatura interna mediante sonda de penetración</td></tr>
+<tr><td>Sensor</td><td>Infrarrojo y sonda de penetración plegable</td></tr>
+<tr><td>Relación distancia/punto</td><td>10:1</td></tr>
+<tr><td>Puntero láser</td><td>Láser de 2 puntos</td></tr>
+<tr><td>Protección</td><td>IP65</td></tr>
+<tr><td>Pantalla</td><td>LCD de gran tamaño</td></tr>
+<tr><td>Activación automática</td><td>Sí, mediante despliegue de la sonda</td></tr>
+<tr><td>Normativas</td><td>APPCC, EN 13485, ICT/155/2020</td></tr>
+<tr><td>Características</td><td>Sonda plegable, carcasa resistente al agua, diseño compacto de bolsillo</td></tr>
+<tr><td>Aplicaciones</td><td>Recepción, almacenamiento, transporte y control de temperatura en la industria alimentaria</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+</table>","<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Termómetro por Infrarrojos con Punta de Penetración para Alimentos testo 104 IR</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros
+0560 8311,Termómetro por Infrarrojos con Puntero Láser y Óptica 10:1 testo 830-T1 - TESTO PERÚ,,,https://youtu.be/0oJfZD5U_Dk?si=jdeTzzQ9gOWNx4E5,"<p>El <strong>Termómetro por Infrarrojos testo 830-T1</strong> es un instrumento profesional diseñado para la medición rápida y precisa de la temperatura superficial sin contacto. Gracias a su diseño ergonómico tipo pistola, este equipo resulta ideal para aplicaciones de inspección, mantenimiento, control de calidad e instalaciones industriales y de construcción. El instrumento incorpora una óptica de 10:1 que permite realizar mediciones precisas incluso a media distancia, mientras que su procesador de alta resolución proporciona una resolución de 0,1 grados Celsius para obtener resultados fiables en una amplia variedad de superficies. Además, el termómetro dispone de un puntero láser de un haz que facilita la identificación exacta del punto de medición, optimizando la precisión durante las tareas de inspección y diagnóstico.</p>
+
+<br><br>
+
+<p>El <strong>testo 830-T1</strong> permite efectuar hasta dos mediciones por segundo, facilitando la realización rápida y eficiente de grandes series de medición. El equipo incorpora funciones avanzadas como visualización de valores mínimos y máximos, función Hold para retener los resultados en pantalla y dos valores límite configurables con alarma óptica y acústica cuando se exceden los umbrales establecidos. Asimismo, la emisividad puede ajustarse manualmente para adaptarse a diferentes materiales y mejorar la exactitud de las mediciones sobre distintas superficies. Su gran pantalla digital retroiluminada garantiza una lectura cómoda incluso en entornos con poca iluminación, convirtiendo al testo 830-T1 en una solución profesional, portátil y eficiente para la medición sin contacto de temperaturas superficiales en aplicaciones industriales y de mantenimiento.</p>",Tipo,Infrarrojo,Rango de Temperatura,-30 a 400 °C,Resolución,"0,1 °C",Precisión,"±1,5 °C ",Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 830-T1</td></tr>
+<tr><td>Tipo de equipo</td><td>Termómetro por infrarrojos</td></tr>
+<tr><td>Tipo de medición</td><td>Temperatura superficial sin contacto</td></tr>
+<tr><td>Relación distancia/punto</td><td>10:1</td></tr>
+<tr><td>Resolución</td><td>0,1 °C</td></tr>
+<tr><td>Velocidad de medición</td><td>2 mediciones por segundo</td></tr>
+<tr><td>Puntero láser</td><td>Láser de 1 haz</td></tr>
+<tr><td>Emisividad</td><td>Ajustable</td></tr>
+<tr><td>Valores límite</td><td>Dos valores límite configurables</td></tr>
+<tr><td>Alarmas</td><td>Alarma óptica y acústica</td></tr>
+<tr><td>Funciones</td><td>Hold, visualización de valores mínimos y máximos</td></tr>
+<tr><td>Pantalla</td><td>Pantalla digital con retroiluminación</td></tr>
+<tr><td>Diseño</td><td>Tipo pistola para manejo con una sola mano</td></tr>
+<tr><td>Aplicaciones</td><td>Control de temperatura superficial en la industria y el sector de la construcción</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+</table>","<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Termómetro por Infrarrojos con Puntero Láser y Óptica 10:1 testo 830-T1</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros
+0560 8312,Termómetro por Infrarrojos con Conector para Sondas Externas testo 830-T2 - TESTO PERÚ,,,https://youtu.be/0oJfZD5U_Dk?si=jdeTzzQ9gOWNx4E5,"<p>El <strong>Termómetro por Infrarrojos testo 830-T2</strong> es un instrumento profesional diseñado para la medición rápida y precisa de la temperatura superficial sin contacto en aplicaciones industriales, de mantenimiento y del sector de la construcción. Gracias a su diseño ergonómico tipo pistola, este equipo ofrece un manejo cómodo y eficiente para realizar inspecciones de temperatura en una amplia variedad de superficies. El instrumento incorpora una óptica de 12:1 y un procesador de alta resolución que proporciona mediciones precisas con una resolución de 0,1 grados Celsius, permitiendo obtener resultados fiables incluso a media distancia. Además, el termómetro dispone de un sistema láser de dos puntos que delimita con precisión la zona de medición, facilitando la localización exacta del área analizada y mejorando la exactitud de las inspecciones.</p>
+
+<br><br>
+
+<p>El <strong>testo 830-T2</strong> permite realizar hasta dos mediciones por segundo, optimizando las tareas de control y permitiendo efectuar grandes series de medición de forma rápida y eficiente. El equipo incorpora funciones avanzadas como visualización de valores mínimos y máximos, función Hold para retener las mediciones en pantalla y dos valores límite configurables con alarma óptica y acústica cuando se superan los umbrales establecidos. Asimismo, dispone de emisividad ajustable para adaptarse a diferentes materiales y mejorar la precisión de las mediciones sobre distintas superficies. Una característica destacada del instrumento es su conexión para sondas externas de temperatura tipo K, que permite complementar las mediciones por infrarrojos con mediciones por contacto mediante sondas opcionales de superficie, aire o inmersión. Su gran pantalla digital retroiluminada facilita la lectura de los resultados incluso en condiciones de baja iluminación, convirtiendo al testo 830-T2 en una solución profesional, versátil y eficiente para la medición de temperatura en aplicaciones industriales y de mantenimiento.</p>
+",Tipo,Infrarrojo,Rango de Temperatura,-30 a 400 °C,Resolución,"0,1 °C",Precisión,"±1,5 °C ",Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 830-T2</td></tr>
+<tr><td>Tipo de equipo</td><td>Termómetro por infrarrojos</td></tr>
+<tr><td>Tipo de medición</td><td>Temperatura superficial sin contacto y medición de contacto mediante sonda externa</td></tr>
+<tr><td>Relación distancia/punto</td><td>12:1</td></tr>
+<tr><td>Resolución</td><td>0,1 °C</td></tr>
+<tr><td>Velocidad de medición</td><td>2 mediciones por segundo</td></tr>
+<tr><td>Puntero láser</td><td>Láser de 2 puntos</td></tr>
+<tr><td>Emisividad</td><td>Ajustable</td></tr>
+<tr><td>Conexión para sonda externa</td><td>Termopar tipo K</td></tr>
+<tr><td>Valores límite</td><td>Dos valores límite configurables</td></tr>
+<tr><td>Alarmas</td><td>Alarma óptica y acústica</td></tr>
+<tr><td>Funciones</td><td>Hold, visualización de valores mínimos y máximos</td></tr>
+<tr><td>Pantalla</td><td>Pantalla digital con retroiluminación</td></tr>
+<tr><td>Diseño</td><td>Tipo pistola para manejo con una sola mano</td></tr>
+<tr><td>Aplicaciones</td><td>Control de temperatura superficial en la industria y el sector de la construcción</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+</table>","<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Termómetro por Infrarrojos con Conector para Sondas Externas testo 830-T2</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros
+0560 0810,Termómetro por Infrarrojos de Bolsillo testo 810 - TESTO PERÚ,,,https://youtu.be/0oJfZD5U_Dk?si=jdeTzzQ9gOWNx4E5,"<p>El <strong>Termómetro testo 810</strong> es un instrumento compacto diseñado para la medición simultánea de la temperatura ambiente y la temperatura superficial sin contacto mediante tecnología infrarroja. Gracias a su diseño de bolsillo y a su capacidad de medición en dos canales, este equipo resulta especialmente adecuado para aplicaciones en sistemas de calefacción, climatización y ventilación, permitiendo comparar de forma inmediata la temperatura de superficies con la temperatura ambiente. El instrumento incorpora un sensor infrarrojo para la medición superficial y un sensor NTC integrado para la medición precisa de la temperatura ambiente, mostrando automáticamente la diferencia de temperatura entre ambos valores. Esta característica facilita la evaluación rápida del rendimiento térmico de radiadores, salidas de aire, ventanas y otros componentes de instalaciones HVAC.</p>
+
+<br><br>
+
+<p>El <strong>testo 810</strong> incorpora un puntero láser de un haz que permite identificar con precisión la zona de medición, mientras que su óptica 6:1 proporciona resultados fiables en mediciones a corta y media distancia. El equipo dispone de emisividad ajustable para adaptarse a diferentes materiales y mejorar la precisión de las mediciones sobre diversas superficies. Asimismo, integra funciones prácticas como visualización de valores mínimos y máximos, función Hold para retener los resultados en pantalla y una pantalla retroiluminada que facilita la lectura en entornos con poca iluminación. Su tamaño compacto permite transportarlo cómodamente en el bolsillo, mientras que la tapa de protección y el estuche para cinturón incluidos contribuyen a proteger el instrumento durante el uso diario. Gracias a su versatilidad, precisión y facilidad de manejo, el testo 810 constituye una solución profesional y portátil para la medición y comparación de temperaturas en aplicaciones de climatización, mantenimiento e inspección técnica.</p>
+",Tipo,Infrarrojo,Rango de Temperatura,-30 a 300 °C,Resolución,"0,1 °C",Precisión,"±1,5 °C ",Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 810</td></tr>
+<tr><td>Tipo de equipo</td><td>Termómetro por infrarrojos de bolsillo</td></tr>
+<tr><td>Tipo de medición</td><td>Temperatura superficial sin contacto y temperatura ambiente</td></tr>
+<tr><td>Temperatura medida</td><td>Temperatura superficial y temperatura ambiente</td></tr>
+<tr><td>Sensor de temperatura ambiente</td><td>NTC integrado</td></tr>
+<tr><td>Relación distancia/punto</td><td>6:1</td></tr>
+<tr><td>Puntero láser</td><td>Láser de 1 punto</td></tr>
+<tr><td>Emisividad</td><td>Ajustable</td></tr>
+<tr><td>Visualización</td><td>Diferencia de temperatura automática</td></tr>
+<tr><td>Funciones</td><td>Hold, valores mínimos y máximos</td></tr>
+<tr><td>Pantalla</td><td>Pantalla con retroiluminación</td></tr>
+<tr><td>Aplicaciones</td><td>Medición en sistemas de calefacción, climatización y ventilación</td></tr>
+<tr><td>Diseño</td><td>Compacto de bolsillo</td></tr>
+<tr><td>Accesorios incluidos</td><td>Tapa de protección y estuche para cinturón</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+</table>","<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Termómetro por Infrarrojos de Bolsillo testo 810</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros
+0563 8284,Termómetro por Infrarrojos con Sonda de Penetración testo 826-T4 - TESTO PERÚ,,,https://youtu.be/0oJfZD5U_Dk?si=jdeTzzQ9gOWNx4E5,"<p>El <strong>Termómetro por Infrarrojos testo 826-T4</strong> es un instrumento profesional diseñado para el control rápido y preciso de la temperatura en productos alimentarios mediante mediciones combinadas por infrarrojos y por contacto. Este equipo permite realizar inspecciones rápidas de la temperatura superficial sin dañar los alimentos gracias a su tecnología infrarroja, y complementarlas con mediciones de la temperatura interna mediante su sonda de penetración fija cuando se requiere una verificación más precisa. El instrumento está especialmente desarrollado para aplicaciones en la recepción y salida de mercancías, producción alimentaria, control de calidad e inspecciones sanitarias. Además, cumple con los requisitos del sistema APPCC y está certificado conforme a la norma EN 13485 y la homologación ICT 155/2020, garantizando su idoneidad para aplicaciones profesionales en el sector alimentario.</p>
+
+<br><br>
+
+<p>El <strong>testo 826-T4</strong> permite realizar hasta dos mediciones por segundo mediante tecnología infrarroja y ofrece una resolución de 0,1 grados Celsius para obtener resultados rápidos y fiables. El equipo incorpora una óptica 6:1 y un puntero láser de un haz que facilitan la identificación exacta de la zona de medición durante las inspecciones. Asimismo, dispone de dos valores límite configurables con alarma óptica y acústica para advertir inmediatamente cuando se exceden los rangos establecidos. Entre sus funciones adicionales se incluyen la visualización de valores mínimos y máximos y la función Hold para retener los resultados en pantalla. El instrumento se suministra con una funda protectora TopSafe resistente e impermeable con grado de protección IP67, apta para lavado en lavavajillas, así como accesorios que facilitan el almacenamiento y la medición en productos congelados. Gracias a su robustez, precisión y cumplimiento normativo, el testo 826-T4 constituye una solución profesional y eficiente para el control de temperatura en la industria alimentaria.</p>",Tipo,Infrarrojo,Rango de Temperatura,-50 a 300 °C,Resolución,"0,1 °C",Precisión,"±1,5 °C ",Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 826-T4</td></tr>
+<tr><td>Tipo de equipo</td><td>Termómetro de penetración por infrarrojos</td></tr>
+<tr><td>Tipo de medición</td><td>Temperatura superficial sin contacto y temperatura interna por penetración</td></tr>
+<tr><td>Aplicación</td><td>Control de temperatura en alimentos</td></tr>
+<tr><td>Relación distancia/punto</td><td>6:1</td></tr>
+<tr><td>Puntero láser</td><td>Láser de 1 punto</td></tr>
+<tr><td>Resolución</td><td>0,1 °C</td></tr>
+<tr><td>Velocidad de medición</td><td>2 mediciones por segundo</td></tr>
+<tr><td>Sonda de penetración</td><td>Fija</td></tr>
+<tr><td>Valores límite</td><td>2 valores límite configurables</td></tr>
+<tr><td>Alarmas</td><td>Alarma óptica y acústica</td></tr>
+<tr><td>Funciones</td><td>Hold, valores mínimos y máximos</td></tr>
+<tr><td>Pantalla</td><td>Pantalla digital</td></tr>
+<tr><td>Clase de protección</td><td>IP67</td></tr>
+<tr><td>Normativas</td><td>APPCC, EN 13485, ICT 155/2020</td></tr>
+<tr><td>Accesorios incluidos</td><td>Funda protectora TopSafe, broca para alimentos congelados, soporte de pared/cinturón y tapa de protección para la sonda</td></tr>
+<tr><td>Aplicaciones</td><td>Recepción, producción y control de alimentos</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+</table>","<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Termómetro por Infrarrojos con Sonda de Penetración testo 826-T4</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros
+0560 8314,Termómetro por Infrarrojos con Láser de 2 Haces y Óptica 30:1 testo 830-T4 - TESTO PERÚ,,,https://youtu.be/0oJfZD5U_Dk?si=jdeTzzQ9gOWNx4E5,"<p>El <strong>Termómetro por Infrarrojos testo 830-T4</strong> es un instrumento profesional diseñado para la medición rápida y precisa de la temperatura superficial sin contacto en aplicaciones industriales y del sector de la construcción. Gracias a su potente óptica 30:1 y a su procesador de alta resolución, el equipo permite obtener mediciones altamente precisas incluso a grandes distancias y sobre objetos de pequeño tamaño. Esta característica lo convierte en una solución ideal para la inspección segura de componentes en movimiento, equipos de difícil acceso o superficies a altas temperaturas. El instrumento incorpora un sistema láser de dos haces que delimita con exactitud la zona de medición, facilitando la localización precisa del área analizada y mejorando significativamente la fiabilidad de las mediciones. Además, su diseño ergonómico tipo pistola proporciona un manejo cómodo y eficiente durante largas jornadas de trabajo.</p>
+
+<br><br>
+
+<p>El <strong>testo 830-T4</strong> permite realizar hasta dos mediciones por segundo, optimizando las tareas de control e inspección de grandes superficies. El equipo dispone de emisividad ajustable para adaptarse a diferentes materiales y obtener resultados más precisos en una amplia variedad de aplicaciones. Asimismo, incorpora funciones avanzadas como visualización de valores mínimos y máximos, función Hold para retener los resultados en pantalla y dos valores límite configurables con alarma óptica y acústica cuando se superan los umbrales establecidos. El instrumento también permite conectar sondas externas de temperatura termopar para efectuar mediciones por contacto en aire, líquidos, materiales semisólidos o superficies, así como para determinar la emisividad real de un material y optimizar las mediciones por infrarrojos posteriores. Su gran pantalla digital retroiluminada facilita la lectura de los resultados incluso en condiciones de baja iluminación, convirtiendo al testo 830-T4 en una solución profesional, versátil y eficiente para la medición de temperatura en aplicaciones industriales y de mantenimiento.</p>",Tipo,Infrarrojo,Rango de Temperatura,-30 a 400 °C,Resolución,"0,1 °C",Precisión,"±1,5 °C ",Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 830-T4</td></tr>
+<tr><td>Tipo de equipo</td><td>Termómetro por infrarrojos</td></tr>
+<tr><td>Tipo de medición</td><td>Temperatura superficial sin contacto y medición de contacto mediante sonda externa</td></tr>
+<tr><td>Relación distancia/punto</td><td>30:1</td></tr>
+<tr><td>Puntero láser</td><td>Láser de 2 puntos</td></tr>
+<tr><td>Resolución</td><td>0,1 °C</td></tr>
+<tr><td>Velocidad de medición</td><td>2 mediciones por segundo</td></tr>
+<tr><td>Emisividad</td><td>Ajustable</td></tr>
+<tr><td>Conexión para sonda externa</td><td>Sí, para sondas termopar</td></tr>
+<tr><td>Valores límite</td><td>2 valores límite configurables</td></tr>
+<tr><td>Alarmas</td><td>Alarma óptica y acústica</td></tr>
+<tr><td>Funciones</td><td>Hold, valores mínimos y máximos</td></tr>
+<tr><td>Pantalla</td><td>Pantalla digital con retroiluminación</td></tr>
+<tr><td>Diseño</td><td>Tipo pistola para manejo con una sola mano</td></tr>
+<tr><td>Aplicaciones</td><td>Medición de temperatura superficial en la industria y el sector de la construcción</td></tr>
+<tr><td>Características adicionales</td><td>Medición precisa a grandes distancias y objetivos pequeños</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+</table>","<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Termómetro por Infrarrojos con Láser de 2 Haces y Óptica 30:1 testo 830-T4</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros
+0563 8282,Termómetro por Infrarrojos para el Sector Alimentario testo 826 T2 - TESTO PERÚ,,,https://youtu.be/0oJfZD5U_Dk?si=jdeTzzQ9gOWNx4E5,"<p>El <strong>Termómetro por Infrarrojos testo 826 T2</strong> es un instrumento profesional diseñado específicamente para el control rápido y seguro de la temperatura en la industria alimentaria. Gracias a su tecnología de medición por infrarrojos, este equipo permite determinar la temperatura superficial de alimentos y mercancías sin necesidad de contacto, evitando daños en los productos y garantizando procesos de inspección higiénicos y eficientes. El instrumento resulta ideal para aplicaciones en la recepción de mercancías, producción alimentaria, supermercados, panaderías, carnicerías y servicios de alimentación. Además, cumple con los requisitos del sistema APPCC y, en combinación con la funda protectora TopSafe incluida, está certificado conforme a la norma EN 13485, lo que lo convierte en una solución idónea para el control profesional de la calidad alimentaria.</p>
+
+<br><br>
+
+<p>El <strong>testo 826 T2</strong> permite realizar hasta dos mediciones por segundo con una resolución de 0,1 grados Celsius, facilitando el escaneo rápido y preciso de grandes volúmenes de productos. El equipo incorpora una óptica 6:1 y un puntero láser de un punto para identificar con precisión el centro de la zona de medición, siendo especialmente adecuado para mediciones a corta y media distancia. Asimismo, dispone de funciones avanzadas como visualización de valores mínimos y máximos, función Hold para retener las mediciones en pantalla y configuración de hasta dos valores límite con alarma óptica y acústica cuando se superan los umbrales establecidos. El instrumento se suministra con la funda protectora TopSafe, resistente al agua conforme al grado de protección IP67 y apta para limpieza en lavavajillas, así como con un soporte de pared o cinturón para un almacenamiento seguro. Gracias a su rapidez, precisión y cumplimiento de las normativas alimentarias, el testo 826 T2 constituye una solución profesional y eficiente para el control de temperatura en el sector alimentario.</p>",Tipo,Infrarrojo,Rango de Temperatura,-50 a 300 °C,Resolución,"0,1 °C",Precisión,"±1,5 °C ",Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 826-T2</td></tr>
+<tr><td>Tipo de equipo</td><td>Termómetro por infrarrojos</td></tr>
+<tr><td>Tipo de medición</td><td>Temperatura superficial sin contacto</td></tr>
+<tr><td>Aplicación</td><td>Control de temperatura en alimentos</td></tr>
+<tr><td>Relación distancia/punto</td><td>6:1</td></tr>
+<tr><td>Puntero láser</td><td>Láser de 1 punto</td></tr>
+<tr><td>Resolución</td><td>0,1 °C</td></tr>
+<tr><td>Velocidad de medición</td><td>2 mediciones por segundo</td></tr>
+<tr><td>Valores límite</td><td>2 valores límite configurables</td></tr>
+<tr><td>Alarmas</td><td>Alarma óptica y acústica</td></tr>
+<tr><td>Funciones</td><td>Hold, valores mínimos y máximos</td></tr>
+<tr><td>Pantalla</td><td>Pantalla digital</td></tr>
+<tr><td>Clase de protección</td><td>IP67 con funda TopSafe</td></tr>
+<tr><td>Normativas</td><td>APPCC, EN 13485</td></tr>
+<tr><td>Accesorios incluidos</td><td>Funda protectora TopSafe y soporte de pared/cinturón</td></tr>
+<tr><td>Aplicaciones</td><td>Recepción de mercancías, producción, servicio de alimentos y cocción</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+</table>","<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Termómetro por Infrarrojos para el Sector Alimentario testo 826 T2</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Termómetros

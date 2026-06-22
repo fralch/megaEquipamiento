@@ -10,6 +10,7 @@ class ParseResultDto
      * @param  array<int, array<string, mixed>>  $subcategoriasPendientes
      * @param  array<int, array<string, mixed>>  $marcasPendientes
      * @param  array<int, array<string, mixed>>  $errores
+     * @param  array<int, string>  $archivosOrigen  Nombres de los archivos procesados
      */
     public function __construct(
         public array $productos = [],
@@ -17,7 +18,89 @@ class ParseResultDto
         public array $subcategoriasPendientes = [],
         public array $marcasPendientes = [],
         public array $errores = [],
+        public array $archivosOrigen = [],
     ) {}
+
+    /**
+     * Fusiona otro ParseResultDto dentro de este, deduplicando pendientes.
+     */
+    public function merge(ParseResultDto $other): void
+    {
+        // Acumular productos (duplicados entre archivos se detectan después)
+        $this->productos = array_merge($this->productos, $other->productos);
+
+        // Acumular errores
+        $this->errores = array_merge($this->errores, $other->errores);
+
+        // Fusionar categorías pendientes por nombre normalizado
+        $this->categoriasPendientes = $this->mergePendientes(
+            $this->categoriasPendientes,
+            $other->categoriasPendientes,
+            'nombre'
+        );
+
+        // Fusionar subcategorías pendientes por nombre+categoría
+        $this->subcategoriasPendientes = $this->mergePendientesSubcategorias(
+            $this->subcategoriasPendientes,
+            $other->subcategoriasPendientes
+        );
+
+        // Fusionar marcas pendientes por nombre normalizado
+        $this->marcasPendientes = $this->mergePendientes(
+            $this->marcasPendientes,
+            $other->marcasPendientes,
+            'nombre'
+        );
+
+        // Fusionar archivos origen
+        $this->archivosOrigen = array_values(array_unique(
+            array_merge($this->archivosOrigen, $other->archivosOrigen)
+        ));
+    }
+
+    /**
+     * Fusiona dos listas de pendientes (categorías o marcas) deduplicando por campo clave.
+     */
+    private function mergePendientes(array $existing, array $incoming, string $keyField): array
+    {
+        $map = [];
+        foreach ($existing as $item) {
+            $key = mb_strtolower(trim($item[$keyField]), 'UTF-8');
+            $map[$key] = $item;
+        }
+        foreach ($incoming as $item) {
+            $key = mb_strtolower(trim($item[$keyField]), 'UTF-8');
+            if (isset($map[$key])) {
+                $map[$key]['ocurrencias'] = ($map[$key]['ocurrencias'] ?? 0) + ($item['ocurrencias'] ?? 0);
+            } else {
+                $map[$key] = $item;
+            }
+        }
+
+        return array_values($map);
+    }
+
+    /**
+     * Fusiona subcategorías pendientes deduplicando por nombre+categoría.
+     */
+    private function mergePendientesSubcategorias(array $existing, array $incoming): array
+    {
+        $map = [];
+        foreach ($existing as $item) {
+            $key = mb_strtolower(trim($item['categoria'] ?? '') . '|' . trim($item['nombre']), 'UTF-8');
+            $map[$key] = $item;
+        }
+        foreach ($incoming as $item) {
+            $key = mb_strtolower(trim($item['categoria'] ?? '') . '|' . trim($item['nombre']), 'UTF-8');
+            if (isset($map[$key])) {
+                $map[$key]['ocurrencias'] = ($map[$key]['ocurrencias'] ?? 0) + ($item['ocurrencias'] ?? 0);
+            } else {
+                $map[$key] = $item;
+            }
+        }
+
+        return array_values($map);
+    }
 
     public function tienePendientes(): bool
     {
@@ -38,7 +121,7 @@ class ParseResultDto
 
     public function toArray(): array
     {
-        return [
+        $data = [
             'productos' => $this->productos,
             'categorias_pendientes' => $this->categoriasPendientes,
             'subcategorias_pendientes' => $this->subcategoriasPendientes,
@@ -52,5 +135,11 @@ class ParseResultDto
                 'marcas_pendientes' => count($this->marcasPendientes),
             ],
         ];
+
+        if (! empty($this->archivosOrigen)) {
+            $data['archivos_origen'] = $this->archivosOrigen;
+        }
+
+        return $data;
     }
 }

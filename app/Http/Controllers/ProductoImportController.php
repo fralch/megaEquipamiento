@@ -22,45 +22,79 @@ class ProductoImportController extends Controller
     public function __construct(private readonly CsvProductoParser $parser) {}
 
     /**
-     * Fase 1: recibe el CSV, lo parsea y guarda el resultado en cache
-     * para que la siguiente fase (import) pueda usarlo sin re-subir el archivo.
+     * Fase 1: recibe uno o varios CSVs, los parsea y guarda el resultado en cache
+     * para que la siguiente fase (import) pueda usarlo sin re-subir los archivos.
+     *
+     * Acepta tanto `archivo` (un solo file) como `archivo[]` (múltiples files).
      */
     public function previewCsv(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'archivo' => ['required', 'file', 'max:10240'],
-        ]);
+        // Detectar si viene como array (multi-upload) o archivo suelto
+        $isMultiple = is_array($request->file('archivo'));
+        $files = $isMultiple
+            ? $request->file('archivo')
+            : ($request->hasFile('archivo') ? [$request->file('archivo')] : []);
 
-        $validator->after(function ($v) use ($request) {
-            if (! $request->hasFile('archivo')) {
-                return;
-            }
-            $ext = strtolower($request->file('archivo')->getClientOriginalExtension());
-            if (! in_array($ext, ['csv', 'txt'], true)) {
-                $v->errors()->add('archivo', 'El archivo debe tener extensión .csv o .txt (recibido: .'.$ext.').');
-            }
-        });
-
-        if ($validator->fails()) {
+        if (empty($files)) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors(),
+                'errors' => ['archivo' => ['Se requiere al menos un archivo.']],
             ], 422);
         }
 
-        $file = $request->file('archivo');
-        $stored = $file->storeAs(
-            'csv-imports',
-            uniqid('import_', true).'.'.$file->getClientOriginalExtension(),
-            'local'
-        );
+        // Validar cada archivo
+        $errors = [];
+        foreach ($files as $idx => $file) {
+            if (! $file || ! $file->isValid()) {
+                $errors[] = 'Archivo '.($idx + 1).': archivo inválido o no subido correctamente.';
 
-        $fullPath = Storage::disk('local')->path($stored);
-        $result = $this->parser->parse($fullPath);
+                continue;
+            }
+            if ($file->getSize() > 10240 * 1024) {
+                $errors[] = 'Archivo "'.$file->getClientOriginalName().'": excede el límite de 10 MB.';
+            }
+            $ext = strtolower($file->getClientOriginalExtension());
+            if (! in_array($ext, ['csv', 'txt'], true)) {
+                $errors[] = 'Archivo "'.$file->getClientOriginalName().'": debe tener extensión .csv o .txt (recibido: .'.$ext.').';
+            }
+        }
+
+        if (! empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'errors' => ['archivo' => $errors],
+            ], 422);
+        }
+
+        // Almacenar y parsear
+        $storedPaths = [];
+        $fileInfos = [];
+
+        foreach ($files as $file) {
+            $stored = $file->storeAs(
+                'csv-imports',
+                uniqid('import_', true).'.'.$file->getClientOriginalExtension(),
+                'local'
+            );
+            $storedPaths[] = $stored;
+            $fileInfos[] = [
+                'path' => Storage::disk('local')->path($stored),
+                'name' => $file->getClientOriginalName(),
+            ];
+        }
+
+        // Si es un solo archivo, usar parse() directamente (compatible con el flujo existente)
+        if (count($fileInfos) === 1) {
+            $result = $this->parser->parse($fileInfos[0]['path'], $fileInfos[0]['name']);
+        } else {
+            $result = $this->parser->parseMultiple($fileInfos);
+        }
 
         Cache::put(self::CACHE_KEY.':'.$this->cacheId($request), [
-            'stored_path' => $stored,
-            'original_name' => $file->getClientOriginalName(),
+            'stored_paths' => $storedPaths,
+            'stored_path' => $storedPaths[0], // compatibilidad hacia atrás
+            'original_names' => array_column($fileInfos, 'name'),
+            'original_name' => $fileInfos[0]['name'], // compatibilidad hacia atrás
             'result' => $result->toArray(),
         ], self::CACHE_TTL_SECONDS);
 
@@ -261,6 +295,7 @@ class ProductoImportController extends Controller
                 'soporte_tecnico' => $row['soporte_tecnico'] ?? null,
                 'caracteristicas' => $row['caracteristicas'] ?? [],
                 'especificaciones_tecnicas' => $row['especificaciones_tecnicas'] ?? null,
+                'archivos_adicionales' => $row['documentos'] ?? null,
             ];
 
             $producto = Producto::updateOrCreate(['sku' => $sku], $payloadRow);
@@ -271,10 +306,12 @@ class ProductoImportController extends Controller
             }
         }
 
-        // Limpia el archivo temporal y la cache si se importó todo
+        // Limpia los archivos temporales y la cache si se importó todo
         if (count($omitidos) === 0) {
-            if (! empty($cached['stored_path'])) {
-                Storage::disk('local')->delete($cached['stored_path']);
+            $pathsToDelete = $cached['stored_paths']
+                ?? (! empty($cached['stored_path']) ? [$cached['stored_path']] : []);
+            foreach ($pathsToDelete as $path) {
+                Storage::disk('local')->delete($path);
             }
             Cache::forget($cacheKey);
         }

@@ -1,0 +1,414 @@
+SKU,Nombre,Precio Base,% Ganancia,Video YouTube,Descripción,Attribute 1 name,Attribute 1 value(s),Attribute 2 name,Attribute 2 value(s),Attribute 3 name,Attribute 3 value(s),Attribute 4 name,Attribute 4 value(s),Attribute 5 name,Attribute 5 value(s),Attribute 6 name,Attribute 6 value(s),Especificaciones Técnicas,Documentos/Descargas,Contenido de Envío,Soporte Técnico,Categorías,SubCategorías
+0560 8830,Cámara Termográfica 883-1 - TESTO PERÚ,,,https://youtu.be/dGViFG3u9TE?si=tCpp8TgCMHD27wGw,"<p>La <strong>Cámara Termográfica testo 883-1</strong> es un instrumento profesional de alta gama diseñado para la medición precisa de temperatura superficial mediante tecnología infrarroja. Está especialmente orientada a técnicos de mantenimiento, gestores de instalaciones (Facility Managers) y consultores energéticos, ofreciendo una solución eficiente para la detección de anomalías térmicas en edificios, sistemas eléctricos e instalaciones industriales. Gracias a su alta calidad de imagen térmica y a su sistema de gestión inteligente de datos, permite ahorrar tiempo en inspecciones y mejorar la fiabilidad de los diagnósticos. Su diseño está optimizado para un uso profesional intensivo, combinando ergonomía, precisión y conectividad avanzada para la generación de informes técnicos.</p>
+
+<br><br>
+
+<p>La <strong>testo 883-1</strong> incorpora un sensor infrarrojo con resolución de 320 x 240 píxeles, ampliable hasta 640 x 480 píxeles mediante tecnología SuperResolution, lo que permite obtener imágenes térmicas de alta definición. Presenta una sensibilidad térmica inferior a 0,04 grados Celsius, lo que facilita la detección de variaciones mínimas de temperatura. Dispone de enfoque manual y objetivos intercambiables para adaptarse a diferentes distancias y escenarios de medición. Incluye funciones avanzadas como reconocimiento automático de objetos mediante código QR (SiteRecognition), ajuste automático de contraste (ScaleAssist) y transferencia inalámbrica de datos mediante Bluetooth. Además, permite la integración con software profesional para PC y aplicación móvil, facilitando la creación de informes técnicos detallados, análisis de imágenes y documentación in situ. Su sistema de trabajo está diseñado para maximizar la precisión, la trazabilidad de los datos y la eficiencia en inspecciones térmicas complejas.</p>",Resolución,640 x 480 px,Temperatura,-30 a 650 °C,Sensibilidad Térmica,< 40 mK,Frecuencia de Refresco,27 Hz,Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 883-1</td></tr>
+<tr><td>Tipo de equipo</td><td>Cámara termográfica</td></tr>
+<tr><td>Tipo de medición</td><td>Termografía de temperatura superficial</td></tr>
+<tr><td>Resolución infrarroja</td><td>320 x 240 píxeles</td></tr>
+<tr><td>Resolución con SuperResolution</td><td>640 x 480 píxeles</td></tr>
+<tr><td>Sensibilidad térmica (NETD)</td><td>&lt; 0,04 °C</td></tr>
+<tr><td>Objetivo incluido</td><td>Objetivo estándar 30° x 23°</td></tr>
+<tr><td>Enfoque</td><td>Manual</td></tr>
+<tr><td>Objetivos intercambiables</td><td>Sí</td></tr>
+<tr><td>Pantalla</td><td>Táctil</td></tr>
+<tr><td>Interfaz</td><td>WiFi y App móvil</td></tr>
+<tr><td>Función de análisis</td><td>Software IRSoft + App Thermography</td></tr>
+<tr><td>Gestión de imágenes</td><td>Testo SiteRecognition (QR / códigos automáticos)</td></tr>
+<tr><td>Funciones inteligentes</td><td>ScaleAssist, modo humedad, análisis automático</td></tr>
+<tr><td>Transferencia de datos</td><td>Bluetooth desde pinzas o sondas externas</td></tr>
+<tr><td>Uso recomendado</td><td>Mantenimiento industrial, facility management, eficiencia energética</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+</table>","""<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Cámara Termográfica 883-1 - TESTO PERÚ</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Cámaras Termográficas
+0560 8836,Cámara Termográfica 883-2 - TESTO PERÚ,,,https://youtu.be/dGViFG3u9TE?si=tCpp8TgCMHD27wGw,"<p>La <strong>Cámara Termográfica testo 883-2</strong> es un instrumento de medición profesional diseñado para la detección precisa de anomalías térmicas en edificios, instalaciones eléctricas e infraestructuras industriales. Está especialmente orientada a asesores energéticos, técnicos de mantenimiento y profesionales de inspección térmica, ofreciendo una solución completa para la evaluación de eficiencia energética y diagnóstico de fallos. Gracias a su combinación de alta calidad de imagen, software de análisis profesional y conectividad avanzada, permite realizar inspecciones térmicas rápidas, fiables y con una documentación técnica optimizada. Su diseño está enfocado en la productividad, facilitando el trabajo en campo y la generación de informes directamente desde el lugar de medición.</p>
+
+<br><br>
+
+<p>La <strong>testo 883-2</strong> incorpora un sensor infrarrojo con resolución de 320 x 240 píxeles, ampliable hasta 640 x 480 píxeles mediante tecnología SuperResolution, y una sensibilidad térmica inferior a 0,04 grados Celsius, lo que permite detectar variaciones mínimas de temperatura con gran precisión. Dispone de enfoque manual y objetivo gran angular de 42° x 32°, ideal para inspecciones en espacios reducidos, así como compatibilidad con teleobjetivos intercambiables para aplicaciones a larga distancia. Integra funciones avanzadas como ScaleAssist para ajuste automático de contraste y modo de humedad para detección de riesgo de condensación y moho mediante indicadores visuales. Además, permite la conexión inalámbrica con dispositivos como el testo 605i y la pinza amperimétrica testo 770-3 para integrar datos eléctricos y ambientales directamente en la imagen térmica. Su sistema se complementa con software profesional para PC y aplicación móvil, facilitando la creación de informes técnicos, análisis detallados y monitoreo en tiempo real.</p>",Resolución,320 x 240 px,Temperatura,,Sensibilidad Térmica,< 40 mK,Frecuencia de Refresco,27 Hz,Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 883-2</td></tr>
+<tr><td>Tipo de equipo</td><td>Cámara termográfica</td></tr>
+<tr><td>Resolución infrarroja</td><td>320 x 240 píxeles</td></tr>
+<tr><td>Resolución con SuperResolution</td><td>640 x 480 píxeles</td></tr>
+<tr><td>Sensibilidad térmica (NETD)</td><td>&lt; 0,04 °C</td></tr>
+<tr><td>Objetivo incluido</td><td>Gran angular 42° x 32°</td></tr>
+<tr><td>Objetivos intercambiables</td><td>Sí (teleobjetivo opcional)</td></tr>
+<tr><td>Enfoque</td><td>Manual</td></tr>
+<tr><td>Pantalla</td><td>Táctil</td></tr>
+<tr><td>Software incluido</td><td>IRSoft (PC) + App Thermography</td></tr>
+<tr><td>Funciones de análisis</td><td>ScaleAssist, modo humedad, informes automáticos</td></tr>
+<tr><td>Conectividad</td><td>Bluetooth + App móvil</td></tr>
+<tr><td>Integración con sondas</td><td>testo 605i (humedad/temperatura)</td></tr>
+<tr><td>Integración eléctrica</td><td>Pinza testo 770-3 (corriente/tensión)</td></tr>
+<tr><td>Uso recomendado</td><td>Asesoría energética, edificios, inspección térmica</td></tr>
+<tr><td>Gestión de imágenes</td><td>SiteRecognition / análisis automático</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+
+</table>","""<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Cámara Termográfica 883-2 - TESTO PERÚ</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Cámaras Termográficas
+0563 0860,Set Cámara Termográfica 860i - TESTO PERÚ,,,https://youtu.be/dGViFG3u9TE?si=tCpp8TgCMHD27wGw,"<p>El <strong>Set cámara termográfica testo 860i</strong> es un instrumento portátil compacto diseñado para la realización de termografías rápidas y precisas mediante conexión directa a smartphones o tablets. Este equipo está orientado a aplicaciones de mantenimiento preventivo, climatización, refrigeración, construcción y verificación de instalaciones, permitiendo una visualización térmica clara y eficiente en tiempo real. Su diseño ligero y su integración con la App testo Smart lo convierten en una solución práctica para el trabajo diario, facilitando la captura de imágenes térmicas, el análisis inmediato de datos y la generación de informes técnicos sin necesidad de equipos voluminosos adicionales.</p>
+
+<br><br>
+
+<p>El <strong>testo 860i</strong> incorpora un detector térmico con resolución de 256 x 192 píxeles, que proporciona imágenes térmicas nítidas y detalladas para inspecciones rápidas. Dispone de funciones avanzadas como el cálculo automático de temperatura diferencial mediante los menús DeltaHeat y DeltaCool, lo que permite analizar de forma inmediata diferencias de temperatura en sistemas de calefacción, refrigeración y climatización. Además, incluye un modo de análisis de humedad que evalúa el riesgo de condensación y formación de moho mediante indicadores visuales tipo semáforo. El dispositivo se conecta directamente a la App testo Smart, donde se gestionan todas las funciones de control, visualización y generación de informes. Su diseño permite utilizarlo de forma portátil o acoplado al smartphone mediante clips, e incorpora protección IP54 y resistencia a caídas de hasta 1,5 metros, garantizando durabilidad y fiabilidad en entornos de trabajo exigentes.</p>",Resolución,256 x 192 px,Temperatura,,Sensibilidad Térmica,,Frecuencia de Refresco,,Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 860i</td></tr>
+<tr><td>Tipo de equipo</td><td>Cámara termográfica para smartphone</td></tr>
+<tr><td>Resolución infrarroja</td><td>256 x 192 píxeles</td></tr>
+<tr><td>Visualización</td><td>App testo Smart (Android / iOS)</td></tr>
+<tr><td>Conectividad</td><td>USB-C + App móvil</td></tr>
+<tr><td>Modos de análisis</td><td>DeltaHeat / DeltaCool / Termografía / Humedad</td></tr>
+<tr><td>Funciones principales</td><td>Delta T (temperatura diferencial), análisis térmico rápido</td></tr>
+<tr><td>Montaje</td><td>Uso portátil o acoplado al smartphone/tablet</td></tr>
+<tr><td>Protección</td><td>IP54</td></tr>
+<tr><td>Resistencia a caídas</td><td>Hasta 1,5 m</td></tr>
+<tr><td>Batería</td><td>Recargable</td></tr>
+<tr><td>Software</td><td>App testo Smart (informes + análisis)</td></tr>
+<tr><td>Uso recomendado</td><td>HVAC, mantenimiento, construcción, inspección rápida</td></tr>
+<tr><td>Accesorios incluidos</td><td>Cable USB-C + estuche de transporte</td></tr>
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+
+</table>","""<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Set Cámara Termográfica 860i - TESTO PERÚ</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Cámaras Termográficas
+0560 8725,Cámara Termográfica 872s - TESTO PERÚ,,,https://youtu.be/dGViFG3u9TE?si=tCpp8TgCMHD27wGw,"<p>La <strong>Cámara Termográfica testo 872s</strong> es un instrumento profesional de alta gama diseñado para la detección precisa de anomalías térmicas en aplicaciones de mantenimiento industrial, inspección de edificios y diagnóstico energético. Se trata del modelo superior dentro de su gama, destacando por su elevada calidad de imagen, mayor sensibilidad térmica y funciones avanzadas de análisis que permiten optimizar la identificación de fallos en instalaciones eléctricas, sistemas HVAC, estructuras de construcción y procesos industriales. Su diseño está orientado a ofrecer mediciones rápidas, fiables y altamente detalladas, facilitando la generación de informes técnicos completos mediante software especializado.</p>
+
+<br><br>
+
+<p>La <strong>testo 872s</strong> incorpora un detector infrarrojo con resolución de 320 x 240 píxeles, ampliable hasta 640 x 480 píxeles mediante tecnología SuperResolution, lo que permite obtener imágenes térmicas de alta definición. Presenta una sensibilidad térmica de hasta 0,05 grados Celsius (NETD 50 mK), permitiendo detectar incluso pequeñas variaciones de temperatura. Integra marcador láser visible tanto en la escena real como en la imagen térmica, así como detección automática de puntos fríos y calientes. Dispone de funciones avanzadas como ScaleAssist para ajuste automático de escala de temperatura, IFOV warner para evitar errores de medición según distancia y tamaño del objetivo, y conectividad total mediante WLAN y Bluetooth. Esta conectividad permite integrar datos de instrumentos como el testo 605i y la pinza amperimétrica testo 770-3, mejorando el análisis de condiciones ambientales y eléctricas. Además, incluye compatibilidad con software IRSoft para análisis profesional y generación de informes detallados, así como aplicación móvil para control remoto, visualización en tiempo real y documentación en campo.</p>",Resolución,320 x 240 px,Temperatura,-30 a 650 °C,Sensibilidad Térmica,< 50 mK,Frecuencia de Refresco,9 Hz,Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 872s</td></tr>
+<tr><td>Tipo de equipo</td><td>Cámara termográfica profesional</td></tr>
+
+<tr><td>Resolución infrarroja</td><td>320 x 240 píxeles</td></tr>
+<tr><td>Resolución con SuperResolution</td><td>640 x 480 píxeles</td></tr>
+<tr><td>Sensibilidad térmica (NETD)</td><td>0,05 °C (50 mK)</td></tr>
+
+<tr><td>Marcador láser</td><td>Integrado visible en imagen térmica</td></tr>
+<tr><td>Detección automática</td><td>Puntos fríos y calientes</td></tr>
+<tr><td>IFOV warner</td><td>Asistencia de distancia y tamaño del objetivo</td></tr>
+
+<tr><td>ScaleAssist</td><td>Ajuste automático de escala y paleta</td></tr>
+<tr><td>Modo humedad</td><td>Análisis de riesgo de condensación (semáforo)</td></tr>
+
+<tr><td>Conectividad</td><td>WLAN + Bluetooth</td></tr>
+<tr><td>App móvil</td><td>Testo Thermography App (iOS / Android)</td></tr>
+<tr><td>Software PC</td><td>IRSoft (análisis y reportes)</td></tr>
+
+<tr><td>Integración con sondas</td><td>testo 605i (humedad/temperatura)</td></tr>
+<tr><td>Integración eléctrica</td><td>testo 770-3 (pinza amperimétrica)</td></tr>
+
+<tr><td>Funciones inteligentes</td><td>Auto análisis térmico + medición asistida</td></tr>
+
+<tr><td>Formato de imagen</td><td>JPEG + imagen térmica radiométrica</td></tr>
+
+<tr><td>Uso recomendado</td><td>Industria, mantenimiento, edificios, energía</td></tr>
+
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+
+</table>","""<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Cámara Termográfica 872s - TESTO PERÚ</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Cámaras Termográficas
+0560 8716,Cámara Termográfica 871s - TESTO PERÚ,,,https://youtu.be/dGViFG3u9TE?si=tCpp8TgCMHD27wGw,"<p>La <strong>Cámara Termográfica testo 871s</strong> es un instrumento de medición profesional diseñado para la detección precisa de anomalías térmicas en aplicaciones de mantenimiento industrial, inspección de edificios y diagnóstico energético. Este modelo destaca dentro de su gama por ofrecer una excelente combinación entre facilidad de uso y tecnología avanzada, incorporando conectividad inalámbrica y funciones inteligentes que facilitan la generación de informes técnicos y el análisis de imágenes térmicas. Su diseño está orientado a profesionales que requieren rapidez en la medición, fiabilidad en los resultados y documentación eficiente de los datos en campo.</p>
+
+<br><br>
+
+<p>La <strong>testo 871s</strong> dispone de un detector infrarrojo con resolución de 240 x 180 píxeles, ampliable hasta 480 x 360 píxeles mediante tecnología SuperResolution, lo que permite obtener imágenes térmicas detalladas para el análisis de instalaciones y estructuras. Presenta una sensibilidad térmica de hasta 0,08 grados Celsius (NETD 80 mK), permitiendo la detección de diferencias de temperatura relevantes en sistemas eléctricos, climatización y envolventes de edificios. Integra funciones avanzadas como ScaleAssist para optimización automática de la escala térmica, IFOV warner para evitar errores de medición según distancia y tamaño del objetivo, y detección automática de puntos fríos y calientes. Además, cuenta con conectividad Bluetooth y WLAN para sincronización con dispositivos móviles, permitiendo el uso de la App testo Thermography como segunda pantalla, control remoto y herramienta de generación de informes. También es compatible con instrumentos como el testo 605i y la pinza amperimétrica testo 770-3 para la integración de datos ambientales y eléctricos en la imagen térmica, así como con el software IRSoft para análisis avanzado en PC.</p>",Resolución,240 x 180 px,Temperatura,-30 a 650 °C,Sensibilidad Térmica,< 80 mK,Frecuencia de Refresco,9 Hz,Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 871s</td></tr>
+<tr><td>Tipo de equipo</td><td>Cámara termográfica profesional</td></tr>
+
+<tr><td>Resolución infrarroja</td><td>240 x 180 píxeles</td></tr>
+<tr><td>Resolución con SuperResolution</td><td>480 x 360 píxeles</td></tr>
+
+<tr><td>Sensibilidad térmica (NETD)</td><td>0,08 °C (80 mK)</td></tr>
+
+<tr><td>Conectividad</td><td>WLAN + Bluetooth</td></tr>
+<tr><td>App móvil</td><td>Testo Thermography App (iOS / Android)</td></tr>
+
+<tr><td>Software PC</td><td>IRSoft</td></tr>
+<tr><td>Formato de imagen</td><td>JPEG + radiométrico</td></tr>
+
+<tr><td>Funciones inteligentes</td><td>IFOV warner, ScaleAssist, detección automática de puntos fríos/calientes</td></tr>
+
+<tr><td>Integración con sondas</td><td>testo 605i (humedad/temperatura)</td></tr>
+<tr><td>Integración eléctrica</td><td>testo 770-3 (pinza amperimétrica)</td></tr>
+
+<tr><td>Cámara digital integrada</td><td>Sí (imagen real + imagen térmica)</td></tr>
+
+<tr><td>Uso recomendado</td><td>Mantenimiento, construcción, inspección, energía</td></tr>
+
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+
+</table>","""<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Cámara Termográfica 871s - TESTO PERÚ</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Cámaras Termográficas
+0563 8836,Set Cámara Termográfica 883-2 - TESTO PERÚ,,,https://youtu.be/dGViFG3u9TE?si=tCpp8TgCMHD27wGw,"<p>El <strong>Set cámara termográfica testo 883-2</strong> es una solución profesional de alta gama diseñada para la detección avanzada de anomalías térmicas en aplicaciones de consultoría energética, inspección de edificios y mantenimiento industrial. Este set está orientado a usuarios que requieren máxima precisión, versatilidad y capacidad de análisis en campo, incorporando no solo la cámara termográfica principal, sino también accesorios que amplían su rendimiento en mediciones a corta y larga distancia. Gracias a su combinación de hardware de alta resolución, óptica intercambiable y software profesional, permite realizar diagnósticos térmicos completos con gran eficiencia y documentación técnica optimizada.</p>
+
+<br><br>
+
+<p>El <strong>testo 883-2</strong> incluido en el set dispone de un detector infrarrojo con resolución de 320 x 240 píxeles, ampliable hasta 640 x 480 píxeles mediante tecnología SuperResolution, lo que garantiza imágenes térmicas detalladas y de alta calidad. Presenta una sensibilidad térmica inferior a 0,04 grados Celsius, permitiendo identificar variaciones mínimas de temperatura en instalaciones eléctricas, envolventes de edificios y sistemas HVAC. El set incluye objetivo gran angular de 42° x 32° para espacios reducidos y teleobjetivo de 12° x 9° para mediciones a larga distancia, además de batería adicional y estación de carga para uso prolongado en campo. Incorpora funciones avanzadas como ScaleAssist para ajuste automático de escala térmica, reconocimiento automático de puntos fríos y calientes, y conectividad mediante App testo Thermography para control remoto, análisis en tiempo real y generación de informes in situ. Además, es compatible con instrumentos como el testo 605i y la pinza amperimétrica testo 770-3, permitiendo integrar datos eléctricos y ambientales en las imágenes térmicas para un análisis más completo.</p>",Resolución,640 x 480 px,Temperatura,-30 a 650 °C,Sensibilidad Térmica,< 40 mK,Frecuencia de Refresco,27 Hz,Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 883-2 (SET)</td></tr>
+<tr><td>Tipo de equipo</td><td>Cámara termográfica profesional con kit</td></tr>
+
+<tr><td>Resolución infrarroja</td><td>320 x 240 píxeles</td></tr>
+<tr><td>Resolución con SuperResolution</td><td>640 x 480 píxeles</td></tr>
+
+<tr><td>Sensibilidad térmica (NETD)</td><td>&lt; 0,04 °C</td></tr>
+
+<tr><td>Objetivos incluidos</td><td>Gran angular 42° x 32° + Teleobjetivo 12° x 9°</td></tr>
+<tr><td>Enfoque</td><td>Manual</td></tr>
+
+<tr><td>Accesorios del set</td><td>Batería adicional + estación de carga de sobremesa</td></tr>
+
+<tr><td>Software incluido</td><td>IRSoft (PC) + App Thermography</td></tr>
+
+<tr><td>Funciones inteligentes</td><td>ScaleAssist, IFOV warner, detección automática de puntos fríos/calientes</td></tr>
+
+<tr><td>Conectividad</td><td>WLAN + Bluetooth</td></tr>
+
+<tr><td>Integración con sondas</td><td>testo 605i (humedad/temperatura)</td></tr>
+<tr><td>Integración eléctrica</td><td>testo 770-3 (pinza amperimétrica)</td></tr>
+
+<tr><td>Formato de imagen</td><td>JPEG + radiométrico</td></tr>
+
+<tr><td>Uso recomendado</td><td>Edificación, consultoría energética, mantenimiento industrial</td></tr>
+
+<tr><td>Ventaja del set</td><td>Mayor autonomía + mejor alcance con teleobjetivo</td></tr>
+
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+
+</table>","""<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Set Cámara Termográfica 883-2 - TESTO PERÚ</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Cámaras Termográficas
+0563 8836,Set Cámara Termográfica 883-2 - TESTO PERÚ,,,https://youtu.be/dGViFG3u9TE?si=tCpp8TgCMHD27wGw,"<p>El <strong>Set cámara termográfica testo 883-2</strong> es una solución profesional de alta gama diseñada para la detección precisa de anomalías térmicas en aplicaciones de consultoría energética, inspección de edificios y mantenimiento industrial. Este set está especialmente orientado a usuarios que requieren un sistema completo y versátil para trabajos de medición prolongados y análisis térmicos avanzados, incorporando accesorios que amplían su capacidad operativa tanto en campo como en entornos técnicos exigentes. Su diseño combina alta resolución de imagen, conectividad avanzada y herramientas de software profesional para la generación de informes detallados, permitiendo una gestión eficiente de datos térmicos y una evaluación precisa del comportamiento energético de instalaciones y edificaciones.</p>
+
+<br><br>
+
+<p>El <strong>testo 883-2 (set completo)</strong> incorpora un detector infrarrojo con resolución de 320 x 240 píxeles, ampliable hasta 640 x 480 píxeles mediante tecnología SuperResolution, y una sensibilidad térmica inferior a 0,04 grados Celsius, lo que permite detectar diferencias mínimas de temperatura con gran precisión. Este set incluye un objetivo gran angular de 42° x 32° para inspecciones en espacios reducidos y un teleobjetivo de 12° x 9° para mediciones a larga distancia, además de batería de repuesto y estación de carga de sobremesa para mayor autonomía en trabajos prolongados. Dispone de funciones avanzadas como ScaleAssist para ajuste automático del contraste, IFOV warner para evitar errores de medición según distancia y tamaño del objetivo, y detección automática de puntos fríos y calientes. Asimismo, permite la conexión con la App testo Thermography para control remoto, visualización en tiempo real y generación de informes in situ, además de compatibilidad con el software profesional IRSoft para análisis avanzado en PC. Este conjunto convierte al sistema en una herramienta completa para inspecciones térmicas exigentes y documentación profesional de alta calidad.</p>
+",Resolución,320 x 240 px,Temperatura,-30 a 650 °C,Sensibilidad Térmica,< 40 mK,Frecuencia de Refresco,27 Hz,Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 883-2 (SET)</td></tr>
+<tr><td>Tipo de equipo</td><td>Cámara termográfica profesional (kit completo)</td></tr>
+
+<tr><td>Resolución infrarroja</td><td>320 x 240 píxeles</td></tr>
+<tr><td>Resolución con SuperResolution</td><td>640 x 480 píxeles</td></tr>
+
+<tr><td>Sensibilidad térmica (NETD)</td><td>&lt; 0,04 °C</td></tr>
+
+<tr><td>Objetivos incluidos</td><td>Gran angular 42° x 32° + Teleobjetivo 12° x 9°</td></tr>
+
+<tr><td>Accesorios del set</td><td>Batería adicional + estación de carga de sobremesa</td></tr>
+
+<tr><td>Software incluido</td><td>IRSoft (PC) + App Thermography (móvil)</td></tr>
+
+<tr><td>Funciones inteligentes</td><td>ScaleAssist, IFOV warner, detección automática de puntos fríos/calientes</td></tr>
+
+<tr><td>Conectividad</td><td>WLAN + Bluetooth</td></tr>
+
+<tr><td>Integración con sondas</td><td>testo 605i (humedad/temperatura)</td></tr>
+
+<tr><td>Integración eléctrica</td><td>testo 770-3 (pinza amperimétrica)</td></tr>
+
+<tr><td>Formato de imagen</td><td>JPEG + radiométrico</td></tr>
+
+<tr><td>Uso recomendado</td><td>Consultoría energética, edificación, mantenimiento industrial</td></tr>
+
+<tr><td>Ventaja del set</td><td>Incluye teleobjetivo para medición a larga distancia + autonomía extendida</td></tr>
+
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+
+</table>","""<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Set Cámara Termográfica 883-2 - TESTO PERÚ</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Cámaras Termográficas
+0560 8684,Cámara Termográfica 868s - TESTO PERÚ,,,https://youtu.be/dGViFG3u9TE?si=tCpp8TgCMHD27wGw,"<p>La <strong>cámara termográfica testo 868s</strong> es un equipo profesional diseñado para la detección rápida y eficiente de anomalías térmicas en aplicaciones de mantenimiento industrial, construcción y diagnóstico de instalaciones. Este modelo destaca por ofrecer un equilibrio entre facilidad de uso y tecnología avanzada, permitiendo a técnicos y profesionales realizar inspecciones térmicas precisas sin necesidad de experiencia compleja en termografía. Su conectividad inalámbrica mediante WLAN y su integración con la App móvil facilitan la visualización, el análisis y la documentación de los resultados en tiempo real, optimizando los procesos de inspección y reporte técnico.</p>
+
+<br><br>
+
+<p>La <strong>testo 868s</strong> incorpora un detector infrarrojo de 160 x 120 píxeles, ampliable hasta 320 x 240 píxeles mediante tecnología SuperResolution, lo que permite obtener imágenes térmicas detalladas para la identificación de fallos como fugas, puentes térmicos o sobrecalentamientos eléctricos. Su sensibilidad térmica de 0,08 grados Celsius facilita la detección de pequeñas diferencias de temperatura con alta fiabilidad. El equipo integra funciones avanzadas como detección automática de puntos fríos y calientes, ScaleAssist para optimización de contraste, IFOV warner para evitar errores de medición según distancia, y cámara digital integrada para la visualización simultánea de imagen real y térmica. Además, permite guardar imágenes en formato JPEG y trabajar con el software profesional IRSoft para análisis avanzado y generación de informes, consolidándose como una solución completa para tareas de inspección térmica diaria.</p>",Resolución,160 x 120 px,Temperatura,-30 a 650 °C,Sensibilidad Térmica,< 80 mK,Frecuencia de Refresco,9 Hz,Marca,TESTO,Procedencia,Alemania,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+
+<tr><td>Marca</td><td>TESTO</td></tr>
+<tr><td>Modelo</td><td>testo 868s</td></tr>
+<tr><td>Tipo de equipo</td><td>Cámara termográfica profesional</td></tr>
+
+<tr><td>Resolución infrarroja</td><td>160 x 120 píxeles</td></tr>
+<tr><td>Resolución con SuperResolution</td><td>320 x 240 píxeles</td></tr>
+
+<tr><td>Sensibilidad térmica (NETD)</td><td>0,08 °C</td></tr>
+
+<tr><td>Cámara digital integrada</td><td>Sí</td></tr>
+<tr><td>Conectividad</td><td>WLAN + App testo Thermography</td></tr>
+
+<tr><td>Formatos de imagen</td><td>JPEG</td></tr>
+<tr><td>Software incluido</td><td>IRSoft (PC) + App móvil</td></tr>
+
+<tr><td>Funciones inteligentes</td><td>IFOV warner, ScaleAssist, detección automática de puntos fríos/calientes</td></tr>
+
+<tr><td>Funciones App</td><td>Informe in situ, control remoto, envío de reportes</td></tr>
+
+<tr><td>Uso recomendado</td><td>HVAC, mantenimiento, construcción, inspección eléctrica básica</td></tr>
+
+<tr><td>Ventajas clave</td><td>Alta portabilidad + medición rápida + automatización básica de análisis</td></tr>
+
+<tr><td>Procedencia</td><td>Alemania</td></tr>
+
+</table>","""<strong>Ficha técnica</strong><br>
+https://download.tek.com/datasheet/1KW-60965-16_KickStart_Datasheet_052126.pdf",<ul><li>01 x Cámara Termográfica 868s - TESTO PERÚ</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Cámaras Termográficas

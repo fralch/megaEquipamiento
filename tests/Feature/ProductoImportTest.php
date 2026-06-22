@@ -85,7 +85,7 @@ test('rechaza archivo con extensión no permitida', function () {
     $this->actingAs($this->admin)
         ->postJson('/admin/products/preview-csv', ['archivo' => $archivo])
         ->assertStatus(422)
-        ->assertJsonPath('errors.archivo.0', 'El archivo debe tener extensión .csv o .txt (recibido: .xlsx).');
+        ->assertJsonPath('errors.archivo.0', 'Archivo "productos.xlsx": debe tener extensión .csv o .txt (recibido: .xlsx).');
 });
 
 test('admin crea categoria pendiente y aparece en BD', function () {
@@ -182,7 +182,8 @@ test('flujo completo: preview, resolver pendientes, importar y verificar product
 
     $caracts = $p1->caracteristicas;
     expect($caracts)->toBeArray()
-        ->and(count($caracts))->toBeGreaterThan(0);
+        ->and(count($caracts))->toBeGreaterThan(0)
+        ->and($p1->archivos_adicionales)->toContain('https://example.com/manual.pdf');
 });
 
 test('segunda ejecucion del mismo SKU actualiza en lugar de duplicar', function () {

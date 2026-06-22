@@ -57,7 +57,7 @@ const PendingRow = ({ label, value, onCreate, busy, error }) => {
 const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias, marcas }) => {
   const { isDarkMode } = useTheme();
   const [step, setStep] = useState(Steps.UPLOAD);
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [preview, setPreview] = useState(null);
   const [cacheKey, setCacheKey] = useState(null);
   const [pending, setPending] = useState({
@@ -81,7 +81,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
 
   const reset = () => {
     setStep(Steps.UPLOAD);
-    setFile(null);
+    setFiles([]);
     setPreview(null);
     setCacheKey(null);
     setPending({ categorias: [], subcategorias: [], marcas: [] });
@@ -103,26 +103,34 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
   };
 
   const handleFile = (e) => {
-    const f = e.target.files?.[0];
-    if (f) {
+    const selected = Array.from(e.target.files || []);
+    if (selected.length === 0) return;
+    const invalid = selected.filter((f) => {
       const name = f.name.toLowerCase();
-      if (!name.endsWith('.csv') && !name.endsWith('.txt')) {
-        setError(`Solo se aceptan archivos .csv o .txt (recibido: ${f.name})`);
-        e.target.value = '';
-        return;
-      }
-      setFile(f);
-      setError(null);
+      return !name.endsWith('.csv') && !name.endsWith('.txt');
+    });
+    if (invalid.length > 0) {
+      setError(
+        `Solo se aceptan archivos .csv o .txt. Archivos inválidos: ${invalid.map((f) => f.name).join(', ')}`
+      );
+      e.target.value = '';
+      return;
     }
+    setFiles(selected);
+    setError(null);
   };
 
   const upload = async () => {
-    if (!file) return;
+    if (files.length === 0) return;
     setBusyKey('upload');
     setError(null);
     try {
       const fd = new FormData();
-      fd.append('archivo', file);
+      if (files.length === 1) {
+        fd.append('archivo', files[0]);
+      } else {
+        files.forEach((f) => fd.append('archivo[]', f));
+      }
       const { data } = await axios.post(`${URL_API}/admin/products/preview-csv`, fd, {
         headers: { 'X-CSRF-TOKEN': csrf() },
       });
@@ -152,7 +160,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
       const data = e?.response?.data;
       let msg = 'Error al subir el CSV';
       if (data?.errors?.archivo) {
-        msg = Array.isArray(data.errors.archivo) ? data.errors.archivo[0] : data.errors.archivo;
+        msg = Array.isArray(data.errors.archivo) ? data.errors.archivo.join(' · ') : data.errors.archivo;
       } else if (data?.message) {
         msg = data.message;
       } else if (e.message) {
@@ -359,30 +367,42 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
           {step === Steps.UPLOAD && (
             <div className="space-y-4">
               <p className="text-sm">
-                Sube un archivo CSV con las cabeceras: <code>SKU, Nombre, Precio Base, % Ganancia,
+                Sube uno o varios archivos CSV con las cabeceras: <code>SKU, Nombre, Precio Base, % Ganancia,
                 Video YouTube, Descripción, Attribute 1..6 name/value, Especificaciones Técnicas,
                   Contenido de Envío, Soporte Técnico, Categorías, SubCategorías</code>.
               </p>
               <input
                 ref={inputRef}
                 type="file"
-                accept=".csv,text/csv"
+                multiple
+                accept=".csv,.txt,text/csv"
                 onChange={handleFile}
                 className={`block w-full text-sm ${
                   isDarkMode ? 'text-gray-200' : 'text-gray-700'
                 } file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:font-medium file:bg-indigo-500 file:text-white hover:file:bg-indigo-600`}
               />
+              {files.length > 0 && (
+                <div className={`text-xs space-y-0.5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {files.map((f, i) => (
+                    <div key={i}>📄 {f.name} ({(f.size / 1024).toFixed(1)} KB)</div>
+                  ))}
+                </div>
+              )}
               <button
                 type="button"
-                disabled={!file || busyKey === 'upload'}
+                disabled={files.length === 0 || busyKey === 'upload'}
                 onClick={upload}
                 className={`w-full sm:w-auto px-4 py-2 rounded-md font-medium text-white min-h-[44px] ${
-                  !file || busyKey === 'upload'
+                  files.length === 0 || busyKey === 'upload'
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-indigo-600 hover:bg-indigo-700'
                 }`}
               >
-                {busyKey === 'upload' ? 'Procesando…' : 'Subir y previsualizar'}
+                {busyKey === 'upload'
+                  ? 'Procesando…'
+                  : files.length > 1
+                  ? `Subir ${files.length} archivos y previsualizar`
+                  : 'Subir y previsualizar'}
               </button>
             </div>
           )}
@@ -392,7 +412,11 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
               <div className={`p-3 rounded-md text-sm ${
                 isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
               }`}>
-                <strong>{preview.resumen?.productos ?? 0}</strong> productos detectados.
+                <strong>{preview.resumen?.productos ?? 0}</strong> productos detectados
+                {preview.archivos_origen?.length > 1 && (
+                  <span> en <strong>{preview.archivos_origen.length}</strong> archivos</span>
+                )}
+                .
                 {preview.errores?.length > 0 && (
                   <span className="text-red-500 ml-2">
                     ({preview.errores.length} fila(s) con error)
@@ -517,6 +541,9 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                       <th className="px-2 py-1 text-left">Subcategoría</th>
                       <th className="px-2 py-1 text-left">Marca</th>
                       <th className="px-2 py-1 text-right">Precio IGV</th>
+                      {preview.archivos_origen?.length > 1 && (
+                        <th className="px-2 py-1 text-left">Archivo</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -583,6 +610,15 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                         <td className="px-2 py-1 text-right font-mono">
                           {Number(p.precio_igv).toFixed(2)}
                         </td>
+                        {preview.archivos_origen?.length > 1 && (
+                          <td className="px-2 py-1">
+                            <span className={`inline-block text-[10px] px-1.5 py-0.5 rounded-full ${
+                              isDarkMode ? 'bg-indigo-900/50 text-indigo-300' : 'bg-indigo-100 text-indigo-700'
+                            }`}>
+                              {p.archivo_origen || '—'}
+                            </span>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
