@@ -85,7 +85,7 @@ test('rechaza archivo con extensión no permitida', function () {
     $this->actingAs($this->admin)
         ->postJson('/admin/products/preview-csv', ['archivo' => $archivo])
         ->assertStatus(422)
-        ->assertJsonPath('errors.archivo.0', 'El archivo debe tener extensión .csv o .txt (recibido: .xlsx).');
+        ->assertJsonPath('errors.archivo.0', 'Archivo "productos.xlsx": debe tener extensión .csv o .txt (recibido: .xlsx).');
 });
 
 test('admin crea categoria pendiente y aparece en BD', function () {
@@ -182,7 +182,8 @@ test('flujo completo: preview, resolver pendientes, importar y verificar product
 
     $caracts = $p1->caracteristicas;
     expect($caracts)->toBeArray()
-        ->and(count($caracts))->toBeGreaterThan(0);
+        ->and(count($caracts))->toBeGreaterThan(0)
+        ->and($p1->archivos_adicionales)->toContain('https://example.com/manual.pdf');
 });
 
 test('segunda ejecucion del mismo SKU actualiza en lugar de duplicar', function () {
@@ -223,4 +224,143 @@ test('segunda ejecucion del mismo SKU actualiza en lugar de duplicar', function 
         ])->assertOk()->assertJsonPath('actualizados', 1);
 
     expect(Producto::where('sku', 'SKU001')->count())->toBe(1);
+});
+
+test('refresh-preview actualiza los IDs de dependencias creadas sin resubir CSV', function () {
+    $csv = file_get_contents(base_path('tests/Fixtures/productos_sample.csv'));
+    $archivo = UploadedFile::fake()->createWithContent('productos_sample.csv', $csv);
+    $preview = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest'])
+        ->json();
+
+    $cacheKey = $preview['cache_key'];
+
+    // El preview original no tiene IDs resueltos
+    expect($preview['data']['productos'][0]['id_subcategoria'])->toBeNull()
+        ->and($preview['data']['productos'][0]['marca_id'])->toBeNull();
+
+    // Crear dependencias manualmente (simulando que el usuario las creó una a una)
+    Categoria::create(['nombre' => 'Instrumentos de Medición']);
+    $categoriaId = Categoria::where('nombre', 'Instrumentos de Medición')->value('id_categoria');
+    Subcategoria::create(['nombre' => 'MULTÍMETROS', 'id_categoria' => $categoriaId]);
+    Subcategoria::create(['nombre' => 'OSCILOSCOPIOS', 'id_categoria' => $categoriaId]);
+    Marca::create(['nombre' => 'FLUKE']);
+    Marca::create(['nombre' => 'KEYSIGHT']);
+
+    $refresh = $this->actingAs($this->admin)
+        ->postJson('/admin/products/refresh-preview', ['cache_key' => $cacheKey]);
+
+    $refresh->assertOk();
+    $data = $refresh->json('data');
+
+    // Todas las dependencias deben estar resueltas
+    expect($data['categorias_pendientes'])->toBeEmpty()
+        ->and($data['subcategorias_pendientes'])->toBeEmpty()
+        ->and($data['marcas_pendientes'])->toBeEmpty();
+
+    // Cada producto debe tener id_subcategoria y marca_id
+    foreach ($data['productos'] as $producto) {
+        expect($producto['id_subcategoria'])->not->toBeNull()
+            ->and($producto['marca_id'])->not->toBeNull();
+    }
+});
+
+test('create-pending-dependencies crea todo y devuelve preview actualizado', function () {
+    $csv = file_get_contents(base_path('tests/Fixtures/productos_sample.csv'));
+    $archivo = UploadedFile::fake()->createWithContent('productos_sample.csv', $csv);
+    $preview = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest'])
+        ->json();
+
+    $cacheKey = $preview['cache_key'];
+
+    expect($preview['data']['categorias_pendientes'])->not->toBeEmpty()
+        ->and($preview['data']['marcas_pendientes'])->not->toBeEmpty();
+
+    $response = $this->actingAs($this->admin)
+        ->postJson('/admin/products/create-pending-dependencies', ['cache_key' => $cacheKey]);
+
+    $response->assertOk();
+    $data = $response->json('data');
+
+    expect($data['categorias_pendientes'])->toBeEmpty()
+        ->and($data['subcategorias_pendientes'])->toBeEmpty()
+        ->and($data['marcas_pendientes'])->toBeEmpty()
+        ->and($response->json('resumen.categorias.pendientes_despues'))->toBe(0)
+        ->and($response->json('resumen.marcas.pendientes_despues'))->toBe(0);
+
+    // Verificar que las entidades se crearon en BD
+    expect(Categoria::where('nombre', 'Instrumentos de Medición')->exists())->toBeTrue()
+        ->and(Marca::where('nombre', 'FLUKE')->exists())->toBeTrue()
+        ->and(Marca::where('nombre', 'KEYSIGHT')->exists())->toBeTrue()
+        ->and(Subcategoria::where('nombre', 'MULTÍMETROS')->exists())->toBeTrue();
+});
+
+test('refresh-preview devuelve 410 si la sesion expiro', function () {
+    $this->actingAs($this->admin)
+        ->postJson('/admin/products/refresh-preview', ['cache_key' => 'clave-inexistente'])
+        ->assertStatus(410);
+});
+
+test('flujo con marca TESTO: crear todo resuelve marca_id en todos los productos', function () {
+    Categoria::create(['nombre' => 'Cámaras Termográficas']);
+    $categoriaId = Categoria::where('nombre', 'Cámaras Termográficas')->value('id_categoria');
+    Subcategoria::create(['nombre' => 'Cámaras Termográficas', 'id_categoria' => $categoriaId]);
+
+    $csv = file_get_contents(base_path('tests/Fixtures/productos_marca_testo.csv'));
+    $archivo = UploadedFile::fake()->createWithContent('productos_marca_testo.csv', $csv);
+    $preview = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest'])
+        ->json();
+
+    $cacheKey = $preview['cache_key'];
+
+    expect($preview['data']['marcas_pendientes'])->not->toBeEmpty()
+        ->and($preview['data']['marcas_pendientes'][0]['nombre'])->toBe('TESTO');
+
+    $response = $this->actingAs($this->admin)
+        ->postJson('/admin/products/create-pending-dependencies', ['cache_key' => $cacheKey]);
+
+    $response->assertOk();
+    $data = $response->json('data');
+
+    expect($data['marcas_pendientes'])->toBeEmpty();
+
+    foreach ($data['productos'] as $producto) {
+        expect($producto['marca_id'])->not->toBeNull(
+            "El producto {$producto['sku']} debería tener marca_id resuelto"
+        );
+    }
+});
+
+test('crear marca TESTO individualmente y refrescar preview resuelve marca_id', function () {
+    Categoria::create(['nombre' => 'Cámaras Termográficas']);
+    $categoriaId = Categoria::where('nombre', 'Cámaras Termográficas')->value('id_categoria');
+    Subcategoria::create(['nombre' => 'Cámaras Termográficas', 'id_categoria' => $categoriaId]);
+
+    $csv = file_get_contents(base_path('tests/Fixtures/productos_marca_testo.csv'));
+    $archivo = UploadedFile::fake()->createWithContent('productos_marca_testo.csv', $csv);
+    $preview = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest'])
+        ->json();
+
+    $cacheKey = $preview['cache_key'];
+
+    $this->actingAs($this->admin)
+        ->postJson('/admin/marcas/quick', ['nombre' => 'TESTO'])
+        ->assertStatus(201);
+
+    $refresh = $this->actingAs($this->admin)
+        ->postJson('/admin/products/refresh-preview', ['cache_key' => $cacheKey]);
+
+    $refresh->assertOk();
+    $data = $refresh->json('data');
+
+    expect($data['marcas_pendientes'])->toBeEmpty();
+
+    foreach ($data['productos'] as $producto) {
+        expect($producto['marca_id'])->not->toBeNull(
+            "El producto {$producto['sku']} debería tener marca_id resuelto"
+        );
+    }
 });

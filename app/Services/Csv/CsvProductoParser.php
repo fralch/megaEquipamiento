@@ -11,6 +11,8 @@ class CsvProductoParser
 {
     public const IGV_PORCENTAJE = 18.0;
 
+    public function __construct(private readonly ImportDependencyResolver $dependencyResolver) {}
+
     /**
      * Cabeceras esperadas (case-insensitive, tolerante a espacios/encoding).
      *
@@ -38,12 +40,66 @@ class CsvProductoParser
     ];
 
     /**
+     * Parsea múltiples CSVs y fusiona los resultados en un solo DTO.
+     * Detecta SKUs duplicados entre archivos.
+     *
+     * @param  array<int, array{path: string, name: string}>  $files  [{path, name}, ...]
+     */
+    public function parseMultiple(array $files): ParseResultDto
+    {
+        $combined = new ParseResultDto;
+        $globalSkus = []; // sku => archivo de origen
+
+        foreach ($files as $fileInfo) {
+            $filePath = $fileInfo['path'];
+            $fileName = $fileInfo['name'];
+
+            $result = $this->parse($filePath, $fileName);
+            $combined->merge($result);
+        }
+
+        // Detectar SKUs duplicados entre archivos
+        $skuMap = [];
+        $cleanProductos = [];
+        foreach ($combined->productos as $producto) {
+            $sku = $producto['sku'];
+            if (isset($skuMap[$sku])) {
+                $combined->errores[] = [
+                    'fila' => $producto['fila'],
+                    'sku' => $sku,
+                    'archivo' => $producto['archivo_origen'] ?? null,
+                    'motivo' => "SKU duplicado entre archivos (también en \"{$skuMap[$sku]}\")",
+                ];
+
+                continue;
+            }
+            $skuMap[$sku] = $producto['archivo_origen'] ?? 'desconocido';
+            $cleanProductos[] = $producto;
+        }
+        $combined->productos = $cleanProductos;
+
+        Log::info('CsvProductoParser::parseMultiple finalizado', [
+            'archivos' => count($files),
+            'productos' => count($combined->productos),
+            'errores' => count($combined->errores),
+        ]);
+
+        return $combined;
+    }
+
+    /**
      * Parsea un CSV de productos y devuelve el resultado de la primera fase
      * (sin tocar la BD más allá de lecturas para resolver FKs existentes).
+     *
+     * @param  string|null  $archivoOrigen  Nombre del archivo original para trazabilidad
      */
-    public function parse(string $filePath): ParseResultDto
+    public function parse(string $filePath, ?string $archivoOrigen = null): ParseResultDto
     {
         $result = new ParseResultDto;
+
+        if ($archivoOrigen !== null) {
+            $result->archivosOrigen = [$archivoOrigen];
+        }
 
         if (! is_readable($filePath)) {
             $result->errores[] = ['fila' => 0, 'sku' => null, 'motivo' => 'Archivo no legible: '.$filePath];
@@ -234,6 +290,7 @@ class CsvProductoParser
                 'pais' => $pais,
                 'envio' => trim((string) ($data['envio'] ?? '')) ?: null,
                 'soporte_tecnico' => trim((string) ($data['soporte_tecnico'] ?? '')) ?: null,
+                'documentos' => trim((string) ($data['documentos'] ?? '')) ?: null,
                 'especificaciones_tecnicas' => $especificaciones,
                 'caracteristicas' => $caracteristicas,
                 'categoria_nombre' => $categoriaNombre !== '' ? $categoriaNombre : null,
@@ -243,6 +300,7 @@ class CsvProductoParser
                 'marca_nombre' => $marcaNombre,
                 'marca_id' => $marcaId,
                 'subcategoria_pendiente_key' => $subcategoriaPendienteKey,
+                'archivo_origen' => $archivoOrigen,
             ];
         }
 
@@ -526,81 +584,33 @@ class CsvProductoParser
     }
 
     /**
-     * Crea las marcas pendientes y devuelve un mapa [nombre => id_marca].
+     * @see ImportDependencyResolver::resolveMarcas()
      *
      * @return array<string, int>
      */
     public function resolveMarcas(ParseResultDto $result): array
     {
-        $map = Marca::pluck('id_marca', 'nombre')
-            ->mapWithKeys(fn ($id, $nombre) => [$this->normalizeName($nombre) => $id])
-            ->all();
-        foreach ($result->marcasPendientes as $pendiente) {
-            $nombre = $pendiente['nombre'];
-            $key = $this->normalizeName($nombre);
-            if (isset($map[$key])) {
-                continue;
-            }
-            $map[$key] = Marca::create(['nombre' => $nombre])->id_marca;
-        }
-
-        return $map;
+        return $this->dependencyResolver->resolveMarcas($result);
     }
 
     /**
-     * Crea las categorías pendientes y devuelve un mapa [nombre_normalizado => id_categoria].
+     * @see ImportDependencyResolver::resolveCategorias()
      *
      * @return array<string, int>
      */
     public function resolveCategorias(ParseResultDto $result): array
     {
-        $map = Categoria::pluck('id_categoria', 'nombre')
-            ->mapWithKeys(fn ($id, $nombre) => [$this->normalizeName($nombre) => $id])
-            ->all();
-        foreach ($result->categoriasPendientes as $pendiente) {
-            $nombre = $pendiente['nombre'];
-            $key = $this->normalizeName($nombre);
-            if (isset($map[$key])) {
-                continue;
-            }
-            $map[$key] = Categoria::create(['nombre' => $nombre])->id_categoria;
-        }
-
-        return $map;
+        return $this->dependencyResolver->resolveCategorias($result);
     }
 
     /**
-     * Crea las subcategorías pendientes (requiere que las categorías ya estén
-     * en $categoriasMap) y devuelve un mapa [key => id_subcategoria]
-     * donde la key es `categoria|subcategoria` en minúsculas.
+     * @see ImportDependencyResolver::resolveSubcategorias()
      *
      * @param  array<string, int>  $categoriasMap
      * @return array<string, int>
      */
     public function resolveSubcategorias(ParseResultDto $result, array $categoriasMap): array
     {
-        $map = Subcategoria::with('categoria')->get()
-            ->mapWithKeys(fn (Subcategoria $s) => [
-                $this->normalizeName($s->categoria->nombre.'|'.$s->nombre) => $s->id_subcategoria,
-            ])->all();
-
-        foreach ($result->subcategoriasPendientes as $pendiente) {
-            $catNombre = $pendiente['categoria'];
-            $subNombre = $pendiente['nombre'];
-            $key = $this->normalizeName($catNombre.'|'.$subNombre);
-            if (isset($map[$key])) {
-                continue;
-            }
-            $idCategoria = $categoriasMap[$this->normalizeName($catNombre)] ?? null;
-            if ($idCategoria === null) {
-                continue;
-            }
-            $map[$key] = Subcategoria::create([
-                'nombre' => $subNombre,
-                'id_categoria' => $idCategoria,
-            ])->id_subcategoria;
-        }
-
-        return $map;
+        return $this->dependencyResolver->resolveSubcategorias($result, $categoriasMap);
     }
 }

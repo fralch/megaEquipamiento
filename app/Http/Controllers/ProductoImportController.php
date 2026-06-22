@@ -7,11 +7,12 @@ use App\Models\Marca;
 use App\Models\Producto;
 use App\Models\Subcategoria;
 use App\Services\Csv\CsvProductoParser;
+use App\Services\Csv\ImportDependencyResolver;
+use App\Services\Csv\ParseResultDto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
 class ProductoImportController extends Controller
 {
@@ -19,48 +20,85 @@ class ProductoImportController extends Controller
 
     private const CACHE_TTL_SECONDS = 1800; // 30 min
 
-    public function __construct(private readonly CsvProductoParser $parser) {}
+    public function __construct(
+        private readonly CsvProductoParser $parser,
+        private readonly ImportDependencyResolver $dependencyResolver,
+    ) {}
 
     /**
-     * Fase 1: recibe el CSV, lo parsea y guarda el resultado en cache
-     * para que la siguiente fase (import) pueda usarlo sin re-subir el archivo.
+     * Fase 1: recibe uno o varios CSVs, los parsea y guarda el resultado en cache
+     * para que la siguiente fase (import) pueda usarlo sin re-subir los archivos.
+     *
+     * Acepta tanto `archivo` (un solo file) como `archivo[]` (múltiples files).
      */
     public function previewCsv(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'archivo' => ['required', 'file', 'max:10240'],
-        ]);
+        // Detectar si viene como array (multi-upload) o archivo suelto
+        $isMultiple = is_array($request->file('archivo'));
+        $files = $isMultiple
+            ? $request->file('archivo')
+            : ($request->hasFile('archivo') ? [$request->file('archivo')] : []);
 
-        $validator->after(function ($v) use ($request) {
-            if (! $request->hasFile('archivo')) {
-                return;
-            }
-            $ext = strtolower($request->file('archivo')->getClientOriginalExtension());
-            if (! in_array($ext, ['csv', 'txt'], true)) {
-                $v->errors()->add('archivo', 'El archivo debe tener extensión .csv o .txt (recibido: .'.$ext.').');
-            }
-        });
-
-        if ($validator->fails()) {
+        if (empty($files)) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors(),
+                'errors' => ['archivo' => ['Se requiere al menos un archivo.']],
             ], 422);
         }
 
-        $file = $request->file('archivo');
-        $stored = $file->storeAs(
-            'csv-imports',
-            uniqid('import_', true).'.'.$file->getClientOriginalExtension(),
-            'local'
-        );
+        // Validar cada archivo
+        $errors = [];
+        foreach ($files as $idx => $file) {
+            if (! $file || ! $file->isValid()) {
+                $errors[] = 'Archivo '.($idx + 1).': archivo inválido o no subido correctamente.';
 
-        $fullPath = Storage::disk('local')->path($stored);
-        $result = $this->parser->parse($fullPath);
+                continue;
+            }
+            if ($file->getSize() > 10240 * 1024) {
+                $errors[] = 'Archivo "'.$file->getClientOriginalName().'": excede el límite de 10 MB.';
+            }
+            $ext = strtolower($file->getClientOriginalExtension());
+            if (! in_array($ext, ['csv', 'txt'], true)) {
+                $errors[] = 'Archivo "'.$file->getClientOriginalName().'": debe tener extensión .csv o .txt (recibido: .'.$ext.').';
+            }
+        }
+
+        if (! empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'errors' => ['archivo' => $errors],
+            ], 422);
+        }
+
+        // Almacenar y parsear
+        $storedPaths = [];
+        $fileInfos = [];
+
+        foreach ($files as $file) {
+            $stored = $file->storeAs(
+                'csv-imports',
+                uniqid('import_', true).'.'.$file->getClientOriginalExtension(),
+                'local'
+            );
+            $storedPaths[] = $stored;
+            $fileInfos[] = [
+                'path' => Storage::disk('local')->path($stored),
+                'name' => $file->getClientOriginalName(),
+            ];
+        }
+
+        // Si es un solo archivo, usar parse() directamente (compatible con el flujo existente)
+        if (count($fileInfos) === 1) {
+            $result = $this->parser->parse($fileInfos[0]['path'], $fileInfos[0]['name']);
+        } else {
+            $result = $this->parser->parseMultiple($fileInfos);
+        }
 
         Cache::put(self::CACHE_KEY.':'.$this->cacheId($request), [
-            'stored_path' => $stored,
-            'original_name' => $file->getClientOriginalName(),
+            'stored_paths' => $storedPaths,
+            'stored_path' => $storedPaths[0], // compatibilidad hacia atrás
+            'original_names' => array_column($fileInfos, 'name'),
+            'original_name' => $fileInfos[0]['name'], // compatibilidad hacia atrás
             'result' => $result->toArray(),
         ], self::CACHE_TTL_SECONDS);
 
@@ -68,6 +106,42 @@ class ProductoImportController extends Controller
             'success' => true,
             'data' => $result->toArray(),
             'cache_key' => $this->cacheId($request),
+        ]);
+    }
+
+    /**
+     * Vuelve a parsear los archivos temporales guardados en caché y devuelve
+     * un preview fresco. Útil después de crear categorías/subcategorías/marcas.
+     */
+    public function refreshPreview(Request $request)
+    {
+        $data = $request->validate([
+            'cache_key' => 'required|string',
+        ]);
+
+        $cached = $this->getCachedPayload($data['cache_key']);
+        if (! $cached) {
+            return response()->json([
+                'success' => false,
+                'error' => 'La sesión de importación expiró. Vuelve a subir el CSV.',
+            ], 410);
+        }
+
+        $result = $this->reparseCachedFiles($cached);
+        $this->storeResultInCache($data['cache_key'], $cached, $result);
+
+        Log::debug('refresh-preview completado', [
+            'cache_key' => $data['cache_key'],
+            'productos' => count($result->productos),
+            'categorias_pendientes' => count($result->categoriasPendientes),
+            'subcategorias_pendientes' => count($result->subcategoriasPendientes),
+            'marcas_pendientes' => count($result->marcasPendientes),
+            'productos_con_marca_id' => count(array_filter($result->productos, fn ($p) => ! empty($p['marca_id']))),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => $result->toArray(),
         ]);
     }
 
@@ -201,8 +275,7 @@ class ProductoImportController extends Controller
             'mapping.*.marca_id' => 'nullable|integer|exists:marcas,id_marca',
         ]);
 
-        $cacheKey = self::CACHE_KEY.':'.$data['cache_key'];
-        $cached = Cache::get($cacheKey);
+        $cached = $this->getCachedPayload($data['cache_key']);
         if (! $cached) {
             return response()->json([
                 'success' => false,
@@ -261,6 +334,7 @@ class ProductoImportController extends Controller
                 'soporte_tecnico' => $row['soporte_tecnico'] ?? null,
                 'caracteristicas' => $row['caracteristicas'] ?? [],
                 'especificaciones_tecnicas' => $row['especificaciones_tecnicas'] ?? null,
+                'archivos_adicionales' => $row['documentos'] ?? null,
             ];
 
             $producto = Producto::updateOrCreate(['sku' => $sku], $payloadRow);
@@ -271,12 +345,14 @@ class ProductoImportController extends Controller
             }
         }
 
-        // Limpia el archivo temporal y la cache si se importó todo
+        // Limpia los archivos temporales y la cache si se importó todo
         if (count($omitidos) === 0) {
-            if (! empty($cached['stored_path'])) {
-                Storage::disk('local')->delete($cached['stored_path']);
+            $pathsToDelete = $cached['stored_paths']
+                ?? (! empty($cached['stored_path']) ? [$cached['stored_path']] : []);
+            foreach ($pathsToDelete as $path) {
+                Storage::disk('local')->delete($path);
             }
-            Cache::forget($cacheKey);
+            Cache::forget($this->cacheKeyFromString($data['cache_key']));
         }
 
         Log::info('Importación CSV finalizada', [
@@ -294,6 +370,65 @@ class ProductoImportController extends Controller
         ]);
     }
 
+    /**
+     * Crea todas las dependencias pendientes de una sola vez y devuelve
+     * el preview actualizado, sin borrar los archivos temporales.
+     */
+    public function createPendingDependencies(Request $request)
+    {
+        $data = $request->validate([
+            'cache_key' => 'required|string',
+        ]);
+
+        $cached = $this->getCachedPayload($data['cache_key']);
+        if (! $cached) {
+            return response()->json([
+                'success' => false,
+                'error' => 'La sesión de importación expiró. Vuelve a subir el CSV.',
+            ], 410);
+        }
+
+        $oldResult = $this->resultFromCache($cached['result']);
+
+        try {
+            // Crear dependencias en BD
+            $categoriasMap = $this->dependencyResolver->resolveCategorias($oldResult);
+            $subcategoriasMap = $this->dependencyResolver->resolveSubcategorias($oldResult, $categoriasMap);
+            $marcasMap = $this->dependencyResolver->resolveMarcas($oldResult);
+
+            Log::debug('create-pending-dependencies: dependencias resueltas', [
+                'cache_key' => $data['cache_key'],
+                'categorias_map' => count($categoriasMap),
+                'subcategorias_map' => count($subcategoriasMap),
+                'marcas_map' => $marcasMap,
+            ]);
+
+            // Re-parsear para obtener IDs resueltos de forma fiable
+            $newResult = $this->reparseCachedFiles($cached);
+            $this->storeResultInCache($data['cache_key'], $cached, $newResult);
+
+            Log::debug('create-pending-dependencies: preview re-parseado', [
+                'cache_key' => $data['cache_key'],
+                'productos_con_marca_id' => count(array_filter($newResult->productos, fn ($p) => ! empty($p['marca_id']))),
+                'marcas_pendientes_despues' => count($newResult->marcasPendientes),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Todas las dependencias creadas correctamente.',
+                'data' => $newResult->toArray(),
+                'resumen' => $this->buildSummary($oldResult, $newResult),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error creando dependencias en importación: '.$e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'error' => 'Error al crear dependencias: '.$e->getMessage(),
+            ], 500);
+        }
+    }
+
     private function cacheId(Request $request): string
     {
         $userId = $request->user()?->id ?? 'anon';
@@ -302,11 +437,104 @@ class ProductoImportController extends Controller
         return hash('sha256', $userId.'|'.$session);
     }
 
+    private function cacheKeyFromString(string $key): string
+    {
+        return self::CACHE_KEY.':'.$key;
+    }
+
+    private function getCachedPayload(string $cacheId): ?array
+    {
+        return Cache::get($this->cacheKeyFromString($cacheId));
+    }
+
     private function normalizeName(string $s): string
     {
         $s = trim($s);
         $s = preg_replace('/\s+/u', ' ', $s) ?? $s;
 
         return mb_strtolower($s, 'UTF-8');
+    }
+
+    /**
+     * Reconstruye los fileInfos a partir de la entrada en caché.
+     *
+     * @return array<int, array{path: string, name: string}>
+     */
+    private function buildFileInfos(array $cached): array
+    {
+        $storedPaths = $cached['stored_paths'] ?? (! empty($cached['stored_path']) ? [$cached['stored_path']] : []);
+        $originalNames = $cached['original_names'] ?? (! empty($cached['original_name']) ? [$cached['original_name']] : []);
+
+        $fileInfos = [];
+        foreach ($storedPaths as $idx => $storedPath) {
+            $fileInfos[] = [
+                'path' => Storage::disk('local')->path($storedPath),
+                'name' => $originalNames[$idx] ?? basename($storedPath),
+            ];
+        }
+
+        return $fileInfos;
+    }
+
+    private function reparseCachedFiles(array $cached): ParseResultDto
+    {
+        $fileInfos = $this->buildFileInfos($cached);
+
+        if (count($fileInfos) === 0) {
+            throw new \RuntimeException('No se encontraron archivos temporales para re-parsear.');
+        }
+
+        if (count($fileInfos) === 1) {
+            return $this->parser->parse($fileInfos[0]['path'], $fileInfos[0]['name']);
+        }
+
+        return $this->parser->parseMultiple($fileInfos);
+    }
+
+    private function storeResultInCache(string $cacheId, array $cached, ParseResultDto $result): void
+    {
+        Cache::put($this->cacheKeyFromString($cacheId), [
+            'stored_paths' => (array) ($cached['stored_paths'] ?? $cached['stored_path'] ?? []),
+            'stored_path' => $cached['stored_path'] ?? null,
+            'original_names' => (array) ($cached['original_names'] ?? $cached['original_name'] ?? []),
+            'original_name' => $cached['original_name'] ?? null,
+            'result' => $result->toArray(),
+        ], self::CACHE_TTL_SECONDS);
+    }
+
+    /**
+     * Construye un DTO a partir de los datos crudos guardados en caché.
+     */
+    private function resultFromCache(array $payload): ParseResultDto
+    {
+        return new ParseResultDto(
+            productos: $payload['productos'] ?? [],
+            categoriasPendientes: $payload['categorias_pendientes'] ?? [],
+            subcategoriasPendientes: $payload['subcategorias_pendientes'] ?? [],
+            marcasPendientes: $payload['marcas_pendientes'] ?? [],
+            errores: $payload['errores'] ?? [],
+            archivosOrigen: $payload['archivos_origen'] ?? [],
+        );
+    }
+
+    /**
+     * Resume cuántas dependencias quedaron resueltas tras el re-parseo.
+     */
+    private function buildSummary(ParseResultDto $old, ParseResultDto $new): array
+    {
+        return [
+            'categorias' => [
+                'pendientes_antes' => count($old->categoriasPendientes),
+                'pendientes_despues' => count($new->categoriasPendientes),
+            ],
+            'subcategorias' => [
+                'pendientes_antes' => count($old->subcategoriasPendientes),
+                'pendientes_despues' => count($new->subcategoriasPendientes),
+            ],
+            'marcas' => [
+                'pendientes_antes' => count($old->marcasPendientes),
+                'pendientes_despues' => count($new->marcasPendientes),
+            ],
+        ];
     }
 }

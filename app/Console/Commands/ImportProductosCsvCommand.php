@@ -98,6 +98,7 @@ class ImportProductosCsvCommand extends Command
                 'soporte_tecnico' => $row['soporte_tecnico'],
                 'caracteristicas' => $row['caracteristicas'] ?? [],
                 'especificaciones_tecnicas' => $row['especificaciones_tecnicas'],
+                'archivos_adicionales' => $row['documentos'] ?? null,
             ];
 
             $p = Producto::updateOrCreate(['sku' => $row['sku']], $payload);
