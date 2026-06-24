@@ -39,6 +39,34 @@ test('parsea especificaciones como JSON estructurado sin tocarlo', function () {
     expect($out)->toBe(['filas' => ['a' => 'b']]);
 });
 
+test('parseDecimal retorna null para strings vacíos o espacios', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'parseDecimal');
+    $ref->setAccessible(true);
+
+    expect($ref->invoke($this->parser, ''))->toBeNull();
+    expect($ref->invoke($this->parser, '   '))->toBeNull();
+    expect($ref->invoke($this->parser, null))->toBeNull();
+});
+
+test('parseDecimal retorna float para números válidos', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'parseDecimal');
+    $ref->setAccessible(true);
+
+    expect($ref->invoke($this->parser, '0'))->toBe(0.0);
+    expect($ref->invoke($this->parser, '150'))->toBe(150.0);
+    expect($ref->invoke($this->parser, '150.50'))->toBe(150.5);
+    expect($ref->invoke($this->parser, '1,234.56'))->toBe(1234.56);
+    expect($ref->invoke($this->parser, '1.234,56'))->toBe(1234.56);
+});
+
+test('parseDecimal retorna null para valores inválidos', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'parseDecimal');
+    $ref->setAccessible(true);
+
+    expect($ref->invoke($this->parser, 'abc'))->toBeNull();
+    expect($ref->invoke($this->parser, '123abc'))->toBeNull();
+});
+
 test('parsea el fixture CSV sin BD devuelve 0 errores', function () {
     // La prueba completa con detección de pendientes está en
     // Feature/ProductoImportTest. Aquí validamos que el método

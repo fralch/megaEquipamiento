@@ -187,22 +187,34 @@ class CsvProductoParser
             }
             $skusVistos[$sku] = $rowNumber;
 
-            $precioBaseRaw = $data['precio_base'] ?? '0';
-            $porcentajeRaw = $data['porcentaje_ganancia'] ?? '0';
-            $precioBase = $this->parseDecimal($precioBaseRaw);
-            $porcentajeGanancia = $this->parseDecimal($porcentajeRaw);
+            $precioBaseRaw = trim((string) ($data['precio_base'] ?? ''));
+            $porcentajeRaw = trim((string) ($data['porcentaje_ganancia'] ?? ''));
 
-            if ($precioBase === null || $porcentajeGanancia === null) {
-                $result->errores[] = [
-                    'fila' => $rowNumber,
-                    'sku' => $sku,
-                    'motivo' => "Precio base o porcentaje de ganancia inválido ('{$precioBaseRaw}', '{$porcentajeRaw}')",
+            // Ambos vacíos intencionalmente → permitir importación con precios nulos
+            if ($precioBaseRaw === '' && $porcentajeRaw === '') {
+                $precioBase = null;
+                $porcentajeGanancia = null;
+                $precios = [
+                    'precio_sin_ganancia' => null,
+                    'precio_ganancia' => null,
+                    'precio_igv' => null,
                 ];
+            } else {
+                $precioBase = $this->parseDecimal($precioBaseRaw);
+                $porcentajeGanancia = $this->parseDecimal($porcentajeRaw);
 
-                continue;
+                if ($precioBase === null || $porcentajeGanancia === null) {
+                    $result->errores[] = [
+                        'fila' => $rowNumber,
+                        'sku' => $sku,
+                        'motivo' => "Precio base o porcentaje de ganancia inválido ('{$precioBaseRaw}', '{$porcentajeRaw}')",
+                    ];
+
+                    continue;
+                }
+
+                $precios = $this->calcularPrecios($precioBase, (float) $porcentajeGanancia);
             }
-
-            $precios = $this->calcularPrecios($precioBase, (float) $porcentajeGanancia);
 
             // Atributos variables → caracteristicas
             $atributos = $this->parseAtributos($row, $attributeIndexes);
@@ -283,7 +295,7 @@ class CsvProductoParser
                 'descripcion' => $this->normalizeMultilineHtml($data['descripcion'] ?? null),
                 'video' => trim((string) ($data['video'] ?? '')) ?: null,
                 'precio_base' => $precioBase,
-                'porcentaje_ganancia' => (float) $porcentajeGanancia,
+                'porcentaje_ganancia' => $porcentajeGanancia !== null ? (float) $porcentajeGanancia : null,
                 'precio_sin_ganancia' => $precios['precio_sin_ganancia'],
                 'precio_ganancia' => $precios['precio_ganancia'],
                 'precio_igv' => $precios['precio_igv'],
@@ -498,8 +510,8 @@ class CsvProductoParser
 
     private function parseDecimal(mixed $raw): ?float
     {
-        if ($raw === null || $raw === '') {
-            return 0.0;
+        if ($raw === null || $raw === '' || trim((string) $raw) === '') {
+            return null;
         }
         $s = trim((string) $raw);
         // Acepta "1.234,56" y "1,234.56" y "1234.56"

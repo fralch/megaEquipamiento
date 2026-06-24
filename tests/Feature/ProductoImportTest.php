@@ -364,3 +364,222 @@ test('crear marca TESTO individualmente y refrescar preview resuelve marca_id', 
         );
     }
 });
+
+test('CSV con precios vacíos genera preview con precios nulos sin errores', function () {
+    $csv = file_get_contents(base_path('tests/Fixtures/productos_empty_prices.csv'));
+    $archivo = UploadedFile::fake()->createWithContent('productos_empty_prices.csv', $csv);
+
+    $response = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest']);
+
+    $response->assertOk();
+    $data = $response->json('data');
+
+    expect($data['resumen']['productos'])->toBe(1)
+        ->and($data['resumen']['errores'])->toBe(0);
+
+    $producto = $data['productos'][0];
+    expect($producto['sku'])->toBe('SKU-EMPTY')
+        ->and($producto['precio_base'])->toBeNull()
+        ->and($producto['porcentaje_ganancia'])->toBeNull()
+        ->and($producto['precio_sin_ganancia'])->toBeNull()
+        ->and($producto['precio_ganancia'])->toBeNull()
+        ->and($producto['precio_igv'])->toBeNull()
+        ->and($producto['nombre'])->toBe('Producto Sin Precios');
+});
+
+test('flujo completo con precios vacíos importa producto con precios nulos', function () {
+    $csv = file_get_contents(base_path('tests/Fixtures/productos_empty_prices.csv'));
+    $archivo = UploadedFile::fake()->createWithContent('productos_empty_prices.csv', $csv);
+    $preview = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest'])
+        ->json();
+
+    $cacheKey = $preview['cache_key'];
+
+    Categoria::create(['nombre' => 'Instrumentos de Medición']);
+    $categoriaId = Categoria::where('nombre', 'Instrumentos de Medición')->value('id_categoria');
+    Subcategoria::create(['nombre' => 'MULTÍMETROS', 'id_categoria' => $categoriaId]);
+    $subId = Subcategoria::where('nombre', 'MULTÍMETROS')->value('id_subcategoria');
+    Marca::create(['nombre' => 'TESTMARCA']);
+    $marcaId = Marca::where('nombre', 'TESTMARCA')->value('id_marca');
+
+    $import = $this->actingAs($this->admin)
+        ->postJson('/admin/products/import-csv', [
+            'cache_key' => $cacheKey,
+            'skus' => ['SKU-EMPTY'],
+            'mapping' => [
+                'SKU-EMPTY' => ['id_subcategoria' => $subId, 'marca_id' => $marcaId],
+            ],
+        ]);
+
+    $import->assertOk();
+    expect($import->json('insertados'))->toBe(1);
+
+    $producto = Producto::where('sku', 'SKU-EMPTY')->first();
+    expect($producto)->not->toBeNull()
+        ->and($producto->nombre)->toBe('Producto Sin Precios')
+        ->and($producto->precio_sin_ganancia)->toBeNull()
+        ->and($producto->precio_ganancia)->toBeNull()
+        ->and($producto->precio_igv)->toBeNull();
+});
+
+test('precios parciales (solo uno presente) marcan error', function () {
+    $csv = "SKU,Nombre,Precio Base,% Ganancia\nSKU-PARTIAL,Producto Parcial,100,,\n";
+    $archivo = UploadedFile::fake()->createWithContent('parcial.csv', $csv);
+
+    $response = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest']);
+
+    $response->assertOk();
+    $data = $response->json('data');
+
+    expect($data['resumen']['errores'])->toBe(1)
+        ->and($data['resumen']['productos'])->toBe(0);
+});
+
+test('precios con espacios en blanco se tratan como nulos', function () {
+    $csv = "SKU,Nombre,Precio Base,% Ganancia\nSKU-SPACE,Producto Espacios,   ,   ,\n";
+    $archivo = UploadedFile::fake()->createWithContent('espacios.csv', $csv);
+
+    $response = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest']);
+
+    $response->assertOk();
+    $data = $response->json('data');
+
+    expect($data['resumen']['productos'])->toBe(1)
+        ->and($data['resumen']['errores'])->toBe(0);
+
+    $producto = $data['productos'][0];
+    expect($producto['precio_sin_ganancia'])->toBeNull();
+});
+
+test('precio base con formato inválido marca error', function () {
+    $csv = "SKU,Nombre,Precio Base,% Ganancia\nSKU-BAD,Producto Malo,abc,25,\n";
+    $archivo = UploadedFile::fake()->createWithContent('malo.csv', $csv);
+
+    $response = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest']);
+
+    $response->assertOk();
+    $data = $response->json('data');
+
+    expect($data['resumen']['errores'])->toBe(1)
+        ->and($data['resumen']['productos'])->toBe(0);
+});
+
+test('CSV con precios en 0.0 se importan como 0.0 (no null)', function () {
+    $csv = file_get_contents(base_path('tests/Fixtures/productos_marca_testo.csv'));
+    $archivo = UploadedFile::fake()->createWithContent('testo.csv', $csv);
+
+    $response = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest']);
+
+    $response->assertOk();
+    $data = $response->json('data');
+
+    expect($data['resumen']['productos'])->toBe(2)
+        ->and($data['resumen']['errores'])->toBe(0);
+
+    foreach ($data['productos'] as $p) {
+        expect((float) $p['precio_base'])->toBe(0.0)
+            ->and((float) $p['porcentaje_ganancia'])->toBe(0.0)
+            ->and((float) $p['precio_sin_ganancia'])->toBe(0.0)
+            ->and((float) $p['precio_ganancia'])->toBe(0.0)
+            ->and((float) $p['precio_igv'])->toBe(0.0);
+    }
+});
+
+test('marca y procedencia se extraen de atributos y no aparecen en caracteristicas', function () {
+    $csv = file_get_contents(base_path('tests/Fixtures/productos_marca_espec_test.csv'));
+    $archivo = UploadedFile::fake()->createWithContent('marca_espec.csv', $csv);
+
+    $response = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest']);
+
+    $response->assertOk();
+    $producto = $response->json('data.productos.0');
+
+    // Marca y procedencia deben estar en los campos dedicados
+    expect($producto['marca_nombre'])->toBe('CROWCON')
+        ->and($producto['pais'])->toBe('Reino Unido')
+        // Y NO deben estar en caracteristicas
+        ->and($producto['caracteristicas'])->toMatchArray([
+            'Canales' => '16',
+            'Potencia' => '50 W',
+        ]);
+});
+
+test('especificaciones tecnicas HTML se parsean correctamente', function () {
+    $csv = file_get_contents(base_path('tests/Fixtures/productos_marca_espec_test.csv'));
+    $archivo = UploadedFile::fake()->createWithContent('marca_espec.csv', $csv);
+
+    $response = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest']);
+
+    $response->assertOk();
+    $producto = $response->json('data.productos.0');
+
+    expect($producto['especificaciones_tecnicas'])->toBeArray()
+        ->and($producto['especificaciones_tecnicas']['filas'])->toMatchArray([
+            'Modelo' => 'GM16',
+            'Canales' => '1 a 16',
+        ]);
+});
+
+test('flujo completo importa marca, procedencia y especificaciones correctamente', function () {
+    $csv = file_get_contents(base_path('tests/Fixtures/productos_marca_espec_test.csv'));
+    $archivo = UploadedFile::fake()->createWithContent('marca_espec.csv', $csv);
+    $preview = $this->actingAs($this->admin)
+        ->post('/admin/products/preview-csv', ['archivo' => $archivo], ['X-Requested-With' => 'XMLHttpRequest'])
+        ->json();
+
+    $cacheKey = $preview['cache_key'];
+
+    Categoria::create(['nombre' => 'INSTRUMENTOS DE MEDIDA']);
+    $categoriaId = Categoria::where('nombre', 'INSTRUMENTOS DE MEDIDA')->value('id_categoria');
+    Subcategoria::create(['nombre' => 'Paneles de Control', 'id_categoria' => $categoriaId]);
+    $subId = Subcategoria::where('nombre', 'Paneles de Control')->value('id_subcategoria');
+    Marca::create(['nombre' => 'CROWCON']);
+    $marcaId = Marca::where('nombre', 'CROWCON')->value('id_marca');
+
+    $import = $this->actingAs($this->admin)
+        ->postJson('/admin/products/import-csv', [
+            'cache_key' => $cacheKey,
+            'skus' => ['GM16'],
+            'mapping' => [
+                'GM16' => ['id_subcategoria' => $subId, 'marca_id' => $marcaId],
+            ],
+        ]);
+
+    $import->assertOk();
+    expect($import->json('insertados'))->toBe(1);
+
+    $producto = Producto::where('sku', 'GM16')->first();
+    expect($producto)->not->toBeNull()
+        ->and($producto->nombre)->toBe('Panel de Control Direccionable GM16 - CROWCON PERÚ')
+        ->and($producto->marca_id)->toBe($marcaId)
+        ->and($producto->pais)->toBe('Reino Unido')
+        ->and((float) $producto->precio_sin_ganancia)->toBe(100.0)
+        ->and((float) $producto->precio_ganancia)->toBe(133.33)
+        ->and((float) $producto->precio_igv)->toBe(157.33)
+        ->and($producto->caracteristicas)->toMatchArray([
+            'Canales' => '16',
+            'Potencia' => '50 W',
+        ]);
+
+    // Verificar que especificaciones técnicas se guardaron correctamente
+    expect($producto->especificaciones_tecnicas)->toBeArray()
+        ->and($producto->especificaciones_tecnicas['filas'])->toMatchArray([
+            'Modelo' => 'GM16',
+            'Canales' => '1 a 16',
+        ]);
+
+    // Verificar documentos
+    expect($producto->archivos_adicionales)->toContain('https://example.com/manual.pdf');
+
+    // Verificar envío y soporte
+    expect($producto->envio)->toContain('Panel GM16')
+        ->and($producto->soporte_tecnico)->toContain('Garantía');
+});

@@ -1,0 +1,133 @@
+SKU,Nombre,Precio Base,% Ganancia,Video YouTube,Descripción,Attribute 1 name,Attribute 1 value(s),Attribute 2 name,Attribute 2 value(s),Attribute 3 name,Attribute 3 value(s),Attribute 4 name,Attribute 4 value(s),Attribute 5 name,Attribute 5 value(s),Attribute 6 name,Attribute 6 value(s),Especificaciones Técnicas,Documentos/Descargas,Contenido de Envío,Soporte Técnico,Categorías,SubCategorías
+GM16,Panel de Control Direccionable GM16 - CROWCON PERÚ,,,https://youtu.be/WVitQy3Ycz0?si=JXdl4UPgtdTBvMMB,"<p>El <strong>Panel de Control Direccionable CROWCON GM16</strong> es un controlador modular para sistemas de detección fija de gases, diseñado para supervisar y administrar hasta 16 canales de detección. Su arquitectura direccionable permite configurar el sistema según los requerimientos de la aplicación, facilitando la integración con detectores de gases y dispositivos de seguridad industrial.</p><br><br><p>El <strong>CROWCON GM16</strong> incorpora múltiples opciones de visualización, registro de tendencias y comunicaciones industriales, ofreciendo una solución flexible y confiable para aplicaciones de monitoreo de gases.</p>",Canales,16,Potencia,50 W,Marca,CROWCON,Procedencia,Reino Unido,,,,,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>CROWCON</td></tr>
+<tr><td>Modelo</td><td>GM16</td></tr>
+<tr><td>Tipo de equipo</td><td>Controlador direccionable para detección de gases</td></tr>
+<tr><td>Canales</td><td>1 a 16 entradas</td></tr>
+<tr><td>Diseño</td><td>Modular configurable</td></tr>
+<tr><td>Opciones de montaje</td><td>Rack de 19 pulgadas o gabinete</td></tr>
+<tr><td>Material del gabinete</td><td>Fibra de vidrio</td></tr>
+<tr><td>Dimensiones</td><td>406,4 x 334,3 x 215,9 mm (gabinete pequeño)</td></tr>
+<tr><td>Peso</td><td>7,7 kg (gabinete pequeño)</td></tr>
+<tr><td>Grado de protección</td><td>NEMA 4X</td></tr>
+<tr><td>Consumo de energía</td><td>20 a 50 W (sin detectores)</td></tr>
+<tr><td>Salidas eléctricas</td><td>4-20 mA de 2 hilos, 4-20 mA de 3 hilos, RS-485 Modbus RTU, relés 5 A 30 V, RJ45</td></tr>
+<tr><td>Temperatura de operación</td><td>-20 a 50 °C</td></tr>
+<tr><td>Humedad de operación</td><td>0 a 90 % HR sin condensación</td></tr>
+<tr><td>Repetibilidad y deriva</td><td>Canales digitales sin variación; canales analógicos &lt;1 % FSD por año</td></tr>
+<tr><td>Aprobaciones</td><td>Uso en áreas no peligrosas como parte de un sistema intrínsecamente seguro</td></tr>
+<tr><td>Compatibilidad EMC</td><td>Marcado CE</td></tr>
+</table>","<strong>Manual</strong><br>
+https://www.crowcon.com/wp-content/uploads/2024/09/GM-CONTROLLERS-Manual_Rev-B-final.pdf
+<br>
+<strong>Ficha Técnica</strong><br>
+https://www.crowcon.com/wp-content/uploads/2025/12/GM-AddressControlers-Datasheet-US-12_2025.pdf
+<br>
+<strong>Certificados</strong><br>
+https://www.crowcon.com/wp-content/uploads/2026/01/EU_Declaration_of_Conformity_GM16.pdf",<ul><li>01 x Panel de Control Direccionable GM16</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA ,Paneles de Control
+GM64,Panel de Control Direccionable GM64 - CROWCON PERÚ,,,https://youtu.be/WVitQy3Ycz0?si=JXdl4UPgtdTBvMMB,"<p>El <strong>Panel de Control Direccionable CROWCON GM64</strong> es un controlador modular para sistemas de detección fija de gases, diseñado para supervisar y administrar hasta 64 canales de detección. Su arquitectura direccionable permite adaptar el sistema a diferentes aplicaciones industriales, proporcionando un monitoreo centralizado, seguro y escalable.</p><br><br><p>El <strong>CROWCON GM64</strong> ofrece múltiples opciones de visualización, análisis de tendencias y comunicaciones industriales, permitiendo una integración sencilla con sistemas de detección fija de gases.</p>",Canales,64,Potencia,50 W,Marca,CROWCON,Procedencia,Reino Unido,,,,,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>CROWCON</td></tr>
+<tr><td>Modelo</td><td>GM64</td></tr>
+<tr><td>Tipo de equipo</td><td>Controlador direccionable para detección de gases</td></tr>
+<tr><td>Canales</td><td>1 a 64 entradas</td></tr>
+<tr><td>Diseño</td><td>Modular configurable</td></tr>
+<tr><td>Opciones de montaje</td><td>Rack de 19 pulgadas o gabinete</td></tr>
+<tr><td>Material del gabinete</td><td>Fibra de vidrio</td></tr>
+<tr><td>Dimensiones</td><td>612,4 x 687,3 x 241,6 mm (gabinete grande)</td></tr>
+<tr><td>Peso</td><td>25 kg (gabinete grande)</td></tr>
+<tr><td>Grado de protección</td><td>NEMA 4X</td></tr>
+<tr><td>Consumo de energía</td><td>20 a 50 W (sin detectores)</td></tr>
+<tr><td>Salidas eléctricas</td><td>4-20 mA de 2 hilos, 4-20 mA de 3 hilos, RS-485 Modbus RTU, relés 5 A 30 V, RJ45</td></tr>
+<tr><td>Temperatura de operación</td><td>-20 a 50 °C</td></tr>
+<tr><td>Humedad de operación</td><td>0 a 90 % HR sin condensación</td></tr>
+<tr><td>Repetibilidad y deriva</td><td>Canales digitales sin variación; canales analógicos &lt;1 % FSD por año</td></tr>
+<tr><td>Aprobaciones</td><td>Uso en áreas no peligrosas como parte de un sistema intrínsecamente seguro</td></tr>
+<tr><td>Compatibilidad EMC</td><td>Marcado CE</td></tr>
+</table>","<strong>Manual</strong><br>
+https://www.crowcon.com/wp-content/uploads/2024/09/GM-CONTROLLERS-Manual_Rev-B-final.pdf
+<br>
+<strong>Ficha Técnica</strong><br>
+https://www.crowcon.com/wp-content/uploads/2025/12/GM-AddressControlers-Datasheet-US-12_2025.pdf
+<br>
+<strong>Certificados</strong><br>
+https://www.crowcon.com/wp-content/uploads/2026/01/EU_Declaration_of_Conformity_GM64.pdf",<ul><li>01 x Panel de Control Direccionable GM64</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA ,Paneles de Control 
+GM128,Panel de Control Direccionable GM128 - CROWCON PERÚ,,,https://youtu.be/WVitQy3Ycz0?si=JXdl4UPgtdTBvMMB,"<p>El <strong>Panel de Control Direccionable CROWCON GM128</strong> es un controlador modular para sistemas de detección fija de gases, diseñado para supervisar y administrar hasta 128 canales de detección. Su gran capacidad lo convierte en una solución ideal para instalaciones industriales de gran escala que requieren un control centralizado de múltiples detectores.</p><br><br><p>El <strong>CROWCON GM128</strong> incorpora funciones avanzadas de visualización, registro de tendencias y comunicaciones industriales, proporcionando una solución robusta, flexible y confiable para aplicaciones críticas de seguridad.</p>",Canales,128,Potencia,50 W,Marca,CROWCON,Procedencia,Reino Unido,,,,,"<table>
+<tr><td><strong>Especificación</strong></td><td><strong>Valor</strong></td></tr>
+<tr><td>Marca</td><td>CROWCON</td></tr>
+<tr><td>Modelo</td><td>GM128</td></tr>
+<tr><td>Tipo de equipo</td><td>Controlador direccionable para detección de gases</td></tr>
+<tr><td>Canales</td><td>1 a 128 entradas</td></tr>
+<tr><td>Diseño</td><td>Modular configurable</td></tr>
+<tr><td>Opciones de montaje</td><td>Rack de 19 pulgadas</td></tr>
+<tr><td>Material del gabinete</td><td>Fibra de vidrio</td></tr>
+<tr><td>Consumo de energía</td><td>20 a 50 W (sin detectores)</td></tr>
+<tr><td>Salidas eléctricas</td><td>4-20 mA de 2 hilos, 4-20 mA de 3 hilos, RS-485 Modbus RTU, relés 5 A 30 V, RJ45</td></tr>
+<tr><td>Temperatura de operación</td><td>-20 a 50 °C</td></tr>
+<tr><td>Humedad de operación</td><td>0 a 90 % HR sin condensación</td></tr>
+<tr><td>Repetibilidad y deriva</td><td>Canales digitales sin variación; canales analógicos &lt;1 % FSD por año</td></tr>
+<tr><td>Aprobaciones</td><td>Uso en áreas no peligrosas como parte de un sistema intrínsecamente seguro</td></tr>
+<tr><td>Compatibilidad EMC</td><td>Marcado CE</td></tr>
+</table>","<strong>Manual</strong><br>
+https://www.crowcon.com/wp-content/uploads/2024/09/GM-CONTROLLERS-Manual_Rev-B-final.pdf
+<br>
+<strong>Ficha Técnica</strong><br>
+https://www.crowcon.com/wp-content/uploads/2025/12/GM-AddressControlers-Datasheet-US-12_2025.pdf
+<br>
+<strong>Certificados</strong><br>
+https://www.crowcon.com/wp-content/uploads/2026/01/EU_Declaration_of_Conformity_GM128.pdf",<ul><li>01 x Panel de Control Direccionable GM128</li></ul>,"<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA ,Paneles de Control
