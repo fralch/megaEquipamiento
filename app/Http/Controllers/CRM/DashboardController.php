@@ -62,7 +62,7 @@ class DashboardController extends Controller
 
             // Cambio en cotizaciones activas
             $cotizacionesActivasMesAnteriorQuery = Cotizacion::whereIn('estado', ['pendiente', 'enviada', 'negociacion'])
-                ->whereBetween('created_at', [$inicioMesAnterior, $finMesAnterior]);
+                ->whereBetween('fecha_cotizacion', [$inicioMesAnterior, $finMesAnterior]);
             if (! $isAdmin) {
                 $cotizacionesActivasMesAnteriorQuery->where('usuario_id', $usuario->id_usuario);
             }
@@ -88,7 +88,7 @@ class DashboardController extends Controller
 
             // Cambio en pendientes
             $cotizacionesPendientesMesAnteriorQuery = Cotizacion::where('estado', 'pendiente')
-                ->whereBetween('created_at', [$inicioMesAnterior, $finMesAnterior]);
+                ->whereBetween('fecha_cotizacion', [$inicioMesAnterior, $finMesAnterior]);
 
             if (! $isAdmin) {
                 $cotizacionesPendientesMesAnteriorQuery->where('usuario_id', $usuario->id_usuario);
@@ -246,10 +246,10 @@ class DashboardController extends Controller
 
             // 1. Diario (Últimos 7 días)
             $dailyRaw = (clone $baseQuery)
-                ->where('created_at', '>=', $now->copy()->subDays(6)->startOfDay())
+                ->where('fecha_cotizacion', '>=', $now->copy()->subDays(6)->startOfDay())
                 ->get()
                 ->groupBy(function ($date) {
-                    return Carbon::parse($date->created_at)->format('Y-m-d');
+                    return Carbon::parse($date->fecha_cotizacion)->format('Y-m-d');
                 });
 
             $dailyChart = [];
@@ -273,7 +273,7 @@ class DashboardController extends Controller
                 $endOfWeek = $now->copy()->subWeeks($i)->endOfWeek();
 
                 $weekData = (clone $baseQuery)
-                    ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+                    ->whereBetween('fecha_cotizacion', [$startOfWeek, $endOfWeek])
                     ->get();
 
                 $weeklyChart[] = [
@@ -294,8 +294,8 @@ class DashboardController extends Controller
                 $month = $monthDate->month;
 
                 $monthData = (clone $baseQuery)
-                    ->whereYear('created_at', $year)
-                    ->whereMonth('created_at', $month)
+                    ->whereYear('fecha_cotizacion', $year)
+                    ->whereMonth('fecha_cotizacion', $month)
                     ->get();
 
                 $monthlyChart[] = [

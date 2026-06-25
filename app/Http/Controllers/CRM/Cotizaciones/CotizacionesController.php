@@ -715,12 +715,12 @@ class CotizacionesController extends Controller
             $now = \Carbon\Carbon::now();
 
             // Diario (Hoy)
-            $diarioQuery = (clone $personalQuery)->whereDate('created_at', $now->today());
+            $diarioQuery = (clone $personalQuery)->whereDate('fecha_cotizacion', $now->today());
             $diarioCount = $diarioQuery->count();
             $diarioMonto = $this->sumaConvertida($diarioQuery, 'total', $monedaDestino, $tipoCambio);
 
             // Semanal (Esta semana)
-            $semanalQuery = (clone $personalQuery)->whereBetween('created_at', [
+            $semanalQuery = (clone $personalQuery)->whereBetween('fecha_cotizacion', [
                 $now->copy()->startOfWeek(),
                 $now->copy()->endOfWeek(),
             ]);
@@ -728,7 +728,7 @@ class CotizacionesController extends Controller
             $semanalMonto = $this->sumaConvertida($semanalQuery, 'total', $monedaDestino, $tipoCambio);
 
             // Mensual (Este mes)
-            $mensualQuery = (clone $personalQuery)->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year);
+            $mensualQuery = (clone $personalQuery)->whereMonth('fecha_cotizacion', $now->month)->whereYear('fecha_cotizacion', $now->year);
             $mensualCount = $mensualQuery->count();
             $mensualMonto = $this->sumaConvertida($mensualQuery, 'total', $monedaDestino, $tipoCambio);
 
