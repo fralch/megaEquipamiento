@@ -533,6 +533,15 @@ class CotizacionesController extends Controller
 
             $cotizacion = Cotizacion::findOrFail($id);
 
+            // Solo permitir editar cotizaciones en estado pendiente o negociacion
+            if (! in_array($cotizacion->estado, ['pendiente', 'negociacion'])) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'No se puede editar la cotización',
+                    'message' => 'Solo se pueden editar cotizaciones en estado Pendiente o Negociación.',
+                ], 422);
+            }
+
             // Actualizar datos básicos
             $cotizacion->update($request->except(['productos', 'productos_adicionales']));
 

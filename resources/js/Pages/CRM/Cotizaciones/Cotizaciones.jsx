@@ -765,8 +765,17 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                                                     </button>
                                                                     <button
                                                                         onClick={() => handleEdit(cotizacion)}
-                                                                        className="p-1 rounded hover:bg-yellow-100 text-yellow-600 transition-colors duration-200"
-                                                                        title="Editar"
+                                                                        disabled={!['pendiente', 'negociacion'].includes(cotizacion.estado)}
+                                                                        className={`p-1 rounded transition-colors duration-200 ${
+                                                                            ['pendiente', 'negociacion'].includes(cotizacion.estado)
+                                                                                ? 'hover:bg-yellow-100 text-yellow-600'
+                                                                                : 'text-gray-400 cursor-not-allowed'
+                                                                        }`}
+                                                                        title={
+                                                                            ['pendiente', 'negociacion'].includes(cotizacion.estado)
+                                                                                ? 'Editar'
+                                                                                : 'Solo se puede editar en estado Pendiente o Negociación'
+                                                                        }
                                                                     >
                                                                         <FiEdit className="w-4 h-4" />
                                                                     </button>
