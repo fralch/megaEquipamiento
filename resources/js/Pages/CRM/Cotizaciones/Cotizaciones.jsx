@@ -32,6 +32,7 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     const [showEstadoModal, setShowEstadoModal] = useState(false);
     const [cotizacionToChangeEstado, setCotizacionToChangeEstado] = useState(null);
     const [newEstado, setNewEstado] = useState('');
+    const [currentPage, setCurrentPage] = useState(initialPagination?.current_page || 1);
 
     // Currency state
     const [monedaVisualizacion, setMonedaVisualizacion] = useState('soles');
@@ -62,14 +63,14 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         fetchEstadisticas();
     }, [monedaVisualizacion, tipoCambio]);
 
-    // Cargar cotizaciones cuando cambian los filtros o la moneda de visualización
+    // Cargar cotizaciones cuando cambian los filtros, la moneda, el tipo de cambio o la página
     useEffect(() => {
         const timer = setTimeout(() => {
-            fetchCotizaciones();
+            fetchCotizaciones(currentPage);
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [searchTerm, filterEstado, monedaVisualizacion, tipoCambio]);
+    }, [searchTerm, filterEstado, monedaVisualizacion, tipoCambio, currentPage]);
 
     const fetchEstadisticas = async () => {
         try {
@@ -84,12 +85,13 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         }
     };
 
-    const fetchCotizaciones = async () => {
+    const fetchCotizaciones = async (page = 1) => {
         setLoading(true);
         try {
             const params = {
                 moneda: monedaVisualizacion,
                 tipo_cambio: tipoCambio,
+                page: page,
             };
             if (searchTerm) params.search = searchTerm;
             if (filterEstado !== 'all') params.estado = filterEstado;
@@ -105,6 +107,7 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                     per_page: paginator.per_page,
                     total: paginator.total,
                 });
+                setCurrentPage(paginator.current_page);
             }
         } catch (error) {
             console.error('Error al cargar cotizaciones:', error);
@@ -130,7 +133,7 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         try {
             const response = await axios.delete(`/crm/cotizaciones/${id}/delete`);
             if (response.data.success) {
-                fetchCotizaciones();
+                fetchCotizaciones(currentPage);
                 fetchEstadisticas();
                 Swal.fire(
                     'Eliminado!',
@@ -194,8 +197,13 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
 
     const handleSaveSuccess = () => {
         closeModal();
-        fetchCotizaciones();
+        fetchCotizaciones(currentPage);
         fetchEstadisticas();
+    };
+
+    const handlePageChange = (page) => {
+        if (page < 1 || (pagination && page > pagination.last_page)) return;
+        setCurrentPage(page);
     };
 
     const handleChangeEstado = (cotizacion) => {
@@ -213,7 +221,7 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
             });
 
             if (response.data.success) {
-                fetchCotizaciones();
+                fetchCotizaciones(currentPage);
                 fetchEstadisticas();
                 setShowEstadoModal(false);
                 setCotizacionToChangeEstado(null);
@@ -540,7 +548,10 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                         type="text"
                                         placeholder="Buscar cotizaciones..."
                                         value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onChange={(e) => {
+                                            setSearchTerm(e.target.value);
+                                            setCurrentPage(1);
+                                        }}
                                         className={`pl-10 pr-4 py-2 w-64 rounded-lg border ${
                                             isDarkMode
                                                 ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-400'
@@ -552,7 +563,10 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                 {/* Filtro por estado */}
                                 <select
                                     value={filterEstado}
-                                    onChange={(e) => setFilterEstado(e.target.value)}
+                                    onChange={(e) => {
+                                        setFilterEstado(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
                                     className={`pl-4 pr-10 py-2 rounded-lg border ${
                                         isDarkMode
                                             ? 'bg-gray-800 border-gray-700 text-white'
@@ -811,14 +825,71 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                     </table>
                                 </div>
 
-                                {/* Footer con información adicional */}
-                                <div className={`px-6 py-3 border-t ${isDarkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
-                                    <div className="flex items-center justify-between">
-                                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>
-                                            Mostrando <span className="font-medium">{cotizaciones?.length || 0}</span> cotizaciones
-                                            {pagination && <span> de <span className="font-medium">{pagination.total}</span></span>}
-                                        </div>
+                                {/* Footer con información adicional y controles de paginación */}
+                                <div className={`px-6 py-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 ${isDarkMode ? 'border-gray-800 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+                                    <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-700'}`}>
+                                        Mostrando <span className="font-medium">{cotizaciones?.length || 0}</span> cotizaciones
+                                        {pagination && <span> de <span className="font-medium">{pagination.total}</span></span>}
                                     </div>
+
+                                    {pagination && pagination.last_page > 1 && (
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => handlePageChange(pagination.current_page - 1)}
+                                                disabled={pagination.current_page === 1}
+                                                className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all duration-200 ${
+                                                    pagination.current_page === 1
+                                                        ? (isDarkMode ? 'border-gray-800 text-gray-600 cursor-not-allowed' : 'border-gray-200 text-gray-400 cursor-not-allowed')
+                                                        : (isDarkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-100')
+                                                }`}
+                                            >
+                                                Anterior
+                                            </button>
+                                            
+                                            <div className="flex items-center gap-1">
+                                                {Array.from({ length: pagination.last_page }, (_, i) => i + 1)
+                                                    .filter(page => {
+                                                        // Mostrar primera, última y páginas cercanas a la actual para limpieza visual
+                                                        return page === 1 || 
+                                                               page === pagination.last_page || 
+                                                               Math.abs(page - pagination.current_page) <= 1;
+                                                    })
+                                                    .map((page, index, array) => {
+                                                        const showEllipsis = index > 0 && page - array[index - 1] > 1;
+                                                        return (
+                                                            <div key={page} className="flex items-center gap-1">
+                                                                {showEllipsis && (
+                                                                    <span className={`px-2 text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>...</span>
+                                                                )}
+                                                                <button
+                                                                    onClick={() => handlePageChange(page)}
+                                                                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                                                        pagination.current_page === page
+                                                                            ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/20'
+                                                                            : (isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100')
+                                                                    }`}
+                                                                >
+                                                                    {page}
+                                                                </button>
+                                                            </div>
+                                                        );
+                                                    })
+                                                }
+                                            </div>
+
+                                            <button
+                                                onClick={() => handlePageChange(pagination.current_page + 1)}
+                                                disabled={pagination.current_page === pagination.last_page}
+                                                className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all duration-200 ${
+                                                    pagination.current_page === pagination.last_page
+                                                        ? (isDarkMode ? 'border-gray-800 text-gray-600 cursor-not-allowed' : 'border-gray-200 text-gray-400 cursor-not-allowed')
+                                                        : (isDarkMode ? 'border-gray-700 text-gray-300 hover:bg-gray-700' : 'border-gray-300 text-gray-700 hover:bg-gray-100')
+                                                }`}
+                                            >
+                                                Siguiente
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </>
                         )}

@@ -45,11 +45,21 @@ class CotizacionesController extends Controller
                 $query->where('usuario_id', $usuario->id_usuario);
             }
 
-            // Filtro por búsqueda
+            // Filtro por búsqueda avanzado (número, cliente o vendedor)
             if ($request->has('search') && $request->search) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
-                    $q->where('numero', 'like', "%{$search}%");
+                    $q->where('numero', 'like', "%{$search}%")
+                      ->orWhereHas('empresaCliente', function ($q2) use ($search) {
+                          $q2->where('razon_social', 'like', "%{$search}%");
+                      })
+                      ->orWhereHas('clienteParticular', function ($q2) use ($search) {
+                          $q2->where('nombrecompleto', 'like', "%{$search}%");
+                      })
+                      ->orWhereHas('vendedor', function ($q2) use ($search) {
+                          $q2->where('nombre', 'like', "%{$search}%")
+                             ->orWhere('apellido', 'like', "%{$search}%");
+                      });
                 });
             }
 
