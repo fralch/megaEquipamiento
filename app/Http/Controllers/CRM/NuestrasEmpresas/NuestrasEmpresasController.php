@@ -82,6 +82,9 @@ class NuestrasEmpresasController extends Controller
             'codigo_cotizacion' => 'nullable|string|max:10',
             'contador_cotizacion' => 'nullable|integer|min:0',
             'anio_cotizacion' => 'nullable|string|max:4',
+            'cuenta_soles' => 'nullable|string',
+            'cuenta_dolares' => 'nullable|string',
+            'cuenta_detraccion' => 'nullable|string',
             'imagen_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'imagen_firma' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ], [
@@ -191,6 +194,9 @@ class NuestrasEmpresasController extends Controller
                 'codigo_cotizacion' => 'nullable|string|max:10',
                 'contador_cotizacion' => 'nullable|integer|min:0',
                 'anio_cotizacion' => 'nullable|string|max:4',
+                'cuenta_soles' => 'nullable|string',
+                'cuenta_dolares' => 'nullable|string',
+                'cuenta_detraccion' => 'nullable|string',
                 'imagen_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'imagen_firma' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             ], [

@@ -1,4 +1,4 @@
-import { FiX, FiHome, FiMail, FiPhone, FiUser, FiHash, FiCalendar, FiImage } from "react-icons/fi";
+import { FiX, FiHome, FiMail, FiPhone, FiUser, FiHash, FiCalendar, FiImage, FiCreditCard } from "react-icons/fi";
 import { useTheme } from "../../../../storage/ThemeContext";
 
 export default function ShowEmpresaModal({ isOpen, onClose, empresa }) {
@@ -166,6 +166,58 @@ export default function ShowEmpresaModal({ isOpen, onClose, empresa }) {
                       >
                         {empresa.telefono}
                       </a>
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Cuentas bancarias */}
+          {(empresa.cuenta_soles || empresa.cuenta_dolares || empresa.cuenta_detraccion) && (
+            <div>
+              <h5 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>
+                Cuentas Bancarias
+              </h5>
+              <div className="grid grid-cols-1 gap-4">
+                {empresa.cuenta_soles && (
+                  <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div className="flex items-center mb-2">
+                      <FiCreditCard className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        N° de Cuenta Soles
+                      </span>
+                    </div>
+                    <p className={`text-base font-semibold whitespace-pre-wrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {empresa.cuenta_soles}
+                    </p>
+                  </div>
+                )}
+
+                {empresa.cuenta_dolares && (
+                  <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div className="flex items-center mb-2">
+                      <FiCreditCard className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        N° de Cuenta Dólares
+                      </span>
+                    </div>
+                    <p className={`text-base font-semibold whitespace-pre-wrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {empresa.cuenta_dolares}
+                    </p>
+                  </div>
+                )}
+
+                {empresa.cuenta_detraccion && (
+                  <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <div className="flex items-center mb-2">
+                      <FiCreditCard className={`w-5 h-5 mr-2 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+                      <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                        N° de Cuenta Detracción
+                      </span>
+                    </div>
+                    <p className={`text-base font-semibold whitespace-pre-wrap ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {empresa.cuenta_detraccion}
                     </p>
                   </div>
                 )}

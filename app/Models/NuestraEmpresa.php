@@ -24,6 +24,9 @@ class NuestraEmpresa extends Model
         'codigo_cotizacion',
         'contador_cotizacion',
         'anio_cotizacion',
+        'cuenta_soles',
+        'cuenta_dolares',
+        'cuenta_detraccion',
     ];
 
     protected $casts = [

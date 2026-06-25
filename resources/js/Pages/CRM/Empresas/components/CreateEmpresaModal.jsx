@@ -15,6 +15,9 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         codigo_cotizacion: '',
         contador_cotizacion: 0,
         anio_cotizacion: new Date().getFullYear().toString(),
+        cuenta_soles: '',
+        cuenta_dolares: '',
+        cuenta_detraccion: '',
         id_usuario: '',
         imagen_logo: null,
         imagen_firma: null
@@ -80,6 +83,9 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
         if (formData.codigo_cotizacion) data.append('codigo_cotizacion', formData.codigo_cotizacion);
         if (formData.contador_cotizacion) data.append('contador_cotizacion', formData.contador_cotizacion);
         if (formData.anio_cotizacion) data.append('anio_cotizacion', formData.anio_cotizacion);
+        if (formData.cuenta_soles) data.append('cuenta_soles', formData.cuenta_soles);
+        if (formData.cuenta_dolares) data.append('cuenta_dolares', formData.cuenta_dolares);
+        if (formData.cuenta_detraccion) data.append('cuenta_detraccion', formData.cuenta_detraccion);
         if (formData.id_usuario) data.append('id_usuario', formData.id_usuario);
         if (formData.imagen_logo) data.append('imagen_logo', formData.imagen_logo);
         if (formData.imagen_firma) data.append('imagen_firma', formData.imagen_firma);
@@ -135,6 +141,12 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
             ruc: '',
             email: '',
             telefono: '',
+            codigo_cotizacion: '',
+            contador_cotizacion: 0,
+            anio_cotizacion: new Date().getFullYear().toString(),
+            cuenta_soles: '',
+            cuenta_dolares: '',
+            cuenta_detraccion: '',
             id_usuario: '',
             imagen_logo: null,
             imagen_firma: null
@@ -355,6 +367,87 @@ export default function CreateEmpresaModal({ isOpen, onClose, usuarios }) {
                                                         : 'border-gray-300 bg-white text-gray-900'
                                             } focus:outline-none focus:ring-2 focus:ring-blue-500`}
                                         />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Cuentas Bancarias */}
+                            <div className="md:col-span-2 border-t border-b py-4 my-2 border-gray-200 dark:border-gray-700">
+                                <h4 className={`text-sm font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    Cuentas Bancarias
+                                </h4>
+                                <div className="grid grid-cols-1 gap-6">
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            N° de Cuenta Soles
+                                        </label>
+                                        <textarea
+                                            name="cuenta_soles"
+                                            value={formData.cuenta_soles}
+                                            onChange={handleChange}
+                                            rows={2}
+                                            placeholder="Banco, N° de cuenta y CCI"
+                                            className={`w-full px-4 py-2 rounded-lg border ${
+                                                errors.cuenta_soles
+                                                    ? 'border-red-500'
+                                                    : isDarkMode
+                                                        ? 'border-gray-600 bg-gray-700 text-white'
+                                                        : 'border-gray-300 bg-white text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        />
+                                        {errors.cuenta_soles && (
+                                            <p className="mt-1 text-sm text-red-500">{errors.cuenta_soles}</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            N° de Cuenta Dólares
+                                        </label>
+                                        <textarea
+                                            name="cuenta_dolares"
+                                            value={formData.cuenta_dolares}
+                                            onChange={handleChange}
+                                            rows={2}
+                                            placeholder="Banco, N° de cuenta y CCI"
+                                            className={`w-full px-4 py-2 rounded-lg border ${
+                                                errors.cuenta_dolares
+                                                    ? 'border-red-500'
+                                                    : isDarkMode
+                                                        ? 'border-gray-600 bg-gray-700 text-white'
+                                                        : 'border-gray-300 bg-white text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        />
+                                        {errors.cuenta_dolares && (
+                                            <p className="mt-1 text-sm text-red-500">{errors.cuenta_dolares}</p>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            N° de Cuenta Detracción
+                                        </label>
+                                        <textarea
+                                            name="cuenta_detraccion"
+                                            value={formData.cuenta_detraccion}
+                                            onChange={handleChange}
+                                            rows={2}
+                                            placeholder="N° de cuenta de detracción"
+                                            className={`w-full px-4 py-2 rounded-lg border ${
+                                                errors.cuenta_detraccion
+                                                    ? 'border-red-500'
+                                                    : isDarkMode
+                                                        ? 'border-gray-600 bg-gray-700 text-white'
+                                                        : 'border-gray-300 bg-white text-gray-900'
+                                            } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                                        />
+                                        {errors.cuenta_detraccion && (
+                                            <p className="mt-1 text-sm text-red-500">{errors.cuenta_detraccion}</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>

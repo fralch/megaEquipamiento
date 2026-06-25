@@ -15,6 +15,9 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
     codigo_cotizacion: "",
     contador_cotizacion: 0,
     anio_cotizacion: "",
+    cuenta_soles: "",
+    cuenta_dolares: "",
+    cuenta_detraccion: "",
     id_usuario: "",
     imagen_logo: null,
     imagen_firma: null
@@ -34,6 +37,9 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
         codigo_cotizacion: empresa.codigo_cotizacion || "",
         contador_cotizacion: empresa.contador_cotizacion || 0,
         anio_cotizacion: empresa.anio_cotizacion || "",
+        cuenta_soles: empresa.cuenta_soles || "",
+        cuenta_dolares: empresa.cuenta_dolares || "",
+        cuenta_detraccion: empresa.cuenta_detraccion || "",
         id_usuario: empresa.id_usuario || "",
         imagen_logo: null,
         imagen_firma: null
@@ -438,6 +444,83 @@ export default function EditEmpresaModal({ isOpen, onClose, empresa, usuarios })
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                   } ${errors.anio_cotizacion ? 'border-red-500' : ''}`}
                 />
+              </div>
+            </div>
+          </div>
+
+          {/* Cuentas Bancarias */}
+          <div>
+            <h4 className={`text-md font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              Cuentas Bancarias
+            </h4>
+            <div className="grid grid-cols-1 gap-4">
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  N° de Cuenta Soles
+                </label>
+                <textarea
+                  name="cuenta_soles"
+                  value={formData.cuenta_soles}
+                  onChange={handleInputChange}
+                  rows={2}
+                  placeholder="Banco, N° de cuenta y CCI"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isDarkMode
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  } ${errors.cuenta_soles ? 'border-red-500' : ''}`}
+                />
+                {errors.cuenta_soles && (
+                  <p className="mt-1 text-sm text-red-600">{errors.cuenta_soles}</p>
+                )}
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  N° de Cuenta Dólares
+                </label>
+                <textarea
+                  name="cuenta_dolares"
+                  value={formData.cuenta_dolares}
+                  onChange={handleInputChange}
+                  rows={2}
+                  placeholder="Banco, N° de cuenta y CCI"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isDarkMode
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  } ${errors.cuenta_dolares ? 'border-red-500' : ''}`}
+                />
+                {errors.cuenta_dolares && (
+                  <p className="mt-1 text-sm text-red-600">{errors.cuenta_dolares}</p>
+                )}
+              </div>
+
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${
+                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  N° de Cuenta Detracción
+                </label>
+                <textarea
+                  name="cuenta_detraccion"
+                  value={formData.cuenta_detraccion}
+                  onChange={handleInputChange}
+                  rows={2}
+                  placeholder="N° de cuenta de detracción"
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    isDarkMode
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                  } ${errors.cuenta_detraccion ? 'border-red-500' : ''}`}
+                />
+                {errors.cuenta_detraccion && (
+                  <p className="mt-1 text-sm text-red-600">{errors.cuenta_detraccion}</p>
+                )}
               </div>
             </div>
           </div>

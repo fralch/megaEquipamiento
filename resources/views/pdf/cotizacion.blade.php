@@ -595,9 +595,9 @@
                 <p class="font-bold" style="margin: 0.5px 0;">Garantia: {{ $cotizacion->garantia }}</p>
                 <p class="font-bold" style="margin: 0.5px 0;">Forma de pago: {{ $cotizacion->forma_pago }}</p>
                 <p class="font-bold" style="margin: 0.5px 0;">Despacho: A TODO EL PERU Y LATINOAMERICA</p>
-                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA SOLES: BCP 193-9939241-0-72 CCI: 00219300993924107218</p>
-                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DOLARES: BCP 193-9918677-1-64 CCI: 00219300991867716410</p>
-                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DETRACCIÓN: 00-059-167324</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA SOLES: {{ $empresa['cuenta_soles'] ?? '—' }}</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DOLARES: {{ $empresa['cuenta_dolares'] ?? '—' }}</p>
+                <p class="font-bold" style="margin: 0.5px 0;">N° DE CUENTA DETRACCIÓN: {{ $empresa['cuenta_detraccion'] ?? '—' }}</p>
                 <p class="font-bold" style="margin: 0.5px 0;">PROVEEDOR DEL ESTADO PERUANO: REGISTRO VENTAS Y SERVICIOS EN LA OSCE</p>
             </div>
         </div>

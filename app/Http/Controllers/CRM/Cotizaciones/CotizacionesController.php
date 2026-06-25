@@ -1281,6 +1281,9 @@ class CotizacionesController extends Controller
                     'ruc' => $cotizacion->miEmpresa->ruc,
                     'imagen_logo' => $cotizacion->miEmpresa->imagen_logo,
                     'imagen_firma' => $cotizacion->miEmpresa->imagen_firma,
+                    'cuenta_soles' => $cotizacion->miEmpresa->cuenta_soles,
+                    'cuenta_dolares' => $cotizacion->miEmpresa->cuenta_dolares,
+                    'cuenta_detraccion' => $cotizacion->miEmpresa->cuenta_detraccion,
                 ];
             }
 
