@@ -401,7 +401,7 @@ export default function ProductosTemporales() {
                                                         isDarkMode ? 'text-green-400' : 'text-green-600'
                                                     }`}>
                                                         <div className="font-medium">
-                                                            {producto.precio ? `$${parseFloat(producto.precio).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                            {producto.precio ? `$${parseFloat(producto.precio).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}` : 'No disponible'}
                                                         </div>
                                                     </td>
 

@@ -446,7 +446,7 @@ export default function EditCotizaciones({ isOpen, onClose, onSave, cotizacion }
 
     const formatCurrency = (amount) => {
         const symbol = formData.moneda === 'dolares' ? '$' : 'S/';
-        return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
+        return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}`;
     };
 
     if (!isOpen) return null;

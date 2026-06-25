@@ -33,23 +33,49 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     const [cotizacionToChangeEstado, setCotizacionToChangeEstado] = useState(null);
     const [newEstado, setNewEstado] = useState('');
 
+    // Currency state
+    const [monedaVisualizacion, setMonedaVisualizacion] = useState('soles');
+    const [tipoCambio, setTipoCambio] = useState(3.5);
+
+    // Helpers para conversión de moneda
+    const convertirMonto = (monto, monedaOrigen, monedaDestino = monedaVisualizacion) => {
+        const tc = tipoCambio > 0 ? tipoCambio : 3.5;
+        const origen = (monedaOrigen || 'soles').toLowerCase();
+        const destino = (monedaDestino || 'soles').toLowerCase();
+
+        if (origen === destino) return parseFloat(monto || 0);
+        if (origen === 'dolares' && destino === 'soles') return parseFloat(monto || 0) * tc;
+        if (origen === 'soles' && destino === 'dolares') return parseFloat(monto || 0) / tc;
+        return parseFloat(monto || 0);
+    };
+
+    const getMontoVisualizado = (cotizacion, campo) => {
+        const monto = parseFloat(cotizacion[campo] || 0);
+        if (cotizacion.moneda_visualizacion === monedaVisualizacion) {
+            return monto;
+        }
+        return convertirMonto(monto, cotizacion.moneda, monedaVisualizacion);
+    };
+
     // Cargar estadísticas
     useEffect(() => {
         fetchEstadisticas();
-    }, []);
+    }, [monedaVisualizacion, tipoCambio]);
 
-    // Cargar cotizaciones cuando cambian los filtros
+    // Cargar cotizaciones cuando cambian los filtros o la moneda de visualización
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchCotizaciones();
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [searchTerm, filterEstado]);
+    }, [searchTerm, filterEstado, monedaVisualizacion, tipoCambio]);
 
     const fetchEstadisticas = async () => {
         try {
-            const response = await axios.get('/crm/cotizaciones/estadisticas');
+            const response = await axios.get('/crm/cotizaciones/estadisticas', {
+                params: { moneda: monedaVisualizacion, tipo_cambio: tipoCambio }
+            });
             if (response.data.success) {
                 setEstadisticas(response.data.data);
             }
@@ -61,19 +87,23 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
     const fetchCotizaciones = async () => {
         setLoading(true);
         try {
-            const params = {};
+            const params = {
+                moneda: monedaVisualizacion,
+                tipo_cambio: tipoCambio,
+            };
             if (searchTerm) params.search = searchTerm;
             if (filterEstado !== 'all') params.estado = filterEstado;
 
             const response = await axios.get('/crm/cotizaciones', { params });
 
-            if (response.data.data) {
-                setCotizaciones(response.data.data);
+            if (response.data.cotizaciones) {
+                const paginator = response.data.cotizaciones;
+                setCotizaciones(paginator.data || []);
                 setPagination({
-                    current_page: response.data.current_page,
-                    last_page: response.data.last_page,
-                    per_page: response.data.per_page,
-                    total: response.data.total,
+                    current_page: paginator.current_page,
+                    last_page: paginator.last_page,
+                    per_page: paginator.per_page,
+                    total: paginator.total,
                 });
             }
         } catch (error) {
@@ -223,9 +253,9 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
         return estados[estado] || estados['pendiente'];
     };
 
-    const formatCurrency = (amount, currency = 'soles') => {
-        const symbol =   '$'; 
-        return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
+    const formatCurrency = (amount, currency = monedaVisualizacion) => {
+        const symbol = currency === 'dolares' ? '$' : 'S/';
+        return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}`;
     };
 
     const formatDate = (dateString) => {
@@ -538,6 +568,40 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                 </select>
                             </div>
 
+                            {/* Currency Controls */}
+                            <div className="flex items-center gap-3">
+                                <select
+                                    value={monedaVisualizacion}
+                                    onChange={(e) => setMonedaVisualizacion(e.target.value)}
+                                    className={`px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
+                                        isDarkMode
+                                            ? 'bg-gray-800 border-gray-700 text-white'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                >
+                                    <option value="soles">Soles (S/)</option>
+                                    <option value="dolares">Dólares ($)</option>
+                                </select>
+                                <div className="flex items-center gap-2">
+                                    <span className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>TC:</span>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        min="0.01"
+                                        value={tipoCambio}
+                                        onChange={(e) => {
+                                            const value = parseFloat(e.target.value);
+                                            setTipoCambio(isNaN(value) || value <= 0 ? 0.01 : value);
+                                        }}
+                                        className={`w-24 px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
+                                            isDarkMode
+                                                ? 'bg-gray-800 border-gray-700 text-white'
+                                                : 'bg-white border-gray-300 text-gray-900'
+                                        }`}
+                                    />
+                                </div>
+                            </div>
+
                             <button
                                 onClick={handleCreate}
                                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
@@ -643,13 +707,13 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                                             <td className="px-6 py-4 whitespace-nowrap">
                                                                 <div>
                                                                     <div className={`text-sm font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                                                        {formatCurrency(cotizacion.total, cotizacion.moneda)}
+                                                                        {formatCurrency(getMontoVisualizado(cotizacion, 'total'))}
                                                                     </div>
                                                                     <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                                        Productos: {formatCurrency(cotizacion.total_monto_productos, cotizacion.moneda)}
+                                                                        Productos: {formatCurrency(getMontoVisualizado(cotizacion, 'total_monto_productos'))}
                                                                     </div>
                                                                     <div className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                                        Adicionales: {formatCurrency(cotizacion.total_adicionales_monto, cotizacion.moneda)}
+                                                                        Adicionales: {formatCurrency(getMontoVisualizado(cotizacion, 'total_adicionales_monto'))}
                                                                     </div>
                                                                 </div>
                                                             </td>

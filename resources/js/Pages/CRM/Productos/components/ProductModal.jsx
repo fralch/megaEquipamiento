@@ -25,7 +25,7 @@ export default function ProductModal({ producto, isOpen, onClose }) {
 
     const formatPrice = (price) => {
         if (!price) return 'No disponible';
-        return `S/ ${parseFloat(price).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
+        return `S/ ${parseFloat(price).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}`;
     };
 
     const formatDate = (dateString) => {

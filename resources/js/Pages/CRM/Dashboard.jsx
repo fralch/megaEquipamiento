@@ -27,15 +27,20 @@ export default function CrmDashboard() {
     const [stats, setStats] = useState([]);
     const [actividadReciente, setActividadReciente] = useState([]);
     const [tareasProximas, setTareasProximas] = useState([]);
-    
+
     // Chart states
     const [evolutionCharts, setEvolutionCharts] = useState({ daily: [], weekly: [], monthly: [] });
     const [chartPeriod, setChartPeriod] = useState('daily'); // 'daily', 'weekly', 'monthly'
     const [loadingCharts, setLoadingCharts] = useState(true);
 
+    // Currency state
+    const [moneda, setMoneda] = useState('soles');
+    const [tipoCambio, setTipoCambio] = useState(3.5);
+
     // Helper format currency
-    const formatCurrency = (amount) => {
-        return `S/ ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const formatCurrency = (amount, currency = moneda) => {
+        const symbol = currency === 'dolares' ? '$' : 'S/';
+        return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false })}`;
     };
 
     // Get chart data based on period
@@ -66,121 +71,126 @@ export default function CrmDashboard() {
         return null;
     };
 
-    // Fetch dashboard statistics and charts
-    useEffect(() => {
-        const fetchEstadisticas = async () => {
-            try {
-                setLoading(true);
-                const response = await axios.get('/crm/dashboard/estadisticas');
+    // Fetch dashboard statistics
+    const fetchEstadisticas = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get('/crm/dashboard/estadisticas', {
+                params: { moneda, tipo_cambio: tipoCambio }
+            });
 
-                if (response.data.success) {
-                    const data = response.data.data;
+            if (response.data.success) {
+                const data = response.data.data;
 
-                    // Mapear datos a las estadísticas
-                    const statsData = [
-                        {
-                            title: "Total Productos",
-                            value: data.stats.total_productos.toLocaleString(),
-                            change: "+12%",
-                            icon: FiPackage,
-                            color: "blue",
-                            trend: "up"
-                        },
-                        {
-                            title: "Cotizaciones Activas",
-                            value: data.stats.cotizaciones_activas,
-                            change: data.stats.cambio_cotizaciones >= 0
-                                ? `+${data.stats.cambio_cotizaciones}%`
-                                : `${data.stats.cambio_cotizaciones}%`,
-                            icon: FiBarChart,
-                            color: "green",
-                            trend: data.stats.cambio_cotizaciones >= 0 ? "up" : "down"
-                        },
-                        {
-                            title: "Ventas del Mes",
-                            value: `S/ ${parseFloat(data.stats.ventas_mes).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-                            change: data.stats.cambio_ventas >= 0
-                                ? `+${data.stats.cambio_ventas}%`
-                                : `${data.stats.cambio_ventas}%`,
-                            icon: FiDollarSign,
-                            color: "purple",
-                            trend: data.stats.cambio_ventas >= 0 ? "up" : "down"
-                        },
-                        {
-                            title: "Cotizaciones Pendientes",
-                            value: data.stats.cotizaciones_pendientes,
-                            change: data.stats.cambio_pendientes >= 0
-                                ? `+${data.stats.cambio_pendientes}%`
-                                : `${data.stats.cambio_pendientes}%`,
-                            icon: FiActivity,
-                            color: "orange",
-                            trend: data.stats.cambio_pendientes >= 0 ? "up" : "down"
-                        }
-                    ];
-
-                    setStats(statsData);
-                    setActividadReciente(data.actividad_reciente);
-                    setTareasProximas(data.tareas_proximas);
-                }
-            } catch (error) {
-                console.error('Error al obtener estadísticas:', error);
-                // Set default empty stats on error
-                setStats([
+                // Mapear datos a las estadísticas
+                const statsData = [
                     {
                         title: "Total Productos",
-                        value: "0",
-                        change: "0%",
+                        value: data.stats.total_productos.toLocaleString(),
+                        change: "+12%",
                         icon: FiPackage,
                         color: "blue",
                         trend: "up"
                     },
                     {
                         title: "Cotizaciones Activas",
-                        value: "0",
-                        change: "0%",
+                        value: data.stats.cotizaciones_activas,
+                        change: data.stats.cambio_cotizaciones >= 0
+                            ? `+${data.stats.cambio_cotizaciones}%`
+                            : `${data.stats.cambio_cotizaciones}%`,
                         icon: FiBarChart,
                         color: "green",
-                        trend: "up"
+                        trend: data.stats.cambio_cotizaciones >= 0 ? "up" : "down"
                     },
                     {
                         title: "Ventas del Mes",
-                        value: "S/ 0.00",
-                        change: "0%",
+                        value: formatCurrency(data.stats.ventas_mes),
+                        change: data.stats.cambio_ventas >= 0
+                            ? `+${data.stats.cambio_ventas}%`
+                            : `${data.stats.cambio_ventas}%`,
                         icon: FiDollarSign,
                         color: "purple",
-                        trend: "up"
+                        trend: data.stats.cambio_ventas >= 0 ? "up" : "down"
                     },
                     {
                         title: "Cotizaciones Pendientes",
-                        value: "0",
-                        change: "0%",
+                        value: data.stats.cotizaciones_pendientes,
+                        change: data.stats.cambio_pendientes >= 0
+                            ? `+${data.stats.cambio_pendientes}%`
+                            : `${data.stats.cambio_pendientes}%`,
                         icon: FiActivity,
                         color: "orange",
-                        trend: "up"
+                        trend: data.stats.cambio_pendientes >= 0 ? "up" : "down"
                     }
-                ]);
-            } finally {
-                setLoading(false);
-            }
-        };
+                ];
 
-        const fetchGraficos = async () => {
-            try {
-                setLoadingCharts(true);
-                const response = await axios.get('/crm/dashboard/graficos');
-                if (response.data.success) {
-                    setEvolutionCharts(response.data.data.evolution_charts || { daily: [], weekly: [], monthly: [] });
+                setStats(statsData);
+                setActividadReciente(data.actividad_reciente);
+                setTareasProximas(data.tareas_proximas);
+            }
+        } catch (error) {
+            console.error('Error al obtener estadísticas:', error);
+            // Set default empty stats on error
+            setStats([
+                {
+                    title: "Total Productos",
+                    value: "0",
+                    change: "0%",
+                    icon: FiPackage,
+                    color: "blue",
+                    trend: "up"
+                },
+                {
+                    title: "Cotizaciones Activas",
+                    value: "0",
+                    change: "0%",
+                    icon: FiBarChart,
+                    color: "green",
+                    trend: "up"
+                },
+                {
+                    title: "Ventas del Mes",
+                    value: formatCurrency(0),
+                    change: "0%",
+                    icon: FiDollarSign,
+                    color: "purple",
+                    trend: "up"
+                },
+                {
+                    title: "Cotizaciones Pendientes",
+                    value: "0",
+                    change: "0%",
+                    icon: FiActivity,
+                    color: "orange",
+                    trend: "up"
                 }
-            } catch (error) {
-                console.error('Error al obtener gráficos:', error);
-            } finally {
-                setLoadingCharts(false);
-            }
-        };
+            ]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    // Fetch dashboard charts
+    const fetchGraficos = async () => {
+        try {
+            setLoadingCharts(true);
+            const response = await axios.get('/crm/dashboard/graficos', {
+                params: { moneda, tipo_cambio: tipoCambio }
+            });
+            if (response.data.success) {
+                setEvolutionCharts(response.data.data.evolution_charts || { daily: [], weekly: [], monthly: [] });
+            }
+        } catch (error) {
+            console.error('Error al obtener gráficos:', error);
+        } finally {
+            setLoadingCharts(false);
+        }
+    };
+
+    useEffect(() => {
         fetchEstadisticas();
         fetchGraficos();
-    }, []);
+    }, [moneda, tipoCambio]);
 
 
     return (
@@ -192,6 +202,45 @@ export default function CrmDashboard() {
                     <p className={`text-sm mb-6 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         Aquí tienes un resumen de tu actividad hoy
                     </p>
+
+                    {/* Currency Controls */}
+                    <div className={`rounded-xl shadow-sm border p-4 ${isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
+                        <div className="flex flex-wrap items-center gap-4">
+                            <div className="flex items-center gap-2">
+                                <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Moneda:</span>
+                                <select
+                                    value={moneda}
+                                    onChange={(e) => setMoneda(e.target.value)}
+                                    className={`px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
+                                        isDarkMode
+                                            ? 'bg-gray-800 border-gray-700 text-white'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                >
+                                    <option value="soles">Soles (S/)</option>
+                                    <option value="dolares">Dólares ($)</option>
+                                </select>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Tipo de cambio:</span>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0.01"
+                                    value={tipoCambio}
+                                    onChange={(e) => {
+                                        const value = parseFloat(e.target.value);
+                                        setTipoCambio(isNaN(value) || value <= 0 ? 0.01 : value);
+                                    }}
+                                    className={`w-28 px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
+                                        isDarkMode
+                                            ? 'bg-gray-800 border-gray-700 text-white'
+                                            : 'bg-white border-gray-300 text-gray-900'
+                                    }`}
+                                />
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Stats Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -371,14 +420,14 @@ export default function CrmDashboard() {
                                             axisLine={false}
                                             tickLine={false}
                                         />
-                                        <YAxis 
+                                        <YAxis
                                             yAxisId="left"
                                             orientation="left"
                                             stroke={isDarkMode ? '#9ca3af' : '#6b7280'}
                                             tick={{ fontSize: 12 }}
                                             axisLine={false}
                                             tickLine={false}
-                                            tickFormatter={(value) => `S/ ${value}`}
+                                            tickFormatter={(value) => `${moneda === 'dolares' ? '$' : 'S/'} ${value}`}
                                         />
                                         <YAxis 
                                             yAxisId="right"

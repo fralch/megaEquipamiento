@@ -19,6 +19,8 @@ class DashboardController extends Controller
     public function getEstadisticas(Request $request)
     {
         try {
+            [$monedaDestino, $tipoCambio] = $this->obtenerParametrosMoneda($request);
+
             $usuario = auth()->user();
             // Cargar la relación rol para verificar si es admin
             $usuario->load('rol');
@@ -45,7 +47,7 @@ class DashboardController extends Controller
                 $ventasMesQuery->where('usuario_id', $usuario->id_usuario);
             }
 
-            $ventasMes = $ventasMesQuery->sum('total');
+            $ventasMes = $this->sumaConvertida($ventasMesQuery, 'total', $monedaDestino, $tipoCambio);
 
             // Cotizaciones pendientes del usuario o todas si es admin
             $cotizacionesPendientesQuery = Cotizacion::where('estado', 'pendiente');
@@ -78,7 +80,7 @@ class DashboardController extends Controller
                 $ventasMesAnteriorQuery->where('usuario_id', $usuario->id_usuario);
             }
 
-            $ventasMesAnterior = $ventasMesAnteriorQuery->sum('total');
+            $ventasMesAnterior = $this->sumaConvertida($ventasMesAnteriorQuery, 'total', $monedaDestino, $tipoCambio);
 
             $cambioVentas = $ventasMesAnterior > 0
                 ? (($ventasMes - $ventasMesAnterior) / $ventasMesAnterior) * 100
@@ -189,6 +191,8 @@ class DashboardController extends Controller
     public function getGraficos(Request $request)
     {
         try {
+            [$monedaDestino, $tipoCambio] = $this->obtenerParametrosMoneda($request);
+
             $usuario = auth()->user();
             // Cargar la relación rol para verificar si es admin
             $usuario->load('rol');
@@ -208,7 +212,7 @@ class DashboardController extends Controller
                     $ventasQuery->where('usuario_id', $usuario->id_usuario);
                 }
 
-                $total = $ventasQuery->sum('total');
+                $total = $this->sumaConvertida($ventasQuery, 'total', $monedaDestino, $tipoCambio);
 
                 $ventasPorMes[] = [
                     'mes' => $mes->format('M Y'),
@@ -256,7 +260,9 @@ class DashboardController extends Controller
                     'name' => Carbon::parse($date)->locale('es')->isoFormat('dddd D'),
                     'full_date' => $date,
                     'count' => $dayData ? $dayData->count() : 0,
-                    'monto' => $dayData ? $dayData->sum('total') : 0,
+                    'monto' => $dayData ? $dayData->sum(function ($cotizacion) use ($monedaDestino, $tipoCambio) {
+                        return $this->convertirMonto((float) $cotizacion->total, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+                    }) : 0,
                 ];
             }
 
@@ -274,7 +280,9 @@ class DashboardController extends Controller
                     'name' => 'Sem '.$startOfWeek->format('d/m'),
                     'range' => $startOfWeek->format('d/m').' - '.$endOfWeek->format('d/m'),
                     'count' => $weekData->count(),
-                    'monto' => $weekData->sum('total'),
+                    'monto' => $weekData->sum(function ($cotizacion) use ($monedaDestino, $tipoCambio) {
+                        return $this->convertirMonto((float) $cotizacion->total, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+                    }),
                 ];
             }
 
@@ -294,7 +302,9 @@ class DashboardController extends Controller
                     'name' => $monthDate->locale('es')->isoFormat('MMM YY'),
                     'full_date' => $monthDate->format('Y-m'),
                     'count' => $monthData->count(),
-                    'monto' => $monthData->sum('total'),
+                    'monto' => $monthData->sum(function ($cotizacion) use ($monedaDestino, $tipoCambio) {
+                        return $this->convertirMonto((float) $cotizacion->total, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+                    }),
                 ];
             }
 
@@ -320,5 +330,55 @@ class DashboardController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Obtiene y normaliza los parámetros de moneda y tipo de cambio de la petición.
+     */
+    private function obtenerParametrosMoneda(Request $request): array
+    {
+        $moneda = strtolower($request->input('moneda', 'soles'));
+        if (! in_array($moneda, ['soles', 'dolares'])) {
+            $moneda = 'soles';
+        }
+
+        $tipoCambio = (float) $request->input('tipo_cambio', 3.5);
+        if ($tipoCambio <= 0) {
+            $tipoCambio = 3.5;
+        }
+
+        return [$moneda, $tipoCambio];
+    }
+
+    /**
+     * Convierte un monto de la moneda origen a la moneda destino usando el tipo de cambio.
+     */
+    private function convertirMonto(float $monto, ?string $monedaOrigen, string $monedaDestino, float $tipoCambio): float
+    {
+        $monedaOrigen = strtolower($monedaOrigen ?: 'soles');
+
+        if ($monedaOrigen === $monedaDestino) {
+            return $monto;
+        }
+
+        if ($monedaOrigen === 'dolares' && $monedaDestino === 'soles') {
+            return $monto * $tipoCambio;
+        }
+
+        if ($monedaOrigen === 'soles' && $monedaDestino === 'dolares') {
+            return $monto / $tipoCambio;
+        }
+
+        return $monto;
+    }
+
+    /**
+     * Suma un campo de un query de cotizaciones convirtiendo cada valor a la moneda destino.
+     */
+    private function sumaConvertida($query, string $campo, string $monedaDestino, float $tipoCambio): float
+    {
+        return (float) $query->get()->sum(function ($cotizacion) use ($campo, $monedaDestino, $tipoCambio) {
+            return $this->convertirMonto((float) $cotizacion->{$campo}, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+        });
     }
 }

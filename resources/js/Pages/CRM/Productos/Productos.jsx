@@ -157,7 +157,7 @@ export default function Productos() {
 
     const formatPrice = (price) => {
         if (!price) return 'No disponible';
-        return `S/ ${parseFloat(price).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
+        return `S/ ${parseFloat(price).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}`;
     };
 
     const getStockStatus = (stock) => {
@@ -531,7 +531,7 @@ export default function Productos() {
                                                         isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                     }`}>
                                                         <div className="font-medium">
-                                                            {producto.precio_sin_ganancia ? `S/ ${parseFloat(producto.precio_sin_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                            {producto.precio_sin_ganancia ? `S/ ${parseFloat(producto.precio_sin_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}` : 'No disponible'}
                                                         </div>
                                                         <div className="text-xs text-gray-400">Base</div>
                                                     </td>
@@ -541,7 +541,7 @@ export default function Productos() {
                                                         isDarkMode ? 'text-blue-400' : 'text-blue-600'
                                                     }`}>
                                                         <div className="font-medium">
-                                                            {producto.precio_ganancia ? `S/ ${parseFloat(producto.precio_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                            {producto.precio_ganancia ? `S/ ${parseFloat(producto.precio_ganancia).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}` : 'No disponible'}
                                                         </div>
                                                         <div className="text-xs text-gray-400">Sin IGV</div>
                                                     </td>
@@ -551,7 +551,7 @@ export default function Productos() {
                                                         isDarkMode ? 'text-green-400' : 'text-green-600'
                                                     }`}>
                                                         <div className="font-medium">
-                                                            {producto.precio_igv ? `S/ ${parseFloat(producto.precio_igv).toLocaleString('es-PE', { minimumFractionDigits: 2 })}` : 'No disponible'}
+                                                            {producto.precio_igv ? `S/ ${parseFloat(producto.precio_igv).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}` : 'No disponible'}
                                                         </div>
                                                         <div className="text-xs text-gray-400">Con IGV</div>
                                                     </td>

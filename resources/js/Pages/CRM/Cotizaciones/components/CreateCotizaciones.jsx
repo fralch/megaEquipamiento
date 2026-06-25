@@ -697,7 +697,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
 
     const formatCurrency = (amount) => {
         const symbol = formData.moneda === 'dolares' ? '$' : 'S/';
-        return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
+        return `${symbol} ${parseFloat(amount || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}`;
     };
 
     if (!isOpen) return null;
@@ -1335,7 +1335,7 @@ export default function CreateCotizaciones({ isOpen, onClose, onSave }) {
                                                 </div>
                                                 <div className="text-right">
                                                     <span className={`font-bold ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
-                                                        ${parseFloat(producto.precio || 0).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                                                        ${parseFloat(producto.precio || 0).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}
                                                     </span>
                                                 </div>
                                             </div>

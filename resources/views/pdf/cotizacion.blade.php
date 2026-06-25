@@ -537,9 +537,9 @@
                         @foreach($productos as $producto)
                         <tr>
                             <td>{{ $producto['nombre'] }}</td>
-                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['precio_unitario'], 2) }}</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['precio_unitario'], 2, '.', '') }}</td>
                             <td class="text-center">{{ $producto['cantidad'] }}</td>
-                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['subtotal'], 2) }}</td>
+                            <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto['subtotal'], 2, '.', '') }}</td>
                         </tr>
                         @endforeach
                         {{-- Agregar productos adicionales al resumen --}}
@@ -547,15 +547,15 @@
                             @foreach($productos_adicionales as $producto_adicional)
                             <tr>
                                 <td>{{ $producto_adicional['nombre'] }}</td>
-                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['precio_unitario'], 2) }}</td>
+                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['precio_unitario'], 2, '.', '') }}</td>
                                 <td class="text-center">{{ $producto_adicional['cantidad'] }}</td>
-                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['subtotal'], 2) }}</td>
+                                <td class="text-right">{{ $cotizacion->moneda == 'dolares' ? '$' : 'S/' }} {{ number_format((float) $producto_adicional['subtotal'], 2, '.', '') }}</td>
                             </tr>
                             @endforeach
                         @endif
                         <tr>
                             <td colspan="3" class="text-right font-bold">Total productos</td>
-                            <td class="text-right font-bold">{{ $monedaSymbol }} {{ number_format((float) $totalGeneral, 2) }}</td>
+                            <td class="text-right font-bold">{{ $monedaSymbol }} {{ number_format((float) $totalGeneral, 2, '.', '') }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -565,15 +565,15 @@
                     <tbody>
                         <tr>
                             <td class="font-bold">SUBTOTAL</td>
-                            <td class="text-right">{{ $monedaSymbol }} {{ number_format((float) $totalGeneral, 2) }}</td>
+                            <td class="text-right">{{ $monedaSymbol }} {{ number_format((float) $totalGeneral, 2, '.', '') }}</td>
                         </tr>
                         <tr>
                             <td class="font-bold">IGV (18%)</td>
-                            <td class="text-right">{{ $monedaSymbol }} {{ number_format((float) $igv, 2) }}</td>
+                            <td class="text-right">{{ $monedaSymbol }} {{ number_format((float) $igv, 2, '.', '') }}</td>
                         </tr>
                         <tr>
                             <td class="font-bold bg-dark">TOTAL</td>
-                            <td class="text-right font-bold bg-dark">{{ $monedaSymbol }} {{ number_format((float) $totalFinal, 2) }}</td>
+                            <td class="text-right font-bold bg-dark">{{ $monedaSymbol }} {{ number_format((float) $totalFinal, 2, '.', '') }}</td>
                         </tr>
                     </tbody>
                 </table>

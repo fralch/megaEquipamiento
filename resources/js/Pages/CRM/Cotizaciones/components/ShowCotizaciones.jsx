@@ -12,7 +12,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
 
     const formatCurrency = (amount, currency = 'soles') => {
         const symbol = currency === 'dolares' ? '$' : 'S/';
-        return `${symbol} ${parseFloat(amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`;
+        return `${symbol} ${parseFloat(amount).toLocaleString('es-PE', { minimumFractionDigits: 2, useGrouping: false })}`;
     };
 
     const formatDate = (dateString) => {

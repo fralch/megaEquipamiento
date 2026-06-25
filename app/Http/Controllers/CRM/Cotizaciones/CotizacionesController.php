@@ -27,6 +27,8 @@ class CotizacionesController extends Controller
     public function index(Request $request)
     {
         try {
+            [$monedaDestino, $tipoCambio] = $this->obtenerParametrosMoneda($request);
+
             $query = Cotizacion::with([
                 'vendedor:id_usuario,nombre,apellido',
                 'miEmpresa:id,nombre',
@@ -68,7 +70,7 @@ class CotizacionesController extends Controller
             $cotizaciones = $query->paginate($perPage);
 
             // Cargar información de clientes para cada cotización
-            $cotizaciones->getCollection()->transform(function ($cotizacion) {
+            $cotizaciones->getCollection()->transform(function ($cotizacion) use ($monedaDestino, $tipoCambio) {
                 // Cargar cliente dinámicamente
                 if ($cotizacion->cliente_tipo === 'empresa') {
                     $cliente = EmpresaCliente::find($cotizacion->cliente_id);
@@ -90,6 +92,12 @@ class CotizacionesController extends Controller
 
                 // Cargar miEmpresa
                 $cotizacion->mi_empresa = $cotizacion->miEmpresa;
+
+                // Convertir montos a la moneda de visualización
+                $cotizacion->moneda_visualizacion = $monedaDestino;
+                $cotizacion->total = $this->convertirMonto((float) $cotizacion->total, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+                $cotizacion->total_monto_productos = $this->convertirMonto((float) $cotizacion->total_monto_productos, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+                $cotizacion->total_adicionales_monto = $this->convertirMonto((float) $cotizacion->total_adicionales_monto, $cotizacion->moneda, $monedaDestino, $tipoCambio);
 
                 return $cotizacion;
             });
@@ -677,9 +685,11 @@ class CotizacionesController extends Controller
     /**
      * Obtener estadísticas de cotizaciones
      */
-    public function estadisticas()
+    public function estadisticas(Request $request)
     {
         try {
+            [$monedaDestino, $tipoCambio] = $this->obtenerParametrosMoneda($request);
+
             $usuario = auth()->user();
             $baseQuery = Cotizacion::query();
 
@@ -689,7 +699,7 @@ class CotizacionesController extends Controller
             }
 
             $total = (clone $baseQuery)->count();
-            $montoTotal = (clone $baseQuery)->where('estado', 'aprobada')->sum('total');
+            $montoTotal = $this->sumaConvertida((clone $baseQuery)->where('estado', 'aprobada'), 'total', $monedaDestino, $tipoCambio);
             $pendientes = (clone $baseQuery)->where('estado', 'pendiente')->count();
             $aprobadas = (clone $baseQuery)->where('estado', 'aprobada')->count();
             $enviadas = (clone $baseQuery)->where('estado', 'enviada')->count();
@@ -707,7 +717,7 @@ class CotizacionesController extends Controller
             // Diario (Hoy)
             $diarioQuery = (clone $personalQuery)->whereDate('created_at', $now->today());
             $diarioCount = $diarioQuery->count();
-            $diarioMonto = $diarioQuery->sum('total');
+            $diarioMonto = $this->sumaConvertida($diarioQuery, 'total', $monedaDestino, $tipoCambio);
 
             // Semanal (Esta semana)
             $semanalQuery = (clone $personalQuery)->whereBetween('created_at', [
@@ -715,12 +725,12 @@ class CotizacionesController extends Controller
                 $now->copy()->endOfWeek(),
             ]);
             $semanalCount = $semanalQuery->count();
-            $semanalMonto = $semanalQuery->sum('total');
+            $semanalMonto = $this->sumaConvertida($semanalQuery, 'total', $monedaDestino, $tipoCambio);
 
             // Mensual (Este mes)
             $mensualQuery = (clone $personalQuery)->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year);
             $mensualCount = $mensualQuery->count();
-            $mensualMonto = $mensualQuery->sum('total');
+            $mensualMonto = $this->sumaConvertida($mensualQuery, 'total', $monedaDestino, $tipoCambio);
 
             return response()->json([
                 'success' => true,
@@ -1567,5 +1577,55 @@ class CotizacionesController extends Controller
                 'message' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Obtiene y normaliza los parámetros de moneda y tipo de cambio de la petición.
+     */
+    private function obtenerParametrosMoneda(Request $request): array
+    {
+        $moneda = strtolower($request->input('moneda', 'soles'));
+        if (! in_array($moneda, ['soles', 'dolares'])) {
+            $moneda = 'soles';
+        }
+
+        $tipoCambio = (float) $request->input('tipo_cambio', 3.5);
+        if ($tipoCambio <= 0) {
+            $tipoCambio = 3.5;
+        }
+
+        return [$moneda, $tipoCambio];
+    }
+
+    /**
+     * Convierte un monto de la moneda origen a la moneda destino usando el tipo de cambio.
+     */
+    private function convertirMonto(float $monto, ?string $monedaOrigen, string $monedaDestino, float $tipoCambio): float
+    {
+        $monedaOrigen = strtolower($monedaOrigen ?: 'soles');
+
+        if ($monedaOrigen === $monedaDestino) {
+            return $monto;
+        }
+
+        if ($monedaOrigen === 'dolares' && $monedaDestino === 'soles') {
+            return $monto * $tipoCambio;
+        }
+
+        if ($monedaOrigen === 'soles' && $monedaDestino === 'dolares') {
+            return $monto / $tipoCambio;
+        }
+
+        return $monto;
+    }
+
+    /**
+     * Suma un campo de un query de cotizaciones convirtiendo cada valor a la moneda destino.
+     */
+    private function sumaConvertida($query, string $campo, string $monedaDestino, float $tipoCambio): float
+    {
+        return (float) $query->get()->sum(function ($cotizacion) use ($campo, $monedaDestino, $tipoCambio) {
+            return $this->convertirMonto((float) $cotizacion->{$campo}, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+        });
     }
 }
