@@ -848,6 +848,17 @@ class CotizacionesController extends Controller
                 'detallesAdicionales',
             ])->findOrFail($id);
 
+            // Obtener moneda de destino, por defecto la de la cotización
+            $monedaDestino = strtolower($request->query('moneda', $cotizacion->moneda));
+            if (! in_array($monedaDestino, ['soles', 'dolares'])) {
+                $monedaDestino = $cotizacion->moneda;
+            }
+
+            $tipoCambio = (float) ($cotizacion->tipo_cambio ?? 3.7);
+            if ($tipoCambio <= 0) {
+                $tipoCambio = 3.7;
+            }
+
             // Cargar información del cliente
             if ($cotizacion->cliente_tipo === 'empresa') {
                 $cliente = EmpresaCliente::find($cotizacion->cliente_id);
@@ -915,7 +926,7 @@ class CotizacionesController extends Controller
             }
 
             // Mapear detalles de productos con información completa
-            $productos = $cotizacion->detallesProductos->map(function ($detalle) use ($productosCompletos, $productosTemporalesCompletos) {
+            $productos = $cotizacion->detallesProductos->map(function ($detalle) use ($productosCompletos, $productosTemporalesCompletos, $cotizacion, $monedaDestino, $tipoCambio) {
                 $imagen = null;
                 $descripcion = $detalle->descripcion ?? '';
                 $sku = null;
@@ -999,13 +1010,16 @@ class CotizacionesController extends Controller
                     }
                 }
 
+                $precioUnitario = $this->convertirMonto((float) $detalle->precio_unitario, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+                $subtotal = $this->convertirMonto((float) $detalle->subtotal, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+
                 return [
                     'nombre' => $detalle->nombre,
                     'sku' => $sku,
                     'descripcion' => $descripcion,
                     'cantidad' => $detalle->cantidad,
-                    'precio_unitario' => $detalle->precio_unitario,
-                    'subtotal' => $detalle->subtotal,
+                    'precio_unitario' => $precioUnitario,
+                    'subtotal' => $subtotal,
                     'especificaciones' => $especificaciones,
                     'imagen' => $imagen,
                 ];
@@ -1048,7 +1062,7 @@ class CotizacionesController extends Controller
             $adicionalesTemporalesCompletos = ProductoTemporal::whereIn('id', $adicionalesTemporalesIds)->get()->keyBy('id');
 
             // Mapear productos adicionales con información completa
-            $adicionales = $cotizacion->detallesAdicionales->map(function ($detalle) use ($adicionalesCompletos, $adicionalesTemporalesCompletos) {
+            $adicionales = $cotizacion->detallesAdicionales->map(function ($detalle) use ($adicionalesCompletos, $adicionalesTemporalesCompletos, $cotizacion, $monedaDestino, $tipoCambio) {
                 $imagen = null;
                 $descripcion = $detalle->descripcion ?? '';
                 $especificaciones = [];
@@ -1198,16 +1212,22 @@ class CotizacionesController extends Controller
                     }
                 }
 
+                $precioUnitario = $this->convertirMonto((float) $detalle->precio_unitario, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+                $subtotal = $this->convertirMonto((float) $detalle->subtotal, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+
                 return [
                     'nombre' => $detalle->nombre,
                     'descripcion' => $descripcion,
                     'cantidad' => $detalle->cantidad,
-                    'precio_unitario' => $detalle->precio_unitario,
-                    'subtotal' => $detalle->subtotal,
+                    'precio_unitario' => $precioUnitario,
+                    'subtotal' => $subtotal,
                     'imagen' => $imagen,
                     'especificaciones' => $especificaciones,
                 ];
             });
+
+            // Asignar temporalmente en memoria la moneda de destino para el símbolo correcto en el PDF
+            $cotizacion->moneda = $monedaDestino;
 
             // Preparar vendedor
             $vendedor = null;
@@ -1350,6 +1370,17 @@ class CotizacionesController extends Controller
 
             $cotizacion = $id ? $cotizacionQuery->findOrFail($id) : $cotizacionQuery->firstOrFail();
 
+            // Obtener moneda de destino, por defecto la de la cotización
+            $monedaDestino = strtolower(request()->query('moneda', $cotizacion->moneda));
+            if (! in_array($monedaDestino, ['soles', 'dolares'])) {
+                $monedaDestino = $cotizacion->moneda;
+            }
+
+            $tipoCambio = (float) ($cotizacion->tipo_cambio ?? 3.7);
+            if ($tipoCambio <= 0) {
+                $tipoCambio = 3.7;
+            }
+
             // Cargar información del cliente
             if ($cotizacion->cliente_tipo === 'empresa') {
                 $cliente = EmpresaCliente::find($cotizacion->cliente_id);
@@ -1392,7 +1423,7 @@ class CotizacionesController extends Controller
             $productosTemporalesCompletos = ProductoTemporal::whereIn('id', $productosTemporalesIds)->get()->keyBy('id');
 
             // Mapear detalles de productos con información completa
-            $productos = $cotizacion->detallesProductos->map(function ($detalle) use ($productosCompletos, $productosTemporalesCompletos) {
+            $productos = $cotizacion->detallesProductos->map(function ($detalle) use ($productosCompletos, $productosTemporalesCompletos, $cotizacion, $monedaDestino, $tipoCambio) {
                 $imagen = null;
                 $descripcion = $detalle->descripcion ?? '';
                 $sku = null;
@@ -1445,13 +1476,16 @@ class CotizacionesController extends Controller
                     }
                 }
 
+                $precioUnitario = $this->convertirMonto((float) $detalle->precio_unitario, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+                $subtotal = $this->convertirMonto((float) $detalle->subtotal, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+
                 return [
                     'nombre' => $detalle->nombre,
                     'sku' => $sku,
                     'descripcion' => $descripcion,
                     'cantidad' => $detalle->cantidad,
-                    'precio_unitario' => $detalle->precio_unitario,
-                    'subtotal' => $detalle->subtotal,
+                    'precio_unitario' => $precioUnitario,
+                    'subtotal' => $subtotal,
                     'especificaciones' => $especificaciones,
                     'imagen' => $imagen,
                 ];
@@ -1473,7 +1507,7 @@ class CotizacionesController extends Controller
             $adicionalesCompletos = Producto::whereIn('id_producto', $adicionalesIds)->get()->keyBy('id_producto');
             $adicionalesTemporalesCompletos = ProductoTemporal::whereIn('id', $adicionalesTemporalesIds)->get()->keyBy('id');
 
-            $adicionales = $cotizacion->detallesAdicionales->map(function ($detalle) use ($adicionalesCompletos, $adicionalesTemporalesCompletos) {
+            $adicionales = $cotizacion->detallesAdicionales->map(function ($detalle) use ($adicionalesCompletos, $adicionalesTemporalesCompletos, $cotizacion, $monedaDestino, $tipoCambio) {
                 $imagen = null;
                 $descripcion = $detalle->descripcion ?? '';
                 $especificaciones = [];
@@ -1524,16 +1558,22 @@ class CotizacionesController extends Controller
                     }
                 }
 
+                $precioUnitario = $this->convertirMonto((float) $detalle->precio_unitario, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+                $subtotal = $this->convertirMonto((float) $detalle->subtotal, $cotizacion->moneda, $monedaDestino, $tipoCambio);
+
                 return [
                     'nombre' => $detalle->nombre,
                     'descripcion' => $descripcion,
                     'cantidad' => $detalle->cantidad,
-                    'precio_unitario' => $detalle->precio_unitario,
-                    'subtotal' => $detalle->subtotal,
+                    'precio_unitario' => $precioUnitario,
+                    'subtotal' => $subtotal,
                     'imagen' => $imagen,
                     'especificaciones' => $especificaciones,
                 ];
             });
+
+            // Asignar temporalmente en memoria la moneda de destino para el símbolo correcto en la previsualización
+            $cotizacion->moneda = $monedaDestino;
 
             // Vendedor
             $vendedor = null;

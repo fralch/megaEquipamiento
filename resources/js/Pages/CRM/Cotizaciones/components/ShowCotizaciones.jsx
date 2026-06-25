@@ -1,12 +1,40 @@
 import { FiX, FiCalendar, FiUser, FiDollarSign, FiMapPin, FiClock, FiCreditCard, FiShield, FiTruck, FiHome, FiDownload } from "react-icons/fi";
 import { useTheme } from '../../../../storage/ThemeContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
     const { isDarkMode } = useTheme();
     const [isExporting, setIsExporting] = useState(false);
     const [mostrarFirma, setMostrarFirma] = useState(true);
     const [tipoCondiciones, setTipoCondiciones] = useState('ventas');
+    const [exportMoneda, setExportMoneda] = useState(cotizacion?.moneda || 'soles');
+
+    useEffect(() => {
+        if (cotizacion) {
+            setExportMoneda(cotizacion.moneda || 'soles');
+        }
+    }, [cotizacion]);
+
+    const getConvertedAmount = (amount) => {
+        const value = parseFloat(amount) || 0;
+        const originalMoneda = cotizacion?.moneda || 'soles';
+        
+        if (originalMoneda === exportMoneda) {
+            return value;
+        }
+        
+        const tc = parseFloat(cotizacion?.tipo_cambio) || 3.7;
+        if (tc <= 0) return value;
+        
+        if (originalMoneda === 'dolares' && exportMoneda === 'soles') {
+            return value * tc;
+        }
+        if (originalMoneda === 'soles' && exportMoneda === 'dolares') {
+            return value / tc;
+        }
+        
+        return value;
+    };
 
     if (!isOpen || !cotizacion) return null;
 
@@ -62,7 +90,8 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
         try {
             const urlParams = new URLSearchParams({
                 mostrar_firma: mostrarFirma ? '1' : '0',
-                tipo_condiciones: tipoCondiciones
+                tipo_condiciones: tipoCondiciones,
+                moneda: exportMoneda
             });
             const endpointUrl = `/crm/cotizaciones/${cotizacion.id}/export-pdf?${urlParams.toString()}`;
             
@@ -172,10 +201,11 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                                 <FiDollarSign className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
                                 <div>
                                     <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                        Moneda
+                                        Moneda de Exportación
                                     </p>
                                     <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        {cotizacion.moneda === 'dolares' ? 'Dólares (USD)' : 'Soles (PEN)'}
+                                        {exportMoneda === 'dolares' ? 'Dólares (USD)' : 'Soles (PEN)'}
+                                        {cotizacion.moneda !== exportMoneda && ' (Convertido)'}
                                     </p>
                                 </div>
                             </div>
@@ -275,7 +305,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                                 </div>
                             </div>
                         </div>
-                        {cotizacion.moneda === 'dolares' && cotizacion.tipo_cambio && (
+                        {(cotizacion.moneda === 'dolares' || exportMoneda === 'dolares') && cotizacion.tipo_cambio && (
                             <div className="mt-4 flex items-center gap-3">
                                 <FiDollarSign className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
                                 <div>
@@ -311,8 +341,8 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                                             <tr key={index} className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                                                 <td className="py-2 px-3 font-medium">{producto.nombre}</td>
                                                 <td className="py-2 px-3 text-center">{producto.cantidad}</td>
-                                                <td className="py-2 px-3 text-right">{formatCurrency(producto.precio_unitario, cotizacion.moneda)}</td>
-                                                <td className="py-2 px-3 text-right font-medium">{formatCurrency(producto.subtotal, cotizacion.moneda)}</td>
+                                                <td className="py-2 px-3 text-right">{formatCurrency(getConvertedAmount(producto.precio_unitario), exportMoneda)}</td>
+                                                <td className="py-2 px-3 text-right font-medium">{formatCurrency(getConvertedAmount(producto.subtotal), exportMoneda)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -324,7 +354,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                                         Total Productos:
                                     </span>
                                     <span className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        {formatCurrency(cotizacion.total_monto_productos, cotizacion.moneda)}
+                                        {formatCurrency(getConvertedAmount(cotizacion.total_monto_productos), exportMoneda)}
                                     </span>
                                 </div>
                             </div>
@@ -352,8 +382,8 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                                             <tr key={index} className={`border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                                                 <td className="py-2 px-3 font-medium">{producto.nombre}</td>
                                                 <td className="py-2 px-3 text-center">{producto.cantidad}</td>
-                                                <td className="py-2 px-3 text-right">{formatCurrency(producto.precio_unitario, cotizacion.moneda)}</td>
-                                                <td className="py-2 px-3 text-right font-medium">{formatCurrency(producto.subtotal, cotizacion.moneda)}</td>
+                                                <td className="py-2 px-3 text-right">{formatCurrency(getConvertedAmount(producto.precio_unitario), exportMoneda)}</td>
+                                                <td className="py-2 px-3 text-right font-medium">{formatCurrency(getConvertedAmount(producto.subtotal), exportMoneda)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -365,7 +395,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                                         Total Adicionales:
                                     </span>
                                     <span className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                                        {formatCurrency(cotizacion.total_adicionales_monto, cotizacion.moneda)}
+                                        {formatCurrency(getConvertedAmount(cotizacion.total_adicionales_monto), exportMoneda)}
                                     </span>
                                 </div>
                             </div>
@@ -379,7 +409,7 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                                 Total General:
                             </span>
                             <span className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
-                                {formatCurrency(cotizacion.total, cotizacion.moneda)}
+                                {formatCurrency(getConvertedAmount(cotizacion.total), exportMoneda)}
                             </span>
                         </div>
                     </div>
@@ -401,6 +431,19 @@ export default function ShowCotizaciones({ isOpen, onClose, cotizacion }) {
                                 <option value="ventas">Condiciones de Venta</option>
                                 <option value="calibracion">Condiciones de Calibración</option>
                                 <option value="none">Sin condiciones</option>
+                            </select>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <select
+                                value={exportMoneda}
+                                onChange={(e) => setExportMoneda(e.target.value)}
+                                className={`text-sm rounded border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 ${
+                                    isDarkMode ? 'bg-gray-800 text-white border-gray-600' : 'bg-white text-gray-700'
+                                }`}
+                            >
+                                <option value="soles">Soles (PEN)</option>
+                                <option value="dolares">Dólares (USD)</option>
                             </select>
                         </div>
 
