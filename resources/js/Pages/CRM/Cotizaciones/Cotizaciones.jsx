@@ -553,7 +553,7 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                 <select
                                     value={filterEstado}
                                     onChange={(e) => setFilterEstado(e.target.value)}
-                                    className={`px-4 py-2 rounded-lg border ${
+                                    className={`pl-4 pr-10 py-2 rounded-lg border ${
                                         isDarkMode
                                             ? 'bg-gray-800 border-gray-700 text-white'
                                             : 'bg-white border-gray-300 text-gray-900'
@@ -573,7 +573,7 @@ export default function Cotizaciones({ cotizaciones: initialCotizaciones = [], p
                                 <select
                                     value={monedaVisualizacion}
                                     onChange={(e) => setMonedaVisualizacion(e.target.value)}
-                                    className={`px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
+                                    className={`pl-3 pr-8 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
                                         isDarkMode
                                             ? 'bg-gray-800 border-gray-700 text-white'
                                             : 'bg-white border-gray-300 text-gray-900'

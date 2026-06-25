@@ -211,7 +211,7 @@ export default function CrmDashboard() {
                                 <select
                                     value={moneda}
                                     onChange={(e) => setMoneda(e.target.value)}
-                                    className={`px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
+                                    className={`pl-3 pr-8 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 ${
                                         isDarkMode
                                             ? 'bg-gray-800 border-gray-700 text-white'
                                             : 'bg-white border-gray-300 text-gray-900'
