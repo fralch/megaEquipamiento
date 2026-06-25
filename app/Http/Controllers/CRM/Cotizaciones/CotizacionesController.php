@@ -7,15 +7,18 @@ use App\Models\Cliente;
 use App\Models\Cotizacion;
 use App\Models\DetalleCotizacion;
 use App\Models\EmpresaCliente;
+use App\Models\NotificacionCotizacion;
 use App\Models\NuestraEmpresa;
 use App\Models\Producto;
 use App\Models\ProductoTemporal;
 use App\Models\Usuario;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use setasign\Fpdi\Fpdi;
 
@@ -105,7 +108,7 @@ class CotizacionesController extends Controller
             // Calcular contadores globales de notificaciones (vencidas)
             // Warning: 3-4 días vencida
             // Danger: 5+ días vencida
-            $now = \Carbon\Carbon::now();
+            $now = Carbon::now();
             $userId = $usuario ? $usuario->id_usuario : null;
 
             $baseQuery = Cotizacion::query();
@@ -445,21 +448,30 @@ class CotizacionesController extends Controller
             // Transformar detallesProductos a productos para el frontend
             $cotizacion->productos = $cotizacion->detallesProductos->map(function ($detalle) {
                 return [
-                    'id' => $detalle->producto_id,
+                    'id' => $detalle->producto_id ?? $detalle->producto_temporal_id,
+                    'producto_id' => $detalle->producto_id,
+                    'producto_temporal_id' => $detalle->producto_temporal_id,
+                    'es_temporal' => ! is_null($detalle->producto_temporal_id),
                     'nombre' => $detalle->nombre,
                     'cantidad' => $detalle->cantidad,
                     'precio_unitario' => $detalle->precio_unitario,
                     'subtotal' => $detalle->subtotal,
+                    'descripcion' => $detalle->descripcion,
                 ];
             });
 
             // Transformar detallesAdicionales a productos_adicionales para el frontend
             $cotizacion->productos_adicionales = $cotizacion->detallesAdicionales->map(function ($detalle) {
                 return [
+                    'id' => $detalle->producto_id ?? $detalle->producto_temporal_id,
+                    'producto_id' => $detalle->producto_id,
+                    'producto_temporal_id' => $detalle->producto_temporal_id,
+                    'es_temporal' => ! is_null($detalle->producto_temporal_id),
                     'nombre' => $detalle->nombre,
                     'cantidad' => $detalle->cantidad,
                     'precio_unitario' => $detalle->precio_unitario,
                     'subtotal' => $detalle->subtotal,
+                    'descripcion' => $detalle->descripcion,
                 ];
             });
 
@@ -663,7 +675,7 @@ class CotizacionesController extends Controller
 
             // Eliminar notificaciones si el estado es aprobada o rechazada
             if (in_array($request->estado, ['aprobada', 'rechazada'])) {
-                \App\Models\NotificacionCotizacion::where('cotizacion_id', $cotizacion->id)->delete();
+                NotificacionCotizacion::where('cotizacion_id', $cotizacion->id)->delete();
             }
 
             return response()->json([
@@ -712,7 +724,7 @@ class CotizacionesController extends Controller
                 $personalQuery->where('usuario_id', $usuario->id_usuario);
             }
 
-            $now = \Carbon\Carbon::now();
+            $now = Carbon::now();
 
             // Diario (Hoy)
             $diarioQuery = (clone $personalQuery)->whereDate('fecha_cotizacion', $now->today());
@@ -947,7 +959,7 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                            if (Str::startsWith($primeraImagen, 'data:image')) {
                                 $imagen = $primeraImagen;
                             } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
@@ -987,7 +999,7 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                            if (Str::startsWith($primeraImagen, 'data:image')) {
                                 $imagen = $primeraImagen;
                             } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
@@ -1082,7 +1094,7 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                            if (Str::startsWith($primeraImagen, 'data:image')) {
                                 $imagen = $primeraImagen;
                             } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
@@ -1118,7 +1130,7 @@ class CotizacionesController extends Controller
                         if (is_array($imagenes) && count($imagenes) > 0) {
                             $primeraImagen = $imagenes[0];
                             // Para PDF, necesitamos rutas físicas, no URLs
-                            if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                            if (Str::startsWith($primeraImagen, 'data:image')) {
                                 $imagen = $primeraImagen;
                             } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                 $imagen = $primeraImagen;
@@ -1153,7 +1165,7 @@ class CotizacionesController extends Controller
                             $imagenes = $productoMatch->imagen;
                             if (is_array($imagenes) && count($imagenes) > 0) {
                                 $primeraImagen = $imagenes[0];
-                                if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                if (Str::startsWith($primeraImagen, 'data:image')) {
                                     $imagen = $primeraImagen;
                                 } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                     $imagen = $primeraImagen;
@@ -1188,7 +1200,7 @@ class CotizacionesController extends Controller
                                 $imagenes = $productoTemporalMatch->imagenes;
                                 if (is_array($imagenes) && count($imagenes) > 0) {
                                     $primeraImagen = $imagenes[0];
-                                    if (\Illuminate\Support\Str::startsWith($primeraImagen, 'data:image')) {
+                                    if (Str::startsWith($primeraImagen, 'data:image')) {
                                         $imagen = $primeraImagen;
                                     } elseif (filter_var($primeraImagen, FILTER_VALIDATE_URL)) {
                                         $imagen = $primeraImagen;
