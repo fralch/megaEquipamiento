@@ -220,7 +220,49 @@ Reemplazar el parsing complejo de la URL por el uso directo de la prop `marca`. 
 
 ---
 
-### 5. Sitemap (Acción manual post-implementación)
+### 5. Breadcrumbs en Vista de Producto (Nombre de Producto)
+
+#### [MODIFY] [Product.jsx](resources/js/Pages/Product.jsx) (líneas 1341-1363)
+
+Agregar el nombre del producto al final de las migas de pan (`breadcrumbs`) separándolo con una barra diagonal `/`. Se aplica truncamiento responsivo para pantallas pequeñas y el atributo `title` para que se lea completo al pasar el mouse.
+
+```diff
+             {categoriaCurrent && subcategoriaCurrent && (
+                 <div className="flex items-center flex-wrap gap-1 px-4 md:px-6 py-3 ">
+                     <Link 
+                         href={`/categorias/${categoriaCurrent.id_categoria}`} 
+                         className={`hover:text-blue-600 transition-colors duration-200 text-base md:text-lg font-medium ${
+                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                         }`}
+                     >
+                         {categoriaCurrent.nombre_categoria}
+                     </Link>
+                     <span className={`mx-1 text-sm font-medium ${
+                         isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                     }`}>/</span>
+                     <Link 
+                         href={`/subcategoria/${producto.id_subcategoria}`}
+                         className={`hover:text-blue-600 transition-colors duration-200 text-base md:text-lg font-medium ${
+                             isDarkMode ? 'text-gray-100' : 'text-gray-800'
+                         }`}
+                     >
+                         {subcategoriaCurrent.nombre}
+                     </Link>
++                    <span className={`mx-1 text-sm font-medium ${
++                        isDarkMode ? 'text-gray-500' : 'text-gray-400'
++                    }`}>/</span>
++                    <span className={`text-base md:text-lg font-normal truncate max-w-[200px] sm:max-w-xs md:max-w-md lg:max-w-lg ${
++                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
++                    }`} title={producto.nombre}>
++                        {producto.nombre}
++                    </span>
+                 </div>
+             )} 
+```
+
+---
+
+### 6. Sitemap (Acción manual post-implementación)
 
 El sitemap actual es un archivo estático en `public/sitemap.xml` servido por `SitemapController.php`. **No se genera dinámicamente.**
 
@@ -240,6 +282,7 @@ El sitemap actual es un archivo estático en `public/sitemap.xml` servido por `S
 | 6 | `resources/js/Components/home/BrandSection.jsx` | Usar `getMarcaUrl()` en `handleBrandClick` |
 | 7 | `resources/js/Components/categoria/CategoryBrandSection.jsx` | Usar `getMarcaUrl()` en `handleBrandClick` |
 | 8 | `resources/js/Pages/Marcas.jsx` | Simplificar marcaId, meta tags SEO, canonical, eliminar console.logs |
+| 9 | `resources/js/Pages/Product.jsx` | Agregar nombre del producto al final de las migas de pan (breadcrumbs) |
 
 ---
 
@@ -257,3 +300,5 @@ El sitemap actual es un archivo estático en `public/sitemap.xml` servido por `S
    - `<meta property="og:*">` presentes y correctos.
    - `<link rel="canonical">` apunta a la URL con slug.
 7. **CRM no afectado**: Verificar que endpoints del CRM (`/marca/all`, etc.) no incluyan campos `seo_slug` o `marca_url` innecesarios en su respuesta JSON.
+8. **Breadcrumbs en Producto**: Ingresar a la página de cualquier producto y verificar que las migas de pan contengan `/ [Nombre del Producto]` al final, con estilo ligeramente atenuado/diferenciado, y que se visualice correctamente en móvil (truncado) y escritorio.
+
