@@ -1359,6 +1359,14 @@ const ProductPage = ({ producto }) => {
                     >
                         {subcategoriaCurrent.nombre}
                     </Link>
+                    <span className={`mx-1 text-sm font-medium ${
+                        isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                    }`}>/</span>
+                    <span className={`text-base md:text-lg font-normal truncate max-w-[200px] sm:max-w-xs md:max-w-md lg:max-w-lg ${
+                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    }`} title={producto.nombre}>
+                        {producto.nombre}
+                    </span>
                 </div>
             )} 
 

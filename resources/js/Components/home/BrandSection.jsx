@@ -2,6 +2,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
 import { useTheme } from '../../storage/ThemeContext';
+import { getMarcaUrl } from '../../utils/productUrl';
+
+const URL_API = import.meta.env.VITE_API_URL || '';
 
 const BrandCard = ({ brand }) => {
   const { isDarkMode } = useTheme();
@@ -39,7 +42,7 @@ const BrandCard = ({ brand }) => {
     
     setIsSearching(true);
     setTimeout(() => {
-      window.location.href = `/marcas/${brand.id_marca}`;
+      window.location.href = getMarcaUrl(brand);
       setIsSearching(false);
     }, 300);
   };
@@ -142,7 +145,7 @@ const BrandSection = () => {
   useEffect(() => {
     const loadBrands = async () => {
       try {
-        const response = await axios.get('/marca/all');
+        const response = await axios.get(`${URL_API}/marca/all`);
         const brandsData = response.data;
 
         // Ordenar marcas alfabéticamente de A a Z
@@ -172,42 +175,41 @@ const BrandSection = () => {
     const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
     
     if (cachedBrands && cachedTimestamp && (Date.now() - parseInt(cachedTimestamp)) < oneHour) {
-      // Usar datos en caché si son recientes (1 hora)
       const cachedBrandsData = JSON.parse(cachedBrands);
-
-      // Ordenar marcas del caché alfabéticamente de A a Z
-      const sortedCachedBrands = Array.isArray(cachedBrandsData)
-        ? cachedBrandsData.sort((a, b) => {
+      if (Array.isArray(cachedBrandsData) && cachedBrandsData.length > 0) {
+        // Ordenar marcas del caché alfabéticamente de A a Z
+        const sortedCachedBrands = cachedBrandsData.sort((a, b) => {
             const nameA = a.nombre?.toLowerCase() || '';
             const nameB = b.nombre?.toLowerCase() || '';
             return nameA.localeCompare(nameB);
-          })
-        : cachedBrandsData;
+          });
 
-      setBrands(sortedCachedBrands);
-      setLoading(false);
-    } else {
-      // Configurar observer para cargar marcas solo cuando la sección es visible
-      const observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting) {
-            loadBrands();
-            observer.disconnect();
-          }
-        },
-        { threshold: 0.1 }
-      );
-      
-      if (sectionRef.current) {
-        observer.observe(sectionRef.current);
+        setBrands(sortedCachedBrands);
+        setLoading(false);
+        return;
       }
-      
-      return () => {
-        if (sectionRef.current) {
+    }
+
+    // Configurar observer para cargar marcas solo cuando la sección es visible
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadBrands();
           observer.disconnect();
         }
-      };
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
     }
+    
+    return () => {
+      if (sectionRef.current) {
+        observer.disconnect();
+      }
+    };
   }, []);
 
   return (

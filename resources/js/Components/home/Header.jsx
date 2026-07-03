@@ -2,7 +2,9 @@ import React, { useState, useEffect, useRef, useCallback, memo } from "react";
 import axios from "axios";
 import CartIcon from "./CartIcon";
 import { useTheme } from "../../storage/ThemeContext";
-import { getProductUrl } from "../../utils/productUrl";
+import { getProductUrl, getMarcaUrl } from "../../utils/productUrl";
+
+const URL_API = import.meta.env.VITE_API_URL || '';
 
 const Header = memo(() => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -157,7 +159,7 @@ const Header = memo(() => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "/productos/buscar",
+        `${URL_API}/productos/buscar`,
         { producto: term },
         {
           headers: {
@@ -191,7 +193,7 @@ const Header = memo(() => {
 
   // Navegación
   const handleProductClick = (p) => { window.location.href = getProductUrl(p); setIsModalOpen(false); };
-  const handleMarcaClick = (m) => { window.location.href = `/marcas/${m.id_marca}`; setIsModalOpen(false); };
+  const handleMarcaClick = (m) => { window.location.href = getMarcaUrl(m); setIsModalOpen(false); };
   const handleCategoriaClick = (c) => { window.location.href = `/categorias/${c.id_categoria}`; setIsModalOpen(false); };
   const handleSubcategoriaClick = (s) => { window.location.href = `/subcategoria/${s.id_subcategoria}`; setIsModalOpen(false); };
 

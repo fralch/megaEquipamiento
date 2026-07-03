@@ -2,6 +2,7 @@
 import React, { useState, useRef } from "react";
 import { Link } from "@inertiajs/react";
 import { useTheme } from '../../storage/ThemeContext';
+import { getMarcaUrl } from '../../utils/productUrl';
 
 const CategoryBrandCard = ({ brand }) => {
   const { isDarkMode } = useTheme();
@@ -17,7 +18,7 @@ const CategoryBrandCard = ({ brand }) => {
     
     // Navegar directamente usando el id_marca
     setTimeout(() => {
-      window.location.href = `/marcas/${brand.id_marca}`;
+      window.location.href = getMarcaUrl(brand);
     }, 300); // Pequeño delay para mostrar el estado de carga
   };
 

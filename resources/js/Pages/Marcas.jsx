@@ -13,7 +13,7 @@ const URL_API = import.meta.env.VITE_API_URL;
 
 
 
-export default function Marcas({ marca, productos }) {
+export default function Marcas({ marca, productos, seoSlug }) {
     const { isDarkMode } = useTheme();
     const { auth } = usePage().props;
     const [isEditingVideo, setIsEditingVideo] = useState(false);
@@ -32,40 +32,23 @@ export default function Marcas({ marca, productos }) {
 
     useEffect(() => {
         setIsLoading(true);
-        
-        // Obtener el ID de la marca de múltiples fuentes
-        const urlParts = window.location.pathname.split('/');
-        const marcaIdFromUrl = urlParts[urlParts.length - 1];
-        
-        // Intentar obtener marca_id de los productos si está disponible
-        const marcaIdFromProducts = productos && productos.length > 0 
-            ? productos[0]?.marca?.marca_id || productos[0]?.marca_id
-            : null;
-        
-        // Usar la marca de los productos como prioridad, fallback a URL
-        const marcaId = marcaIdFromProducts || (marcaIdFromUrl && !isNaN(marcaIdFromUrl) ? marcaIdFromUrl : null);
-        
-        console.log('Marca ID from URL:', marcaIdFromUrl);
-        console.log('Marca ID from Products:', marcaIdFromProducts);
-        console.log('Marca ID final:', marcaId);
-        console.log('Productos:', productos);
-    
+
+        // Obtener el ID de la marca directamente de las props del servidor
+        const marcaId = marca?.id_marca || null;
+
         // Función para cargar las categorías optimizadas por marca
         const cargarCategoriasOptimizadas = async () => {
             try {
                 // Construir URL usando tu ruta específica
-                const url = marcaId 
+                const url = marcaId
                     ? `${URL_API}/catsub_optimizadas/${marcaId}`
                     : `${URL_API}/catsub_optimizadas`;
-                
-                console.log('Llamando a:', url);
-                
+
                 const categoriasResponse = await fetch(url);
-                
+
                 if (categoriasResponse.ok) {
                     const categoriasData = await categoriasResponse.json();
                     setCategoriasArray(categoriasData);
-                    console.log('Categorías cargadas:', categoriasData);
                 } else {
                     console.error('Error al cargar categorías optimizadas:', categoriasResponse.status);
                     // Fallback: cargar todas las categorías si falla la específica
@@ -73,7 +56,6 @@ export default function Marcas({ marca, productos }) {
                     if (fallbackResponse.ok) {
                         const fallbackData = await fallbackResponse.json();
                         setCategoriasArray(fallbackData);
-                        console.log('Categorías fallback cargadas:', fallbackData);
                     } else {
                         setCategoriasArray([]);
                     }
@@ -83,13 +65,13 @@ export default function Marcas({ marca, productos }) {
                 setCategoriasArray([]);
             }
         };
-    
+
         // Función para cargar información de subcategoría (código existente)
         const cargarInfoSubcategoria = async () => {
             try {
-                // Buscar ID de subcategoría en la URL (diferentes patrones posibles)
+                const urlParts = window.location.pathname.split('/');
                 let subcategoriaId = null;
-                
+
                 // Patron: /subcategoria/123 o /subcategoria/123/456
                 if (urlParts.includes('subcategoria')) {
                     const subcategoriaIndex = urlParts.indexOf('subcategoria');
@@ -97,21 +79,13 @@ export default function Marcas({ marca, productos }) {
                         subcategoriaId = urlParts[subcategoriaIndex + 1];
                     }
                 }
-                // Patron: otro patrón que puedas estar usando
-                else {
-                    subcategoriaId = urlParts.find(part => 
-                        part.match(/^\d+$/) && part !== marcaId?.toString()
-                    );
-                }
-                
+
                 if (subcategoriaId && !isNaN(subcategoriaId)) {
-                    console.log('Cargando info de subcategoría:', subcategoriaId);
-                    
                     const subcategoriaResponse = await fetch(`${URL_API}/subcategoria_id/${subcategoriaId}`);
                     if (subcategoriaResponse.ok) {
                         const subcategoriaData = await subcategoriaResponse.json();
                         setSubcategoriaNombre(subcategoriaData.nombre);
-                        
+
                         // Obtener el nombre de la categoría
                         const categoriaResponse = await fetch(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`);
                         if (categoriaResponse.ok) {
@@ -127,7 +101,7 @@ export default function Marcas({ marca, productos }) {
                 console.error('Error fetching subcategoria info:', error);
             }
         };
-    
+
         // Ejecutar ambas funciones en paralelo
         Promise.all([
             cargarCategoriasOptimizadas(),
@@ -135,8 +109,8 @@ export default function Marcas({ marca, productos }) {
         ]).finally(() => {
             setIsLoading(false);
         });
-    
-    }, [productos]); // Mantener productos como dependencia
+
+    }, [marca, productos]);
 
     const toggleCategory = (categoriaNombre) => {
         setOpenCategories((prevState) => ({
@@ -223,7 +197,14 @@ export default function Marcas({ marca, productos }) {
 
     return (
         <div className="min-h-screen">
-            <Head title="Marca" />
+            <Head title={marca ? `Equipamiento ${marca.nombre} | Mega Equipamiento` : 'Marca | Mega Equipamiento'}>
+                {marca && <meta name="description" content={`Descubre la línea completa de equipamiento ${marca.nombre} en Mega Equipamiento. Productos de laboratorio, equipos industriales y soluciones profesionales con garantía y soporte técnico.`} />}
+                {marca && <meta property="og:title" content={`Equipamiento ${marca.nombre} | Mega Equipamiento`} />}
+                {marca && <meta property="og:description" content={`Explora los productos de ${marca.nombre}. Equipamiento de laboratorio e industrial de alta calidad.`} />}
+                {marca?.imagen_url && <meta property="og:image" content={marca.imagen_url} />}
+                {marca && <meta property="og:type" content="website" />}
+                {marca && <link rel="canonical" href={`${window.location.origin}/marcas/${seoSlug}`} />}
+            </Head>
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
@@ -453,13 +434,12 @@ export default function Marcas({ marca, productos }) {
                                         {openCategories[categoria.nombre] && categoria.subcategorias && (
                                             <div className="mt-2 ml-4 space-y-2 animate-slideDown">
                                                 {categoria.subcategorias.map((subcategoria, subIndex) => {
-                                                    const urlParts = window.location.pathname.split('/');
-                                                    const marcaId = urlParts[urlParts.length - 1];
-                                                    
-                                                    const href = marcaId && !isNaN(marcaId)
+                                                    const marcaId = marca?.id_marca || null;
+
+                                                    const href = marcaId
                                                         ? `/subcategoria/${subcategoria.id_subcategoria}/${marcaId}`
                                                         : `/subcategoria/${subcategoria.id_subcategoria}`;
-                                                    
+
                                                     return (
                                                         <Link
                                                             key={subcategoria.id_subcategoria}
@@ -637,7 +617,7 @@ export default function Marcas({ marca, productos }) {
             
             <Footer />
 
-            <style jsx>{`
+            <style>{`
                 @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(20px); }
                     to { opacity: 1; transform: translateY(0); }

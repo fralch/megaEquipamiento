@@ -79,4 +79,26 @@ class Marca extends Model
         // Para rutas en 'img/marcas/...'
         return asset($path);
     }
+
+    /**
+     * Genera el slug SEO de la marca (ej: "sartorius-peru-65").
+     */
+    public function getSeoSlug(): string
+    {
+        $slug = \Illuminate\Support\Str::slug($this->nombre);
+        // Fallback si el nombre genera un slug vacío (caracteres no latinos, etc.)
+        if (empty($slug)) {
+            $slug = 'marca';
+        }
+
+        return $slug.'-'.$this->id_marca;
+    }
+
+    /**
+     * URL pública SEO de la marca.
+     */
+    public function getSeoUrl(): string
+    {
+        return '/marcas/'.$this->getSeoSlug();
+    }
 }

@@ -467,7 +467,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
             </div>
             <Footer />
 
-            <style jsx>{`
+            <style>{`
                 @keyframes slideIn {
                     from { opacity: 0; transform: translateX(-20px); }
                     to { opacity: 1; transform: translateX(0); }
