@@ -672,6 +672,7 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                       <th className="px-2 py-1 text-left">Nombre</th>
                       <th className="px-2 py-1 text-left">Subcategoría</th>
                       <th className="px-2 py-1 text-left">Marca</th>
+                      <th className="px-2 py-1 text-left">Características</th>
                       <th className="px-2 py-1 text-right">Precio IGV</th>
                       {preview.archivos_origen?.length > 1 && (
                         <th className="px-2 py-1 text-left">Archivo</th>
@@ -749,6 +750,39 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
                                 <span className="ml-1 text-red-500 font-medium">(no resuelta)</span>
                               )}
                             </div>
+                          )}
+                        </td>
+                        <td className="px-2 py-1 max-w-[160px]">
+                          {p.caracteristicas && Object.keys(p.caracteristicas).length > 0 ? (
+                            <div className="text-[10px] leading-tight">
+                              {Object.entries(p.caracteristicas).slice(0, 3).map(([k, v]) => (
+                                <div key={k} className="truncate">
+                                  <span className={`font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{k}:</span>{' '}
+                                  <span className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>{v}</span>
+                                </div>
+                              ))}
+                              {Object.keys(p.caracteristicas).length > 3 && (
+                                <span className={isDarkMode ? 'text-gray-500' : 'text-gray-400'}>
+                                  +{Object.keys(p.caracteristicas).length - 3} más
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className={`text-[10px] ${isDarkMode ? 'text-gray-600' : 'text-gray-300'}`}>—</span>
+                          )}
+                          {p.especificaciones_tecnicas && (
+                            <span className={`inline-block text-[9px] mt-0.5 px-1 py-0.5 rounded-full ${
+                              isDarkMode ? 'bg-green-900/50 text-green-300' : 'bg-green-100 text-green-700'
+                            }`}>
+                              + specs
+                            </span>
+                          )}
+                          {p.pais && (
+                            <span className={`inline-block text-[9px] mt-0.5 ml-1 px-1 py-0.5 rounded-full ${
+                              isDarkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-700'
+                            }`}>
+                              {p.pais}
+                            </span>
                           )}
                         </td>
                         <td className="px-2 py-1 text-right font-mono">

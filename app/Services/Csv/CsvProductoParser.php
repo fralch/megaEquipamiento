@@ -37,6 +37,8 @@ class CsvProductoParser
         'soporte técnico' => 'soporte_tecnico',
         'soporte tecnico' => 'soporte_tecnico',
         'documentos/descargas' => 'documentos',
+        'marca' => 'marca_directa',
+        'procedencia' => 'pais_directa',
     ];
 
     /**
@@ -232,6 +234,24 @@ class CsvProductoParser
                 }
             }
 
+            // FALLBACK: columna directa "Marca" en el CSV
+            if ($marcaNombre === null && ! empty($data['marca_directa'])) {
+                $marcaNombre = trim((string) $data['marca_directa']);
+            }
+
+            // FALLBACK: columna directa "Procedencia" en el CSV
+            if ($pais === null && ! empty($data['pais_directa'])) {
+                $pais = trim((string) $data['pais_directa']);
+            }
+
+            // FALLBACK: extraer marca y procedencia desde el nombre del producto
+            if ($marcaNombre === null && ! empty($nombre)) {
+                $marcaNombre = $this->extractMarcaFromNombre($nombre);
+            }
+            if ($pais === null && ! empty($nombre) && $marcaNombre !== null) {
+                $pais = $this->extractPaisFromNombre($nombre);
+            }
+
             // Resolver marca
             $marcaId = null;
             if ($marcaNombre !== null) {
@@ -278,6 +298,11 @@ class CsvProductoParser
             }
 
             $especificaciones = $this->parseEspecificaciones($data['especificaciones_tecnicas'] ?? null);
+
+            // FALLBACK: extraer especificaciones desde la descripción si la columna dedicada está vacía
+            if ($especificaciones === null && ! empty($data['descripcion'])) {
+                $especificaciones = $this->parseEspecificaciones($data['descripcion']);
+            }
 
             $caracteristicas = [];
             foreach ($atributos as $attr) {
@@ -593,6 +618,32 @@ class CsvProductoParser
         $raw = trim($raw);
 
         return $raw === '' ? null : $raw;
+    }
+
+    /**
+     * Intenta extraer el nombre de la marca desde el nombre del producto.
+     * Busca el patrón "Producto - MARCA PAÍS" al final del nombre.
+     */
+    private function extractMarcaFromNombre(string $nombre): ?string
+    {
+        if (preg_match('/\s[-–—]\s*([A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)?)\s+[A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+\s*$/u', $nombre, $m)) {
+            return trim($m[1]);
+        }
+
+        return null;
+    }
+
+    /**
+     * Intenta extraer el país de procedencia desde el nombre del producto.
+     * Busca el patrón "Producto - MARCA PAÍS" al final del nombre.
+     */
+    private function extractPaisFromNombre(string $nombre): ?string
+    {
+        if (preg_match('/\s[-–—]\s*[A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)?\s+([A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+(?:\s+[A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+)?)\s*$/u', $nombre, $m)) {
+            return trim($m[1]);
+        }
+
+        return null;
     }
 
     /**

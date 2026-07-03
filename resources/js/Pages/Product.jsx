@@ -559,9 +559,20 @@ const ProductPage = ({ producto }) => {
         if (!data) return null;
 
         try {
-            if (typeof data === 'object') return data;
+            if (typeof data === 'object') {
+                if (data.filas && typeof data.filas === 'object' && !Array.isArray(data.filas)) {
+                    const rows = [['Especificación', 'Valor'], ...Object.entries(data.filas)];
+                    return { secciones: [{ tipo: 'tabla', datos: rows }] };
+                }
+                return data;
+            }
 
             const parsed = JSON.parse(data);
+
+            if (parsed?.filas && typeof parsed.filas === 'object' && !Array.isArray(parsed.filas)) {
+                const rows = [['Especificación', 'Valor'], ...Object.entries(parsed.filas)];
+                return { secciones: [{ tipo: 'tabla', datos: rows }] };
+            }
             return parsed;
         } catch (error) {
             console.error("Error parsing especificaciones_tecnicas:", error);
@@ -598,10 +609,23 @@ const ProductPage = ({ producto }) => {
         if (!productData.especificaciones_tecnicas) return;
 
         try {
-            const parsedValue = JSON.parse(productData.especificaciones_tecnicas);
+            const raw = productData.especificaciones_tecnicas;
+            let parsedValue;
+
+            if (typeof raw === 'object') {
+                parsedValue = raw;
+            } else {
+                parsedValue = JSON.parse(raw);
+            }
 
             if (parsedValue?.secciones && Array.isArray(parsedValue.secciones)) {
                 setContenidoTabla(parsedValue);
+            } else if (parsedValue?.filas && typeof parsedValue.filas === 'object') {
+                const rows = [['Especificación', 'Valor'], ...Object.entries(parsedValue.filas)];
+                setContenidoTabla({
+                    secciones: [{ tipo: 'tabla', datos: rows }],
+                    textoActual: ""
+                });
             } else if (Array.isArray(parsedValue) && parsedValue.length > 0) {
                 setContenidoTabla({
                     secciones: [{ tipo: 'tabla', datos: parsedValue }],
@@ -609,13 +633,13 @@ const ProductPage = ({ producto }) => {
                 });
             } else {
                 setContenidoTabla({
-                    secciones: [{ tipo: 'texto', datos: [productData.especificaciones_tecnicas] }],
+                    secciones: [{ tipo: 'texto', datos: [typeof raw === 'string' ? raw : JSON.stringify(raw)] }],
                     textoActual: ""
                 });
             }
         } catch (e) {
             setContenidoTabla({
-                secciones: [{ tipo: 'texto', datos: [productData.especificaciones_tecnicas] }],
+                secciones: [{ tipo: 'texto', datos: [typeof productData.especificaciones_tecnicas === 'string' ? productData.especificaciones_tecnicas : JSON.stringify(productData.especificaciones_tecnicas)] }],
                 textoActual: ""
             });
         }
