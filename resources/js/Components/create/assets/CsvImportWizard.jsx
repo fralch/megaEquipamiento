@@ -469,8 +469,9 @@ const CsvImportWizard = ({ open, onClose, onImported, categorias, subcategorias,
             <div className="space-y-4">
               <p className="text-sm">
                 Sube uno o varios archivos CSV con las cabeceras: <code>SKU, Nombre, Precio Base, % Ganancia,
-                Video YouTube, Descripción, Attribute 1..6 name/value, Especificaciones Técnicas,
-                  Contenido de Envío, Soporte Técnico, Categorías, SubCategorías</code>.
+                Video YouTube, Descripción, Característica 1..6 nombre/valor(s), Especificaciones Técnicas,
+                Manual, Ficha técnica, Certificados, Contenido de Envío, Soporte Técnico,
+                Categorías, SubCategorías, Marca, País</code>.
               </p>
               <input
                 ref={inputRef}

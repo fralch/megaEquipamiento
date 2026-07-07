@@ -526,7 +526,7 @@ class CsvProductoParser
 
     /**
      * Convierte la fila de cabeceras en [idx => logicalKey|null].
-     * Detecta además las columnas "Attribute N name/value".
+     * Detecta además las columnas "Característica N nombre/valor(s)".
      *
      * @param  array<int, string>  $header
      * @return array<int, string|null>
@@ -536,8 +536,19 @@ class CsvProductoParser
         $out = [];
         foreach ($header as $idx => $raw) {
             $key = $this->normalizeName((string) $raw);
+            // Características en español (nuevo formato): "Característica N nombre" / "Característica N valor(s)"
+            if (preg_match('/^caracter[ií]stica\s+(\d+)\s+nombre$/', $key, $m)) {
+                $out[$idx] = '__attr_name_'.$m[1].'__';
+
+                continue;
+            }
+            if (preg_match('/^caracter[ií]stica\s+(\d+)\s+valor\(s\)$/', $key, $m)) {
+                $out[$idx] = '__attr_value_'.$m[1].'__';
+
+                continue;
+            }
+            // Características en inglés (formato legacy): "Attribute N name" / "Attribute N value(s)"
             if (preg_match('/^attribute\s+(\d+)\s+name$/', $key, $m)) {
-                // Marca el índice como "attr-name-N"
                 $out[$idx] = '__attr_name_'.$m[1].'__';
 
                 continue;
