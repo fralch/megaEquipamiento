@@ -537,23 +537,23 @@ class CsvProductoParser
         foreach ($header as $idx => $raw) {
             $key = $this->normalizeName((string) $raw);
             // Características en español (nuevo formato): "Característica N nombre" / "Característica N valor(s)"
-            if (preg_match('/^caracter[ií]stica\s+(\d+)\s+nombre$/', $key, $m)) {
+            if (preg_match('/^caracter[ií]stica\s+(\d+)\s+nombre$/u', $key, $m)) {
                 $out[$idx] = '__attr_name_'.$m[1].'__';
 
                 continue;
             }
-            if (preg_match('/^caracter[ií]stica\s+(\d+)\s+valor\(s\)$/', $key, $m)) {
+            if (preg_match('/^caracter[ií]stica\s+(\d+)\s+valor\(s\)$/u', $key, $m)) {
                 $out[$idx] = '__attr_value_'.$m[1].'__';
 
                 continue;
             }
             // Características en inglés (formato legacy): "Attribute N name" / "Attribute N value(s)"
-            if (preg_match('/^attribute\s+(\d+)\s+name$/', $key, $m)) {
+            if (preg_match('/^attribute\s+(\d+)\s+name$/u', $key, $m)) {
                 $out[$idx] = '__attr_name_'.$m[1].'__';
 
                 continue;
             }
-            if (preg_match('/^attribute\s+(\d+)\s+value\(s\)$/', $key, $m)) {
+            if (preg_match('/^attribute\s+(\d+)\s+value\(s\)$/u', $key, $m)) {
                 $out[$idx] = '__attr_value_'.$m[1].'__';
 
                 continue;
