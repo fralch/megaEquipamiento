@@ -313,7 +313,7 @@ class CsvProductoParser
             $caracteristicas = [];
             foreach ($atributos as $attr) {
                 $name = trim($attr['name']);
-                if ($name === '' || mb_strtolower($name) === 'marca' || mb_strtolower($name) === 'procedencia') {
+                if ($name === '') {
                     continue;
                 }
                 $caracteristicas[$name] = trim($attr['value']);
