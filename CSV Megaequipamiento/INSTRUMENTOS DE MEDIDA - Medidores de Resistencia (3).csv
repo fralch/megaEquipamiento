@@ -1,0 +1,91 @@
+SKU,Nombre,Precio Base,% Ganancia,Video YouTube,Descripción,Característica 1 nombre,Característica 1 valor(s),Característica 2 nombre,Característica 2 valor(s),Característica 3 nombre,Característica 3 valor(s),Característica 4 nombre,Característica 4 valor(s),Característica 5 nombre,Característica 5 valor(s),Característica 6 nombre,Característica 6 valor(s),Especificaciones Técnicas,Manual,Ficha técnica,Certificados,Contenido de Envío,Soporte Técnico,Categorías,SubCategorías,Marca,País
+MPK215R,Comprobador de Microohmios Digital MPK215R - MEGABRAS PERÚ,,,https://youtu.be/cHwjOV67SME,"<p>El MPK215R es un micro-ohmímetro digital de alta corriente diseñado para medir con elevada precisión resistencias de contacto extremadamente bajas en interruptores de potencia, seccionadores, barras conductoras, empalmes, conectores, soldaduras, transformadores y otros elementos de sistemas eléctricos de media y alta tensión. Utiliza el método Kelvin de cuatro terminales para eliminar la influencia de la resistencia de los cables de prueba y obtener mediciones confiables desde 0,1 µΩ hasta 1 Ω. El equipo genera una corriente continua real (True DC) ajustable entre 5 A y 200 A, configurable en incrementos de 0,2 A entre 5 A y 20 A, y de 1 A entre 20 A y 200 A, permitiendo adaptar la prueba a distintos tipos de equipos eléctricos. Incorpora un visor alfanumérico con lectura directa de hasta 4½ dígitos, proporcionando resultados rápidos y precisos con una exactitud básica de ±1 % del valor medido entre 50 µΩ y 1 Ω. Además, ofrece rangos de resolución de hasta 0,1 µΩ, protección contra sobrecorriente, cortorciduto y sobrecalentamiento, así como la posibilidad de programar ensayos entre 15 y 120 segundos con corrientes de hasta 200 A o realizar pruebas de duración ilimitada cuando se utilizan corrientes iguales o inferiores a 100 A.</p>
+
+<br><br>
+
+<p>Una de las principales características del MPK215R es su modo BSG (Both Sides Grounded), que permite realizar mediciones manteniendo ambos lados del equipo bajo prueba conectados a tierra, incrementando significativamente la seguridad del operador durante trabajos en subestaciones eléctricas y reduciendo los riesgos asociados con la manipulación de interruptores, seccionadores y barras energizadas. El instrumento permite ejecutar hasta 30 ensayos consecutivos, incorpora memoria interna con capacidad para almacenar hasta 4000 mediciones organizadas en múltiples registros y dispone de protocolo abierto Modbus para integración con sistemas de automatización, además de comunicación USB y Bluetooth para configuración, control remoto y descarga de datos mediante el software MegaLogg3, aplicaciones Android, LabVIEW o PLC personalizados. También integra una entrada para pinza auxiliar con rango de 0,1 A CA a 60 A CA y precisión de 1 % + 3 dígitos para ampliar las posibilidades de verificación durante las pruebas. Alimentado directamente desde la red eléctrica de 100 a 240 V CA, cuenta con protección ambiental IP65 con la tapa cerrada y cumple con la norma IEC 61010-1. Su construcción robusta, peso aproximado de 11 kg y dimensiones de 502 × 394 × 190 mm lo convierten en un equipo especialmente diseñado para aplicaciones de mantenimiento preventivo, diagnóstico y certificación de sistemas eléctricos industriales y de transmisión de energía.</p>",Resistencia,"0,1 µΩ a 1 Ω",Resolución,"0,1 µΩ",Precisión,±1 %,Marca,MEGABRAS,Procedencia,Brasil,,,"<table>
+
+<tr><td>Modelo</td><td>MPK215R</td></tr>
+
+<tr><td>Producto</td><td>Micro-ohmímetro digital</td></tr>
+
+<tr><td>Aplicación</td><td>Medición de resistencias muy bajas mediante el método Kelvin de cuatro terminales en interruptores, barras conductoras, uniones, contactos eléctricos y otros elementos de baja resistencia.</td></tr>
+
+<tr><td>Método de medición</td><td>Kelvin de 4 terminales.</td></tr>
+
+<tr><td>Modo de operación</td><td>Modo BSG (Both Sides Grounded - Ambos lados conectados a tierra).</td></tr>
+
+<tr><td>Corriente de prueba</td><td>5 A a 200 A CC (True DC), ajustable en pasos de 0,2 A (5 A a 20 A) y de 1 A (20 A a 200 A).</td></tr>
+
+<tr><td>Rango de resistencia</td><td>0,1 μΩ a 1 Ω.</td></tr>
+
+<tr><td>Resolución</td><td>0,1 μΩ (0,1 μΩ a 2 mΩ), 10 μΩ (2 mΩ a 200 mΩ), 1 mΩ (200 mΩ a 1 Ω).</td></tr>
+
+<tr><td>Exactitud</td><td>±1 % de la lectura (50 μΩ a 1 Ω).</td></tr>
+
+<tr><td>Tiempo de ensayo</td><td>Programable de 15 s a 120 s. Ensayos ilimitados con corrientes iguales o inferiores a 100 A.</td></tr>
+
+<tr><td>Protecciones</td><td>Sobrecorriente, cortocircuito y sobrecalentamiento.</td></tr>
+
+<tr><td>Medición con pinza auxiliar</td><td>0,1 A CA a 60 A CA.</td></tr>
+
+<tr><td>Exactitud de la pinza auxiliar</td><td>±1 % + 3 dígitos.</td></tr>
+
+<tr><td>Pantalla</td><td>Display alfanumérico con lectura directa de hasta 4½ dígitos.</td></tr>
+
+<tr><td>Memoria interna</td><td>Hasta 4000 mediciones organizadas en múltiples registros.</td></tr>
+
+<tr><td>Comunicación</td><td>USB, Bluetooth y protocolo Modbus.</td></tr>
+
+<tr><td>Software compatible</td><td>MegaLogg3, LabVIEW, PLC y aplicaciones personalizadas mediante protocolo Modbus.</td></tr>
+
+<tr><td>Funciones</td><td>Modo BSG, hasta 30 ensayos consecutivos, configuración remota, descarga de datos y generación de informes.</td></tr>
+
+<tr><td>Fuente de alimentación</td><td>100 V a 240 V CA.</td></tr>
+
+<tr><td>Seguridad</td><td>IEC 61010-1.</td></tr>
+
+<tr><td>Grado de protección</td><td>IP65 (con la tapa cerrada).</td></tr>
+
+<tr><td>Temperatura de operación</td><td>0 °C a 50 °C.</td></tr>
+
+<tr><td>Temperatura de almacenamiento</td><td>-10 °C a 70 °C.</td></tr>
+
+<tr><td>Humedad de operación</td><td>Hasta 95 % HR (sin condensación).</td></tr>
+
+<tr><td>Dimensiones</td><td>502 × 394 × 190 mm.</td></tr>
+
+<tr><td>Peso</td><td>Aprox. 11 kg.</td></tr>
+
+<tr><td>Marca</td><td>MEGABRAS.</td></tr>
+
+<tr><td>Procedencia</td><td>Brasil.</td></tr>
+
+</table>",https://www.megabras.com/es/soporte/?model=MPK215R,https://www.megabras.com/es/get.php?file=MPK215R.pdf,,"01 x Comprobador de Microohmios Digital MPK215R
+02 x Puntas de prueba combinada (corriente y potencial)
+01 x Pinza auxiliar de corriente
+01 x Cable para conexión a tierra
+01 x Cable de alimentación
+01 x Cable de comunicación USB
+01 x Manual de uso
+01 x Licencia de uso del software MegaLogg3
+01 x Aplicación Android
+01 x Maleta para los accesorios","<b>GARANTÍA:</b>
+Cada equipo se entrega con un certificado de garantía por 24 meses incluyendo:
+Mantenimiento preventivo y/o correctivo por defectos de fábrica durante la garantía
+Instalación y/o capacitación en uso del equipo.
+Cada accesorio se entrega con un certificado de garantía por 6 meses.
+<b>SERVICIO DE CALIBRACIÓN:</b>
+Ponemos a su disposición nuestro Laboratorio de Metrología y Electroquímica.
+Emitimos Certificado de calibración acreditado y/o trazable.
+<b>SERVICIO TÉCNICO:</b>
+Nuestro equipo altamente capacitado está listo para llevar a cabo tareas especializadas, abarcando desde el mantenimiento preventivo hasta el correctivo.
+Repuestos originales en Stock ¡Garantía de calidad y rendimiento para tu equipo!
+<b>CONVENIOS:</b>
+Ofrecemos convenios para el servicio técnico y asesoría permanente garantizando óptimas condiciones de equipos de laboratorios, incluyendo back up para emergencias.
+<b>PARTE DE PAGO:</b>
+¡Actualice su equipo con nuestra exclusiva oferta de renovación! Aproveche la oportunidad de obtener equipos nuevos al entregar su equipo actual como parte del pago. Contacte a uno de nuestros asesores para obtener información detallada.
+<b>ALQUILER:</b>
+Nuestro servicio de alquiler se adapta a tus necesidades, con tarifas que se ajustan según el tiempo que necesites. Ponte en contacto con uno de nuestros asesores para obtener detalles precisos y encontrar la solución de alquiler perfecta para ti.
+<b>RECICLAJE:</b>
+Únete a nuestra causa eco-amigable: Reciclamos productos electrónicos sin ningún costo. ¡Haz tu parte por un futuro sostenible con nosotros!.",INSTRUMENTOS DE MEDIDA,Medidores de Resistencia,MEGABRAS,Brasil

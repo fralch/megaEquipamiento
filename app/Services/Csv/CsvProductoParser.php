@@ -37,8 +37,14 @@ class CsvProductoParser
         'soporte técnico' => 'soporte_tecnico',
         'soporte tecnico' => 'soporte_tecnico',
         'documentos/descargas' => 'documentos',
+        'manual' => 'manual',
+        'ficha técnica' => 'ficha_tecnica',
+        'ficha tecnica' => 'ficha_tecnica',
+        'certificados' => 'certificados',
         'marca' => 'marca_directa',
         'procedencia' => 'pais_directa',
+        'país' => 'pais_directa',
+        'pais' => 'pais_directa',
     ];
 
     /**
@@ -307,7 +313,7 @@ class CsvProductoParser
             $caracteristicas = [];
             foreach ($atributos as $attr) {
                 $name = trim($attr['name']);
-                if ($name === '' || mb_strtolower($name) === 'marca' || mb_strtolower($name) === 'procedencia') {
+                if ($name === '') {
                     continue;
                 }
                 $caracteristicas[$name] = trim($attr['value']);
@@ -327,7 +333,7 @@ class CsvProductoParser
                 'pais' => $pais,
                 'envio' => trim((string) ($data['envio'] ?? '')) ?: null,
                 'soporte_tecnico' => trim((string) ($data['soporte_tecnico'] ?? '')) ?: null,
-                'documentos' => trim((string) ($data['documentos'] ?? '')) ?: null,
+                'documentos' => $this->buildDocumentos($data),
                 'especificaciones_tecnicas' => $especificaciones,
                 'caracteristicas' => $caracteristicas,
                 'categoria_nombre' => $categoriaNombre !== '' ? $categoriaNombre : null,
@@ -382,6 +388,50 @@ class CsvProductoParser
             'precio_ganancia' => $precioGanancia,
             'precio_igv' => $precioIgv,
         ];
+    }
+
+    /**
+     * Combina las columnas separadas Manual, Ficha técnica y Certificados
+     * en un único string con el formato que espera el frontend:
+     *
+     *   MANUAL
+     *   <url>
+     *   FICHA TÉCNICA
+     *   <url>
+     *   CERTIFICADOS
+     *   <url>
+     *
+     * Si ninguna de las tres columnas tiene contenido, cae al fallback
+     * de la columna legacy "Documentos/Descargas".
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private function buildDocumentos(array $data): ?string
+    {
+        $manual = trim((string) ($data['manual'] ?? ''));
+        $ficha = trim((string) ($data['ficha_tecnica'] ?? ''));
+        $certificados = trim((string) ($data['certificados'] ?? ''));
+
+        if ($manual !== '' || $ficha !== '' || $certificados !== '') {
+            $lines = [];
+
+            foreach ([['MANUAL', $manual], ['FICHA TÉCNICA', $ficha], ['CERTIFICADOS', $certificados]] as [$label, $raw]) {
+                $urls = array_filter(array_map('trim', preg_split('/[\n,]/', $raw) ?: []), fn ($u) => $u !== '');
+                if (empty($urls)) {
+                    continue;
+                }
+                $lines[] = $label;
+                foreach ($urls as $url) {
+                    $lines[] = $url;
+                }
+            }
+
+            return ! empty($lines) ? implode("\n", $lines) : null;
+        }
+
+        $documentos = trim((string) ($data['documentos'] ?? ''));
+
+        return $documentos !== '' ? $documentos : null;
     }
 
     /**
@@ -476,7 +526,7 @@ class CsvProductoParser
 
     /**
      * Convierte la fila de cabeceras en [idx => logicalKey|null].
-     * Detecta además las columnas "Attribute N name/value".
+     * Detecta además las columnas "Característica N nombre/valor(s)".
      *
      * @param  array<int, string>  $header
      * @return array<int, string|null>
@@ -486,13 +536,24 @@ class CsvProductoParser
         $out = [];
         foreach ($header as $idx => $raw) {
             $key = $this->normalizeName((string) $raw);
-            if (preg_match('/^attribute\s+(\d+)\s+name$/', $key, $m)) {
-                // Marca el índice como "attr-name-N"
+            // Características en español (nuevo formato): "Característica N nombre" / "Característica N valor(s)"
+            if (preg_match('/^caracter[ií]stica\s+(\d+)\s+nombre$/u', $key, $m)) {
                 $out[$idx] = '__attr_name_'.$m[1].'__';
 
                 continue;
             }
-            if (preg_match('/^attribute\s+(\d+)\s+value\(s\)$/', $key, $m)) {
+            if (preg_match('/^caracter[ií]stica\s+(\d+)\s+valor\(s\)$/u', $key, $m)) {
+                $out[$idx] = '__attr_value_'.$m[1].'__';
+
+                continue;
+            }
+            // Características en inglés (formato legacy): "Attribute N name" / "Attribute N value(s)"
+            if (preg_match('/^attribute\s+(\d+)\s+name$/u', $key, $m)) {
+                $out[$idx] = '__attr_name_'.$m[1].'__';
+
+                continue;
+            }
+            if (preg_match('/^attribute\s+(\d+)\s+value\(s\)$/u', $key, $m)) {
                 $out[$idx] = '__attr_value_'.$m[1].'__';
 
                 continue;
@@ -626,7 +687,7 @@ class CsvProductoParser
      */
     private function extractMarcaFromNombre(string $nombre): ?string
     {
-        if (preg_match('/\s[-–—]\s*([A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)?)\s+[A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+\s*$/u', $nombre, $m)) {
+        if (preg_match('/\s[-–—]\s*([A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)?)\s+[A-ZÁÉÍÓÚÜÑ][A-Za-záéíóúüñÁÉÍÓÚÜÑ]+\s*$/u', $nombre, $m)) {
             return trim($m[1]);
         }
 
@@ -639,7 +700,7 @@ class CsvProductoParser
      */
     private function extractPaisFromNombre(string $nombre): ?string
     {
-        if (preg_match('/\s[-–—]\s*[A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)?\s+([A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+(?:\s+[A-ZÁÉÍÓÚÜÑ][a-záéíóúüñ]+)?)\s*$/u', $nombre, $m)) {
+        if (preg_match('/\s[-–—]\s*[A-Za-z0-9]+(?:\s+[A-Za-z0-9]+)?\s+([A-ZÁÉÍÓÚÜÑ][A-Za-záéíóúüñÁÉÍÓÚÜÑ]+(?:\s+[A-ZÁÉÍÓÚÜÑ][A-Za-záéíóúüñÁÉÍÓÚÜÑ]+)?)\s*$/u', $nombre, $m)) {
             return trim($m[1]);
         }
 

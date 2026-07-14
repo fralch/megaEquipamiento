@@ -79,3 +79,88 @@ test('parsea el fixture CSV sin BD devuelve 0 errores', function () {
     $out = $this->parser->parseEspecificaciones($html);
     expect($out['filas']['Rango'])->toBe('Auto');
 });
+
+test('buildDocumentos combina Manual, Ficha técnica y Certificados en el formato del frontend', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'buildDocumentos');
+    $ref->setAccessible(true);
+
+    $out = $ref->invoke($this->parser, [
+        'manual' => 'https://example.com/manual.pdf',
+        'ficha_tecnica' => 'https://example.com/ficha.pdf',
+        'certificados' => 'https://example.com/cert.pdf',
+    ]);
+
+    expect($out)->toBe(implode("\n", [
+        'MANUAL',
+        'https://example.com/manual.pdf',
+        'FICHA TÉCNICA',
+        'https://example.com/ficha.pdf',
+        'CERTIFICADOS',
+        'https://example.com/cert.pdf',
+    ]));
+});
+
+test('buildDocumentos omite secciones vacías', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'buildDocumentos');
+    $ref->setAccessible(true);
+
+    $out = $ref->invoke($this->parser, [
+        'manual' => '',
+        'ficha_tecnica' => 'https://example.com/ficha.pdf',
+        'certificados' => '',
+    ]);
+
+    expect($out)->toBe(implode("\n", [
+        'FICHA TÉCNICA',
+        'https://example.com/ficha.pdf',
+    ]));
+});
+
+test('buildDocumentos cae al fallback de Documentos/Descargas legacy', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'buildDocumentos');
+    $ref->setAccessible(true);
+
+    $out = $ref->invoke($this->parser, [
+        'documentos' => "MANUAL\nhttps://example.com/manual.pdf",
+    ]);
+
+    expect($out)->toBe("MANUAL\nhttps://example.com/manual.pdf");
+});
+
+test('buildDocumentos retorna null cuando todo está vacío', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'buildDocumentos');
+    $ref->setAccessible(true);
+
+    expect($ref->invoke($this->parser, []))->toBeNull();
+    expect($ref->invoke($this->parser, ['manual' => '', 'ficha_tecnica' => '', 'certificados' => '']))->toBeNull();
+});
+
+test('extractMarcaFromNombre extrae marca con país acentuado tipo PERÚ', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'extractMarcaFromNombre');
+    $ref->setAccessible(true);
+
+    $out = $ref->invoke($this->parser, 'Sistema de Prueba EA BCTS 20010-600-18 - TEKTRONIX PERÚ');
+    expect($out)->toBe('TEKTRONIX');
+});
+
+test('extractPaisFromNombre extrae país con mayúscula acentuada tipo PERÚ', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'extractPaisFromNombre');
+    $ref->setAccessible(true);
+
+    $out = $ref->invoke($this->parser, 'Sistema de Prueba EA BCTS 20010-600-18 - TEKTRONIX PERÚ');
+    expect($out)->toBe('PERÚ');
+});
+
+test('extractMarcaFromNombre extrae marca simple con país sin acentos', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'extractMarcaFromNombre');
+    $ref->setAccessible(true);
+
+    expect($ref->invoke($this->parser, 'Osciloscopio TBS1052C - TEKTRONIX China'))->toBe('TEKTRONIX');
+});
+
+test('extractPaisFromNombre extrae país simple sin acentos', function () {
+    $ref = new ReflectionMethod(CsvProductoParser::class, 'extractPaisFromNombre');
+    $ref->setAccessible(true);
+
+    expect($ref->invoke($this->parser, 'Osciloscopio TBS1052C - TEKTRONIX China'))->toBe('China');
+});
