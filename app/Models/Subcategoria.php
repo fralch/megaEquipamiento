@@ -56,4 +56,10 @@ class Subcategoria extends Model
             ->withPivot('orden', 'activo')
             ->withTimestamps();
     }
+
+    // Relación many-to-many con secciones
+    public function secciones()
+    {
+        return $this->belongsToMany(Seccion::class, 'seccion_subcategoria', 'subcategoria_id', 'seccion_id');
+    }
 }

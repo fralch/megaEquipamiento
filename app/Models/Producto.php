@@ -93,6 +93,11 @@ class Producto extends Model implements HasMedia
         return $this->belongsToMany(Tag::class, 'producto_tag', 'id_producto', 'id_tag')->withTimestamps();
     }
 
+    public function secciones()
+    {
+        return $this->belongsToMany(Seccion::class, 'seccion_producto', 'producto_id', 'seccion_id');
+    }
+
     public function getSeoSlugAttribute(): string
     {
         $slug = Str::slug($this->nombre ?: 'producto');
@@ -182,7 +187,7 @@ class Producto extends Model implements HasMedia
 
     public function agregarImagenDesdeBanco($mediaId, $coleccion = 'imagenes')
     {
-        $media = \App\Models\Media::find($mediaId);
+        $media = Media::find($mediaId);
         if ($media) {
             $this->addMediaFromUrl($media->getUrl())->toMediaCollection($coleccion);
         }

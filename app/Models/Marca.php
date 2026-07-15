@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Marca extends Model
 {
@@ -55,6 +56,12 @@ class Marca extends Model
         return $this->hasMany(Producto::class, 'marca_id', 'id_marca');
     }
 
+    // Relación many-to-many con secciones
+    public function secciones()
+    {
+        return $this->belongsToMany(Seccion::class, 'seccion_marca', 'marca_id', 'seccion_id');
+    }
+
     // Accesor para obtener la URL completa de la imagen sin afectar el valor bruto
     public function getImagenUrlAttribute()
     {
@@ -85,7 +92,7 @@ class Marca extends Model
      */
     public function getSeoSlug(): string
     {
-        $slug = \Illuminate\Support\Str::slug($this->nombre);
+        $slug = Str::slug($this->nombre);
         // Fallback si el nombre genera un slug vacío (caracteres no latinos, etc.)
         if (empty($slug)) {
             $slug = 'marca';

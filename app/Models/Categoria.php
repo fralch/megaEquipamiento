@@ -62,4 +62,10 @@ class Categoria extends Model
     {
         return $this->belongsToMany(Marca::class, 'marca_categoria', 'categoria_id', 'marca_id');
     }
+
+    // Relación many-to-many con secciones
+    public function secciones()
+    {
+        return $this->belongsToMany(Seccion::class, 'seccion_categoria', 'categoria_id', 'seccion_id');
+    }
 }

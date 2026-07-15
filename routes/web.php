@@ -22,6 +22,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ProductoExternoController;
 use App\Http\Controllers\ProductoImportController;
 use App\Http\Controllers\ProductoTagController;
+use App\Http\Controllers\SeccionController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\SubcategoriaController;
 use App\Http\Controllers\TagController;
@@ -48,6 +49,7 @@ Route::get('/categorias/{id_categoria?}', [CategoriaController::class, 'Categori
 Route::get('/subcategoria/{id}/{marca_id?}', [ProductoController::class, 'subCategoriaView'])->name('subcategoria.view');
 Route::get('/producto/{productoSlug}', [ProductoController::class, 'ProductView'])->name('producto.view');
 Route::get('/marcas/{marcaSlug}', [ProductoController::class, 'ProductViewByMarca'])->name('marcas.view');
+Route::get('/seccion/{slug}', [SeccionController::class, 'show'])->name('seccion.show');
 Route::get('/sector/{id_tag_parent}', [SectorController::class, 'show'])->name('sector.view');
 Route::get('/sectores', [SectorController::class, 'index'])->name('sectores.index');
 Route::get('/contacto', function () {
@@ -55,10 +57,10 @@ Route::get('/contacto', function () {
 })->name('contacto.view');
 Route::get('/crear', function () {
     return Inertia::render('Crear');
-})->name('crear.view')->middleware(['auth', \App\Http\Middleware\CheckAdminRole::class]);
+})->name('crear.view')->middleware(['auth', 'role.admin']);
 Route::get('/admin/products', [ProductoController::class, 'productsAdminView'])->name('admin.products.index')->middleware('auth');
 
-Route::middleware(['auth', \App\Http\Middleware\CheckAdminRole::class])->group(function () {
+Route::middleware(['auth', 'role.admin'])->group(function () {
     Route::post('/admin/products/preview-csv', [ProductoImportController::class, 'previewCsv'])->name('admin.products.preview-csv');
     Route::post('/admin/products/refresh-preview', [ProductoImportController::class, 'refreshPreview'])->name('admin.products.refresh-preview');
     Route::post('/admin/products/import-csv', [ProductoImportController::class, 'importCsv'])->name('admin.products.import-csv');
@@ -356,6 +358,22 @@ Route::get('/tags/{id}/productos', [ProductoTagController::class, 'getProductsBy
 // Rutas públicas para sectores
 Route::get('/api/tag-parents', [TagParentController::class, 'getPublicTagParents'])->name('api.tag-parents');
 
+// Rutas públicas para secciones
+Route::get('/api/secciones', [SeccionController::class, 'indexApi'])->name('api.secciones');
+Route::get('/api/secciones/{id}/productos', [SeccionController::class, 'productosApi'])->name('api.secciones.productos');
+
+// Admin de Secciones - protegido
+Route::middleware(['auth', 'role.admin'])->prefix('admin/secciones')->group(function () {
+    Route::get('/', [SeccionController::class, 'index'])->name('admin.secciones.index');
+    Route::post('/', [SeccionController::class, 'store'])->name('admin.secciones.store');
+    Route::match(['put', 'post'], '/{id}', [SeccionController::class, 'update'])->name('admin.secciones.update');
+    Route::delete('/{id}', [SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
+    Route::post('/{id}/productos', [SeccionController::class, 'syncProductos'])->name('admin.secciones.sync-productos');
+    Route::post('/{id}/categorias', [SeccionController::class, 'syncCategorias'])->name('admin.secciones.sync-categorias');
+    Route::post('/{id}/subcategorias', [SeccionController::class, 'syncSubcategorias'])->name('admin.secciones.sync-subcategorias');
+    Route::post('/{id}/marcas', [SeccionController::class, 'syncMarcas'])->name('admin.secciones.sync-marcas');
+});
+
 // API routes for CRM products (used by frontend components)
 Route::get('/api/productos/crm', [ProductoGestionController::class, 'getProductosCRM'])->name('api.productos.crm');
 Route::get('/api/productos/excluye-servicios', [ProductoGestionController::class, 'getProductosExcluyeServicios'])->name('api.productos.excluye-servicios');
@@ -448,13 +466,14 @@ Route::get('/test-pedido-email', function () {
         ],
     ];
 
-    Mail::to('test@example.com')->send(new \App\Mail\PedidoConfirmacion($datosPrueba));
+    Mail::to('test@example.com')->send(new PedidoConfirmacion($datosPrueba));
 
     return 'Email de pedido enviado!';
 });
 
 // Ruta para sitemap
 use App\Http\Controllers\SitemapController;
+use App\Mail\PedidoConfirmacion;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'show'])->name('sitemap.show');
 
