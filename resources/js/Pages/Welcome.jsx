@@ -15,6 +15,7 @@ import SectionsFloatingMenu from "@/Components/home/SectionsFloatingMenu";
 const NavVertical = lazy(() => import("@/Components/home/NavVertical"));
 const LabEquipmentSection = lazy(() => import("@/Components/home/LabEquipmentSection"));
 const Sectores = lazy(() => import("@/Components/home/Sectores"));
+const SeccionProductosPreview = lazy(() => import("@/Components/home/SeccionProductosPreview"));
 const Categorias_cuadrado = lazy(() => import("@/Components/home/Categorias_cuadrado"));
 const BrandSection = lazy(() => import("@/Components/home/BrandSection"));
 const ClientSlider = lazy(() => import("@/Components/home/ClientSlider"));
@@ -28,6 +29,8 @@ export default function Welcome() {
     const [isOpen, setIsOpen] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showProfileModal, setShowProfileModal] = useState(false);
+    const [selectedSeccion, setSelectedSeccion] = useState(null);
+    const [reshuffleKey, setReshuffleKey] = useState(0);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -64,6 +67,13 @@ export default function Welcome() {
 
     const handleLogout = () => {
         router.post("/logout");
+    };
+
+    const handleSelectSeccion = (seccion) => {
+        if (selectedSeccion?.id_seccion === seccion.id_seccion) {
+            setReshuffleKey((k) => k + 1);
+        }
+        setSelectedSeccion(seccion);
     };
 
     const shouldHideButton = isOpen;
@@ -176,7 +186,10 @@ export default function Welcome() {
                     </ErrorBoundary>
                     <main className="mt-0 w-full">
                         <ErrorBoundary>
-                            <SectionsFloatingMenu />
+                            <SectionsFloatingMenu
+                                onSelectSeccion={handleSelectSeccion}
+                                selectedId={selectedSeccion?.id_seccion}
+                            />
                         </ErrorBoundary>
 
                         <ErrorBoundary>
@@ -202,11 +215,37 @@ export default function Welcome() {
                         </ErrorBoundary>
 
                         <ErrorBoundary>
-                            <Suspense fallback={
-                                <div className={`w-full h-96 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
-                            }>
-                                <Categorias_cuadrado />
-                            </Suspense>
+                            <AnimatePresence mode="wait">
+                                {!selectedSeccion ? (
+                                    <motion.div
+                                        key="categorias"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.25 }}
+                                    >
+                                        <Suspense fallback={
+                                            <div className={`w-full h-96 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
+                                        }>
+                                            <Categorias_cuadrado />
+                                        </Suspense>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key={`seccion-${selectedSeccion.id_seccion}-${reshuffleKey}`}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        transition={{ duration: 0.25 }}
+                                    >
+                                        <Suspense fallback={
+                                            <div className={`w-full h-96 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
+                                        }>
+                                            <SeccionProductosPreview seccion={selectedSeccion} />
+                                        </Suspense>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </ErrorBoundary>
 
                         <ErrorBoundary>
