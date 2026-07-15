@@ -9,6 +9,7 @@ import { useTheme } from "@/storage/ThemeContext";
 import Slider from "@/Components/home/Slider";
 import Menu from "@/Components/home/Menu";
 import Header from "@/Components/home/Header";
+import SectionsFloatingMenu from "@/Components/home/SectionsFloatingMenu";
 
 // Componentes no críticos (below the fold) - Lazy loading
 const NavVertical = lazy(() => import("@/Components/home/NavVertical"));
@@ -174,6 +175,10 @@ export default function Welcome() {
                         </Suspense>
                     </ErrorBoundary>
                     <main className="mt-0 w-full">
+                        <ErrorBoundary>
+                            <SectionsFloatingMenu />
+                        </ErrorBoundary>
+
                         <ErrorBoundary>
                             <Slider />
                         </ErrorBoundary>
