@@ -425,9 +425,9 @@ const ProductGrid = ({ products: initialProducts }) => {
       {/* Grid modificado para mostrar 3 columnas en laptop 15" */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mb-8">
         {currentProducts.map((product) => (
-          <Card 
-            key={`product-${product.id}-${product.sku || 'no-sku'}`} 
-            product={product} 
+          <Card
+            key={`product-${product.id}-${product.sku || 'no-sku'}`}
+            product={product}
           />
         ))}
       </div>
@@ -627,8 +627,8 @@ const Card = React.memo(({ product }) => {
     <div
       ref={cardRef}
       className={`w-full rounded-xl shadow-lg overflow-hidden border h-128 relative flex flex-col transition-all duration-300 hover:shadow-xl ${
-        isDarkMode 
-          ? 'bg-gray-800 hover:bg-gray-750 shadow-gray-900/50 border-gray-700' 
+        isDarkMode
+          ? 'bg-gray-800 hover:bg-gray-750 shadow-gray-900/50 border-gray-700'
           : 'bg-white hover:bg-gray-50 border-gray-200'
       }`}
       onMouseEnter={() => setShowDetails(true)}

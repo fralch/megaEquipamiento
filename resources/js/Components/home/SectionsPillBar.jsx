@@ -1,25 +1,48 @@
-import React, { memo } from "react";
+import React, { memo, useState, useEffect } from "react";
 import { Link } from "@inertiajs/react";
 import { useTheme } from "@/storage/ThemeContext";
 
 const SectionsPillBar = memo(function SectionsPillBar({ secciones, onSelect, selectedId }) {
     const { isDarkMode } = useTheme();
+    const [isScrolling, setIsScrolling] = useState(false);
+
+    useEffect(() => {
+        let timeoutId;
+        const handleScroll = () => {
+            setIsScrolling(true);
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => setIsScrolling(false), 300);
+        };
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            clearTimeout(timeoutId);
+        };
+    }, []);
 
     if (!secciones || secciones.length === 0) return null;
 
     const isActive = (id) => id === selectedId;
 
-    const baseClasses = (activo) =>
-        `group flex-shrink-0 inline-flex items-center rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-all duration-200 border focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.97] ${
+    const baseClasses = (activo) => {
+        if (isScrolling) {
+            return `group flex-shrink-0 inline-flex items-center rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-150 border focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.97] ${
+                isDarkMode
+                    ? "bg-gray-200 text-gray-900 border-gray-300"
+                    : "bg-gray-700 text-white border-gray-700"
+            }`;
+        }
+        return `group flex-shrink-0 inline-flex items-center rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors duration-150 border focus:outline-none focus:ring-2 focus:ring-offset-2 active:scale-[0.97] ${
             activo
-                ? "bg-[#1e3a8a] text-white border-[#1e3a8a] shadow-sm"
+                ? "bg-[#1e3a8a] text-white border-[#1e3a8a]"
                 : isDarkMode
-                  ? "bg-gray-700/40 text-gray-200 border-gray-600/60 hover:bg-[#1e3a8a] hover:text-white hover:border-[#1e3a8a] hover:shadow-md focus:ring-blue-500 focus:ring-offset-gray-800"
-                  : "bg-gray-50 text-gray-700 border-gray-200 hover:bg-[#1e3a8a] hover:text-white hover:border-[#1e3a8a] hover:shadow-md focus:ring-blue-600 focus:ring-offset-white"
+                  ? "bg-gray-700/40 text-gray-200 border-gray-600/60"
+                  : "bg-gray-50 text-gray-700 border-gray-200"
         }`;
+    };
 
     const dotClasses = (activo) =>
-        `w-1.5 h-1.5 rounded-full mr-2 transition-colors ${
+        `w-1.5 h-1.5 rounded-full mr-2 transition-colors duration-300 ${
             activo
                 ? "bg-white"
                 : isDarkMode
