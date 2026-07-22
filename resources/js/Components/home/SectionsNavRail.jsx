@@ -45,23 +45,6 @@ function SectionAvatar({ seccion, activo, isDarkMode }) {
     );
 }
 
-function GridAvatar({ activo, isDarkMode }) {
-    return (
-        <span
-            className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-colors duration-200 ${
-                activo
-                    ? "bg-[#1e3a8a] text-white ring-2 ring-blue-500"
-                    : isDarkMode
-                      ? "bg-gray-700 text-blue-300"
-                      : "bg-blue-100 text-[#1e3a8a]"
-            }`}
-            aria-hidden="true"
-        >
-            <FiGrid size={17} />
-        </span>
-    );
-}
-
 const SectionsNavRail = memo(function SectionsNavRail({ secciones, onSelect, selectedId }) {
     const { isDarkMode } = useTheme();
     const [panelOpen, setPanelOpen] = useState(false);
@@ -99,13 +82,12 @@ const SectionsNavRail = memo(function SectionsNavRail({ secciones, onSelect, sel
     /* ---------- Desktop: rail flotante expansible ---------- */
 
     const railItem = (seccion) => {
-        const esTodas = seccion === null;
-        const activo = esTodas ? !hasSelection : isActive(seccion.id_seccion);
-        const nombre = esTodas ? "Todas" : seccion.nombre;
+        const activo = isActive(seccion.id_seccion);
+        const nombre = seccion.nombre;
 
         return (
             <button
-                key={esTodas ? "todas" : seccion.id_seccion}
+                key={seccion.id_seccion}
                 type="button"
                 onClick={() => onSelect?.(seccion)}
                 aria-pressed={activo}
@@ -128,15 +110,11 @@ const SectionsNavRail = memo(function SectionsNavRail({ secciones, onSelect, sel
                     />
                 )}
 
-                {esTodas ? (
-                    <GridAvatar activo={activo} isDarkMode={isDarkMode} />
-                ) : (
-                    <SectionAvatar
-                        seccion={seccion}
-                        activo={activo}
-                        isDarkMode={isDarkMode}
-                    />
-                )}
+                <SectionAvatar
+                    seccion={seccion}
+                    activo={activo}
+                    isDarkMode={isDarkMode}
+                />
 
                 <span
                     className={`flex-1 whitespace-nowrap text-sm opacity-0 -translate-x-1 transition-all duration-200 delay-75 group-hover:opacity-100 group-hover:translate-x-0 ${
@@ -156,13 +134,12 @@ const SectionsNavRail = memo(function SectionsNavRail({ secciones, onSelect, sel
     /* ---------- Móvil: fila del panel ---------- */
 
     const panelItem = (seccion) => {
-        const esTodas = seccion === null;
-        const activo = esTodas ? !hasSelection : isActive(seccion.id_seccion);
-        const nombre = esTodas ? "Todas" : seccion.nombre;
+        const activo = isActive(seccion.id_seccion);
+        const nombre = seccion.nombre;
 
         return (
             <button
-                key={esTodas ? "todas" : seccion.id_seccion}
+                key={seccion.id_seccion}
                 type="button"
                 onClick={() => handleSelect(seccion)}
                 aria-pressed={activo}
@@ -176,15 +153,11 @@ const SectionsNavRail = memo(function SectionsNavRail({ secciones, onSelect, sel
                           : "hover:bg-gray-900/5"
                 }`}
             >
-                {esTodas ? (
-                    <GridAvatar activo={activo} isDarkMode={isDarkMode} />
-                ) : (
-                    <SectionAvatar
-                        seccion={seccion}
-                        activo={activo}
-                        isDarkMode={isDarkMode}
-                    />
-                )}
+                <SectionAvatar
+                    seccion={seccion}
+                    activo={activo}
+                    isDarkMode={isDarkMode}
+                />
 
                 <span
                     className={`flex-1 text-sm ${
@@ -257,7 +230,6 @@ const SectionsNavRail = memo(function SectionsNavRail({ secciones, onSelect, sel
 
                         {/* Lista con scroll interno */}
                         <div className="max-h-[min(56vh,26rem)] overflow-y-auto scrollbar-hide flex flex-col gap-0.5 pb-1">
-                            {railItem(null)}
                             {secciones.map((seccion) => railItem(seccion))}
                         </div>
                     </div>
@@ -361,7 +333,6 @@ const SectionsNavRail = memo(function SectionsNavRail({ secciones, onSelect, sel
                             </div>
 
                             <div className="flex-1 overflow-y-auto scrollbar-hide p-3 flex flex-col gap-0.5">
-                                {panelItem(null)}
                                 {secciones.map((seccion) => panelItem(seccion))}
                             </div>
                         </motion.div>
