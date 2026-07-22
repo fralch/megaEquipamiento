@@ -1,6 +1,6 @@
 import React from "react";
 import useSecciones from "@/hooks/useSecciones";
-import SectionsPillBar from "@/Components/home/SectionsPillBar";
+import SectionsNavRail from "@/Components/home/SectionsNavRail";
 
 export default function SectionsFloatingMenu({ onSelectSeccion, selectedId }) {
     const { secciones, loading } = useSecciones();
@@ -8,7 +8,7 @@ export default function SectionsFloatingMenu({ onSelectSeccion, selectedId }) {
     if (loading || secciones.length === 0) return null;
 
     return (
-        <SectionsPillBar
+        <SectionsNavRail
             secciones={secciones}
             onSelect={onSelectSeccion}
             selectedId={selectedId}
