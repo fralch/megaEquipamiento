@@ -6,10 +6,7 @@ const GestionarSecciones = () => {
     const { isDarkMode } = useTheme();
 
     const [secciones, setSecciones] = useState([]);
-    const [productos, setProductos] = useState([]);
     const [categorias, setCategorias] = useState([]);
-    const [subcategorias, setSubcategorias] = useState([]);
-    const [marcas, setMarcas] = useState([]);
 
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({ type: "", text: "" });
@@ -31,11 +28,7 @@ const GestionarSecciones = () => {
         orden: 0,
     });
 
-    const [productoIds, setProductoIds] = useState([]);
     const [categoriaIds, setCategoriaIds] = useState([]);
-    const [subcategoriaIds, setSubcategoriaIds] = useState([]);
-    const [marcaIds, setMarcaIds] = useState([]);
-    const [productoSearch, setProductoSearch] = useState("");
     const [syncLoading, setSyncLoading] = useState(false);
 
     const showMessage = (type, text) => {
@@ -48,10 +41,7 @@ const GestionarSecciones = () => {
         try {
             const res = await axios.get("/admin/secciones");
             setSecciones(res.data.secciones || []);
-            setProductos(res.data.productos || []);
             setCategorias(res.data.categorias || []);
-            setSubcategorias(res.data.subcategorias || []);
-            setMarcas(res.data.marcas || []);
         } catch (error) {
             console.error("Error al cargar secciones:", error);
             showMessage("error", "Error al cargar las secciones");
@@ -63,6 +53,14 @@ const GestionarSecciones = () => {
     useEffect(() => {
         fetchAll();
     }, []);
+
+    const seccionNombreById = useMemo(() => {
+        const map = {};
+        secciones.forEach((s) => {
+            map[s.id_seccion] = s.nombre;
+        });
+        return map;
+    }, [secciones]);
 
     const filteredSecciones = useMemo(() => {
         let list = secciones;
@@ -100,11 +98,7 @@ const GestionarSecciones = () => {
             activo: true,
             orden: 0,
         });
-        setProductoIds([]);
         setCategoriaIds([]);
-        setSubcategoriaIds([]);
-        setMarcaIds([]);
-        setProductoSearch("");
         setActiveTab("general");
         setShowModal(true);
     };
@@ -118,11 +112,7 @@ const GestionarSecciones = () => {
             activo: !!seccion.activo,
             orden: seccion.orden ?? 0,
         });
-        setProductoIds(seccion.producto_ids || []);
         setCategoriaIds(seccion.categoria_ids || []);
-        setSubcategoriaIds(seccion.subcategoria_ids || []);
-        setMarcaIds(seccion.marca_ids || []);
-        setProductoSearch("");
         setActiveTab("general");
         setShowModal(true);
     };
@@ -167,7 +157,7 @@ const GestionarSecciones = () => {
     const handleDelete = async (seccion) => {
         if (
             !confirm(
-                `¿Eliminar la sección "${seccion.nombre}"? Esta acción no se puede deshacer.`
+                `¿Eliminar la sección "${seccion.nombre}"? Sus categorías quedarán sin sección.`
             )
         ) {
             return;
@@ -182,24 +172,6 @@ const GestionarSecciones = () => {
             showMessage("error", "Error al eliminar la sección");
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleSyncProductos = async () => {
-        if (!editingSeccion) return;
-        setSyncLoading(true);
-        try {
-            await axios.post(
-                `/admin/secciones/${editingSeccion.id_seccion}/productos`,
-                { producto_ids: productoIds }
-            );
-            showMessage("success", "Productos sincronizados");
-            await fetchAll();
-        } catch (error) {
-            console.error("Error:", error);
-            showMessage("error", "Error al sincronizar productos");
-        } finally {
-            setSyncLoading(false);
         }
     };
 
@@ -221,88 +193,11 @@ const GestionarSecciones = () => {
         }
     };
 
-    const handleSyncSubcategorias = async () => {
-        if (!editingSeccion) return;
-        setSyncLoading(true);
-        try {
-            await axios.post(
-                `/admin/secciones/${editingSeccion.id_seccion}/subcategorias`,
-                { subcategoria_ids: subcategoriaIds }
-            );
-            showMessage("success", "Subcategorías sincronizadas");
-            await fetchAll();
-        } catch (error) {
-            console.error("Error:", error);
-            showMessage("error", "Error al sincronizar subcategorías");
-        } finally {
-            setSyncLoading(false);
-        }
-    };
-
-    const handleSyncMarcas = async () => {
-        if (!editingSeccion) return;
-        setSyncLoading(true);
-        try {
-            await axios.post(
-                `/admin/secciones/${editingSeccion.id_seccion}/marcas`,
-                { marca_ids: marcaIds }
-            );
-            showMessage("success", "Marcas sincronizadas");
-            await fetchAll();
-        } catch (error) {
-            console.error("Error:", error);
-            showMessage("error", "Error al sincronizar marcas");
-        } finally {
-            setSyncLoading(false);
-        }
-    };
-
-    const toggleProducto = (id) => {
-        setProductoIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-        );
-    };
-
     const toggleCategoria = (id) => {
         setCategoriaIds((prev) =>
             prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
         );
     };
-
-    const toggleSubcategoria = (id) => {
-        setSubcategoriaIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-        );
-    };
-
-    const toggleMarca = (id) => {
-        setMarcaIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-        );
-    };
-
-    const filteredProductos = useMemo(() => {
-        if (!productoSearch.trim()) return productos;
-        const term = productoSearch.toLowerCase();
-        return productos.filter(
-            (p) =>
-                (p.nombre || "").toLowerCase().includes(term) ||
-                (p.sku || "").toLowerCase().includes(term)
-        );
-    }, [productos, productoSearch]);
-
-    const subcategoriasByCategoria = useMemo(() => {
-        const grouped = {};
-        categorias.forEach((c) => {
-            grouped[c.id_categoria] = {
-                categoria: c,
-                subcategorias: subcategorias.filter(
-                    (s) => s.id_categoria === c.id_categoria
-                ),
-            };
-        });
-        return grouped;
-    }, [categorias, subcategorias]);
 
     const inputClass = `w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
         isDarkMode
@@ -320,14 +215,7 @@ const GestionarSecciones = () => {
 
     const tabs = [
         { key: "general", label: "General" },
-        { key: "productos", label: "Productos", requiresEdit: true },
         { key: "categorias", label: "Categorías", requiresEdit: true },
-        {
-            key: "subcategorias",
-            label: "Subcategorías",
-            requiresEdit: true,
-        },
-        { key: "marcas", label: "Marcas", requiresEdit: true },
     ];
 
     return (
@@ -343,8 +231,8 @@ const GestionarSecciones = () => {
                                 isDarkMode ? "text-gray-400" : "text-gray-600"
                             }`}
                         >
-                            Agrupa productos transversalmente por categoría,
-                            subcategoría, marca o asignación manual.
+                            Las secciones agrupan categorías. Las subcategorías
+                            y productos se heredan automáticamente.
                         </p>
                     </div>
                     <button
@@ -428,7 +316,7 @@ const GestionarSecciones = () => {
                                         Orden
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                                        Asignaciones
+                                        Categorías
                                     </th>
                                     <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                                         Acciones
@@ -474,56 +362,16 @@ const GestionarSecciones = () => {
                                             {s.orden}
                                         </td>
                                         <td className="px-6 py-4 text-sm">
-                                            <div className="flex flex-wrap gap-1">
-                                                <span
-                                                    className={`px-2 py-0.5 rounded text-xs ${
-                                                        isDarkMode
-                                                            ? "bg-blue-900 text-blue-200"
-                                                            : "bg-blue-100 text-blue-800"
-                                                    }`}
-                                                >
-                                                    P:{" "}
-                                                    {(
-                                                        s.producto_ids || []
-                                                    ).length}
-                                                </span>
-                                                <span
-                                                    className={`px-2 py-0.5 rounded text-xs ${
-                                                        isDarkMode
-                                                            ? "bg-purple-900 text-purple-200"
-                                                            : "bg-purple-100 text-purple-800"
-                                                    }`}
-                                                >
-                                                    C:{" "}
-                                                    {(
-                                                        s.categoria_ids || []
-                                                    ).length}
-                                                </span>
-                                                <span
-                                                    className={`px-2 py-0.5 rounded text-xs ${
-                                                        isDarkMode
-                                                            ? "bg-yellow-900 text-yellow-200"
-                                                            : "bg-yellow-100 text-yellow-800"
-                                                    }`}
-                                                >
-                                                    S:{" "}
-                                                    {(
-                                                        s.subcategoria_ids ||
-                                                        []
-                                                    ).length}
-                                                </span>
-                                                <span
-                                                    className={`px-2 py-0.5 rounded text-xs ${
-                                                        isDarkMode
-                                                            ? "bg-pink-900 text-pink-200"
-                                                            : "bg-pink-100 text-pink-800"
-                                                    }`}
-                                                >
-                                                    M:{" "}
-                                                    {(s.marca_ids || [])
-                                                        .length}
-                                                </span>
-                                            </div>
+                                            <span
+                                                className={`px-2 py-0.5 rounded text-xs ${
+                                                    isDarkMode
+                                                        ? "bg-purple-900 text-purple-200"
+                                                        : "bg-purple-100 text-purple-800"
+                                                }`}
+                                            >
+                                                {(s.categoria_ids || []).length}{" "}
+                                                asignadas
+                                            </span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                                             <button
@@ -824,97 +672,6 @@ const GestionarSecciones = () => {
                                 </form>
                             )}
 
-                            {activeTab === "productos" && editingSeccion && (
-                                <div className="space-y-4">
-                                    <p
-                                        className={`text-sm ${
-                                            isDarkMode
-                                                ? "text-gray-400"
-                                                : "text-gray-600"
-                                        }`}
-                                    >
-                                        Selecciona los productos para asignación
-                                        manual. Las asignaciones por
-                                        categoría/subcategoría/marca se aplican
-                                        automáticamente.
-                                    </p>
-                                    <input
-                                        type="text"
-                                        placeholder="Buscar producto por nombre o SKU..."
-                                        value={productoSearch}
-                                        onChange={(e) =>
-                                            setProductoSearch(e.target.value)
-                                        }
-                                        className={inputClass}
-                                    />
-                                    <div
-                                        className={`max-h-96 overflow-y-auto border rounded-lg p-3 space-y-1 ${
-                                            isDarkMode
-                                                ? "border-gray-700 bg-gray-900"
-                                                : "border-gray-200 bg-gray-50"
-                                        }`}
-                                    >
-                                        {filteredProductos.length === 0 ? (
-                                            <p className="text-sm text-gray-500 text-center py-4">
-                                                Sin productos
-                                            </p>
-                                        ) : (
-                                            filteredProductos.map((p) => (
-                                                <label
-                                                    key={p.id_producto}
-                                                    className={`flex items-center gap-2 p-2 rounded cursor-pointer ${
-                                                        isDarkMode
-                                                            ? "hover:bg-gray-800"
-                                                            : "hover:bg-gray-100"
-                                                    }`}
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={productoIds.includes(
-                                                            p.id_producto
-                                                        )}
-                                                        onChange={() =>
-                                                            toggleProducto(
-                                                                p.id_producto
-                                                            )
-                                                        }
-                                                    />
-                                                    <span className="text-sm">
-                                                        {p.nombre}{" "}
-                                                        {p.sku && (
-                                                            <span
-                                                                className={
-                                                                    isDarkMode
-                                                                        ? "text-gray-500"
-                                                                        : "text-gray-400"
-                                                                }
-                                                            >
-                                                                ({p.sku})
-                                                            </span>
-                                                        )}
-                                                    </span>
-                                                </label>
-                                            ))
-                                        )}
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={handleSyncProductos}
-                                            disabled={syncLoading}
-                                            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                                                isDarkMode
-                                                    ? "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800"
-                                                    : "bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300"
-                                            } text-white disabled:cursor-not-allowed`}
-                                        >
-                                            {syncLoading
-                                                ? "Sincronizando..."
-                                                : `Guardar Productos (${productoIds.length})`}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
                             {activeTab === "categorias" && editingSeccion && (
                                 <div className="space-y-4">
                                     <p
@@ -924,8 +681,11 @@ const GestionarSecciones = () => {
                                                 : "text-gray-600"
                                         }`}
                                     >
-                                        Las categorías marcadas traerán todos
-                                        los productos de sus subcategorías.
+                                        Las categorías marcadas pasarán a
+                                        pertenecer a esta sección (una
+                                        categoría solo puede estar en una
+                                        sección). Sus subcategorías y productos
+                                        se heredan automáticamente.
                                     </p>
                                     <div
                                         className={`max-h-96 overflow-y-auto border rounded-lg p-3 space-y-1 ${
@@ -939,31 +699,56 @@ const GestionarSecciones = () => {
                                                 Sin categorías
                                             </p>
                                         ) : (
-                                            categorias.map((c) => (
-                                                <label
-                                                    key={c.id_categoria}
-                                                    className={`flex items-center gap-2 p-2 rounded cursor-pointer ${
-                                                        isDarkMode
-                                                            ? "hover:bg-gray-800"
-                                                            : "hover:bg-gray-100"
-                                                    }`}
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={categoriaIds.includes(
-                                                            c.id_categoria
-                                                        )}
-                                                        onChange={() =>
-                                                            toggleCategoria(
+                                            categorias.map((c) => {
+                                                const otraSeccion =
+                                                    c.id_seccion &&
+                                                    c.id_seccion !==
+                                                        editingSeccion.id_seccion
+                                                        ? seccionNombreById[
+                                                              c.id_seccion
+                                                          ]
+                                                        : null;
+                                                return (
+                                                    <label
+                                                        key={c.id_categoria}
+                                                        className={`flex items-center gap-2 p-2 rounded cursor-pointer ${
+                                                            isDarkMode
+                                                                ? "hover:bg-gray-800"
+                                                                : "hover:bg-gray-100"
+                                                        }`}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={categoriaIds.includes(
                                                                 c.id_categoria
-                                                            )
-                                                        }
-                                                    />
-                                                    <span className="text-sm">
-                                                        {c.nombre}
-                                                    </span>
-                                                </label>
-                                            ))
+                                                            )}
+                                                            onChange={() =>
+                                                                toggleCategoria(
+                                                                    c.id_categoria
+                                                                )
+                                                            }
+                                                        />
+                                                        <span className="text-sm">
+                                                            {c.nombre}
+                                                            {otraSeccion && (
+                                                                <span
+                                                                    className={`ml-1 text-xs ${
+                                                                        isDarkMode
+                                                                            ? "text-yellow-400"
+                                                                            : "text-yellow-600"
+                                                                    }`}
+                                                                >
+                                                                    (en:{" "}
+                                                                    {
+                                                                        otraSeccion
+                                                                    }
+                                                                    )
+                                                                </span>
+                                                            )}
+                                                        </span>
+                                                    </label>
+                                                );
+                                            })
                                         )}
                                     </div>
                                     <div className="flex gap-2">
@@ -979,187 +764,6 @@ const GestionarSecciones = () => {
                                             {syncLoading
                                                 ? "Sincronizando..."
                                                 : `Guardar Categorías (${categoriaIds.length})`}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            {activeTab === "subcategorias" &&
-                                editingSeccion && (
-                                    <div className="space-y-4">
-                                        <p
-                                            className={`text-sm ${
-                                                isDarkMode
-                                                    ? "text-gray-400"
-                                                    : "text-gray-600"
-                                            }`}
-                                        >
-                                            Marca las subcategorías específicas
-                                            que incluirá la sección.
-                                        </p>
-                                        <div
-                                            className={`max-h-96 overflow-y-auto border rounded-lg p-3 space-y-3 ${
-                                                isDarkMode
-                                                    ? "border-gray-700 bg-gray-900"
-                                                    : "border-gray-200 bg-gray-50"
-                                            }`}
-                                        >
-                                            {Object.keys(
-                                                subcategoriasByCategoria
-                                            ).length === 0 ? (
-                                                <p className="text-sm text-gray-500 text-center py-4">
-                                                    Sin subcategorías
-                                                </p>
-                                            ) : (
-                                                Object.values(
-                                                    subcategoriasByCategoria
-                                                ).map(
-                                                    ({
-                                                        categoria,
-                                                        subcategorias: subs,
-                                                    }) => (
-                                                        <div key={categoria.id_categoria}>
-                                                            <h4
-                                                                className={`text-sm font-semibold mb-1 ${
-                                                                    isDarkMode
-                                                                        ? "text-gray-300"
-                                                                        : "text-gray-700"
-                                                                }`}
-                                                            >
-                                                                {
-                                                                    categoria.nombre
-                                                                }
-                                                            </h4>
-                                                            {subs.length ===
-                                                            0 ? (
-                                                                <p className="text-xs text-gray-500 pl-4">
-                                                                    Sin
-                                                                    subcategorías
-                                                                </p>
-                                                            ) : (
-                                                                <div className="space-y-1 pl-2">
-                                                                    {subs.map(
-                                                                        (s) => (
-                                                                            <label
-                                                                                key={
-                                                                                    s.id_subcategoria
-                                                                                }
-                                                                                className={`flex items-center gap-2 p-1 rounded cursor-pointer ${
-                                                                                    isDarkMode
-                                                                                        ? "hover:bg-gray-800"
-                                                                                        : "hover:bg-gray-100"
-                                                                                }`}
-                                                                            >
-                                                                                <input
-                                                                                    type="checkbox"
-                                                                                    checked={subcategoriaIds.includes(
-                                                                                        s.id_subcategoria
-                                                                                    )}
-                                                                                    onChange={() =>
-                                                                                        toggleSubcategoria(
-                                                                                            s.id_subcategoria
-                                                                                        )
-                                                                                    }
-                                                                                />
-                                                                                <span className="text-sm">
-                                                                                    {
-                                                                                        s.nombre
-                                                                                    }
-                                                                                </span>
-                                                                            </label>
-                                                                        )
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    )
-                                                )
-                                            )}
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={
-                                                    handleSyncSubcategorias
-                                                }
-                                                disabled={syncLoading}
-                                                className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                                                    isDarkMode
-                                                        ? "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800"
-                                                        : "bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300"
-                                                } text-white disabled:cursor-not-allowed`}
-                                            >
-                                                {syncLoading
-                                                    ? "Sincronizando..."
-                                                    : `Guardar Subcategorías (${subcategoriaIds.length})`}
-                                            </button>
-                                        </div>
-                                    </div>
-                                )}
-
-                            {activeTab === "marcas" && editingSeccion && (
-                                <div className="space-y-4">
-                                    <p
-                                        className={`text-sm ${
-                                            isDarkMode
-                                                ? "text-gray-400"
-                                                : "text-gray-600"
-                                        }`}
-                                    >
-                                        Marca las marcas cuyos productos se
-                                        incluirán automáticamente.
-                                    </p>
-                                    <div
-                                        className={`max-h-96 overflow-y-auto border rounded-lg p-3 space-y-1 ${
-                                            isDarkMode
-                                                ? "border-gray-700 bg-gray-900"
-                                                : "border-gray-200 bg-gray-50"
-                                        }`}
-                                    >
-                                        {marcas.length === 0 ? (
-                                            <p className="text-sm text-gray-500 text-center py-4">
-                                                Sin marcas
-                                            </p>
-                                        ) : (
-                                            marcas.map((m) => (
-                                                <label
-                                                    key={m.id_marca}
-                                                    className={`flex items-center gap-2 p-2 rounded cursor-pointer ${
-                                                        isDarkMode
-                                                            ? "hover:bg-gray-800"
-                                                            : "hover:bg-gray-100"
-                                                    }`}
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={marcaIds.includes(
-                                                            m.id_marca
-                                                        )}
-                                                        onChange={() =>
-                                                            toggleMarca(
-                                                                m.id_marca
-                                                            )
-                                                        }
-                                                    />
-                                                    <span className="text-sm">
-                                                        {m.nombre}
-                                                    </span>
-                                                </label>
-                                            ))
-                                        )}
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={handleSyncMarcas}
-                                            disabled={syncLoading}
-                                            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                                                isDarkMode
-                                                    ? "bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800"
-                                                    : "bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300"
-                                            } text-white disabled:cursor-not-allowed`}
-                                        >
-                                            {syncLoading
-                                                ? "Sincronizando..."
-                                                : `Guardar Marcas (${marcaIds.length})`}
                                         </button>
                                     </div>
                                 </div>

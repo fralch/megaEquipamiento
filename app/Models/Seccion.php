@@ -29,48 +29,22 @@ class Seccion extends Model
         'orden' => 'integer',
     ];
 
-    public function productos()
-    {
-        return $this->belongsToMany(Producto::class, 'seccion_producto', 'seccion_id', 'producto_id');
-    }
-
+    /**
+     * Categorías que pertenecen a esta sección (jerarquía: Sección → Categorías → Subcategorías → Productos).
+     */
     public function categorias()
     {
-        return $this->belongsToMany(Categoria::class, 'seccion_categoria', 'seccion_id', 'categoria_id');
-    }
-
-    public function subcategorias()
-    {
-        return $this->belongsToMany(Subcategoria::class, 'seccion_subcategoria', 'seccion_id', 'subcategoria_id');
-    }
-
-    public function marcas()
-    {
-        return $this->belongsToMany(Marca::class, 'seccion_marca', 'seccion_id', 'marca_id');
+        return $this->hasMany(Categoria::class, 'id_seccion');
     }
 
     /**
-     * Obtiene TODOS los productos de la sección (manuales + automáticos por categoría/subcategoría/marca).
+     * Obtiene TODOS los productos de la sección (heredados de sus categorías vía subcategorías).
      */
     public function getAllProductos()
     {
-        $manualIds = $this->productos()->pluck('productos.id_producto');
-
-        $categoriaIds = $this->categorias()->pluck('categorias.id_categoria');
-        $subcategoriaIdsFromCats = Subcategoria::whereIn('id_categoria', $categoriaIds)->pluck('id_subcategoria');
-
-        $subcategoriaIds = $this->subcategorias()->pluck('subcategorias.id_subcategoria');
-        $allSubcategoriaIds = $subcategoriaIdsFromCats->merge($subcategoriaIds)->unique();
-
-        $marcaIds = $this->marcas()->pluck('marcas.id_marca');
-
-        $productoIds = Producto::whereIn('id_subcategoria', $allSubcategoriaIds)
-            ->orWhereIn('marca_id', $marcaIds)
-            ->pluck('id_producto')
-            ->merge($manualIds)
-            ->unique();
-
-        return Producto::whereIn('id_producto', $productoIds);
+        return Producto::whereHas('subcategoria.categoria', function ($q) {
+            $q->where('id_seccion', $this->id_seccion);
+        });
     }
 
     public function scopeActivo($query)

@@ -368,10 +368,7 @@ Route::middleware(['auth', 'role.admin'])->prefix('admin/secciones')->group(func
     Route::post('/', [SeccionController::class, 'store'])->name('admin.secciones.store');
     Route::match(['put', 'post'], '/{id}', [SeccionController::class, 'update'])->name('admin.secciones.update');
     Route::delete('/{id}', [SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
-    Route::post('/{id}/productos', [SeccionController::class, 'syncProductos'])->name('admin.secciones.sync-productos');
     Route::post('/{id}/categorias', [SeccionController::class, 'syncCategorias'])->name('admin.secciones.sync-categorias');
-    Route::post('/{id}/subcategorias', [SeccionController::class, 'syncSubcategorias'])->name('admin.secciones.sync-subcategorias');
-    Route::post('/{id}/marcas', [SeccionController::class, 'syncMarcas'])->name('admin.secciones.sync-marcas');
 });
 
 // API routes for CRM products (used by frontend components)

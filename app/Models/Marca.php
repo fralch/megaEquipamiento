@@ -56,12 +56,6 @@ class Marca extends Model
         return $this->hasMany(Producto::class, 'marca_id', 'id_marca');
     }
 
-    // Relación many-to-many con secciones
-    public function secciones()
-    {
-        return $this->belongsToMany(Seccion::class, 'seccion_marca', 'marca_id', 'seccion_id');
-    }
-
     // Accesor para obtener la URL completa de la imagen sin afectar el valor bruto
     public function getImagenUrlAttribute()
     {

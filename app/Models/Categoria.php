@@ -24,6 +24,7 @@ class Categoria extends Model
         'descripcion',
         'img',
         'video',
+        'id_seccion',
     ];
 
     // Definir los campos que deben ser ocultados en arrays
@@ -63,9 +64,9 @@ class Categoria extends Model
         return $this->belongsToMany(Marca::class, 'marca_categoria', 'categoria_id', 'marca_id');
     }
 
-    // Relación many-to-many con secciones
-    public function secciones()
+    // Relación many-to-one con secciones (una categoría pertenece a una sola sección)
+    public function seccion()
     {
-        return $this->belongsToMany(Seccion::class, 'seccion_categoria', 'categoria_id', 'seccion_id');
+        return $this->belongsTo(Seccion::class, 'id_seccion');
     }
 }

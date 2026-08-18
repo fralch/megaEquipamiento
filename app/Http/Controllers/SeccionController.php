@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
-use App\Models\Marca;
-use App\Models\Producto;
 use App\Models\Seccion;
-use App\Models\Subcategoria;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -63,11 +60,11 @@ class SeccionController extends Controller
     }
 
     /**
-     * Admin: devuelve JSON con todas las secciones y los catálogos para los selectores del formulario.
+     * Admin: devuelve JSON con todas las secciones y el catálogo de categorías para el formulario.
      */
     public function index(Request $request)
     {
-        $secciones = Seccion::with(['productos:id_producto', 'categorias:id_categoria', 'subcategorias:id_subcategoria', 'marcas:id_marca'])
+        $secciones = Seccion::with(['categorias:id_categoria,id_seccion'])
             ->ordenado()
             ->get()
             ->map(function ($seccion) {
@@ -79,29 +76,15 @@ class SeccionController extends Controller
                     'imagen' => $seccion->imagen,
                     'activo' => $seccion->activo,
                     'orden' => $seccion->orden,
-                    'producto_ids' => $seccion->productos->pluck('id_producto')->values(),
                     'categoria_ids' => $seccion->categorias->pluck('id_categoria')->values(),
-                    'subcategoria_ids' => $seccion->subcategorias->pluck('id_subcategoria')->values(),
-                    'marca_ids' => $seccion->marcas->pluck('id_marca')->values(),
                 ];
             });
 
-        $productos = Producto::orderBy('nombre')->get(['id_producto', 'nombre', 'sku']);
-
-        $categorias = Categoria::orderBy('nombre')->get(['id_categoria', 'nombre']);
-
-        $subcategorias = Subcategoria::with('categoria:id_categoria,nombre')
-            ->orderBy('nombre')
-            ->get(['id_subcategoria', 'nombre', 'id_categoria']);
-
-        $marcas = Marca::orderBy('nombre')->get(['id_marca', 'nombre']);
+        $categorias = Categoria::orderBy('nombre')->get(['id_categoria', 'nombre', 'id_seccion']);
 
         return response()->json([
             'secciones' => $secciones,
-            'productos' => $productos,
             'categorias' => $categorias,
-            'subcategorias' => $subcategorias,
-            'marcas' => $marcas,
         ]);
     }
 
@@ -191,23 +174,7 @@ class SeccionController extends Controller
     }
 
     /**
-     * Admin: sincronizar productos manuales.
-     */
-    public function syncProductos(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'producto_ids' => 'array',
-            'producto_ids.*' => 'exists:productos,id_producto',
-        ]);
-
-        $seccion = Seccion::findOrFail($id);
-        $seccion->productos()->sync($validated['producto_ids'] ?? []);
-
-        return response()->json(['message' => 'Productos sincronizados exitosamente']);
-    }
-
-    /**
-     * Admin: sincronizar categorías.
+     * Admin: sincronizar categorías (semántica exclusiva: una categoría pertenece a una sola sección).
      */
     public function syncCategorias(Request $request, $id)
     {
@@ -217,40 +184,17 @@ class SeccionController extends Controller
         ]);
 
         $seccion = Seccion::findOrFail($id);
-        $seccion->categorias()->sync($validated['categoria_ids'] ?? []);
+        $ids = $validated['categoria_ids'] ?? [];
+
+        // Desasignar las que tenían esta sección y ya no están en la lista
+        Categoria::where('id_seccion', $seccion->id_seccion)
+            ->whereNotIn('id_categoria', $ids)
+            ->update(['id_seccion' => null]);
+
+        // Asignar (o mover desde otra sección) las de la lista
+        Categoria::whereIn('id_categoria', $ids)
+            ->update(['id_seccion' => $seccion->id_seccion]);
 
         return response()->json(['message' => 'Categorías sincronizadas exitosamente']);
-    }
-
-    /**
-     * Admin: sincronizar subcategorías.
-     */
-    public function syncSubcategorias(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'subcategoria_ids' => 'array',
-            'subcategoria_ids.*' => 'exists:subcategorias,id_subcategoria',
-        ]);
-
-        $seccion = Seccion::findOrFail($id);
-        $seccion->subcategorias()->sync($validated['subcategoria_ids'] ?? []);
-
-        return response()->json(['message' => 'Subcategorías sincronizadas exitosamente']);
-    }
-
-    /**
-     * Admin: sincronizar marcas.
-     */
-    public function syncMarcas(Request $request, $id)
-    {
-        $validated = $request->validate([
-            'marca_ids' => 'array',
-            'marca_ids.*' => 'exists:marcas,id_marca',
-        ]);
-
-        $seccion = Seccion::findOrFail($id);
-        $seccion->marcas()->sync($validated['marca_ids'] ?? []);
-
-        return response()->json(['message' => 'Marcas sincronizadas exitosamente']);
     }
 }
