@@ -22,11 +22,18 @@ class SeccionController extends Controller
             ->orderBy('nombre')
             ->get();
 
+        // Solo las categorías de esta sección (con sus subcategorías) para el sidebar
+        $categorias = $seccion->categorias()
+            ->with(['subcategorias' => fn ($q) => $q->orderBy('nombre')])
+            ->orderBy('nombre')
+            ->get(['id_categoria', 'nombre', 'id_seccion']);
+
         $seoSlug = $seccion->slug.'-'.$seccion->id_seccion;
 
         return Inertia::render('Seccion', [
             'seccion' => $seccion,
             'productos' => $productos,
+            'categorias' => $categorias,
             'seoSlug' => $seoSlug,
         ]);
     }

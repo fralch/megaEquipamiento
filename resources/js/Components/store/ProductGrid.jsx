@@ -94,7 +94,7 @@ const OptimizedImage = React.memo(({ src, alt, className, style, fallbackSrc = F
 
 OptimizedImage.displayName = 'OptimizedImage';
 
-const ProductGrid = ({ products: initialProducts }) => {
+const ProductGrid = ({ products: initialProducts, fullWidth = false }) => {
   const { isDarkMode } = useTheme();
   const { formatPrice } = useCurrency();
   const [products, setProducts] = useState([]);
@@ -421,9 +421,9 @@ const ProductGrid = ({ products: initialProducts }) => {
   if (ErrorComponent) return ErrorComponent;
 
   return (
-    <div className={`container mx-auto px-4 py-8 transition-colors duration-300 ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
-      {/* Grid modificado para mostrar 3 columnas en laptop 15" */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 2xl:grid-cols-4 gap-6 mb-8">
+    <div className={`${fullWidth ? 'w-full py-4' : 'container mx-auto px-4 py-8'} transition-colors duration-300 ${isDarkMode ? (fullWidth ? 'bg-transparent' : 'bg-gray-900') : (fullWidth ? 'bg-transparent' : 'bg-white')}`}>
+      {/* Grid responsivo optimizado para ancho completo y pantallas grandes */}
+      <div className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 ${fullWidth ? 'xl:grid-cols-4 2xl:grid-cols-4' : '2xl:grid-cols-4'} gap-6 mb-8`}>
         {currentProducts.map((product) => (
           <Card
             key={`product-${product.id}-${product.sku || 'no-sku'}`}
@@ -679,17 +679,21 @@ const Card = React.memo(({ product }) => {
       </div>
 
       {/* Información del producto (40% restante) */}
-      <div className="p-4 flex-grow overflow-y-auto min-h-60">
-        <h2 className={`text-lg font-semibold mb-2 transition-colors duration-300 ${
-          isDarkMode ? 'text-gray-100' : 'text-gray-800'
-        }`}>{product.title}</h2>
-        {summaryEntries.map(([key, value], index) => (
-          <p key={`${key}-${index}`} className={`text-sm transition-colors duration-300 ${
-            isDarkMode ? 'text-gray-300' : 'text-gray-600'
-          }`}>
-            <strong>{key}:</strong> {value}
-          </p>
-        ))}
+      <div className="p-4 flex-grow flex flex-col justify-between overflow-hidden">
+        <div>
+          <h2 className={`text-base font-semibold mb-2 line-clamp-2 transition-colors duration-300 ${
+            isDarkMode ? 'text-gray-100' : 'text-gray-800'
+          }`}>{product.title}</h2>
+          <div className="space-y-0.5 max-h-24 overflow-hidden">
+            {summaryEntries.slice(0, 3).map(([key, value], index) => (
+              <p key={`${key}-${index}`} className={`text-xs truncate transition-colors duration-300 ${
+                isDarkMode ? 'text-gray-300' : 'text-gray-600'
+              }`}>
+                <strong>{key}:</strong> {value}
+              </p>
+            ))}
+          </div>
+        </div>
         <div className="flex justify-between items-center mt-2">
             {product.nombre_marca?.toLowerCase() !== 'aralab' && (
               <span className={`text-xl font-bold transition-colors duration-300 ${

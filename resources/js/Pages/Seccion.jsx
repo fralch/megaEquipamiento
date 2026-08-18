@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from "@inertiajs/react";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     ChevronDown,
@@ -18,16 +18,15 @@ import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
 
-const URL_API = import.meta.env.VITE_API_URL;
-
-export default function Seccion({ seccion, productos, seoSlug }) {
+export default function Seccion({ seccion, productos, categorias = [], seoSlug }) {
     const { isDarkMode } = useTheme();
     const { auth } = usePage().props;
     const [isOpen, setIsOpen] = useState(false);
-    const [categoriasArray, setCategoriasArray] = useState([]);
+    // Solo las categorías de esta sección (vienen del servidor)
+    const [categoriasArray] = useState(categorias);
     const [openCategories, setOpenCategories] = useState({});
     const [activeCategory, setActiveCategory] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading] = useState(false);
     const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -37,34 +36,6 @@ export default function Seccion({ seccion, productos, seoSlug }) {
         setOpenCategories((prev) => ({ ...prev, [id]: !prev[id] }));
         setActiveCategory(id);
     };
-
-    useEffect(() => {
-        setIsLoading(true);
-        const cargarCategorias = async () => {
-            try {
-                const storedData = localStorage.getItem("categoriasCompleta");
-                if (storedData) {
-                    setCategoriasArray(JSON.parse(storedData));
-                } else {
-                    const res = await fetch(`${URL_API}/categorias-con-subcategorias`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        setCategoriasArray(data);
-                        localStorage.setItem(
-                            "categoriasCompleta",
-                            JSON.stringify(data)
-                        );
-                    } else {
-                        setCategoriasArray([]);
-                    }
-                }
-            } catch (e) {
-                console.error("Error al cargar categorías:", e);
-                setCategoriasArray([]);
-            }
-        };
-        cargarCategorias().finally(() => setIsLoading(false));
-    }, []);
 
     const categoriasFiltradas = useMemo(() => {
         if (!searchTerm.trim()) return categoriasArray;
@@ -139,7 +110,7 @@ export default function Seccion({ seccion, productos, seoSlug }) {
                             }`}
                         />
 
-                        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-10 lg:pt-12 lg:pb-14">
+                        <div className="relative w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-8 pb-10 lg:pt-10 lg:pb-12">
                             {/* Breadcrumb */}
                             <motion.nav
                                 initial={{ opacity: 0, y: -10 }}
@@ -237,7 +208,7 @@ export default function Seccion({ seccion, productos, seoSlug }) {
 
                                         {seccion.descripcion && (
                                             <p
-                                                className={`text-base lg:text-lg max-w-2xl leading-relaxed ${
+                                                className={`text-base lg:text-lg max-w-3xl leading-relaxed ${
                                                     isDarkMode
                                                         ? "text-gray-300"
                                                         : "text-gray-600"
@@ -297,19 +268,10 @@ export default function Seccion({ seccion, productos, seoSlug }) {
                 )}
 
                 {/* MAIN CONTENT + SIDEBAR */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-                    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-                        {/* CONTENIDO PRINCIPAL */}
-                        <main className="flex-1 min-w-0 order-2 lg:order-1">
-                            {productos && productos.length > 0 ? (
-                                <ProductGrid products={productos} />
-                            ) : (
-                                <EmptyState isDarkMode={isDarkMode} />
-                            )}
-                        </main>
-
-                        {/* SIDEBAR DE CATEGORÍAS */}
-                        <aside className="order-1 lg:order-2 lg:w-80 xl:w-96 lg:flex-shrink-0">
+                <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8 lg:py-10">
+                    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+                        {/* SIDEBAR DE CATEGORÍAS (IZQUIERDA) */}
+                        <aside className="order-1 lg:w-72 xl:w-80 2xl:w-84 flex-shrink-0 w-full">
                             {/* Sidebar móvil */}
                             <AnimatePresence>
                                 {isMobileSidebarOpen && (
@@ -325,20 +287,20 @@ export default function Seccion({ seccion, productos, seoSlug }) {
                                         />
                                         <motion.div
                                             initial={{
-                                                x: "100%",
+                                                x: "-100%",
                                                 opacity: 0,
                                             }}
                                             animate={{
                                                 x: 0,
                                                 opacity: 1,
                                             }}
-                                            exit={{ x: "100%", opacity: 0 }}
+                                            exit={{ x: "-100%", opacity: 0 }}
                                             transition={{
                                                 type: "spring",
                                                 damping: 25,
                                                 stiffness: 200,
                                             }}
-                                            className={`fixed top-0 right-0 h-full w-80 max-w-[85vw] z-50 lg:hidden shadow-2xl ${
+                                            className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] z-50 lg:hidden shadow-2xl ${
                                                 isDarkMode
                                                     ? "bg-gray-900"
                                                     : "bg-white"
@@ -373,7 +335,7 @@ export default function Seccion({ seccion, productos, seoSlug }) {
                             </AnimatePresence>
 
                             {/* Sidebar desktop */}
-                            <div className="hidden lg:block lg:sticky lg:top-6">
+                            <div className="hidden lg:block lg:sticky lg:top-24">
                                 <SidebarContent
                                     isDarkMode={isDarkMode}
                                     isLoading={isLoading}
@@ -386,6 +348,15 @@ export default function Seccion({ seccion, productos, seoSlug }) {
                                 />
                             </div>
                         </aside>
+
+                        {/* CONTENIDO PRINCIPAL (DERECHA) */}
+                        <main className="flex-1 min-w-0 order-2 w-full">
+                            {productos && productos.length > 0 ? (
+                                <ProductGrid products={productos} fullWidth={true} />
+                            ) : (
+                                <EmptyState isDarkMode={isDarkMode} />
+                            )}
+                        </main>
                     </div>
                 </div>
 
