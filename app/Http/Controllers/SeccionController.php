@@ -67,6 +67,21 @@ class SeccionController extends Controller
     }
 
     /**
+     * API: categorías de una sección con sus subcategorías e imágenes (público).
+     */
+    public function categoriasApi($id)
+    {
+        $seccion = Seccion::activo()->findOrFail($id);
+
+        $categorias = $seccion->categorias()
+            ->with('subcategorias:id_subcategoria,nombre,id_categoria')
+            ->orderBy('nombre')
+            ->get(['id_categoria', 'nombre', 'img']);
+
+        return response()->json($categorias);
+    }
+
+    /**
      * Admin: devuelve JSON con todas las secciones y el catálogo de categorías para el formulario.
      */
     public function index(Request $request)

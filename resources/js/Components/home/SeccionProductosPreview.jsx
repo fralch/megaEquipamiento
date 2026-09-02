@@ -2,20 +2,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "@inertiajs/react";
 import axios from "axios";
 import { useTheme } from "@/storage/ThemeContext";
-import ProductGrid from "@/Components/store/ProductGrid";
+import { CategoryCard } from "@/Components/home/Categorias_cuadrado";
 
 const URL_API = import.meta.env.VITE_API_URL || "";
-const LIMIT = 16;
 const cacheRef = {};
-
-function shuffleArray(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-}
 
 const ArrowIcon = () => (
     <svg
@@ -58,7 +48,7 @@ function SectionHeader({ seccion, isDarkMode }) {
                             : "text-[#1e3a8a] hover:text-blue-700"
                     }`}
                 >
-                    Ver todos los productos
+                    Ver sección
                     <ArrowIcon />
                 </Link>
             </div>
@@ -94,7 +84,7 @@ function ErrorState({ isDarkMode, onRetry }) {
                 isDarkMode ? "bg-gray-900 text-gray-300" : "bg-gray-50 text-gray-700"
             }`}
         >
-            <p className="text-sm">Error al cargar los productos.</p>
+            <p className="text-sm">Error al cargar las categorías.</p>
             <button
                 type="button"
                 onClick={onRetry}
@@ -113,7 +103,7 @@ function EmptyState({ isDarkMode }) {
                 isDarkMode ? "bg-gray-900 text-gray-400" : "bg-gray-50 text-gray-500"
             }`}
         >
-            <p className="text-sm">No hay productos disponibles en esta sección.</p>
+            <p className="text-sm">No hay categorías disponibles en esta sección.</p>
         </div>
     );
 }
@@ -121,9 +111,7 @@ function EmptyState({ isDarkMode }) {
 function SectionContent({ seccion }) {
     const { isDarkMode } = useTheme();
     const cached = cacheRef[seccion.id_seccion];
-    const [productos, setProductos] = useState(
-        cached ? shuffleArray(cached).slice(0, LIMIT) : null
-    );
+    const [categorias, setCategorias] = useState(cached || null);
     const [loading, setLoading] = useState(!cached);
     const [error, setError] = useState(null);
 
@@ -131,12 +119,12 @@ function SectionContent({ seccion }) {
         delete cacheRef[seccion.id_seccion];
         setError(null);
         setLoading(true);
-        setProductos(null);
+        setCategorias(null);
     }, [seccion.id_seccion]);
 
     useEffect(() => {
         if (cacheRef[seccion.id_seccion]) {
-            setProductos(shuffleArray(cacheRef[seccion.id_seccion]).slice(0, LIMIT));
+            setCategorias(cacheRef[seccion.id_seccion]);
             setLoading(false);
             return;
         }
@@ -150,16 +138,16 @@ function SectionContent({ seccion }) {
 
             try {
                 const response = await axios.get(
-                    `${URL_API}/api/secciones/${seccion.id_seccion}/productos`,
+                    `${URL_API}/api/secciones/${seccion.id_seccion}/categorias`,
                     { signal: controller.signal }
                 );
                 if (cancelled) return;
-                const raw = response.data.productos || [];
+                const raw = response.data || [];
                 cacheRef[seccion.id_seccion] = raw;
-                setProductos(shuffleArray(raw).slice(0, LIMIT));
+                setCategorias(raw);
             } catch (err) {
                 if (err.name !== "CanceledError" && err.code !== "ERR_CANCELED") {
-                    console.error("Error fetching section products:", err);
+                    console.error("Error fetching section categories:", err);
                     if (!cancelled) setError(err);
                 }
             } finally {
@@ -181,7 +169,7 @@ function SectionContent({ seccion }) {
         <div className="w-full">
             <SectionHeader seccion={seccion} isDarkMode={isDarkMode} />
 
-            {loading && !error && !productos && (
+            {loading && !error && !categorias && (
                 <LoadingState isDarkMode={isDarkMode} />
             )}
 
@@ -189,13 +177,25 @@ function SectionContent({ seccion }) {
                 <ErrorState isDarkMode={isDarkMode} onRetry={doRetry} />
             )}
 
-            {!loading && !error && productos && productos.length === 0 && (
+            {!loading && !error && categorias && categorias.length === 0 && (
                 <EmptyState isDarkMode={isDarkMode} />
             )}
 
-            {!loading && !error && productos && productos.length > 0 && (
+            {!loading && !error && categorias && categorias.length > 0 && (
                 <div className={isDarkMode ? "bg-gray-900" : "bg-gray-50"}>
-                    <ProductGrid products={productos} />
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                            {categorias.map((categoria) => (
+                                <CategoryCard
+                                    key={`category-${categoria.id_categoria}`}
+                                    title={categoria.nombre}
+                                    items={categoria.subcategorias || []}
+                                    categoryId={categoria.id_categoria}
+                                    categoryImages={categoria.img}
+                                />
+                            ))}
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

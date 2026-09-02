@@ -18,7 +18,7 @@ const SubcategoryLink = React.memo(({ item, isDarkMode }) => (
 
 SubcategoryLink.displayName = 'SubcategoryLink';
 
-const CategoryCard = React.memo(({ title, items, categoryId, categoryImages }) => {
+export const CategoryCard = React.memo(({ title, items, categoryId, categoryImages }) => {
   const { isDarkMode } = useTheme();
   const [imagePaths, setImagePaths] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);

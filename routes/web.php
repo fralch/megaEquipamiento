@@ -361,6 +361,7 @@ Route::get('/api/tag-parents', [TagParentController::class, 'getPublicTagParents
 // Rutas públicas para secciones
 Route::get('/api/secciones', [SeccionController::class, 'indexApi'])->name('api.secciones');
 Route::get('/api/secciones/{id}/productos', [SeccionController::class, 'productosApi'])->name('api.secciones.productos');
+Route::get('/api/secciones/{id}/categorias', [SeccionController::class, 'categoriasApi'])->name('api.secciones.categorias');
 
 // Admin de Secciones - protegido
 Route::middleware(['auth', 'role.admin'])->prefix('admin/secciones')->group(function () {
