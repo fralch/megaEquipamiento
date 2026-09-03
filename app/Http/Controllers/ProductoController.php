@@ -95,18 +95,53 @@ class ProductoController extends Controller
     }
 
     /* Vista de productos por marca view */
-    public function ProductViewByMarca(Request $request, $marca_id)
+    public function ProductViewByMarca(Request $request, $marcaSlug)
     {
-        // Obtener la información de la marca
-        $marca = Marca::find($marca_id);
+        // Extraer ID del final del slug (ej: "sartorius-peru-65" → 65, "65" → 65)
+        $marcaId = $this->extractMarcaIdFromSlug($marcaSlug);
+
+        if (! $marcaId) {
+            abort(404);
+        }
+
+        $marca = Marca::find($marcaId);
+
+        if (! $marca) {
+            abort(404);
+        }
+
+        // Redirección 301 si el slug no coincide con el canónico
+        $canonicalSlug = $marca->getSeoSlug();
+        if ($marcaSlug !== $canonicalSlug) {
+            return redirect($marca->getSeoUrl(), 301);
+        }
 
         // Obtener todos los productos de la marca especificada
         $productos = Producto::with('marca')
-            ->where('marca_id', $marca_id)
+            ->where('marca_id', $marcaId)
             ->get();
 
+        $seoSlug = $canonicalSlug;
+
         // Renderizar la vista con Inertia y pasar tanto la marca como los productos
-        return Inertia::render('Marcas', compact('marca', 'productos'));
+        return Inertia::render('Marcas', compact('marca', 'productos', 'seoSlug'));
+    }
+
+    /**
+     * Extrae el ID numérico del slug de marca.
+     * Soporta: "sartorius-peru-65" → 65, "65" → 65
+     */
+    private function extractMarcaIdFromSlug(string $slug): ?int
+    {
+        if (ctype_digit($slug)) {
+            return (int) $slug;
+        }
+
+        if (preg_match('/-(\d+)$/', $slug, $matches)) {
+            return (int) $matches[1];
+        }
+
+        return null;
     }
 
     /**

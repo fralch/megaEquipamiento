@@ -7,6 +7,8 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import axios from "axios";
 
+const URL_API = import.meta.env.VITE_API_URL || '';
+
 const Carrusel = () => {
     const [tagParents, setTagParents] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -14,7 +16,7 @@ const Carrusel = () => {
     useEffect(() => {
         const loadTagParents = async () => {
             try {
-                const response = await axios.get('/api/tag-parents');
+                const response = await axios.get(`${URL_API}/api/tag-parents`);
                 setTagParents(response.data);
             } catch (error) {
                 console.error('Error loading tag parents:', error);

@@ -182,7 +182,7 @@ class Producto extends Model implements HasMedia
 
     public function agregarImagenDesdeBanco($mediaId, $coleccion = 'imagenes')
     {
-        $media = \App\Models\Media::find($mediaId);
+        $media = Media::find($mediaId);
         if ($media) {
             $this->addMediaFromUrl($media->getUrl())->toMediaCollection($coleccion);
         }

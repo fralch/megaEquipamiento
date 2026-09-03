@@ -321,7 +321,7 @@ export default function FiltroList({ filtros, auth, onEditar, onEliminar, filtro
             )}
             
             {/* Estilos CSS simplificados para los sliders y scrollbars */}
-            <style jsx global>{`
+            <style>{`
                 .range-slider-simple {
                     -webkit-appearance: none;
                     appearance: none;

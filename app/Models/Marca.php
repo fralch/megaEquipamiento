@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Marca extends Model
 {
@@ -78,5 +79,27 @@ class Marca extends Model
 
         // Para rutas en 'img/marcas/...'
         return asset($path);
+    }
+
+    /**
+     * Genera el slug SEO de la marca (ej: "sartorius-peru-65").
+     */
+    public function getSeoSlug(): string
+    {
+        $slug = Str::slug($this->nombre);
+        // Fallback si el nombre genera un slug vacío (caracteres no latinos, etc.)
+        if (empty($slug)) {
+            $slug = 'marca';
+        }
+
+        return $slug.'-'.$this->id_marca;
+    }
+
+    /**
+     * URL pública SEO de la marca.
+     */
+    public function getSeoUrl(): string
+    {
+        return '/marcas/'.$this->getSeoSlug();
     }
 }

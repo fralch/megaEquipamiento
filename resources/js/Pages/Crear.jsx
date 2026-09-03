@@ -13,6 +13,7 @@ import Tags from "../Components/create/createTags";
 import TagParents from "../Components/create/createTagParents";
 import MoveSubcategories from "../Components/create/MoveSubcategories";
 import ProductoTagsManagement from "../Components/ProductoTagsManagement";
+import GestionarSecciones from "../Components/create/GestionarSecciones";
 
 const CrearProducto = () => {
     const { isDarkMode, toggleDarkMode } = useTheme();
@@ -25,6 +26,7 @@ const CrearProducto = () => {
     const [crearTagParents, setCrearTagParents] = useState(false);
     const [moverSubcategorias, setMoverSubcategorias] = useState(false);
     const [productoTagsManagement, setProductoTagsManagement] = useState(false);
+    const [crearSecciones, setCrearSecciones] = useState(false);
     const [sidebarVisible, setSidebarVisible] = useState(window.innerWidth >= 768);
     const [activeButton, setActiveButton] = useState('producto');
     
@@ -111,6 +113,7 @@ const CrearProducto = () => {
         setCrearTagParents(false);
         setMoverSubcategorias(false);
         setProductoTagsManagement(false);
+        setCrearSecciones(false);
         setActiveButton('producto');
     };
 
@@ -124,6 +127,7 @@ const CrearProducto = () => {
         setCrearTagParents(false);
         setMoverSubcategorias(false);
         setProductoTagsManagement(false);
+        setCrearSecciones(false);
         setActiveButton('categoria');
     };
 
@@ -137,6 +141,7 @@ const CrearProducto = () => {
         setCrearTagParents(false);
         setMoverSubcategorias(false);
         setProductoTagsManagement(false);
+        setCrearSecciones(false);
         setActiveButton('subcategoria');
     };
 
@@ -150,6 +155,7 @@ const CrearProducto = () => {
         setCrearTagParents(false);
         setMoverSubcategorias(false);
         setProductoTagsManagement(false);
+        setCrearSecciones(false);
         setActiveButton('marca');
     };
 
@@ -163,6 +169,7 @@ const CrearProducto = () => {
         setCrearTagParents(false);
         setMoverSubcategorias(false);
         setProductoTagsManagement(false);
+        setCrearSecciones(false);
         setActiveButton('marca-categoria');
     };
 
@@ -176,6 +183,7 @@ const CrearProducto = () => {
         setCrearTagParents(false);
         setMoverSubcategorias(false);
         setProductoTagsManagement(false);
+        setCrearSecciones(false);
         setActiveButton('tags');
     };
 
@@ -189,6 +197,7 @@ const CrearProducto = () => {
         setCrearTagParents(true);
         setMoverSubcategorias(false);
         setProductoTagsManagement(false);
+        setCrearSecciones(false);
         setActiveButton('tagparents');
     };
 
@@ -202,6 +211,7 @@ const CrearProducto = () => {
         setCrearTagParents(false);
         setMoverSubcategorias(true);
         setProductoTagsManagement(false);
+        setCrearSecciones(false);
         setActiveButton('mover');
     };
 
@@ -233,6 +243,20 @@ const CrearProducto = () => {
                 setLoadingProductoTagsData(false);
             }
         }
+    };
+
+    const handleCrearSeccionesClick = () => {
+        setCrearProducto(false);
+        setCrearCategoria(false);
+        setCrearSubcategoria(false);
+        setCrearMarca(false);
+        setCrearMarcaCategoria(false);
+        setCrearTags(false);
+        setCrearTagParents(false);
+        setMoverSubcategorias(false);
+        setProductoTagsManagement(false);
+        setCrearSecciones(true);
+        setActiveButton('secciones');
     };
 
     return (
@@ -411,7 +435,18 @@ const CrearProducto = () => {
                         >
                             Mover Subcategorías
                         </button>
-                        
+
+                        <button
+                            className={`w-full py-2 px-4 rounded-md font-medium transition-colors duration-300 ${
+                                activeButton === 'secciones'
+                                    ? (isDarkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
+                                    : (isDarkMode ? 'bg-gray-700 text-blue-400 hover:bg-gray-600' : 'bg-blue-200 text-blue-600 hover:bg-blue-300')
+                            }`}
+                            onClick={handleCrearSeccionesClick}
+                        >
+                            📦 Gestionar Secciones
+                        </button>
+
                         {/* Sección: Visualización */}
                         <div className={`text-xs font-semibold uppercase tracking-wider pb-2 border-b mt-6 ${
                             isDarkMode ? 'text-purple-400 border-gray-600' : 'text-purple-600 border-purple-200'
@@ -479,6 +514,9 @@ const CrearProducto = () => {
                                 initialFilters={productoTagsData.filters}
                             />
                         )}
+                    </div>
+                    <div className={crearSecciones ? "block" : "hidden"}>
+                        <GestionarSecciones />
                     </div>
                 </div>
             </div>
