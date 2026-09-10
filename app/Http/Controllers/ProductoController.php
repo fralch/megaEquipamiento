@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\Marca;
 use App\Models\Producto;
+use App\Models\Seccion;
 use App\Models\Subcategoria;
 use App\Models\Tag;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -142,6 +146,54 @@ class ProductoController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Vista pública: productos de una marca dentro de una sección específica.
+     * URL: /seccion/{seccionSlug}/marca/{marcaSlug}
+     */
+    public function ProductViewByMarcaSeccion(Request $request, $seccionSlug, $marcaSlug)
+    {
+        $seccion = Seccion::where('slug', $seccionSlug)->where('activo', true)->firstOrFail();
+
+        $marcaId = $this->extractMarcaIdFromSlug($marcaSlug);
+
+        if (! $marcaId) {
+            abort(404);
+        }
+
+        $marca = Marca::find($marcaId);
+
+        if (! $marca) {
+            abort(404);
+        }
+
+        // Redirección 301 si el slug de marca no coincide con el canónico
+        $canonicalMarcaSlug = $marca->getSeoSlug();
+        if ($marcaSlug !== $canonicalMarcaSlug) {
+            return redirect("/seccion/{$seccion->slug}/marca/{$canonicalMarcaSlug}", 301);
+        }
+
+        // Solo los productos de esta marca dentro de esta sección
+        $productos = $seccion->getAllProductos()
+            ->where('marca_id', $marca->id_marca)
+            ->with(['marca', 'subcategoria.categoria'])
+            ->orderBy('nombre')
+            ->get();
+
+        // Categorías de la sección para el sidebar
+        $categorias = $seccion->categorias()
+            ->with(['subcategorias' => fn ($q) => $q->orderBy('nombre')])
+            ->orderBy('nombre')
+            ->get(['id_categoria', 'nombre', 'id_seccion']);
+
+        return Inertia::render('SeccionMarca', [
+            'seccion' => $seccion,
+            'marca' => $marca,
+            'productos' => $productos,
+            'categorias' => $categorias,
+            'marcaSeoSlug' => $canonicalMarcaSlug,
+        ]);
     }
 
     /**
@@ -332,7 +384,7 @@ class ProductoController extends Controller
     /**
      * Buscar productos por iniciales
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function buscarPorIniciales(Request $request)
     {
@@ -349,14 +401,14 @@ class ProductoController extends Controller
             ->get();
 
         // Buscar marcas que coincidan con el término O que tengan productos que coincidan
-        $marcasDirectas = \App\Models\Marca::where('nombre', 'LIKE', '%'.$termino.'%')
+        $marcasDirectas = Marca::where('nombre', 'LIKE', '%'.$termino.'%')
             ->with(['productos' => function ($query) {
                 $query->with(['marca', 'subcategoria.categoria'])->limit(5);
             }])
             ->get();
 
         // Obtener marcas de los productos encontrados
-        $marcasDeProductos = \App\Models\Marca::whereHas('productos', function ($query) use ($termino) {
+        $marcasDeProductos = Marca::whereHas('productos', function ($query) use ($termino) {
             $query->where('nombre', 'LIKE', '%'.$termino.'%')
                 ->orWhere('sku', 'LIKE', '%'.$termino.'%');
         })
@@ -372,14 +424,14 @@ class ProductoController extends Controller
         $marcas = $marcasDirectas->merge($marcasDeProductos)->unique('id_marca');
 
         // Buscar categorías que coincidan con el término O que tengan productos que coincidan
-        $categoriasDirectas = \App\Models\Categoria::where('nombre', 'LIKE', '%'.$termino.'%')
+        $categoriasDirectas = Categoria::where('nombre', 'LIKE', '%'.$termino.'%')
             ->with(['subcategorias.productos' => function ($query) {
                 $query->with(['marca', 'subcategoria.categoria'])->limit(5);
             }])
             ->get();
 
         // Obtener categorías de los productos encontrados
-        $categoriasDeProductos = \App\Models\Categoria::whereHas('subcategorias.productos', function ($query) use ($termino) {
+        $categoriasDeProductos = Categoria::whereHas('subcategorias.productos', function ($query) use ($termino) {
             $query->where('nombre', 'LIKE', '%'.$termino.'%')
                 ->orWhere('sku', 'LIKE', '%'.$termino.'%');
         })
@@ -395,14 +447,14 @@ class ProductoController extends Controller
         $categorias = $categoriasDirectas->merge($categoriasDeProductos)->unique('id_categoria');
 
         // Buscar subcategorías que coincidan con el término O que tengan productos que coincidan
-        $subcategoriasDirectas = \App\Models\Subcategoria::where('nombre', 'LIKE', '%'.$termino.'%')
+        $subcategoriasDirectas = Subcategoria::where('nombre', 'LIKE', '%'.$termino.'%')
             ->with(['productos' => function ($query) {
                 $query->with(['marca', 'subcategoria.categoria'])->limit(5);
             }, 'categoria'])
             ->get();
 
         // Obtener subcategorías de los productos encontrados
-        $subcategoriasDeProductos = \App\Models\Subcategoria::whereHas('productos', function ($query) use ($termino) {
+        $subcategoriasDeProductos = Subcategoria::whereHas('productos', function ($query) use ($termino) {
             $query->where('nombre', 'LIKE', '%'.$termino.'%')
                 ->orWhere('sku', 'LIKE', '%'.$termino.'%');
         })
@@ -720,7 +772,7 @@ class ProductoController extends Controller
      * Obtener productos que tienen como relacionado al producto especificado
      *
      * @param  int  $id  ID del producto relacionado
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function obtenerProductosQueRelacionan($id)
     {
@@ -737,7 +789,7 @@ class ProductoController extends Controller
     /**
      * Eliminar una relación entre productos
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function eliminarRelacion(Request $request)
     {
@@ -909,7 +961,7 @@ class ProductoController extends Controller
 
         // Marcas disponibles para este tag (para filtros)
         $marcaIds = $tagModel->productos()->select('marca_id')->whereNotNull('marca_id')->distinct()->pluck('marca_id');
-        $marcas = \App\Models\Marca::whereIn('id_marca', $marcaIds)->orderBy('nombre')->get(['id_marca', 'nombre']);
+        $marcas = Marca::whereIn('id_marca', $marcaIds)->orderBy('nombre')->get(['id_marca', 'nombre']);
 
         if ($request->wantsJson() || $request->expectsJson() || $request->ajax()) {
             return response()->json([
@@ -969,7 +1021,7 @@ class ProductoController extends Controller
     /**
      * Actualizar categoría, subcategoría, marca y país de un producto
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function updateProductCategory(Request $request)
     {
@@ -1139,7 +1191,7 @@ class ProductoController extends Controller
 
             return Inertia::location('/');
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Producto no encontrado',

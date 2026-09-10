@@ -20,11 +20,14 @@ export const getProductUrl = (product) => {
   return `/producto/${slug || 'producto'}-${id}`;
 };
 
-export const getMarcaUrl = (brand) => {
-  if (!brand) return '/';
+export const getMarcaSeoSlug = (brand) => {
+  if (!brand) return null;
 
-  // Si el backend ya calculó la URL
-  if (brand.seo_url) return brand.seo_url;
+  // Si el backend ya calculó la URL, extraer su último segmento
+  if (brand.seo_url) {
+    const parts = brand.seo_url.toString().split('/').filter(Boolean);
+    return parts[parts.length - 1] || null;
+  }
 
   const id = brand.id_marca || brand.id;
   const name = brand.nombre || brand.name || 'marca';
@@ -36,5 +39,20 @@ export const getMarcaUrl = (brand) => {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-  return `/marcas/${slug || 'marca'}-${id}`;
+  return `${slug || 'marca'}-${id}`;
+};
+
+export const getMarcaUrl = (brand) => {
+  if (!brand) return '/';
+
+  // Si el backend ya calculó la URL
+  if (brand.seo_url) return brand.seo_url;
+
+  return `/marcas/${getMarcaSeoSlug(brand)}`;
+};
+
+export const getSeccionMarcaUrl = (brand, seccion) => {
+  if (!brand || !seccion?.slug) return getMarcaUrl(brand);
+
+  return `/seccion/${seccion.slug}/marca/${getMarcaSeoSlug(brand)}`;
 };

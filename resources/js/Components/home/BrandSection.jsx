@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from 'axios';
 import { useTheme } from '../../storage/ThemeContext';
-import { getMarcaUrl } from '../../utils/productUrl';
+import { getMarcaUrl, getSeccionMarcaUrl } from '../../utils/productUrl';
 
 const URL_API = import.meta.env.VITE_API_URL || '';
 
@@ -17,7 +17,7 @@ const sortByName = (list) =>
     return nameA.localeCompare(nameB);
   });
 
-const BrandCard = ({ brand }) => {
+const BrandCard = ({ brand, seccion = null }) => {
   const { isDarkMode } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -53,7 +53,9 @@ const BrandCard = ({ brand }) => {
     
     setIsSearching(true);
     setTimeout(() => {
-      window.location.href = getMarcaUrl(brand);
+      window.location.href = seccion
+        ? getSeccionMarcaUrl(brand, seccion)
+        : getMarcaUrl(brand);
       setIsSearching(false);
     }, 300);
   };
@@ -288,6 +290,7 @@ const BrandSection = ({ seccion = null, marcas: marcasProp = null }) => {
             <BrandCard 
               key={brand.id_marca} 
               brand={brand} 
+              seccion={seccion}
             />
           ))}
         </div>
