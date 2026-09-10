@@ -50,6 +50,7 @@ Route::get('/subcategoria/{id}/{marca_id?}', [ProductoController::class, 'subCat
 Route::get('/producto/{productoSlug}', [ProductoController::class, 'ProductView'])->name('producto.view');
 Route::get('/marcas/{marcaSlug}', [ProductoController::class, 'ProductViewByMarca'])->name('marcas.view');
 Route::get('/seccion/{slug}', [SeccionController::class, 'show'])->name('seccion.show');
+Route::get('/seccion/{seccionSlug}/marca/{marcaSlug}', [ProductoController::class, 'ProductViewByMarcaSeccion'])->name('seccion.marca.view');
 Route::get('/sector/{id_tag_parent}', [SectorController::class, 'show'])->name('sector.view');
 Route::get('/sectores', [SectorController::class, 'index'])->name('sectores.index');
 Route::get('/contacto', function () {
@@ -362,6 +363,7 @@ Route::get('/api/tag-parents', [TagParentController::class, 'getPublicTagParents
 Route::get('/api/secciones', [SeccionController::class, 'indexApi'])->name('api.secciones');
 Route::get('/api/secciones/{id}/productos', [SeccionController::class, 'productosApi'])->name('api.secciones.productos');
 Route::get('/api/secciones/{id}/categorias', [SeccionController::class, 'categoriasApi'])->name('api.secciones.categorias');
+Route::get('/api/secciones/{id}/marcas', [SeccionController::class, 'marcasApi'])->name('api.secciones.marcas');
 
 // Admin de Secciones - protegido
 Route::middleware(['auth', 'role.admin'])->prefix('admin/secciones')->group(function () {

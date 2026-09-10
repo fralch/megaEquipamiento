@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
+use App\Models\Marca;
 use App\Models\Seccion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -79,6 +80,26 @@ class SeccionController extends Controller
             ->get(['id_categoria', 'nombre', 'img']);
 
         return response()->json($categorias);
+    }
+
+    /**
+     * API: marcas asociadas a una sección (público).
+     * Una marca pertenece a la sección si está vinculada a alguna de sus
+     * categorías (marca_categoria) o si tiene productos en ellas.
+     */
+    public function marcasApi($id)
+    {
+        $seccion = Seccion::activo()->findOrFail($id);
+
+        $marcas = Marca::query()
+            ->where(function ($q) use ($seccion) {
+                $q->whereHas('categorias', fn ($c) => $c->where('categorias.id_seccion', $seccion->id_seccion))
+                    ->orWhereHas('productos.subcategoria.categoria', fn ($c) => $c->where('categorias.id_seccion', $seccion->id_seccion));
+            })
+            ->orderBy('nombre')
+            ->get();
+
+        return response()->json($marcas);
     }
 
     /**
