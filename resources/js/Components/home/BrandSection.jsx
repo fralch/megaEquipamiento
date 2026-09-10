@@ -6,6 +6,17 @@ import { getMarcaUrl } from '../../utils/productUrl';
 
 const URL_API = import.meta.env.VITE_API_URL || '';
 
+// Caché en memoria de marcas por sección (vive mientras dure la sesión de la página).
+// NUNCA se escribe en localStorage: la clave global 'brandsData' es exclusiva del listado completo.
+const seccionMarcasCache = {};
+
+const sortByName = (list) =>
+  [...list].sort((a, b) => {
+    const nameA = a.nombre?.toLowerCase() || '';
+    const nameB = b.nombre?.toLowerCase() || '';
+    return nameA.localeCompare(nameB);
+  });
+
 const BrandCard = ({ brand }) => {
   const { isDarkMode } = useTheme();
   const [isVisible, setIsVisible] = useState(false);
@@ -135,82 +146,124 @@ const BrandCard = ({ brand }) => {
   );
 };
 
-const BrandSection = () => {
+const BrandSection = ({ seccion = null, marcas: marcasProp = null }) => {
   const { isDarkMode } = useTheme();
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [hasBeenVisible, setHasBeenVisible] = useState(false);
   const sectionRef = useRef(null);
+  const seccionId = seccion?.id_seccion ?? null;
 
-  // Cargar información de marcas desde la API
+  // Efecto A: detectar visibilidad para mantener la carga lazy (solo al montar)
   useEffect(() => {
-    const loadBrands = async () => {
-      try {
-        const response = await axios.get(`${URL_API}/marca/all`);
-        const brandsData = response.data;
-
-        // Ordenar marcas alfabéticamente de A a Z
-        const sortedBrands = Array.isArray(brandsData)
-          ? brandsData.sort((a, b) => {
-              const nameA = a.nombre?.toLowerCase() || '';
-              const nameB = b.nombre?.toLowerCase() || '';
-              return nameA.localeCompare(nameB);
-            })
-          : brandsData;
-
-        // Guardar en localStorage con timestamp para caché
-        localStorage.setItem('brandsData', JSON.stringify(sortedBrands));
-        localStorage.setItem('brandsDataTimestamp', Date.now().toString());
-
-        setBrands(sortedBrands);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error loading brands from API:', error);
-        setLoading(false);
-      }
-    };
-    
-    // Verificar si hay datos en caché
-    const cachedBrands = localStorage.getItem('brandsData');
-    const cachedTimestamp = localStorage.getItem('brandsDataTimestamp');
-    const oneHour = 60 * 60 * 1000; // 1 hora en milisegundos
-    
-    if (cachedBrands && cachedTimestamp && (Date.now() - parseInt(cachedTimestamp)) < oneHour) {
-      const cachedBrandsData = JSON.parse(cachedBrands);
-      if (Array.isArray(cachedBrandsData) && cachedBrandsData.length > 0) {
-        // Ordenar marcas del caché alfabéticamente de A a Z
-        const sortedCachedBrands = cachedBrandsData.sort((a, b) => {
-            const nameA = a.nombre?.toLowerCase() || '';
-            const nameB = b.nombre?.toLowerCase() || '';
-            return nameA.localeCompare(nameB);
-          });
-
-        setBrands(sortedCachedBrands);
-        setLoading(false);
-        return;
-      }
-    }
-
-    // Configurar observer para cargar marcas solo cuando la sección es visible
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          loadBrands();
+          setHasBeenVisible(true);
           observer.disconnect();
         }
       },
       { threshold: 0.1 }
     );
-    
+
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
-    
-    return () => {
-      if (sectionRef.current) {
-        observer.disconnect();
-      }
-    };
+
+    return () => observer.disconnect();
   }, []);
+
+  // Efecto B: cargar marcas según la rama (marcas explícitas > sección > global)
+  useEffect(() => {
+    if (!hasBeenVisible) return;
+
+    let cancelled = false;
+    const controller = new AbortController();
+
+    const applyBrands = (data) => {
+      if (cancelled) return;
+      setBrands(data);
+      setLoading(false);
+    };
+
+    // Rama 1: marcas explícitas por prop (sin fetch)
+    if (marcasProp) {
+      applyBrands(Array.isArray(marcasProp) ? marcasProp : []);
+      return;
+    }
+
+    // Rama 2: marcas filtradas por sección (caché solo en memoria)
+    if (seccionId !== null) {
+      const cached = seccionMarcasCache[seccionId];
+      if (cached) {
+        applyBrands(cached);
+        return;
+      }
+
+      setLoading(true);
+      axios
+        .get(`${URL_API}/api/secciones/${seccionId}/marcas`, { signal: controller.signal })
+        .then((response) => {
+          const data = Array.isArray(response.data) ? response.data : [];
+          seccionMarcasCache[seccionId] = data;
+          applyBrands(data);
+        })
+        .catch((error) => {
+          if (cancelled || error.name === 'CanceledError' || error.code === 'ERR_CANCELED') return;
+          console.error('Error loading section brands from API:', error);
+          applyBrands([]);
+        });
+
+      return () => {
+        cancelled = true;
+        controller.abort();
+      };
+    }
+
+    // Rama 3: comportamiento global original (/marca/all + caché localStorage 1h)
+    const oneHour = 60 * 60 * 1000;
+    try {
+      const cachedBrands = localStorage.getItem('brandsData');
+      const cachedTimestamp = localStorage.getItem('brandsDataTimestamp');
+
+      if (cachedBrands && cachedTimestamp && (Date.now() - parseInt(cachedTimestamp)) < oneHour) {
+        const parsed = JSON.parse(cachedBrands);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          applyBrands(sortByName(parsed));
+          return;
+        }
+      }
+    } catch {
+      // Caché corrupto o localStorage no disponible: continuar con fetch
+    }
+
+    setLoading(true);
+    axios
+      .get(`${URL_API}/marca/all`, { signal: controller.signal })
+      .then((response) => {
+        const brandsData = response.data;
+        const sortedBrands = Array.isArray(brandsData) ? sortByName(brandsData) : brandsData;
+
+        try {
+          localStorage.setItem('brandsData', JSON.stringify(sortedBrands));
+          localStorage.setItem('brandsDataTimestamp', Date.now().toString());
+        } catch {
+          // localStorage lleno o deshabilitado: ignorar
+        }
+
+        applyBrands(sortedBrands);
+      })
+      .catch((error) => {
+        if (cancelled || error.name === 'CanceledError' || error.code === 'ERR_CANCELED') return;
+        console.error('Error loading brands from API:', error);
+        applyBrands([]);
+      });
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [hasBeenVisible, seccionId, marcasProp]);
 
   return (
     <div className={`p-8 transition-colors duration-300 ${
@@ -218,7 +271,9 @@ const BrandSection = () => {
     }`} id="marcas" ref={sectionRef}>
       <h2 className={`text-2xl font-bold mb-8 text-center transition-colors duration-300 ${
         isDarkMode ? 'text-white' : 'text-gray-900'
-      }`}>Marcas</h2>
+      }`}>
+        {seccion ? `Marcas de ${seccion.nombre}` : 'Marcas'}
+      </h2>
       
       {loading ? (
         // Indicador de carga
@@ -227,25 +282,20 @@ const BrandSection = () => {
             isDarkMode ? 'border-blue-400' : 'border-blue-500'
           }`}></div>
         </div>
-      ) : brands && brands.length > 0 ? (
+      ) : brands.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-          {Array.isArray(brands) ? brands.map((brand) => (
+          {brands.map((brand) => (
             <BrandCard 
               key={brand.id_marca} 
               brand={brand} 
             />
-          )) : (
-            <BrandCard 
-              key={brands.id_marca} 
-              brand={brands} 
-            />
-          )}
+          ))}
         </div>
       ) : (
         <div className={`text-center py-12 ${
           isDarkMode ? 'text-gray-400' : 'text-gray-600'
         }`}>
-          <p>No se encontraron marcas disponibles.</p>
+          <p>{seccion ? 'No hay marcas asociadas a esta sección.' : 'No se encontraron marcas disponibles.'}</p>
         </div>
       )}
     </div>

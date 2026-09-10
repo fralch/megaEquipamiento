@@ -252,7 +252,7 @@ export default function Welcome() {
                             <Suspense fallback={
                                 <div className={`w-full h-64 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
                             }>
-                                <BrandSection />
+                                <BrandSection seccion={selectedSeccion} />
                             </Suspense>
                         </ErrorBoundary>
 
