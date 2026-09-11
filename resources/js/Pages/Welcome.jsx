@@ -22,6 +22,18 @@ const ClientSlider = lazy(() => import("@/Components/home/ClientSlider"));
 const Footer = lazy(() => import("@/Components/home/Footer"));
 const UserProfileModal = lazy(() => import("@/Components/UserProfileModal"));
 
+const SECCION_STORAGE_KEY = "mega_seccion_activa";
+
+function readSeccionFromStorage() {
+    try {
+        const raw = sessionStorage.getItem(SECCION_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : null;
+        return parsed?.id_seccion ? parsed : null;
+    } catch {
+        return null;
+    }
+}
+
 export default function Welcome() {
     const { auth } = usePage().props;
     const { isDarkMode } = useTheme();
@@ -29,7 +41,7 @@ export default function Welcome() {
     const [isOpen, setIsOpen] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showProfileModal, setShowProfileModal] = useState(false);
-    const [selectedSeccion, setSelectedSeccion] = useState(null);
+    const [selectedSeccion, setSelectedSeccion] = useState(readSeccionFromStorage);
     const [reshuffleKey, setReshuffleKey] = useState(0);
 
     useEffect(() => {
@@ -74,6 +86,11 @@ export default function Welcome() {
             setReshuffleKey((k) => k + 1);
         }
         setSelectedSeccion(seccion);
+        try {
+            sessionStorage.setItem(SECCION_STORAGE_KEY, JSON.stringify(seccion));
+        } catch {
+            /* storage lleno o deshabilitado, ignorar */
+        }
     };
 
     const shouldHideButton = isOpen;
