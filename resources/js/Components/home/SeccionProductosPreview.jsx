@@ -32,7 +32,7 @@ function SectionHeader({ seccion, isDarkMode }) {
                 isDarkMode ? "bg-gray-900" : "bg-gray-50"
             }`}
         >
-            <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="max-w-[95%] mx-auto flex items-center justify-between">
                 <h2
                     className={`text-2xl font-bold ${
                         isDarkMode ? "text-white" : "text-gray-900"
@@ -54,7 +54,7 @@ function SectionHeader({ seccion, isDarkMode }) {
             </div>
             {seccion.descripcion && (
                 <p
-                    className={`max-w-7xl mx-auto mt-1 text-sm ${
+                    className={`max-w-[95%] mx-auto mt-1 text-sm ${
                         isDarkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                 >
@@ -183,8 +183,8 @@ function SectionContent({ seccion }) {
 
             {!loading && !error && categorias && categorias.length > 0 && (
                 <div className={isDarkMode ? "bg-gray-900" : "bg-gray-50"}>
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                    <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 sm:gap-8">
                             {categorias.map((categoria) => (
                                 <CategoryCard
                                     key={`category-${categoria.id_categoria}`}
