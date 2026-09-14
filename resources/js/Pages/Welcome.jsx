@@ -91,6 +91,13 @@ export default function Welcome() {
         } catch {
             /* storage lleno o deshabilitado, ignorar */
         }
+
+        setTimeout(() => {
+            const el = document.getElementById("seccion-categorias-preview");
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }, 100);
     };
 
     const shouldHideButton = isOpen;
@@ -231,39 +238,41 @@ export default function Welcome() {
                             </Suspense>
                         </ErrorBoundary>
 
-                        <ErrorBoundary>
-                            <AnimatePresence mode="wait">
-                                {!selectedSeccion ? (
-                                    <motion.div
-                                        key="categorias"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.25 }}
-                                    >
-                                        <Suspense fallback={
-                                            <div className={`w-full h-96 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
-                                        }>
-                                            <Categorias_cuadrado />
-                                        </Suspense>
-                                    </motion.div>
-                                ) : (
-                                    <motion.div
-                                        key={`seccion-${selectedSeccion.id_seccion}-${reshuffleKey}`}
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.25 }}
-                                    >
-                                        <Suspense fallback={
-                                            <div className={`w-full h-96 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
-                                        }>
-                                            <SeccionProductosPreview seccion={selectedSeccion} />
-                                        </Suspense>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </ErrorBoundary>
+                        <div id="seccion-categorias-preview" className="scroll-mt-6">
+                            <ErrorBoundary>
+                                <AnimatePresence mode="wait">
+                                    {!selectedSeccion ? (
+                                        <motion.div
+                                            key="categorias"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.25 }}
+                                        >
+                                            <Suspense fallback={
+                                                <div className={`w-full h-96 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
+                                            }>
+                                                <Categorias_cuadrado />
+                                            </Suspense>
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key={`seccion-${selectedSeccion.id_seccion}-${reshuffleKey}`}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.25 }}
+                                        >
+                                            <Suspense fallback={
+                                                <div className={`w-full h-96 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-200'}`}></div>
+                                            }>
+                                                <SeccionProductosPreview seccion={selectedSeccion} />
+                                            </Suspense>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </ErrorBoundary>
+                        </div>
 
                         <ErrorBoundary>
                             <Suspense fallback={
