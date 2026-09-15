@@ -1,7 +1,9 @@
 import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { Link, usePage } from "@inertiajs/react";
 import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
+import { FiSettings } from "react-icons/fi";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -276,6 +278,10 @@ const Slider = () => {
     const [loadVideo, setLoadVideo] = useState(false);
     const [slides, setSlides] = useState(FALLBACK_SLIDES);
     const [usingFallback, setUsingFallback] = useState(true);
+    const { auth } = usePage().props;
+    const isAdmin =
+        !!auth?.user?.rol &&
+        String(auth.user.rol.nombre_rol || "").toLowerCase() === "admin";
 
     useEffect(() => {
         let cancelled = false;
@@ -303,7 +309,18 @@ const Slider = () => {
     }
 
     return (
-        <Swiper
+        <div style={{ position: "relative" }}>
+            {isAdmin && (
+                <Link
+                    href="/crear?section=slider"
+                    className="absolute top-4 right-4 z-30 flex items-center gap-2 px-4 py-2 rounded-lg shadow-lg transition-all bg-white/90 hover:bg-white text-gray-800 hover:text-blue-700 text-sm font-medium backdrop-blur-sm border border-gray-200"
+                    title="Gestionar slider"
+                >
+                    <FiSettings className="w-4 h-4" />
+                    Gestionar slider
+                </Link>
+            )}
+            <Swiper
             modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
             spaceBetween={0}
             slidesPerView={1}
@@ -354,6 +371,7 @@ const Slider = () => {
             <div className="swiper-button-next"></div>
             <div className="swiper-button-prev"></div>
         </Swiper>
+        </div>
     );
 };
 

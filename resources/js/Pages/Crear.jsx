@@ -287,6 +287,16 @@ const CrearProducto = () => {
         setActiveButton('slider');
     };
 
+    // Efecto para abrir una sección específica vía ?section= en la URL
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const section = params.get('section');
+        if (section === 'slider') {
+            handleGestionarSliderClick();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <div className="w-full relative">
             <div className={`min-h-screen flex flex-col md:flex-row transition-colors duration-300 ${
