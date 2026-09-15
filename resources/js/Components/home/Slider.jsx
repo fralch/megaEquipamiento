@@ -1,88 +1,83 @@
 import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useMemo, useState } from "react";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 
-const Slider = () => {
-    const [loadVideo, setLoadVideo] = useState(false);
+// Fallback estático: idéntico al slider hardcodeado previo (usado solo si la API falla o BD vacía)
+const FALLBACK_SLIDES = [
+    {
+        id_slider: "fallback-1",
+        tipo: "video",
+        titulo: "Líder en Ventas de",
+        subtitulo: "Equipos de",
+        subtitulo_2: "Laboratorio",
+        subtitulo_pie: "En todas las regiones del Perú",
+        texto_boton: "Ver más",
+        url_boton: "https://wa.me/51999999999",
+        video_youtube_id: "F8pMhuLK7nE",
+        video_thumbnail: "https://i.ytimg.com/vi/F8pMhuLK7nE/hqdefault.jpg",
+        imagen: null,
+        imagen_url: null,
+    },
+    {
+        id_slider: "fallback-2",
+        tipo: "imagen",
+        titulo: "Líder en Ventas de",
+        subtitulo: "Equipos de",
+        subtitulo_2: "Laboratorio",
+        subtitulo_pie: "En todas las regiones del Perú",
+        texto_boton: "Ver más",
+        url_boton: "https://wa.me/51999999999",
+        imagen: "img/slider-img1.webp",
+        imagen_url: "img/slider-img1.webp",
+    },
+    {
+        id_slider: "fallback-3",
+        tipo: "imagen",
+        titulo: "Líder en Ventas de",
+        subtitulo: "Equipos de",
+        subtitulo_2: "Laboratorio",
+        subtitulo_pie: "En todas las regiones del Perú",
+        texto_boton: "Ver más",
+        url_boton: "https://wa.me/51999999999",
+        imagen: "img/slider-img2.webp",
+        imagen_url: "img/slider-img2.webp",
+    },
+];
 
-    return (
-        <Swiper
-            modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
-            spaceBetween={0}
-            slidesPerView={1}
-            navigation={{
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            }}
-            pagination={{
-                clickable: true,
-                dynamicBullets: true,
-                bulletClass: 'swiper-pagination-bullet',
-                bulletActiveClass: 'swiper-pagination-bullet-active'
-            }}
-            scrollbar={{ draggable: true }}
-            autoplay={{
-                delay: 4000,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true
-            }}
-            loop={true}
-            grabCursor={true}
-            touchRatio={1}
-            touchAngle={45}
-            threshold={10}
-            style={{
-                width: "100%",
-                height: "85vh",
-                minHeight: "400px",
-                maxHeight: "100vh"
-            }}
-            onSlideChange={(swiper) => {
-                // Cargar video solo cuando el usuario navega al slide del video
-                if (swiper.realIndex === 0) {
-                    setLoadVideo(true);
-                }
-            }}
-        >
-            {/* Slide con iframe - OPTIMIZADO */}
-            <SwiperSlide>
-                <div
-                    style={{
-                        position: "relative",
-                        width: "100%",
-                        height: "100%",
-                    }}
-                >
-                    {loadVideo ? (
-                        <iframe
-                            src="https://www.youtube.com/embed/F8pMhuLK7nE?mute=1&autoplay=1&loop=1&playlist=F8pMhuLK7nE&vq=hd720&controls=0&modestbranding=1&showinfo=0&rel=0"
-                            title="YouTube video"
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                border: "none",
-                                objectFit: "cover"
-                            }}
-                            allow="autoplay; encrypted-media"
-                            loading="lazy"
-                        />
-                    ) : (
-                        // Placeholder hasta que se navegue al slide
-                        <div
-                            style={{
-                                width: "100%",
-                                height: "100%",
-                                backgroundColor: "#0c2249",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center"
-                            }}
-                            onClick={() => setLoadVideo(true)}
-                        >
+function SlideMedia({ slide, loadVideo, onLoadVideo }) {
+    if (slide.tipo === "video" && slide.video_youtube_id) {
+        return (
+            <div style={{ position: "relative", width: "100%", height: "100%" }}>
+                {loadVideo ? (
+                    <iframe
+                        src={`https://www.youtube.com/embed/${slide.video_youtube_id}?mute=1&autoplay=1&loop=1&playlist=${slide.video_youtube_id}&vq=hd720&controls=0&modestbranding=1&showinfo=0&rel=0`}
+                        title="YouTube video"
+                        style={{ width: "100%", height: "100%", border: "none", objectFit: "cover" }}
+                        allow="autoplay; encrypted-media"
+                        loading="lazy"
+                    />
+                ) : (
+                    <div
+                        style={{
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: "#0c2249",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            backgroundImage: slide.video_thumbnail ? `url(${slide.video_thumbnail})` : undefined,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                        }}
+                        onClick={onLoadVideo}
+                    >
+                        {!slide.video_thumbnail && (
                             <button
                                 style={{
                                     fontSize: "4rem",
@@ -92,526 +87,270 @@ const Slider = () => {
                                     width: "100px",
                                     height: "100px",
                                     border: "none",
-                                    cursor: "pointer"
+                                    cursor: "pointer",
                                 }}
+                                aria-label="Reproducir video"
                             >
                                 ▶
                             </button>
-                        </div>
-                    )}
-                    {/* Div que cubre el iframe, con z-index bajo */}
-                    <div
-                        style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                            backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo transparente
-                            zIndex: 0, // Asegúrate de que esté debajo del enlace
-                        }}
-                    ></div>
-                </div>
-
-                {/* Contenido para desktop */}
+                        )}
+                    </div>
+                )}
                 <div
-                    className="hidden md:block"
                     style={{
                         position: "absolute",
-                        top: "47%",
-                        left: "20%",
-                        transform: "translate(-50%, -50%)",
-                        color: "#fff",
-                        textAlign: "left",
-                        zIndex: 2,
-                    }}
-                >
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#fff",
-                        }}
-                    >
-                        Líder en Ventas de
-                    </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            marginTop: -10,
-                        }}
-                    >
-                        Equipos de
-                    </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            marginTop: -20,
-                        }}
-                    >
-                        Laboratorio
-                    </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "1rem",
-                            fontFamily: "",
-                            fontWeight: "bold",
-                            color: "#fff",
-                        }}
-                    >
-                        En todas las regiones del Peru
-                    </h2>
-                    <a
-                        href="https://wa.me/51999999999"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            display: "block",
-                            marginTop: "1rem",
-                            fontSize: "1.2rem",
-                            color: "#fff",
-                            textDecoration: "none",
-                            backgroundColor: "#1e3a8a",
-                            padding: "0.5rem 1rem",
-                            borderRadius: "5px",
-                            transition: "background-color 0.3s ease",
-                            width: "fit-content",
-                        }}
-                    >
-                        Ver más
-                    </a>
-                </div>
-
-                {/* Contenido para móviles */}
-                <div
-                    className="block md:hidden"
-                    style={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        color: "#fff",
-                        textAlign: "center",
-                        zIndex: 2,
-                        padding: "0 1rem",
-                        width: "90%",
-                    }}
-                >
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "1.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            lineHeight: "1.2",
-                        }}
-                    >
-                        Líder en Ventas de
-                    </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "1.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            marginTop: "0.2rem",
-                            lineHeight: "1.2",
-                        }}
-                    >
-                        Equipos de Laboratorio
-                    </h2>
-                    <h3
-                        style={{
-                            margin: 0,
-                            fontSize: "0.9rem",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            marginTop: "0.5rem",
-                        }}
-                    >
-                        En todas las regiones del Perú
-                    </h3>
-                    <a
-                        href="https://wa.me/51999999999"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            display: "inline-block",
-                            marginTop: "1rem",
-                            fontSize: "1rem",
-                            color: "#fff",
-                            textDecoration: "none",
-                            backgroundColor: "#1e3a8a",
-                            padding: "0.7rem 1.5rem",
-                            borderRadius: "5px",
-                            transition: "background-color 0.3s ease",
-                            fontWeight: "bold",
-                        }}
-                    >
-                        Ver más
-                    </a>
-                </div>
-            </SwiperSlide>
-
-            {/* Slide con imagen - PRIMERA IMAGEN PRIORITARIA */}
-            <SwiperSlide>
-                <img
-                    src="img/slider-img1.webp"
-                    alt="Líder en Ventas de Equipos de Laboratorio"
-                    fetchPriority="high"
-                    style={{
+                        top: 0,
+                        left: 0,
                         width: "100%",
                         height: "100%",
-                        objectFit: "cover",
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        zIndex: 0,
                     }}
                 />
-                {/* Contenido para desktop */}
-                <div
-                    className="hidden md:block"
-                    style={{
-                        position: "absolute",
-                        top: "47%",
-                        left: "20%",
-                        transform: "translate(-50%, -50%)",
-                        color: "#fff",
-                        textAlign: "left",
-                    }}
-                >
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#777",
-                            textShadow: "2px 2px 4px rgba(255, 255, 255, 0.9)",
-                        }}
-                    >
-                        Líder en Ventas de
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={slide.imagen_url || slide.imagen}
+            alt={slide.titulo || "slide"}
+            fetchPriority={slide.id_slider === "fallback-1" || slide.orden === 1 ? "high" : "auto"}
+            loading="lazy"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+    );
+}
+
+function SlideOverlay({ slide, isFirstVideo }) {
+    // Video: texto blanco + botón. Imagen: texto gris/azul.
+    const isVideo = slide.tipo === "video";
+
+    const desktopColor1 = isVideo ? "#fff" : "#777";
+    const desktopColor2 = isVideo ? "#fff" : "#1e3a8a";
+    const desktopColorPie = isVideo ? "#fff" : "#777";
+
+    const desktopTextShadow = isVideo
+        ? "none"
+        : "2px 2px 4px rgba(255, 255, 255, 0.9)";
+
+    const desktopStyle = {
+        position: "absolute",
+        top: "47%",
+        left: "20%",
+        transform: "translate(-50%, -50%)",
+        color: "#fff",
+        textAlign: "left",
+        zIndex: 2,
+    };
+
+    const desktopHeadingBase = {
+        margin: 0,
+        fontSize: "2.5rem",
+        fontFamily: "verdana, sans-serif, serif, arial",
+        fontWeight: "bold",
+        textShadow: desktopTextShadow,
+    };
+
+    const desktopHeadingSmall = {
+        ...desktopHeadingBase,
+        fontSize: "1rem",
+    };
+
+    const buttonStyle = {
+        display: "block",
+        marginTop: "1rem",
+        fontSize: "1.2rem",
+        color: "#fff",
+        textDecoration: "none",
+        backgroundColor: "#1e3a8a",
+        padding: "0.5rem 1rem",
+        borderRadius: "5px",
+        transition: "background-color 0.3s ease",
+        width: "fit-content",
+    };
+
+    const mobileStyle = {
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        color: "#fff",
+        textAlign: "center",
+        zIndex: 2,
+        padding: "0 1rem",
+        width: "90%",
+        backgroundColor: isVideo ? "transparent" : "rgba(0, 0, 0, 0.6)",
+        borderRadius: isVideo ? "0" : "10px",
+        paddingTop: isVideo ? "0" : "1rem",
+        paddingBottom: isVideo ? "0" : "1rem",
+    };
+
+    const mobileHeading = {
+        margin: 0,
+        fontSize: "1.5rem",
+        fontFamily: "verdana, sans-serif, serif, arial",
+        fontWeight: "bold",
+        color: "#fff",
+        lineHeight: "1.2",
+    };
+
+    const mobileHeadingSmall = {
+        ...mobileHeading,
+        fontSize: "0.9rem",
+        marginTop: "0.5rem",
+    };
+
+    const mobileButtonStyle = {
+        display: "inline-block",
+        marginTop: "1rem",
+        fontSize: "1rem",
+        color: "#fff",
+        textDecoration: "none",
+        backgroundColor: "#1e3a8a",
+        padding: "0.7rem 1.5rem",
+        borderRadius: "5px",
+        transition: "background-color 0.3s ease",
+        fontWeight: "bold",
+    };
+
+    return (
+        <>
+            {/* Desktop */}
+            <div className="hidden md:block" style={desktopStyle}>
+                {slide.titulo && (
+                    <h2 style={{ ...desktopHeadingBase, color: desktopColor1 }}>{slide.titulo}</h2>
+                )}
+                {slide.subtitulo && (
+                    <h2 style={{ ...desktopHeadingBase, color: desktopColor2, marginTop: -10 }}>
+                        {slide.subtitulo}
                     </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#1e3a8a",
-                            marginTop: -10,
-                        }}
-                    >
-                        Equipos de
+                )}
+                {slide.subtitulo_2 && (
+                    <h2 style={{ ...desktopHeadingBase, color: desktopColor2, marginTop: -20 }}>
+                        {slide.subtitulo_2}
                     </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "2.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#1e3a8a",
-                            marginTop: -20,
-                        }}
-                    >
-                        Laboratorio
+                )}
+                {slide.subtitulo_pie && (
+                    <h2 style={{ ...desktopHeadingSmall, color: desktopColorPie }}>
+                        {slide.subtitulo_pie}
                     </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "1rem",
-                            fontFamily: "",
-                            fontWeight: "bold",
-                            color: "#777",
-                        }}
-                    >
-                        En todas las regiones del Peru
-                    </h2>
+                )}
+                {slide.url_boton && (
                     <a
-                        href="https://wa.me/51999999999"
+                        href={slide.url_boton}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{
-                            display: "block",
-                            marginTop: "1rem",
-                            fontSize: "1.2rem",
-                            color: "#fff",
-                            textDecoration: "none",
-                            backgroundColor: "#1e3a8a",
-                            padding: "0.5rem 1rem",
-                            borderRadius: "5px",
-                            transition: "background-color 0.3s ease",
-                            width: "fit-content",
-                        }}
+                        style={buttonStyle}
                     >
-                        Ver más
+                        {slide.texto_boton || "Ver más"}
                     </a>
-                </div>
+                )}
+            </div>
 
-                {/* Contenido para móviles */}
-                <div
-                    className="block md:hidden"
-                    style={{
-                        position: "absolute",
-                        top: "50%",
-                        left: "50%",
-                        transform: "translate(-50%, -50%)",
-                        color: "#fff",
-                        textAlign: "center",
-                        zIndex: 2,
-                        padding: "0 1rem",
-                        width: "90%",
-                        backgroundColor: "rgba(0, 0, 0, 0.6)",
-                        borderRadius: "10px",
-                        paddingTop: "1rem",
-                        paddingBottom: "1rem",
-                    }}
-                >
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "1.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            lineHeight: "1.2",
-                        }}
-                    >
-                        Líder en Ventas de
+            {/* Mobile */}
+            <div className="block md:hidden" style={mobileStyle}>
+                {slide.titulo && <h2 style={mobileHeading}>{slide.titulo}</h2>}
+                {(slide.subtitulo || slide.subtitulo_2) && (
+                    <h2 style={{ ...mobileHeading, marginTop: "0.2rem" }}>
+                        {[slide.subtitulo, slide.subtitulo_2].filter(Boolean).join(" ")}
                     </h2>
-                    <h2
-                        style={{
-                            margin: 0,
-                            fontSize: "1.5rem",
-                            fontFamily: "verdana, sans-serif, serif, arial",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            marginTop: "0.2rem",
-                            lineHeight: "1.2",
-                        }}
-                    >
-                        Equipos de Laboratorio
-                    </h2>
-                    <h3
-                        style={{
-                            margin: 0,
-                            fontSize: "0.9rem",
-                            fontWeight: "bold",
-                            color: "#fff",
-                            marginTop: "0.5rem",
-                        }}
-                    >
-                        En todas las regiones del Perú
-                    </h3>
+                )}
+                {slide.subtitulo_pie && <h3 style={mobileHeadingSmall}>{slide.subtitulo_pie}</h3>}
+                {slide.url_boton && (
                     <a
-                        href="https://wa.me/51999999999"
+                        href={slide.url_boton}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{
-                            display: "inline-block",
-                            marginTop: "1rem",
-                            fontSize: "1rem",
-                            color: "#fff",
-                            textDecoration: "none",
-                            backgroundColor: "#1e3a8a",
-                            padding: "0.7rem 1.5rem",
-                            borderRadius: "5px",
-                            transition: "background-color 0.3s ease",
-                            fontWeight: "bold",
-                        }}
+                        style={mobileButtonStyle}
                     >
-                        Ver más
+                        {slide.texto_boton || "Ver más"}
                     </a>
-                </div>
-            </SwiperSlide>
+                )}
+            </div>
+        </>
+    );
+}
 
-            {/* Slide con otra imagen - LAZY LOADING */}
-            <SwiperSlide>
-                <div
-                    style={{
-                        position: "relative",
-                        width: "100%",
-                        height: "100%",
-                    }}
-                >
-                    <img
-                        src="img/slider-img2.webp"
-                        alt="Equipos de Laboratorio en Perú"
-                        loading="lazy"
-                        style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                        }}
+const Slider = () => {
+    const [loadVideo, setLoadVideo] = useState(false);
+    const [slides, setSlides] = useState(FALLBACK_SLIDES);
+    const [usingFallback, setUsingFallback] = useState(true);
+
+    useEffect(() => {
+        let cancelled = false;
+        axios
+            .get("/api/slider")
+            .then(({ data }) => {
+                if (cancelled) return;
+                if (Array.isArray(data) && data.length > 0) {
+                    setSlides(data);
+                    setUsingFallback(false);
+                }
+            })
+            .catch(() => {
+                // Silencioso: mantenemos fallback
+            });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    const slidesToRender = useMemo(() => slides, [slides]);
+
+    if (slidesToRender.length === 0) {
+        return null;
+    }
+
+    return (
+        <Swiper
+            modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
+            spaceBetween={0}
+            slidesPerView={1}
+            navigation={{
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+            }}
+            pagination={{
+                clickable: true,
+                dynamicBullets: true,
+                bulletClass: "swiper-pagination-bullet",
+                bulletActiveClass: "swiper-pagination-bullet-active",
+            }}
+            scrollbar={{ draggable: true }}
+            autoplay={{
+                delay: 4000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            }}
+            loop={slidesToRender.length > 1}
+            grabCursor={true}
+            touchRatio={1}
+            touchAngle={45}
+            threshold={10}
+            style={{
+                width: "100%",
+                height: "85vh",
+                minHeight: "400px",
+                maxHeight: "100vh",
+            }}
+            onSlideChange={(swiper) => {
+                if (swiper.realIndex === 0) {
+                    setLoadVideo(true);
+                }
+            }}
+        >
+            {slidesToRender.map((slide) => (
+                <SwiperSlide key={slide.id_slider}>
+                    <SlideMedia
+                        slide={slide}
+                        loadVideo={loadVideo && slide.tipo === "video"}
+                        onLoadVideo={() => setLoadVideo(true)}
                     />
-                    {/* Contenido para desktop */}
-                    <div
-                        className="hidden md:block"
-                        style={{
-                            position: "absolute",
-                            top: "45%",
-                            left: "20%",
-                            transform: "translate(-50%, -50%)",
-                            color: "#fff",
-                            textAlign: "left",
-                        }}
-                    >
-                        <h2
-                            style={{
-                                margin: 0,
-                                fontSize: "2.5rem",
-                                fontFamily: "verdana, sans-serif, serif, arial",
-                                fontWeight: "bold",
-                                color: "#777",
-                            }}
-                        >
-                            Líder en Ventas de
-                        </h2>
-                        <h2
-                            style={{
-                                margin: 0,
-                                fontSize: "2.5rem",
-                                fontFamily: "verdana, sans-serif, serif, arial",
-                                fontWeight: "bold",
-                                color: "#1e3a8a",
-                                marginTop: -10,
-                            }}
-                        >
-                            Equipos de
-                        </h2>
-                        <h2
-                            style={{
-                                margin: 0,
-                                fontSize: "2.5rem",
-                                fontFamily: "verdana, sans-serif, serif, arial",
-                                fontWeight: "bold",
-                                color: "#1e3a8a",
-                                marginTop: -20,
-                            }}
-                        >
-                            Laboratorio
-                        </h2>
-                        <h2
-                            style={{
-                                margin: 0,
-                                fontSize: "1rem",
-                                fontFamily: "",
-                                fontWeight: "bold",
-                                color: "#777",
-                            }}
-                        >
-                            En todas las regiones del Peru
-                        </h2>
-                        <a
-                            href="https://wa.me/51999999999"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                                display: "block",
-                                marginTop: "1rem",
-                                fontSize: "1.2rem",
-                                color: "#fff",
-                                textDecoration: "none",
-                                backgroundColor: "#1e3a8a",
-                                padding: "0.5rem 1rem",
-                                borderRadius: "5px",
-                                transition: "background-color 0.3s ease",
-                                width: "fit-content",
-                            }}
-                        >
-                            Ver más
-                        </a>
-                    </div>
+                    <SlideOverlay slide={slide} isFirstVideo={false} />
+                </SwiperSlide>
+            ))}
 
-                    {/* Contenido para móviles */}
-                    <div
-                        className="block md:hidden"
-                        style={{
-                            position: "absolute",
-                            top: "50%",
-                            left: "50%",
-                            transform: "translate(-50%, -50%)",
-                            color: "#fff",
-                            textAlign: "center",
-                            zIndex: 2,
-                            padding: "0 1rem",
-                            width: "90%",
-                            backgroundColor: "rgba(0, 0, 0, 0.6)",
-                            borderRadius: "10px",
-                            paddingTop: "1rem",
-                            paddingBottom: "1rem",
-                        }}
-                    >
-                        <h2
-                            style={{
-                                margin: 0,
-                                fontSize: "1.5rem",
-                                fontFamily: "verdana, sans-serif, serif, arial",
-                                fontWeight: "bold",
-                                color: "#fff",
-                                lineHeight: "1.2",
-                            }}
-                        >
-                            Líder en Ventas de
-                        </h2>
-                        <h2
-                            style={{
-                                margin: 0,
-                                fontSize: "1.5rem",
-                                fontFamily: "verdana, sans-serif, serif, arial",
-                                fontWeight: "bold",
-                                color: "#fff",
-                                marginTop: "0.2rem",
-                                lineHeight: "1.2",
-                            }}
-                        >
-                            Equipos de Laboratorio
-                        </h2>
-                        <h3
-                            style={{
-                                margin: 0,
-                                fontSize: "0.9rem",
-                                fontWeight: "bold",
-                                color: "#fff",
-                                marginTop: "0.5rem",
-                            }}
-                        >
-                            En todas las regiones del Perú
-                        </h3>
-                        <a
-                            href="https://wa.me/51999999999"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
-                                display: "inline-block",
-                                marginTop: "1rem",
-                                fontSize: "1rem",
-                                color: "#fff",
-                                textDecoration: "none",
-                                backgroundColor: "#1e3a8a",
-                                padding: "0.7rem 1.5rem",
-                                borderRadius: "5px",
-                                transition: "background-color 0.3s ease",
-                                fontWeight: "bold",
-                            }}
-                        >
-                            Ver más
-                        </a>
-                    </div>
-                </div>
-            </SwiperSlide>
-
-            {/* Flechas de navegación */}
             <div className="swiper-button-next"></div>
             <div className="swiper-button-prev"></div>
         </Swiper>

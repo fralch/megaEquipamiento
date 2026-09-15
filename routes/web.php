@@ -11,6 +11,7 @@ use App\Http\Controllers\CRM\NuestrasEmpresas\NuestrasEmpresasController;
 use App\Http\Controllers\CRM\Productos\ProductoGestionController;
 use App\Http\Controllers\CRM\Productos\ProductoTemporalController;
 use App\Http\Controllers\CRM\SectorController as CRMSectorController;
+use App\Http\Controllers\CRM\SliderController;
 use App\Http\Controllers\CRM\UsuariosRoles\RolesUsuariosController;
 use App\Http\Controllers\CRM\UsuariosRoles\UsuariosGestionController;
 use App\Http\Controllers\FiltroController;
@@ -24,6 +25,7 @@ use App\Http\Controllers\ProductoImportController;
 use App\Http\Controllers\ProductoTagController;
 use App\Http\Controllers\SeccionController;
 use App\Http\Controllers\SectorController;
+use App\Http\Controllers\SliderPublicController;
 use App\Http\Controllers\SubcategoriaController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\TagParentController;
@@ -361,6 +363,9 @@ Route::get('/api/tag-parents', [TagParentController::class, 'getPublicTagParents
 
 // Rutas públicas para secciones
 Route::get('/api/secciones', [SeccionController::class, 'indexApi'])->name('api.secciones');
+
+// Ruta pública para los slides del home
+Route::get('/api/slider', [SliderPublicController::class, 'index'])->name('api.slider');
 Route::get('/api/secciones/{id}/productos', [SeccionController::class, 'productosApi'])->name('api.secciones.productos');
 Route::get('/api/secciones/{id}/categorias', [SeccionController::class, 'categoriasApi'])->name('api.secciones.categorias');
 Route::get('/api/secciones/{id}/marcas', [SeccionController::class, 'marcasApi'])->name('api.secciones.marcas');
@@ -372,6 +377,18 @@ Route::middleware(['auth', 'role.admin'])->prefix('admin/secciones')->group(func
     Route::match(['put', 'post'], '/{id}', [SeccionController::class, 'update'])->name('admin.secciones.update');
     Route::delete('/{id}', [SeccionController::class, 'destroy'])->name('admin.secciones.destroy');
     Route::post('/{id}/categorias', [SeccionController::class, 'syncCategorias'])->name('admin.secciones.sync-categorias');
+});
+
+// Admin de Slider (home) - protegido
+Route::middleware(['auth', 'role.admin'])->prefix('admin/slider')->name('admin.slider.')->group(function () {
+    Route::get('/', [SliderController::class, 'index'])->name('index');
+    Route::get('/data', [SliderController::class, 'data'])->name('data');
+    Route::post('/store', [SliderController::class, 'store'])->name('store');
+    Route::post('/reorder', [SliderController::class, 'reorder'])->name('reorder');
+    Route::get('/{id}', [SliderController::class, 'show'])->name('show');
+    Route::match(['put', 'post'], '/{id}', [SliderController::class, 'update'])->name('update');
+    Route::match(['delete', 'post'], '/{id}/delete', [SliderController::class, 'destroy'])->name('destroy');
+    Route::post('/{id}/toggle-activo', [SliderController::class, 'toggleActivo'])->name('toggle-activo');
 });
 
 // API routes for CRM products (used by frontend components)
