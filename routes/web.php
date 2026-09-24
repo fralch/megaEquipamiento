@@ -47,7 +47,7 @@ Route::get('/carrito', function () {
 Route::get('/', function () {
     return Inertia::render('Welcome');
 })->name('welcome');
-Route::get('/categorias/{id_categoria?}', [CategoriaController::class, 'CategoriasWiew'])->name('categorias.view');
+Route::get('/categorias/{categoriaSlug?}', [CategoriaController::class, 'CategoriasWiew'])->name('categorias.view');
 Route::get('/subcategoria/{id}/{marca_id?}', [ProductoController::class, 'subCategoriaView'])->name('subcategoria.view');
 Route::get('/producto/{productoSlug}', [ProductoController::class, 'ProductView'])->name('producto.view');
 Route::get('/marcas/{marcaSlug}', [ProductoController::class, 'ProductViewByMarca'])->name('marcas.view');

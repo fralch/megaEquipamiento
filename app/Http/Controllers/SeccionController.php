@@ -27,7 +27,7 @@ class SeccionController extends Controller
         $categorias = $seccion->categorias()
             ->with(['subcategorias' => fn ($q) => $q->orderBy('nombre')])
             ->orderBy('nombre')
-            ->get(['id_categoria', 'nombre', 'id_seccion']);
+            ->get(['id_categoria', 'nombre', 'slug', 'id_seccion']);
 
         $seoSlug = $seccion->slug.'-'.$seccion->id_seccion;
 
@@ -77,7 +77,7 @@ class SeccionController extends Controller
         $categorias = $seccion->categorias()
             ->with('subcategorias:id_subcategoria,nombre,id_categoria')
             ->orderBy('nombre')
-            ->get(['id_categoria', 'nombre', 'img']);
+            ->get(['id_categoria', 'nombre', 'slug', 'img']);
 
         return response()->json($categorias);
     }

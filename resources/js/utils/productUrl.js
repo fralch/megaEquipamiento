@@ -56,3 +56,41 @@ export const getSeccionMarcaUrl = (brand, seccion) => {
 
   return `/seccion/${seccion.slug}/marca/${getMarcaSeoSlug(brand)}`;
 };
+
+export const getCategoriaSlug = (categoria) => {
+  if (!categoria) return '';
+
+  if (typeof categoria === 'string') {
+    return categoria;
+  }
+
+  if (categoria.slug) {
+    return categoria.slug;
+  }
+
+  const name = categoria.nombre || categoria.nombre_categoria || categoria.name || '';
+  return name
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
+export const getCategoriaUrl = (categoria) => {
+  if (!categoria) return '/categorias';
+
+  if (typeof categoria === 'string' && categoria.startsWith('/categorias/')) {
+    return categoria;
+  }
+
+  const slug = getCategoriaSlug(categoria);
+  if (slug) {
+    return `/categorias/${slug}`;
+  }
+
+  const id = typeof categoria === 'object' ? (categoria.id_categoria || categoria.id) : categoria;
+  return id ? `/categorias/${id}` : '/categorias';
+};
+

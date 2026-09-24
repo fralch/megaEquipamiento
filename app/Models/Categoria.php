@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Categoria extends Model
 {
@@ -21,6 +22,7 @@ class Categoria extends Model
     // Definir los campos que se pueden asignar en masa
     protected $fillable = [
         'nombre',
+        'slug',
         'descripcion',
         'img',
         'video',
@@ -68,5 +70,68 @@ class Categoria extends Model
     public function seccion()
     {
         return $this->belongsTo(Seccion::class, 'id_seccion');
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($categoria) {
+            if (empty($categoria->slug) && !empty($categoria->nombre)) {
+                $categoria->slug = static::generateUniqueSlug($categoria->nombre);
+            }
+        });
+
+        static::updating(function ($categoria) {
+            if ($categoria->isDirty('nombre') && empty($categoria->slug)) {
+                $categoria->slug = static::generateUniqueSlug($categoria->nombre, $categoria->id_categoria);
+            }
+        });
+    }
+
+    /**
+     * Genera un slug único para la categoría.
+     */
+    public static function generateUniqueSlug(string $nombre, $excludeId = null): string
+    {
+        $baseSlug = Str::slug($nombre);
+        if (empty($baseSlug)) {
+            $baseSlug = 'categoria';
+        }
+
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (static::where('slug', $slug)
+            ->when($excludeId, fn ($q) => $q->where('id_categoria', '!=', $excludeId))
+            ->exists()) {
+            $slug = $baseSlug.'-'.$counter;
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Genera el slug SEO de la categoría (ej: "alcoholimetro").
+     */
+    public function getSeoSlug(): string
+    {
+        if (!empty($this->slug)) {
+            return $this->slug;
+        }
+
+        $slug = Str::slug($this->nombre);
+        if (empty($slug)) {
+            return 'categoria-'.$this->id_categoria;
+        }
+
+        return $slug;
+    }
+
+    /**
+     * URL pública SEO de la categoría.
+     */
+    public function getSeoUrl(): string
+    {
+        return '/categorias/'.$this->getSeoSlug();
     }
 }

@@ -7,19 +7,20 @@ use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class CategoriaController extends Controller
 {
-    public function CategoriasWiew($id_categoria = null)
+    public function CategoriasWiew($categoriaSlug = null)
     {
         // Cache para todas las categorías por 1 hora
         $todasCategorias = Cache::remember('todas_categorias', 3600, function () {
             return Categoria::with('subcategorias')->get();
         });
 
-        if ($id_categoria === null) {
-            // Si no se proporciona id_categoria, devolver un array vacío
+        if ($categoriaSlug === null) {
+            // Si no se proporciona categoría, devolver un array vacío
             $productos = [];
             $categoria = null;
             $subcategorias = [];
@@ -31,15 +32,54 @@ class CategoriaController extends Controller
                 'subcategorias' => $subcategorias,
                 'marcas' => $marcas,
                 'todasCategorias' => $todasCategorias,
+                'seoSlug' => null,
             ]);
         }
 
-        // Obtener la categoría por su ID con subcategorías y marcas precargadas
-        $categoria = Categoria::with(['subcategorias', 'marcas'])->find($id_categoria);
+        $categoria = null;
+
+        // 1. Si es numérico (retrocompatibilidad ej: /categorias/105)
+        if (ctype_digit((string) $categoriaSlug)) {
+            $categoria = Categoria::with(['subcategorias', 'marcas'])->find($categoriaSlug);
+            if ($categoria) {
+                return redirect($categoria->getSeoUrl(), 301);
+            }
+            abort(404);
+        }
+
+        // 2. Si viene con formato slug-id (ej: /categorias/alcoholimetro-105)
+        if (preg_match('/-(\d+)$/', (string) $categoriaSlug, $matches)) {
+            $idFromSlug = (int) $matches[1];
+            $categoria = Categoria::with(['subcategorias', 'marcas'])->find($idFromSlug);
+            if ($categoria) {
+                return redirect($categoria->getSeoUrl(), 301);
+            }
+        }
+
+        // 3. Buscar por slug directo
+        $categoria = Categoria::with(['subcategorias', 'marcas'])
+            ->where('slug', $categoriaSlug)
+            ->first();
+
+        // 4. Fallback si no coincide con slug directo (por ejemplo caracteres con tildes o variaciones)
+        if (! $categoria) {
+            $categoria = $todasCategorias->first(function ($cat) use ($categoriaSlug) {
+                return Str::slug($cat->nombre) === $categoriaSlug;
+            });
+
+            if ($categoria && ! empty($categoria->slug) && $categoriaSlug !== $categoria->slug) {
+                return redirect($categoria->getSeoUrl(), 301);
+            }
+        }
 
         if (! $categoria) {
-            // Manejar el caso en que la categoría no se encuentre
-            return response()->json(['error' => 'Categoría no encontrada'], 404);
+            abort(404);
+        }
+
+        // Si el slug solicitado difiere del canónico, redirigir 301
+        $canonicalSlug = $categoria->getSeoSlug();
+        if ($categoriaSlug !== $canonicalSlug) {
+            return redirect($categoria->getSeoUrl(), 301);
         }
 
         // Las subcategorías y marcas ya están cargadas por el eager loading
@@ -52,6 +92,8 @@ class CategoriaController extends Controller
         // Obtener los productos que pertenecen a esas subcategorías y cargar la relación 'marca'
         $productos = Producto::with('marca')->whereIn('id_subcategoria', $subcategoriaIds)->get();
 
+        $seoSlug = $canonicalSlug;
+
         // Devolver los productos en la vista usando Inertia
         return Inertia::render('Categoria', [
             'productos' => $productos,
@@ -59,6 +101,7 @@ class CategoriaController extends Controller
             'subcategorias' => $subcategorias,
             'marcas' => $marcas,
             'todasCategorias' => $todasCategorias,
+            'seoSlug' => $seoSlug,
         ]);
     }
 
@@ -355,7 +398,7 @@ class CategoriaController extends Controller
     public function getCategoriasConSubcategoriasIds()
     {
         // Obtener todas las categorías con sus subcategorías incluyendo las imágenes
-        $categorias = Categoria::with('subcategorias:id_subcategoria,nombre,id_categoria')->get(['id_categoria', 'nombre', 'img']);
+        $categorias = Categoria::with('subcategorias:id_subcategoria,nombre,id_categoria')->get(['id_categoria', 'nombre', 'slug', 'img']);
 
         // Debug: agregar información sobre las imágenes
         $categorias->each(function ($categoria) {

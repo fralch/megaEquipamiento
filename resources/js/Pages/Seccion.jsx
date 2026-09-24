@@ -17,6 +17,7 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
+import { getCategoriaUrl } from "../utils/productUrl";
 
 export default function Seccion({ seccion, productos, categorias = [], seoSlug }) {
     const { isDarkMode } = useTheme();
@@ -671,7 +672,7 @@ function CategoryItem({
                         </motion.div>
                     ) : (
                         <Link
-                            href={`/categorias/${categoria.id_categoria}`}
+                            href={getCategoriaUrl(categoria)}
                             onClick={(e) => e.stopPropagation()}
                             className={`flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-all ${
                                 isDarkMode

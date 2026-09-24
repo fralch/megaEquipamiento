@@ -7,9 +7,10 @@ import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
 import VideoPlayer from "../Components/VideoPlayer";
+import { getCategoriaUrl } from "../utils/productUrl";
 const URL_API = import.meta.env.VITE_API_URL;
 
-export default function Categoria({ productos, categoria, subcategorias, marcas, todasCategorias }) {
+export default function Categoria({ productos, categoria, subcategorias, marcas, todasCategorias, seoSlug }) {
     const { auth } = usePage().props;
     const { isDarkMode } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
@@ -207,7 +208,9 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
 
     return (
         <div>
-            <Head title="Categorias" />
+            <Head title={categoria ? `${categoria.nombre} | Categorías` : 'Categorías'}>
+                {seoSlug && <link rel="canonical" href={typeof window !== 'undefined' ? `${window.location.origin}/categorias/${seoSlug}` : `/categorias/${seoSlug}`} />}
+            </Head>
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
@@ -325,7 +328,7 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                                             </button>
                                         ) : (
                                             <Link
-                                                href={`/categorias/${cat.id_categoria}`}
+                                                href={getCategoriaUrl(cat)}
                                                 className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold flex items-center justify-between animate-slideIn ${
                                                     isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
                                                 }`}

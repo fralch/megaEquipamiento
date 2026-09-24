@@ -25,7 +25,7 @@ import ModalRelatedProducts from "../Components/product/ModalRelatedProducts";
 import RelatedProducts from "../Components/product/RelatedProducts";
 import ProductCategoryEdit from "../Components/product/ProductCategoryEdit";
 import BancoImagenesModal from '../Components/store/BancoImagenesModal';
-import { getProductUrl } from "../utils/productUrl";
+import { getProductUrl, getCategoriaUrl } from "../utils/productUrl";
 
 // Currency formatting function moved to CurrencyContext
 // probando github actions
@@ -1331,7 +1331,7 @@ const ProductPage = ({ producto }) => {
                                 "@type": "ListItem",
                                 "position": 2,
                                 "name": categoriaCurrent?.nombre_categoria || "Categoría",
-                                "item": `${window.location.origin}/categorias/${categoriaCurrent?.id_categoria || ''}`
+                                "item": `${window.location.origin}${getCategoriaUrl({ id_categoria: categoriaCurrent?.id_categoria, nombre: categoriaCurrent?.nombre_categoria, slug: categoriaCurrent?.slug })}`
                             },
                             {
                                 "@type": "ListItem",
@@ -1365,7 +1365,7 @@ const ProductPage = ({ producto }) => {
             {categoriaCurrent && subcategoriaCurrent && (
                 <div className="flex items-center flex-wrap gap-1 px-4 md:px-6 py-3 ">
                     <Link 
-                        href={`/categorias/${categoriaCurrent.id_categoria}`} 
+                        href={getCategoriaUrl({ id_categoria: categoriaCurrent.id_categoria, nombre: categoriaCurrent.nombre_categoria, slug: categoriaCurrent.slug })} 
                         className={`hover:text-blue-600 transition-colors duration-200 text-base md:text-lg font-medium ${
                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                         }`}
@@ -1633,7 +1633,7 @@ const ProductPage = ({ producto }) => {
                                             {categoriaCurrent && (
                                                 <>
                                                     <Link 
-                                                        href={`/categorias/${categoriaCurrent.id_categoria}`} 
+                                                        href={getCategoriaUrl({ id_categoria: categoriaCurrent.id_categoria, nombre: categoriaCurrent.nombre_categoria, slug: categoriaCurrent.slug })} 
                                                         className={`hover:text-blue-600 transition-colors duration-200 ml-1 ${
                                                             isDarkMode ? 'text-gray-300' : 'text-gray-600'
                                                         }`}

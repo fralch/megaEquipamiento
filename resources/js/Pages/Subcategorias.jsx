@@ -9,6 +9,7 @@ import Footer from "../Components/home/Footer";
 import FiltroForm from "../Components/filtros/FiltroForm";
 import FiltroList from "../Components/filtros/FiltroList";
 import FiltroConfirmDialog from "../Components/filtros/FiltroConfirmDialog";
+import { getCategoriaUrl } from "../utils/productUrl";
 
 const URL_API = import.meta.env.VITE_API_URL;
 
@@ -144,6 +145,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
     const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
     const [categoriaNombre, setCategoriaNombre] = useState("");
     const [categoriaId, setCategoriaId] = useState("");
+    const [categoriaSlug, setCategoriaSlug] = useState("");
     const [subcategoriasCategoria, setSubcategoriasCategoria] = useState([]);
     const [mostrarFormularioFiltro, setMostrarFormularioFiltro] = useState(false);
     const [filtroEnEdicion, setFiltroEnEdicion] = useState(null);
@@ -640,6 +642,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                 const categoriaData = await makeRequest(`${URL_API}/subcategoria_get/cat/${subcategoriaId}`);
                 setCategoriaNombre(categoriaData.nombre_categoria);
                 setCategoriaId(categoriaData.id_categoria);
+                setCategoriaSlug(categoriaData.slug || '');
 
                 console.log('Categoria ID:', categoriaData.id_categoria); // Debug
                 console.log('Categoria Data:', categoriaData); // Debug
@@ -1016,7 +1019,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                     <div className="mb-8">
                                         <div className="flex items-center justify-between mb-4">
                                             <h1 className={titleClasses}>
-                                                <Link href={`/categorias/${categoriaId}`}>
+                                                <Link href={getCategoriaUrl({ id_categoria: categoriaId, nombre: categoriaNombre, slug: categoriaSlug })}>
                                                     <span className={`text-xl lg:text-2xl font-bold hover:underline ${
                                                         isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
                                                     } transition-colors duration-200`}>
@@ -1076,7 +1079,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                             <h1 className={`text-2xl lg:text-2xl font-bold mb-2 ${
                                                 isDarkMode ? 'text-white' : 'text-gray-900'
                                             } transition-colors duration-200`}>
-                                                <Link href={`/categorias/${categoriaId}`}>
+                                                <Link href={getCategoriaUrl({ id_categoria: categoriaId, nombre: categoriaNombre, slug: categoriaSlug })}>
                                                     <span className={`text-lg lg:text-xl font-bold hover:underline ${
                                                         isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
                                                     } transition-colors duration-200`}>
@@ -1176,7 +1179,7 @@ export default function Subcategoria({ productos: productosIniciales, marcas }) 
                                         <h1 className={`text-2xl lg:text-2xl font-bold mb-2 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         } transition-colors duration-200`}>
-                                            <Link href={`/categorias/${categoriaId}`}>
+                                            <Link href={getCategoriaUrl({ id_categoria: categoriaId, nombre: categoriaNombre, slug: categoriaSlug })}>
                                                 <span className={`text-lg lg:text-xl font-bold hover:underline ${
                                                     isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
                                                 } transition-colors duration-200`}>
