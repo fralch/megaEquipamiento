@@ -13,7 +13,6 @@
         "barryvdh/laravel-dompdf": "*",
         "doctrine/dbal": "^4.2",
         "inertiajs/inertia-laravel": "^1.0",
-        "kreait/laravel-firebase": "^7.2",
         "laravel/framework": "^11.31",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
@@ -76,6 +75,11 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "policy": {
+            "advisories": {
+                "block": false
+            }
         }
     },
     "minimum-stability": "stable",
