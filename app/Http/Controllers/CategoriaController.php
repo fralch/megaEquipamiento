@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Categoria;
 use App\Models\Producto;
+use App\Models\Seccion;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -32,7 +35,10 @@ class CategoriaController extends Controller
                 'subcategorias' => $subcategorias,
                 'marcas' => $marcas,
                 'todasCategorias' => $todasCategorias,
+                'categoriasSidebar' => null,
+                'seccion' => null,
                 'seoSlug' => null,
+                'canonicalPath' => null,
             ]);
         }
 
@@ -40,7 +46,7 @@ class CategoriaController extends Controller
 
         // 1. Si es numérico (retrocompatibilidad ej: /categorias/105)
         if (ctype_digit((string) $categoriaSlug)) {
-            $categoria = Categoria::with(['subcategorias', 'marcas'])->find($categoriaSlug);
+            $categoria = Categoria::with(['subcategorias', 'marcas', 'seccion'])->find($categoriaSlug);
             if ($categoria) {
                 return redirect($categoria->getSeoUrl(), 301);
             }
@@ -50,14 +56,14 @@ class CategoriaController extends Controller
         // 2. Si viene con formato slug-id (ej: /categorias/alcoholimetro-105)
         if (preg_match('/-(\d+)$/', (string) $categoriaSlug, $matches)) {
             $idFromSlug = (int) $matches[1];
-            $categoria = Categoria::with(['subcategorias', 'marcas'])->find($idFromSlug);
+            $categoria = Categoria::with(['subcategorias', 'marcas', 'seccion'])->find($idFromSlug);
             if ($categoria) {
                 return redirect($categoria->getSeoUrl(), 301);
             }
         }
 
         // 3. Buscar por slug directo
-        $categoria = Categoria::with(['subcategorias', 'marcas'])
+        $categoria = Categoria::with(['subcategorias', 'marcas', 'seccion'])
             ->where('slug', $categoriaSlug)
             ->first();
 
@@ -67,8 +73,11 @@ class CategoriaController extends Controller
                 return Str::slug($cat->nombre) === $categoriaSlug;
             });
 
-            if ($categoria && ! empty($categoria->slug) && $categoriaSlug !== $categoria->slug) {
-                return redirect($categoria->getSeoUrl(), 301);
+            if ($categoria) {
+                $categoria->load(['subcategorias', 'marcas', 'seccion']);
+                if (! empty($categoria->slug) && $categoriaSlug !== $categoria->slug) {
+                    return redirect($categoria->getSeoUrl(), 301);
+                }
             }
         }
 
@@ -92,7 +101,7 @@ class CategoriaController extends Controller
         // Obtener los productos que pertenecen a esas subcategorías y cargar la relación 'marca'
         $productos = Producto::with('marca')->whereIn('id_subcategoria', $subcategoriaIds)->get();
 
-        $seoSlug = $canonicalSlug;
+        [$seccion, $categoriasSidebar, $canonicalPath] = $this->resolveSeccionContext($categoria);
 
         // Devolver los productos en la vista usando Inertia
         return Inertia::render('Categoria', [
@@ -101,8 +110,125 @@ class CategoriaController extends Controller
             'subcategorias' => $subcategorias,
             'marcas' => $marcas,
             'todasCategorias' => $todasCategorias,
-            'seoSlug' => $seoSlug,
+            'categoriasSidebar' => $categoriasSidebar,
+            'seccion' => $seccion,
+            'seoSlug' => $canonicalSlug,
+            'canonicalPath' => $canonicalPath,
         ]);
+    }
+
+    /**
+     * Vista pública: categoría dentro de una sección específica.
+     * URL: /seccion/{seccionSlug}/categoria/{categoriaSlug}
+     */
+    public function CategoriaSeccionView($seccionSlug, $categoriaSlug)
+    {
+        $seccion = Seccion::where('slug', $seccionSlug)->where('activo', true)->firstOrFail();
+
+        // Resolver la categoría solo dentro de esta sección (no mezclamos secciones)
+        $categoria = null;
+
+        if (ctype_digit((string) $categoriaSlug)) {
+            $categoria = Categoria::with(['subcategorias', 'marcas'])
+                ->where('id_seccion', $seccion->id_seccion)
+                ->find($categoriaSlug);
+
+            if ($categoria) {
+                return redirect($categoria->getSeccionSeoUrl($seccion), 301);
+            }
+            abort(404);
+        }
+
+        if (preg_match('/-(\d+)$/', (string) $categoriaSlug, $matches)) {
+            $idFromSlug = (int) $matches[1];
+            $categoria = Categoria::with(['subcategorias', 'marcas'])
+                ->where('id_seccion', $seccion->id_seccion)
+                ->find($idFromSlug);
+
+            if ($categoria) {
+                return redirect($categoria->getSeccionSeoUrl($seccion), 301);
+            }
+        }
+
+        $categoria = Categoria::with(['subcategorias', 'marcas'])
+            ->where('slug', $categoriaSlug)
+            ->where('id_seccion', $seccion->id_seccion)
+            ->first();
+
+        if (! $categoria) {
+            $todasCategorias = Cache::remember('todas_categorias', 3600, function () {
+                return Categoria::with('subcategorias')->get();
+            });
+
+            $categoria = $todasCategorias->first(function ($cat) use ($categoriaSlug, $seccion) {
+                return $cat->id_seccion === $seccion->id_seccion
+                    && Str::slug($cat->nombre) === $categoriaSlug;
+            });
+
+            if ($categoria) {
+                $categoria->load(['subcategorias', 'marcas']);
+                if (! empty($categoria->slug) && $categoriaSlug !== $categoria->slug) {
+                    return redirect($categoria->getSeccionSeoUrl($seccion), 301);
+                }
+            }
+        }
+
+        if (! $categoria) {
+            abort(404);
+        }
+
+        $canonicalSlug = $categoria->getSeoSlug();
+        if ($categoriaSlug !== $canonicalSlug) {
+            return redirect($categoria->getSeccionSeoUrl($seccion), 301);
+        }
+
+        $subcategorias = $categoria->subcategorias;
+        $marcas = $categoria->marcas;
+        $subcategoriaIds = $subcategorias->pluck('id_subcategoria')->toArray();
+
+        $productos = Producto::with('marca')->whereIn('id_subcategoria', $subcategoriaIds)->get();
+
+        $categoria->setRelation('seccion', $seccion);
+        [$resolvedSeccion, $categoriasSidebar, $canonicalPath] = $this->resolveSeccionContext($categoria);
+
+        return Inertia::render('Categoria', [
+            'productos' => $productos,
+            'categoria' => $categoria,
+            'subcategorias' => $subcategorias,
+            'marcas' => $marcas,
+            'todasCategorias' => Cache::remember('todas_categorias', 3600, function () {
+                return Categoria::with('subcategorias')->get();
+            }),
+            'categoriasSidebar' => $categoriasSidebar,
+            'seccion' => $resolvedSeccion,
+            'seoSlug' => $canonicalSlug,
+            'canonicalPath' => $canonicalPath,
+        ]);
+    }
+
+    /**
+     * Resuelve sección y categorías de sidebar para una categoría dada.
+     *
+     * @return array{0: ?Seccion, 1: Collection, 2: string}
+     */
+    private function resolveSeccionContext(Categoria $categoria): array
+    {
+        $seccion = $categoria->seccion;
+
+        if ($seccion && $seccion->activo) {
+            $categoriasSidebar = Cache::remember(
+                'categorias_seccion_'.$seccion->id_seccion,
+                3600,
+                fn () => $seccion->categorias()
+                    ->with(['subcategorias' => fn ($q) => $q->orderBy('nombre')])
+                    ->orderBy('nombre')
+                    ->get()
+            );
+
+            return [$seccion, $categoriasSidebar, $categoria->getSeccionSeoUrl($seccion)];
+        }
+
+        return [null, collect(), $categoria->getSeoUrl()];
     }
 
     /*
@@ -178,6 +304,7 @@ class CategoriaController extends Controller
 
         // Invalidar cache de categorías
         Cache::forget('todas_categorias');
+        $this->forgetSeccionCache($categoria->id_seccion);
 
         return response()->json($categoria);
     }
@@ -201,6 +328,8 @@ class CategoriaController extends Controller
         if (! $categoria) {
             return response()->json(['error' => 'Categoría no encontrada'], 404);
         }
+
+        $previousSeccionId = $categoria->id_seccion;
 
         // Preparar datos para actualización
         $dataToUpdate = $request->except(['imagen', 'imagenes', 'imagenesDelBanco']);
@@ -264,6 +393,8 @@ class CategoriaController extends Controller
 
         // Invalidar cache de categorías
         Cache::forget('todas_categorias');
+        $this->forgetSeccionCache($categoria->id_seccion);
+        $this->forgetSeccionCache($previousSeccionId);
 
         return response()->json($categoria);
     }
@@ -374,14 +505,16 @@ class CategoriaController extends Controller
             }
 
             // Eliminar la categoría
+            $seccionId = $categoria->id_seccion;
             $categoria->delete();
 
             // Invalidar cache de categorías
             Cache::forget('todas_categorias');
+            $this->forgetSeccionCache($seccionId);
 
             return response()->json($id);
 
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Categoría no encontrada',
@@ -449,6 +582,16 @@ class CategoriaController extends Controller
         $subcategorias = $categoria->subcategorias;
 
         return response()->json($subcategorias);
+    }
+
+    /**
+     * Olvida la caché de categorías de una sección específica.
+     */
+    private function forgetSeccionCache(?int $seccionId): void
+    {
+        if ($seccionId) {
+            Cache::forget('categorias_seccion_'.$seccionId);
+        }
     }
 
     /**

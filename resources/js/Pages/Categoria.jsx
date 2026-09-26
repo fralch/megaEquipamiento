@@ -10,13 +10,14 @@ import VideoPlayer from "../Components/VideoPlayer";
 import { getCategoriaUrl } from "../utils/productUrl";
 const URL_API = import.meta.env.VITE_API_URL;
 
-export default function Categoria({ productos, categoria, subcategorias, marcas, todasCategorias, seoSlug }) {
+export default function Categoria({ productos, categoria, subcategorias, marcas, todasCategorias, categoriasSidebar, seccion, seoSlug, canonicalPath }) {
     const { auth } = usePage().props;
     const { isDarkMode } = useTheme();
     const [isOpen, setIsOpen] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [categoriasArray, setCategoriasArray] = useState([]);
     const [mostrarProductos, setMostrarProductos] = useState(false);
+    const [showAllCategories, setShowAllCategories] = useState(false);
 
 
 
@@ -209,7 +210,14 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
     return (
         <div>
             <Head title={categoria ? `${categoria.nombre} | Categorías` : 'Categorías'}>
-                {seoSlug && <link rel="canonical" href={typeof window !== 'undefined' ? `${window.location.origin}/categorias/${seoSlug}` : `/categorias/${seoSlug}`} />}
+                {seoSlug && (
+                    <link
+                        rel="canonical"
+                        href={typeof window !== 'undefined'
+                            ? `${window.location.origin}${canonicalPath || `/categorias/${seoSlug}`}`
+                            : (canonicalPath || `/categorias/${seoSlug}`)}
+                    />
+                )}
             </Head>
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
@@ -277,104 +285,154 @@ export default function Categoria({ productos, categoria, subcategorias, marcas,
                         </div>
                     </div>
 
+                    {/* Encabezado de sección (sidebar) */}
+                    {seccion && (
+                        <div className={`p-4 rounded-lg shadow-md flex items-center justify-between gap-2 ${
+                            isDarkMode ? 'bg-gray-900' : 'bg-gray-100'
+                        }`}>
+                            <div className="min-w-0">
+                                <p className={`text-xs uppercase tracking-wide font-semibold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    Sección
+                                </p>
+                                <p className={`text-sm font-bold truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                                    {seccion.nombre}
+                                </p>
+                            </div>
+                            <Link
+                                href={`/seccion/${seccion.slug}`}
+                                className={`shrink-0 text-xs font-semibold px-3 py-1.5 rounded-md transition-colors ${
+                                    isDarkMode ? 'bg-blue-700 hover:bg-blue-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                }`}
+                            >
+                                Ver sección
+                            </Link>
+                        </div>
+                    )}
+
                     {/* Navegación de categorías */}
-                    <nav 
+                    <nav
                         className={`p-4 overflow-y-auto shadow-2xl transition-all duration-200 rounded-lg ${
-                            isDarkMode 
-                                ? 'bg-gradient-to-b from-gray-900 via-black to-gray-900' 
+                            isDarkMode
+                                ? 'bg-gradient-to-b from-gray-900 via-black to-gray-900'
                                 : 'bg-gradient-to-b from-gray-100 via-white to-gray-100'
-                        }`} 
+                        }`}
                         id="nav-fijo"
                     >
+                        <div className="flex items-center justify-between mb-3">
+                            <p className={`text-xs uppercase tracking-wide font-semibold ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                {seccion && !showAllCategories ? `Categorías de ${seccion.nombre}` : 'Todas las categorías'}
+                            </p>
+                            {seccion && (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAllCategories(v => !v)}
+                                    className={`text-xs font-semibold underline underline-offset-2 transition-colors ${
+                                        isDarkMode ? 'text-blue-300 hover:text-blue-200' : 'text-blue-600 hover:text-blue-700'
+                                    }`}
+                                >
+                                    {showAllCategories ? `Solo ${seccion.nombre}` : 'Ver todas'}
+                                </button>
+                            )}
+                        </div>
                         <div className="space-y-2">
-                            {todasCategorias && todasCategorias.length > 0 ? (() => {
-                                const categoriasOrdenadas = [...todasCategorias].sort((a, b) => {
+                            {(() => {
+                                const lista = (seccion && !showAllCategories && categoriasSidebar && categoriasSidebar.length > 0)
+                                    ? categoriasSidebar
+                                    : (todasCategorias || []);
+
+                                if (!lista || lista.length === 0) {
+                                    return (
+                                        <div className={`p-3 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            <p>No hay categorías disponibles</p>
+                                        </div>
+                                    );
+                                }
+
+                                const linkSeccion = (showAllCategories || !seccion) ? null : seccion;
+
+                                const categoriasOrdenadas = [...lista].sort((a, b) => {
                                     const aEsActual = categoria && categoria.id_categoria === a.id_categoria;
                                     const bEsActual = categoria && categoria.id_categoria === b.id_categoria;
                                     if (aEsActual && !bEsActual) return -1;
                                     if (!aEsActual && bEsActual) return 1;
                                     return 0;
                                 });
-                                
-                                return categoriasOrdenadas.map((cat, catIndex) => {
-                                const isCurrentCategory = categoria && categoria.id_categoria === cat.id_categoria;
-                                return (
-                                    <div key={cat.id_categoria} className="space-y-1">
-                                        {isCurrentCategory ? (
-                                            <button
-                                                onClick={toggleSubcategoryDropdown}
-                                                className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold flex items-center justify-between animate-slideIn ${
-                                                    isDarkMode ? 'bg-blue-800 text-white shadow-md' : 'bg-blue-600 text-white shadow-md'
-                                                }`}
-                                                style={{ animationDelay: `${catIndex * 0.05}s` }}
-                                            >
-                                                <span className="font-medium text-sm">
-                                                    {cat.nombre}
-                                                </span>
-                                                {subcategorias && subcategorias.length > 0 && (
-                                                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20">
-                                                        <svg 
-                                                            className={`w-4 h-4 transform transition-transform duration-300 text-white ${
-                                                                isSubcategoryDropdownOpen ? 'rotate-180' : ''
-                                                            }`} 
-                                                            fill="none" 
-                                                            stroke="currentColor" 
-                                                            viewBox="0 0 24 24"
-                                                        >
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                        </svg>
-                                                    </div>
-                                                )}
-                                            </button>
-                                        ) : (
-                                            <Link
-                                                href={getCategoriaUrl(cat)}
-                                                className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold flex items-center justify-between animate-slideIn ${
-                                                    isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-                                                }`}
-                                                style={{ animationDelay: `${catIndex * 0.05}s` }}
-                                            >
-                                                <span className="font-medium text-sm">
-                                                    {cat.nombre}
-                                                </span>
-                                            </Link>
-                                        )}
 
-                                        {isCurrentCategory && isSubcategoryDropdownOpen && subcategorias && subcategorias.length > 0 && (
-                                            <div className="ml-3 space-y-1 animate-slideDown">
-                                                {subcategorias.map((subcategoria, subIndex) => (
-                                                    <Link
-                                                        key={subcategoria.id_subcategoria}
-                                                        href={`/subcategoria/${subcategoria.id_subcategoria}`}
-                                                        className={`group block p-2 pl-4 rounded-md transition-all duration-150 transform hover:scale-[1.02] hover:translate-x-1 ${
-                                                            isDarkMode 
-                                                                ? 'bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 border border-gray-600/50 hover:border-gray-500/70' 
-                                                                : 'bg-blue-50/50 hover:bg-blue-100/70 text-gray-800 border border-blue-100 hover:border-blue-200'
-                                                        } hover:shadow-sm animate-slideIn`}
-                                                        style={{ animationDelay: `${subIndex * 0.03}s` }}
-                                                    >
-                                                        <div className="flex items-center">
-                                                            <div className={`w-1.5 h-1.5 rounded-full mr-2 transition-all duration-100 ${
-                                                                isDarkMode 
-                                                                    ? 'bg-green-400 group-hover:bg-green-300' 
-                                                                    : 'bg-green-500 group-hover:bg-green-600'
-                                                            }`}></div>
-                                                            <span className="text-sm font-medium group-hover:font-semibold transition-all duration-100">
-                                                                {subcategoria.nombre}
-                                                            </span>
+                                return categoriasOrdenadas.map((cat, catIndex) => {
+                                    const isCurrentCategory = categoria && categoria.id_categoria === cat.id_categoria;
+                                    return (
+                                        <div key={cat.id_categoria} className="space-y-1">
+                                            {isCurrentCategory ? (
+                                                <button
+                                                    onClick={toggleSubcategoryDropdown}
+                                                    className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold flex items-center justify-between animate-slideIn ${
+                                                        isDarkMode ? 'bg-blue-800 text-white shadow-md' : 'bg-blue-600 text-white shadow-md'
+                                                    }`}
+                                                    style={{ animationDelay: `${catIndex * 0.05}s` }}
+                                                >
+                                                    <span className="font-medium text-sm">
+                                                        {cat.nombre}
+                                                    </span>
+                                                    {subcategorias && subcategorias.length > 0 && (
+                                                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-white/20">
+                                                            <svg
+                                                                className={`w-4 h-4 transform transition-transform duration-300 text-white ${
+                                                                    isSubcategoryDropdownOpen ? 'rotate-180' : ''
+                                                                }`}
+                                                                fill="none"
+                                                                stroke="currentColor"
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                            </svg>
                                                         </div>
-                                                    </Link>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
+                                                    )}
+                                                </button>
+                                            ) : (
+                                                <Link
+                                                    href={getCategoriaUrl(cat, linkSeccion)}
+                                                    className={`group w-full text-left p-3 rounded-lg transition-all duration-200 transform hover:scale-105 hover:shadow-lg font-bold flex items-center justify-between animate-slideIn ${
+                                                        isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                                                    }`}
+                                                    style={{ animationDelay: `${catIndex * 0.05}s` }}
+                                                >
+                                                    <span className="font-medium text-sm">
+                                                        {cat.nombre}
+                                                    </span>
+                                                </Link>
+                                            )}
+
+                                            {isCurrentCategory && isSubcategoryDropdownOpen && subcategorias && subcategorias.length > 0 && (
+                                                <div className="ml-3 space-y-1 animate-slideDown">
+                                                    {subcategorias.map((subcategoria, subIndex) => (
+                                                        <Link
+                                                            key={subcategoria.id_subcategoria}
+                                                            href={`/subcategoria/${subcategoria.id_subcategoria}`}
+                                                            className={`group block p-2 pl-4 rounded-md transition-all duration-150 transform hover:scale-[1.02] hover:translate-x-1 ${
+                                                                isDarkMode
+                                                                    ? 'bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 border border-gray-600/50 hover:border-gray-500/70'
+                                                                    : 'bg-blue-50/50 hover:bg-blue-100/70 text-gray-800 border border-blue-100 hover:border-blue-200'
+                                                            } hover:shadow-sm animate-slideIn`}
+                                                            style={{ animationDelay: `${subIndex * 0.03}s` }}
+                                                        >
+                                                            <div className="flex items-center">
+                                                                <div className={`w-1.5 h-1.5 rounded-full mr-2 transition-all duration-100 ${
+                                                                    isDarkMode
+                                                                        ? 'bg-green-400 group-hover:bg-green-300'
+                                                                        : 'bg-green-500 group-hover:bg-green-600'
+                                                                }`}></div>
+                                                                <span className="text-sm font-medium group-hover:font-semibold transition-all duration-100">
+                                                                    {subcategoria.nombre}
+                                                                </span>
+                                                            </div>
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
                                 });
-                            })() : (
-                                <div className={`p-3 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                                    <p>No hay categorías disponibles</p>
-                                </div>
-                            )}
+                            })()}
                         </div>
                     </nav>
                 </div>

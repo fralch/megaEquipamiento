@@ -52,6 +52,7 @@ Route::get('/subcategoria/{id}/{marca_id?}', [ProductoController::class, 'subCat
 Route::get('/producto/{productoSlug}', [ProductoController::class, 'ProductView'])->name('producto.view');
 Route::get('/marcas/{marcaSlug}', [ProductoController::class, 'ProductViewByMarca'])->name('marcas.view');
 Route::get('/seccion/{slug}', [SeccionController::class, 'show'])->name('seccion.show');
+Route::get('/seccion/{seccionSlug}/categoria/{categoriaSlug}', [CategoriaController::class, 'CategoriaSeccionView'])->name('seccion.categoria.view');
 Route::get('/seccion/{seccionSlug}/marca/{marcaSlug}', [ProductoController::class, 'ProductViewByMarcaSeccion'])->name('seccion.marca.view');
 Route::get('/sector/{id_tag_parent}', [SectorController::class, 'show'])->name('sector.view');
 Route::get('/sectores', [SectorController::class, 'index'])->name('sectores.index');

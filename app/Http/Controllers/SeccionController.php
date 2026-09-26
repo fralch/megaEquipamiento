@@ -6,6 +6,7 @@ use App\Models\Categoria;
 use App\Models\Marca;
 use App\Models\Seccion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -229,6 +230,14 @@ class SeccionController extends Controller
         $seccion = Seccion::findOrFail($id);
         $ids = $validated['categoria_ids'] ?? [];
 
+        // Identificar secciones afectadas antes de modificar (origen de las que se mueven)
+        $seccionesAfectadas = Categoria::whereIn('id_categoria', $ids)
+            ->orWhere('id_seccion', $seccion->id_seccion)
+            ->pluck('id_seccion')
+            ->filter()
+            ->unique()
+            ->values();
+
         // Desasignar las que tenían esta sección y ya no están en la lista
         Categoria::where('id_seccion', $seccion->id_seccion)
             ->whereNotIn('id_categoria', $ids)
@@ -237,6 +246,13 @@ class SeccionController extends Controller
         // Asignar (o mover desde otra sección) las de la lista
         Categoria::whereIn('id_categoria', $ids)
             ->update(['id_seccion' => $seccion->id_seccion]);
+
+        // Invalidar cachés afectadas
+        Cache::forget('todas_categorias');
+        foreach ($seccionesAfectadas as $seccionId) {
+            Cache::forget('categorias_seccion_'.$seccionId);
+        }
+        Cache::forget('categorias_seccion_'.$seccion->id_seccion);
 
         return response()->json(['message' => 'Categorías sincronizadas exitosamente']);
     }

@@ -75,7 +75,7 @@ class Categoria extends Model
     protected static function booted()
     {
         static::creating(function ($categoria) {
-            if (empty($categoria->slug) && !empty($categoria->nombre)) {
+            if (empty($categoria->slug) && ! empty($categoria->nombre)) {
                 $categoria->slug = static::generateUniqueSlug($categoria->nombre);
             }
         });
@@ -115,7 +115,7 @@ class Categoria extends Model
      */
     public function getSeoSlug(): string
     {
-        if (!empty($this->slug)) {
+        if (! empty($this->slug)) {
             return $this->slug;
         }
 
@@ -133,5 +133,19 @@ class Categoria extends Model
     public function getSeoUrl(): string
     {
         return '/categorias/'.$this->getSeoSlug();
+    }
+
+    /**
+     * URL pública SEO de la categoría dentro de una sección específica.
+     */
+    public function getSeccionSeoUrl(?Seccion $seccion = null): string
+    {
+        $seccion = $seccion ?? $this->seccion;
+
+        if ($seccion && ! empty($seccion->slug)) {
+            return '/seccion/'.$seccion->slug.'/categoria/'.$this->getSeoSlug();
+        }
+
+        return $this->getSeoUrl();
     }
 }

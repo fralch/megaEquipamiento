@@ -720,7 +720,7 @@ function CategoryItem({
                         </motion.div>
                     ) : (
                         <Link
-                            href={getCategoriaUrl(categoria)}
+                            href={getCategoriaUrl(categoria, seccion)}
                             onClick={(e) => e.stopPropagation()}
                             className={`flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-all ${
                                 isDarkMode

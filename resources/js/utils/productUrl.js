@@ -78,7 +78,7 @@ export const getCategoriaSlug = (categoria) => {
     .replace(/^-+|-+$/g, '');
 };
 
-export const getCategoriaUrl = (categoria) => {
+export const getCategoriaUrl = (categoria, seccion) => {
   if (!categoria) return '/categorias';
 
   if (typeof categoria === 'string' && categoria.startsWith('/categorias/')) {
@@ -86,11 +86,21 @@ export const getCategoriaUrl = (categoria) => {
   }
 
   const slug = getCategoriaSlug(categoria);
+  const seccionSlug = seccion ? (typeof seccion === 'string' ? seccion : seccion.slug) : null;
+
   if (slug) {
-    return `/categorias/${slug}`;
+    return seccionSlug
+      ? `/seccion/${seccionSlug}/categoria/${slug}`
+      : `/categorias/${slug}`;
   }
 
   const id = typeof categoria === 'object' ? (categoria.id_categoria || categoria.id) : categoria;
-  return id ? `/categorias/${id}` : '/categorias';
+  if (id) {
+    return seccionSlug
+      ? `/seccion/${seccionSlug}/categoria/${id}`
+      : `/categorias/${id}`;
+  }
+
+  return '/categorias';
 };
 
