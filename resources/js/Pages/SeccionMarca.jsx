@@ -1,918 +1,564 @@
-import { Head, Link } from "@inertiajs/react";
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-    ChevronDown,
-    Search,
-    X,
-    Package,
-    Grid3x3,
-    Sparkles,
-    ArrowRight,
-    SlidersHorizontal,
-} from "lucide-react";
+import { Head, Link, usePage } from "@inertiajs/react";
+import { useEffect, useState } from "react";
 import { useTheme } from "../storage/ThemeContext";
 import Header from "../Components/home/Header";
 import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
-import { getCategoriaUrl } from "../utils/productUrl";
+import VideoPlayer from "../Components/VideoPlayer";
 
-export default function SeccionMarca({ seccion, marca, productos, categorias = [], marcaSeoSlug }) {
+export default function SeccionMarca({ seccion, marca, productos = [], categorias = [], marcaSeoSlug }) {
     const { isDarkMode } = useTheme();
+    const { auth } = usePage().props;
+    const [isEditingVideo, setIsEditingVideo] = useState(false);
+    const [editVideoForm, setEditVideoForm] = useState({ video_url: '' });
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [updateMessage, setUpdateMessage] = useState({ type: '', text: '' });
+    const [videoPreview, setVideoPreview] = useState(null);
     const [isOpen, setIsOpen] = useState(false);
-    // Solo las categorías de esta sección (vienen del servidor)
-    const [categoriasArray] = useState(categorias);
+    const [categoriasArray, setCategoriasArray] = useState(categorias || []);
     const [openCategories, setOpenCategories] = useState({});
     const [activeCategory, setActiveCategory] = useState(null);
-    const [isLoading] = useState(false);
-    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [imgError, setImgError] = useState(false);
 
-    const toggleMenu = () => setIsOpen(!isOpen);
+    useEffect(() => {
+        if (categorias) {
+            setCategoriasArray(categorias);
+        }
+    }, [categorias]);
 
-    const toggleCategory = (id) => {
-        setOpenCategories((prev) => ({ ...prev, [id]: !prev[id] }));
-        setActiveCategory(id);
+    const toggleCategory = (categoriaNombre) => {
+        setOpenCategories((prevState) => ({
+            ...prevState,
+            [categoriaNombre]: !prevState[categoriaNombre],
+        }));
+        setActiveCategory(categoriaNombre);
     };
 
-    const categoriasFiltradas = useMemo(() => {
-        if (!searchTerm.trim()) return categoriasArray;
-        const term = searchTerm.toLowerCase();
-        return categoriasArray
-            .map((cat) => {
-                const coincideCategoria = cat.nombre
-                    ?.toLowerCase()
-                    .includes(term);
-                const subFiltradas = (cat.subcategorias || []).filter((sub) =>
-                    sub.nombre?.toLowerCase().includes(term)
-                );
-                if (coincideCategoria || subFiltradas.length > 0) {
-                    return {
-                        ...cat,
-                        subcategorias: coincideCategoria
-                            ? cat.subcategorias || []
-                            : subFiltradas,
-                    };
-                }
-                return null;
-            })
-            .filter(Boolean);
-    }, [categoriasArray, searchTerm]);
+    const toggleMenu = () => {
+        setIsOpen(!isOpen);
+    };
 
-    const totalProductos = productos?.length || 0;
-    const showImage = Boolean(marca?.imagen) && !imgError;
+    // Initialize edit form when marca changes
+    useEffect(() => {
+        if (marca && marca.video_url) {
+            setEditVideoForm({ video_url: marca.video_url });
+            setVideoPreview(marca.video_url);
+        }
+    }, [marca]);
+
+    // Handle edit video form changes
+    const handleEditVideoChange = (e) => {
+        const value = e.target.value;
+        setEditVideoForm({ video_url: value });
+        setVideoPreview(value);
+    };
+
+    // Handle video update submission
+    const handleUpdateVideo = async (e) => {
+        e.preventDefault();
+        if (!marca || !marca.id_marca) return;
+
+        setIsUpdating(true);
+        setUpdateMessage({ type: '', text: '' });
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
+            const formData = new FormData();
+            formData.append('nombre', marca.nombre);
+            formData.append('descripcion', marca.descripcion || '');
+            formData.append('video_url', editVideoForm.video_url);
+
+            const response = await fetch(`/marca/update/${marca.id_marca}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                },
+                body: formData,
+            });
+
+            if (response.ok) {
+                marca.video_url = editVideoForm.video_url;
+                setUpdateMessage({ type: 'success', text: 'Video actualizado correctamente!' });
+                setIsEditingVideo(false);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al actualizar el video');
+            }
+        } catch (error) {
+            console.error('Error updating video:', error);
+            setUpdateMessage({ type: 'error', text: error.message || 'Error al actualizar el video' });
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    // Auto-clear messages
+    useEffect(() => {
+        if (updateMessage.text) {
+            const timer = setTimeout(() => {
+                setUpdateMessage({ type: '', text: '' });
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [updateMessage]);
 
     return (
         <div className="min-h-screen">
-            <Head
-                title={
-                    marca && seccion
-                        ? `${marca.nombre} en ${seccion.nombre} | Mega Equipamiento`
-                        : "Marca en Sección | Mega Equipamiento"
-                }
-            >
-                {marca && seccion && (
+            <Head title={marca ? `Equipamiento ${marca.nombre}${seccion ? ` - ${seccion.nombre}` : ''} | Mega Equipamiento` : 'Marca | Mega Equipamiento'}>
+                {marca && (
                     <meta
                         name="description"
-                        content={
-                            marca.descripcion ||
-                            `Descubre los productos de ${marca.nombre} en la sección ${seccion.nombre} de Mega Equipamiento.`
-                        }
+                        content={`Descubre la línea completa de equipamiento ${marca.nombre}${seccion ? ` en la sección ${seccion.nombre}` : ''} en Mega Equipamiento. Productos de laboratorio, equipos industriales y soluciones profesionales con garantía y soporte técnico.`}
                     />
                 )}
-                {marca && seccion && (
-                    <meta
-                        property="og:title"
-                        content={`${marca.nombre} en ${seccion.nombre} | Mega Equipamiento`}
-                    />
-                )}
-                {marca && seccion && (
-                    <meta
-                        property="og:description"
-                        content={`Explora los productos de ${marca.nombre} disponibles en la sección ${seccion.nombre}.`}
-                    />
-                )}
-                {marca?.imagen_url && (
-                    <meta property="og:image" content={marca.imagen_url} />
-                )}
-                {marca && seccion && (
-                    <meta property="og:type" content="website" />
-                )}
+                {marca && <meta property="og:title" content={`Equipamiento ${marca.nombre}${seccion ? ` - ${seccion.nombre}` : ''} | Mega Equipamiento`} />}
+                {marca && <meta property="og:description" content={`Explora los productos de ${marca.nombre}${seccion ? ` en ${seccion.nombre}` : ''}. Equipamiento de laboratorio e industrial de alta calidad.`} />}
+                {marca?.imagen_url && <meta property="og:image" content={marca.imagen_url} />}
+                {marca && <meta property="og:type" content="website" />}
                 {marca && seccion && (
                     <link
                         rel="canonical"
-                        href={`${window.location.origin}/seccion/${seccion.slug}/marca/${marcaSeoSlug}`}
+                        href={`${window.location.origin}/seccion/${seccion.slug}/marca/${marcaSeoSlug || marca.slug || marca.id_marca}`}
                     />
                 )}
             </Head>
             <Header />
             <Menu toggleMenu={toggleMenu} className="mt-10" />
             <NavVertical isOpen={isOpen} onClose={toggleMenu} />
-
-            <div
-                className={`w-full min-h-screen ${
-                    isDarkMode
-                        ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900"
-                        : "bg-gradient-to-br from-slate-50 via-white to-blue-50"
-                } transition-all duration-300`}
-            >
-                {/* HERO SECTION */}
-                {seccion && marca && (
-                    <section className="relative overflow-hidden">
-                        <div
-                            className={`absolute inset-0 opacity-50 pointer-events-none ${
-                                isDarkMode
-                                    ? "bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.15),transparent_50%),radial-gradient(circle_at_70%_80%,rgba(16,185,129,0.1),transparent_50%)]"
-                                    : "bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_50%),radial-gradient(circle_at_70%_80%,rgba(16,185,129,0.06),transparent_50%)]"
-                            }`}
-                        />
-
-                        <div className="relative w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-8 pb-10 lg:pt-10 lg:pb-12">
-                            {/* Breadcrumb */}
-                            <motion.nav
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.4 }}
-                                className={`flex flex-wrap items-center gap-2 text-sm mb-6 ${
-                                    isDarkMode ? "text-gray-400" : "text-gray-500"
-                                }`}
-                            >
-                                <Link
-                                    href="/"
-                                    className={`hover:underline transition-colors ${
-                                        isDarkMode
-                                            ? "hover:text-blue-400"
-                                            : "hover:text-blue-600"
-                                    }`}
-                                >
-                                    Inicio
-                                </Link>
-                                <ChevronDown className="w-3 h-3 -rotate-90" />
-                                <Link
-                                    href={`/seccion/${seccion.slug}`}
-                                    className={`hover:underline transition-colors ${
-                                        isDarkMode
-                                            ? "hover:text-blue-400"
-                                            : "hover:text-blue-600"
-                                    }`}
-                                >
-                                    {seccion.nombre}
-                                </Link>
-                                <ChevronDown className="w-3 h-3 -rotate-90" />
-                                <span
-                                    className={`font-medium ${
-                                        isDarkMode ? "text-white" : "text-gray-900"
-                                    }`}
-                                >
-                                    {marca.nombre}
-                                </span>
-                            </motion.nav>
-
-                            <div className="flex flex-col lg:flex-row gap-8 items-start lg:items-center">
-                                {/* Imagen de la marca */}
-                                {showImage && (
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{
-                                            duration: 0.5,
-                                            delay: 0.1,
-                                        }}
-                                        className="relative group"
-                                    >
-                                        <div
-                                            className={`absolute -inset-1 rounded-2xl blur-lg opacity-60 group-hover:opacity-80 transition-opacity duration-500 ${
-                                                isDarkMode
-                                                    ? "bg-gradient-to-br from-blue-600 to-emerald-500"
-                                                    : "bg-gradient-to-br from-blue-500 to-emerald-400"
-                                            }`}
-                                        />
-                                        <div
-                                            className={`relative w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden bg-white ring-2 ${
-                                                isDarkMode
-                                                    ? "ring-gray-700/50"
-                                                    : "ring-white"
-                                            } shadow-2xl`}
-                                        >
-                                            <img
-                                                src={marca.imagen}
-                                                alt={marca.nombre}
-                                                onError={() => setImgError(true)}
-                                                className="w-full h-full object-contain p-3 transform group-hover:scale-110 transition-transform duration-700"
-                                            />
-                                        </div>
-                                    </motion.div>
-                                )}
-
-                                <div className="flex-1 min-w-0">
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{
-                                            duration: 0.5,
-                                            delay: 0.2,
-                                        }}
-                                    >
-                                        {/* Badges */}
-                                        <div className="flex flex-wrap items-center gap-2 mb-3">
-                                            <div
-                                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
-                                                    isDarkMode
-                                                        ? "bg-blue-500/10 text-blue-300 ring-1 ring-blue-400/20"
-                                                        : "bg-blue-50 text-blue-700 ring-1 ring-blue-200"
-                                                }`}
-                                            >
-                                                <Sparkles className="w-3 h-3" />
-                                                Marca
+            
+            <div className={`w-full min-h-screen ${
+                isDarkMode 
+                    ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
+                    : 'bg-gradient-to-br from-blue-50 via-white to-indigo-50'
+            } transition-all duration-300`}>
+                
+                {/* Main Content Container */}
+                <div className="flex flex-col lg:flex-row w-full">
+                    
+                    {/* Products Section */}
+                    <div className="flex-1 p-6 lg:p-8 w-full">
+                        <div className="w-full">
+                            {productos && productos.length > 0 ? (
+                                <>
+                                    {(() => {
+                                        let nombreMarca = marca?.nombre || productos[0]?.marca?.nombre || "Marca";
+                                        nombreMarca = nombreMarca.replace(/[-_]/g, " ").replace(/\s+/g, " ").trim();
+                                        nombreMarca = nombreMarca.charAt(0).toUpperCase() + nombreMarca.slice(1);
+                                        return (
+                                            <div className="mb-8">
+                                                <h1 className={`text-3xl lg:text-4xl font-bold mb-2 ${
+                                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                                } transition-colors duration-200`}>
+                                                    {nombreMarca}
+                                                </h1>
+                                                <p className={`text-lg ${
+                                                    isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                } mb-6 transition-colors duration-200`}>
+                                                    Descubre nuestra selección de productos de alta calidad
+                                                </p>
+                                                <div className={`h-1 w-20 rounded-full ${
+                                                    isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
+                                                } mb-8`}></div>
                                             </div>
-                                            <Link
-                                                href={`/seccion/${seccion.slug}`}
-                                                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
-                                                    isDarkMode
-                                                        ? "bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-400/20 hover:bg-emerald-500/20"
-                                                        : "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 hover:bg-emerald-100"
-                                                }`}
-                                            >
-                                                {seccion.nombre}
-                                                <ArrowRight className="w-3 h-3" />
-                                            </Link>
-                                        </div>
+                                        );
+                                    })()}
+                                    
+                                    {/* Video de la marca */}
+                                    {marca && (marca.video_url || auth?.user) && (
+                                        <div className="mb-8">
+                                            <div className={`rounded-2xl overflow-hidden shadow-2xl ${
+                                                isDarkMode 
+                                                    ? 'bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700' 
+                                                    : 'bg-gradient-to-br from-white to-gray-50 border border-gray-200'
+                                            } transition-all duration-300`}>
+                                                
+                                                {/* Video Header with Edit Button */}
+                                                {auth?.user && (
+                                                    <div className={`p-4 border-b ${
+                                                        isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                                                    } flex justify-between items-center`}>
+                                                        <h3 className={`text-lg font-semibold ${
+                                                            isDarkMode ? 'text-white' : 'text-gray-900'
+                                                        }`}>
+                                                            Video de la Marca
+                                                        </h3>
+                                                        <button
+                                                            onClick={() => setIsEditingVideo(true)}
+                                                            className={`px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                                                isDarkMode
+                                                                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                                            }`}
+                                                        >
+                                                            {marca.video_url ? 'Editar Video' : 'Agregar Video'}
+                                                        </button>
+                                                    </div>
+                                                )}
 
-                                        <h1
-                                            className={`text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-3 ${
-                                                isDarkMode
-                                                    ? "text-white"
-                                                    : "text-gray-900"
-                                            }`}
-                                        >
-                                            {marca.nombre}
-                                        </h1>
-
-                                        <p
-                                            className={`text-base lg:text-lg max-w-3xl leading-relaxed ${
-                                                isDarkMode
-                                                    ? "text-gray-300"
-                                                    : "text-gray-600"
-                                            }`}
-                                        >
-                                            {marca.descripcion ||
-                                                `Productos de ${marca.nombre} disponibles en la sección ${seccion.nombre}.`}
-                                        </p>
-
-                                        {/* Stats */}
-                                        <div className="mt-5 flex flex-wrap items-center gap-3">
-                                            <div
-                                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium ${
-                                                    isDarkMode
-                                                        ? "bg-gray-800/80 ring-1 ring-gray-700 text-gray-200"
-                                                        : "bg-white/80 backdrop-blur ring-1 ring-gray-200 text-gray-700 shadow-sm"
-                                                }`}
-                                            >
-                                                <Package className="w-4 h-4 text-emerald-500" />
-                                                <span>
-                                                    {totalProductos} producto
-                                                    {totalProductos !== 1
-                                                        ? "s"
-                                                        : ""}{" "}
-                                                    de {marca.nombre} en esta
-                                                    sección
-                                                </span>
+                                                {/* Video Content */}
+                                                {marca.video_url ? (
+                                                    <div className="p-4">
+                                                        <VideoPlayer
+                                                            videoUrl={marca.video_url}
+                                                            title={`Video de ${marca.nombre}`}
+                                                            autoplay={true}
+                                                            mute={true}
+                                                            showControls={auth?.user ? true : false}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div className={`p-8 text-center ${
+                                                        isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                    }`}>
+                                                        {auth?.user ? (
+                                                            <div>
+                                                                <svg className={`mx-auto h-12 w-12 mb-4 ${
+                                                                    isDarkMode ? 'text-gray-400' : 'text-gray-300'
+                                                                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                                </svg>
+                                                                <p className="text-lg font-medium mb-2">No hay video configurado</p>
+                                                                <p className="text-sm">Haz clic en "Agregar Video" para añadir un video a esta marca</p>
+                                                            </div>
+                                                        ) : marca.video_url ? (
+                                                            <p>Video no disponible o URL inválida</p>
+                                                        ) : null}
+                                                    </div>
+                                                )}
                                             </div>
-                                            <Link
-                                                href={`/seccion/${seccion.slug}`}
-                                                className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all hover:scale-[1.02] ${
-                                                    isDarkMode
-                                                        ? "bg-emerald-500/10 ring-1 ring-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20"
-                                                        : "bg-emerald-50 ring-1 ring-emerald-200 text-emerald-700 hover:bg-emerald-100"
-                                                }`}
-                                            >
-                                                <Grid3x3 className="w-4 h-4" />
-                                                Ver toda la sección
-                                            </Link>
                                         </div>
-                                    </motion.div>
+                                    )}
+                                    
+                                    <div className="animate-fadeIn">
+                                        <ProductGrid products={productos} />
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-center py-16 lg:py-24">
+                                    <div className="max-w-md mx-auto">
+                                        <div className="mb-8">
+                                            <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-6 ${
+                                                isDarkMode 
+                                                    ? 'bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600' 
+                                                    : 'bg-gradient-to-br from-gray-100 to-gray-200 border border-gray-300'
+                                            } shadow-lg transition-all duration-200`}>
+                                                <svg className={`w-10 h-10 ${
+                                                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                                } transition-colors duration-200`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                </svg>
+                                            </div>
+                                            <h1 className={`text-2xl lg:text-3xl font-bold mb-4 ${
+                                                isDarkMode ? 'text-white' : 'text-gray-800'
+                                            } transition-colors duration-200`}>
+                                                No hay productos disponibles
+                                            </h1>
+                                            <p className={`text-lg ${
+                                                isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                                            } mb-8 transition-colors duration-200`}>
+                                                No se encontraron productos para esta marca en esta sección.
+                                            </p>
+                                            <div className={`inline-flex items-center px-6 py-3 rounded-lg text-sm font-medium ${
+                                                isDarkMode 
+                                                    ? 'bg-blue-900/20 text-blue-300 border border-blue-800/50' 
+                                                    : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                            } transition-all duration-200 hover:scale-105`}>
+                                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Explora otras categorías en el menú lateral
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Enhanced Sidebar Navigation */}
+                    <nav className={`w-full lg:w-80 xl:w-96 flex-shrink-0 min-h-screen p-6 overflow-y-auto ${
+                        isDarkMode 
+                            ? 'bg-gradient-to-b from-gray-800 via-gray-900 to-gray-800 border-l border-gray-700' 
+                            : 'bg-gradient-to-b from-white via-gray-50 to-white border-l border-gray-200'
+                    } shadow-2xl transition-all duration-300`} id="nav-fijo">
+                        
+                        <div className="mb-8">
+                            <h2 className={`text-xl font-bold mb-2 ${
+                                isDarkMode ? 'text-white' : 'text-gray-900'
+                            } transition-colors duration-200`}>
+                                Categorías
+                            </h2>
+                            <div className={`h-0.5 w-12 rounded-full ${
+                                isDarkMode ? 'bg-gradient-to-r from-blue-800 to-green-400' : 'bg-gradient-to-r from-blue-700 to-green-500'
+                            }`}></div>
+                        </div>
+
+                        <div className="space-y-2">
+                            {categoriasArray && categoriasArray.length > 0 ? (
+                                categoriasArray.map((categoria, index) => (
+                                    <div key={categoria.id_categoria || index} 
+                                         className="animate-slideIn"
+                                         style={{ animationDelay: `${index * 0.08}s` }}>
+                                        
+                                        <button
+                                            onClick={() => toggleCategory(categoria.nombre)}
+                                            className={`group w-full text-left p-3 rounded-lg transition-all duration-200 hover:shadow-md ${
+                                                activeCategory === categoria.nombre
+                                                    ? isDarkMode
+                                                        ? 'bg-gradient-to-r from-blue-800 to-green-500 text-white shadow-md shadow-blue-500/20'
+                                                        : 'bg-gradient-to-r from-blue-700 to-green-500 text-white shadow-md shadow-blue-500/20'
+                                                    : isDarkMode 
+                                                        ? 'bg-gray-700/40 hover:bg-gray-700/60 text-gray-100 border border-gray-600/40 hover:border-gray-500/60' 
+                                                        : 'bg-white hover:bg-gray-50 text-gray-900 border border-gray-200 hover:border-gray-300 shadow-sm'
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-medium text-sm">
+                                                    {categoria.nombre}
+                                                </span>
+                                                <div className={`flex items-center justify-center w-6 h-6 rounded-full transition-all duration-200 ${
+                                                    activeCategory === categoria.nombre
+                                                        ? 'bg-white/20 rotate-45'
+                                                        : isDarkMode
+                                                            ? 'bg-gray-600 group-hover:bg-gray-500'
+                                                            : 'bg-gray-100 group-hover:bg-gray-200'
+                                                }`}>
+                                                    <span className={`text-xs font-bold transition-all duration-200 ${
+                                                        activeCategory === categoria.nombre
+                                                            ? 'text-white'
+                                                            : isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                                                    }`}>
+                                                        {openCategories[categoria.nombre] ? '−' : '+'}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </button>
+
+                                        {openCategories[categoria.nombre] && categoria.subcategorias && (
+                                            <div className="mt-2 ml-4 space-y-2 animate-slideDown">
+                                                {categoria.subcategorias.map((subcategoria, subIndex) => {
+                                                    const marcaId = marca?.id_marca || null;
+
+                                                    const href = marcaId
+                                                        ? `/subcategoria/${subcategoria.id_subcategoria}/${marcaId}`
+                                                        : `/subcategoria/${subcategoria.id_subcategoria}`;
+
+                                                    return (
+                                                        <Link
+                                                            key={subcategoria.id_subcategoria}
+                                                            href={href}
+                                                            className={`group block p-3 rounded-lg transition-all duration-300 transform hover:scale-[1.01] hover:translate-x-2 ${
+                                                                isDarkMode 
+                                                                    ? 'bg-gray-600/30 hover:bg-gray-600/50 text-gray-200 border border-gray-600/50 hover:border-gray-500/70' 
+                                                                    : 'bg-blue-50/50 hover:bg-blue-100/70 text-gray-800 border border-blue-100 hover:border-blue-200'
+                                                            } hover:shadow-md`}
+                                                            style={{ animationDelay: `${subIndex * 0.05}s` }}
+                                                        >
+                                                            <div className="flex items-center">
+                                                                <div className={`w-2 h-2 rounded-full mr-3 transition-all duration-300 ${
+                                                                    isDarkMode 
+                                                                        ? 'bg-green-400 group-hover:bg-green-300' 
+                                                                        : 'bg-green-500 group-hover:bg-green-600'
+                                                                } group-hover:scale-125`}></div>
+                                                                <span className="text-sm font-medium group-hover:font-semibold transition-all duration-200">
+                                                                    {subcategoria.nombre}
+                                                                </span>
+                                                            </div>
+                                                        </Link>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            ) : (
+                                <div className={`text-sm py-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    No hay categorías en esta sección
+                                </div>
+                            )}
+                        </div>
+                    </nav>
+                </div>
+            </div>
+            
+            {/* Edit Video Modal */}
+            {isEditingVideo && auth?.user && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className={`max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-lg shadow-xl ${
+                        isDarkMode ? 'bg-gray-800' : 'bg-white'
+                    } transition-colors duration-200`}>
+                        <div className={`p-6 border-b ${
+                            isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                        }`}>
+                            <div className="flex justify-between items-center">
+                                <h2 className={`text-xl font-bold ${
+                                    isDarkMode ? 'text-white' : 'text-gray-900'
+                                }`}>
+                                    {marca.video_url ? 'Editar Video' : 'Agregar Video'} - {marca.nombre}
+                                </h2>
+                                <button
+                                    onClick={() => {
+                                        setIsEditingVideo(false);
+                                        setEditVideoForm({ video_url: marca.video_url || '' });
+                                        setVideoPreview(marca.video_url || null);
+                                        setUpdateMessage({ type: '', text: '' });
+                                    }}
+                                    className={`p-2 rounded-md transition-colors duration-200 ${
+                                        isDarkMode 
+                                            ? 'text-gray-400 hover:text-gray-200 hover:bg-gray-700' 
+                                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                                    }`}
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
 
-                        <div
-                            className={`absolute bottom-0 left-0 right-0 h-px ${
-                                isDarkMode
-                                    ? "bg-gradient-to-r from-transparent via-gray-700 to-transparent"
-                                    : "bg-gradient-to-r from-transparent via-gray-200 to-transparent"
-                            }`}
-                        />
-                    </section>
-                )}
-
-                {/* MAIN CONTENT + SIDEBAR */}
-                <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8 lg:py-10">
-                    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
-                        {/* SIDEBAR DE CATEGORÍAS (IZQUIERDA) */}
-                        <aside className="order-1 lg:w-72 xl:w-80 2xl:w-84 flex-shrink-0 w-full">
-                            {/* Sidebar móvil */}
-                            <AnimatePresence>
-                                {isMobileSidebarOpen && (
-                                    <>
-                                        <motion.div
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            onClick={() =>
-                                                setIsMobileSidebarOpen(false)
-                                            }
-                                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
-                                        />
-                                        <motion.div
-                                            initial={{
-                                                x: "-100%",
-                                                opacity: 0,
-                                            }}
-                                            animate={{
-                                                x: 0,
-                                                opacity: 1,
-                                            }}
-                                            exit={{ x: "-100%", opacity: 0 }}
-                                            transition={{
-                                                type: "spring",
-                                                damping: 25,
-                                                stiffness: 200,
-                                            }}
-                                            className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] z-50 lg:hidden shadow-2xl ${
-                                                isDarkMode
-                                                    ? "bg-gray-900"
-                                                    : "bg-white"
-                                            }`}
-                                        >
-                                            <SidebarContent
-                                                isDarkMode={isDarkMode}
-                                                isLoading={isLoading}
-                                                categoriasArray={
-                                                    categoriasFiltradas
-                                                }
-                                                openCategories={
-                                                    openCategories
-                                                }
-                                                activeCategory={
-                                                    activeCategory
-                                                }
-                                                toggleCategory={
-                                                    toggleCategory
-                                                }
-                                                searchTerm={searchTerm}
-                                                setSearchTerm={setSearchTerm}
-                                                marcaId={marca?.id_marca}
-                                                seccion={seccion}
-                                                onClose={() =>
-                                                    setIsMobileSidebarOpen(
-                                                        false
-                                                    )
-                                                }
-                                            />
-                                        </motion.div>
-                                    </>
-                                )}
-                            </AnimatePresence>
-
-                            {/* Sidebar desktop */}
-                            <div className="hidden lg:block lg:sticky lg:top-24">
-                                <SidebarContent
-                                    isDarkMode={isDarkMode}
-                                    isLoading={isLoading}
-                                    categoriasArray={categoriasFiltradas}
-                                    openCategories={openCategories}
-                                    activeCategory={activeCategory}
-                                    toggleCategory={toggleCategory}
-                                    searchTerm={searchTerm}
-                                    setSearchTerm={setSearchTerm}
-                                    marcaId={marca?.id_marca}
-                                    seccion={seccion}
-                                />
-                            </div>
-                        </aside>
-
-                        {/* CONTENIDO PRINCIPAL (DERECHA) */}
-                        <main className="flex-1 min-w-0 order-2 w-full">
-                            {productos && productos.length > 0 ? (
-                                <ProductGrid products={productos} fullWidth={true} />
-                            ) : (
-                                <EmptyState
-                                    isDarkMode={isDarkMode}
-                                    marca={marca}
-                                />
+                        <form onSubmit={handleUpdateVideo} className="p-6">
+                            {/* Update Messages */}
+                            {updateMessage.text && (
+                                <div className={`p-3 mb-4 rounded transition-colors duration-200 ${
+                                    updateMessage.type === 'success' 
+                                        ? (isDarkMode ? 'bg-green-800 text-green-200' : 'bg-green-100 text-green-700')
+                                        : (isDarkMode ? 'bg-red-800 text-red-200' : 'bg-red-100 text-red-700')
+                                }`}>
+                                    {updateMessage.text}
+                                </div>
                             )}
-                        </main>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className={`block text-sm font-medium mb-2 ${
+                                        isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>
+                                        URL del Video
+                                    </label>
+                                    <input
+                                        type="url"
+                                        value={editVideoForm.video_url}
+                                        onChange={handleEditVideoChange}
+                                        placeholder="https://www.youtube.com/watch?v=example o https://vimeo.com/123456789"
+                                        className={`w-full px-3 py-2 border rounded-md shadow-sm transition-colors duration-200 ${
+                                            isDarkMode 
+                                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-400 focus:ring-blue-400' 
+                                                : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500 focus:ring-blue-500'
+                                        }`}
+                                        disabled={isUpdating}
+                                    />
+                                    <p className={`mt-1 text-xs ${
+                                        isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>
+                                        Soporta URLs de YouTube y Vimeo. Deja vacío para eliminar el video.
+                                    </p>
+                                </div>
+
+                                {/* Video Preview */}
+                                {videoPreview && (
+                                    <div>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                            isDarkMode ? 'text-gray-300' : 'text-gray-700'
+                                        }`}>
+                                            Vista Previa
+                                        </label>
+                                        <div className="max-w-2xl">
+                                            <VideoPlayer
+                                                videoUrl={videoPreview}
+                                                title="Video Preview"
+                                                autoplay={false}
+                                                mute={false}
+                                                showControls={true}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className={`flex justify-end space-x-3 mt-6 pt-4 border-t ${
+                                isDarkMode ? 'border-gray-700' : 'border-gray-200'
+                            }`}>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsEditingVideo(false);
+                                        setEditVideoForm({ video_url: marca.video_url || '' });
+                                        setVideoPreview(marca.video_url || null);
+                                        setUpdateMessage({ type: '', text: '' });
+                                    }}
+                                    disabled={isUpdating}
+                                    className={`px-4 py-2 border rounded-md font-medium transition-colors duration-200 ${
+                                        isDarkMode 
+                                            ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
+                                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                                    } disabled:opacity-50`}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isUpdating}
+                                    className={`px-4 py-2 rounded-md font-medium text-white transition-colors duration-200 ${
+                                        isDarkMode
+                                            ? 'bg-blue-600 hover:bg-blue-700'
+                                            : 'bg-blue-500 hover:bg-blue-600'
+                                    } disabled:opacity-50 flex items-center`}
+                                >
+                                    {isUpdating ? (
+                                        <>
+                                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Actualizando...
+                                        </>
+                                    ) : (
+                                        'Guardar Video'
+                                    )}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-                {/* FAB para móvil */}
-                <motion.button
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.5, type: "spring" }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsMobileSidebarOpen(true)}
-                    className={`lg:hidden fixed bottom-6 right-6 z-30 flex items-center gap-2 px-5 py-3 rounded-full font-medium shadow-2xl ${
-                        isDarkMode
-                            ? "bg-gradient-to-r from-blue-600 to-emerald-500 text-white"
-                            : "bg-gradient-to-r from-blue-600 to-emerald-500 text-white"
-                    }`}
-                >
-                    <SlidersHorizontal className="w-4 h-4" />
-                    <span>Categorías</span>
-                </motion.button>
-            </div>
-
+            )}
+            
             <Footer />
 
             <style>{`
-                @keyframes fadeInUp {
+                @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(20px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
-                .animate-fadeInUp {
-                    animation: fadeInUp 0.5s ease-out forwards;
+                
+                @keyframes slideIn {
+                    from { opacity: 0; transform: translateX(-20px); }
+                    to { opacity: 1; transform: translateX(0); }
                 }
-                .scrollbar-thin::-webkit-scrollbar { width: 6px; }
-                .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-                .scrollbar-thin::-webkit-scrollbar-thumb {
-                    background: ${
-                        isDarkMode
-                            ? "rgba(255,255,255,0.1)"
-                            : "rgba(0,0,0,0.1)"
-                    };
-                    border-radius: 10px;
+                
+                @keyframes slideDown {
+                    from { opacity: 0; transform: translateY(-10px); }
+                    to { opacity: 1; transform: translateY(0); }
                 }
-                .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-                    background: ${
-                        isDarkMode
-                            ? "rgba(255,255,255,0.2)"
-                            : "rgba(0,0,0,0.2)"
-                    };
+                
+                .animate-fadeIn {
+                    animation: fadeIn 0.6s ease-out;
+                }
+                
+                .animate-slideIn {
+                    animation: slideIn 0.5s ease-out;
+                }
+                
+                .animate-slideDown {
+                    animation: slideDown 0.4s ease-out;
                 }
             `}</style>
         </div>
-    );
-}
-
-/* ============================================================== */
-/* COMPONENTES INTERNOS                                            */
-/* ============================================================== */
-
-function SidebarContent({
-    isDarkMode,
-    isLoading,
-    categoriasArray,
-    openCategories,
-    activeCategory,
-    toggleCategory,
-    searchTerm,
-    setSearchTerm,
-    marcaId,
-    seccion,
-    onClose,
-}) {
-    return (
-        <div
-            className={`h-full flex flex-col overflow-hidden rounded-2xl ${
-                isDarkMode
-                    ? "bg-gray-800/80 backdrop-blur-xl ring-1 ring-gray-700/50"
-                    : "bg-white/80 backdrop-blur-xl ring-1 ring-gray-200/80 shadow-xl"
-            }`}
-        >
-            {/* Header del sidebar */}
-            <div
-                className={`p-5 border-b ${
-                    isDarkMode ? "border-gray-700/50" : "border-gray-200"
-                }`}
-            >
-                <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2.5">
-                        <div
-                            className={`p-2 rounded-lg ${
-                                isDarkMode
-                                    ? "bg-gradient-to-br from-blue-500/20 to-emerald-500/20 ring-1 ring-blue-400/30"
-                                    : "bg-gradient-to-br from-blue-100 to-emerald-100 ring-1 ring-blue-200"
-                            }`}
-                        >
-                            <Grid3x3
-                                className={`w-4 h-4 ${
-                                    isDarkMode
-                                        ? "text-blue-300"
-                                        : "text-blue-600"
-                                }`}
-                            />
-                        </div>
-                        <div>
-                            <h2
-                                className={`text-base font-bold ${
-                                    isDarkMode ? "text-white" : "text-gray-900"
-                                }`}
-                            >
-                                Categorías
-                            </h2>
-                            <p
-                                className={`text-xs ${
-                                    isDarkMode
-                                        ? "text-gray-400"
-                                        : "text-gray-500"
-                                }`}
-                            >
-                                {categoriasArray.length}{" "}
-                                {categoriasArray.length === 1
-                                    ? "categoría"
-                                    : "categorías"}
-                            </p>
-                        </div>
-                    </div>
-                    {onClose && (
-                        <button
-                            onClick={onClose}
-                            className={`p-1.5 rounded-lg transition-colors ${
-                                isDarkMode
-                                    ? "hover:bg-gray-700 text-gray-400"
-                                    : "hover:bg-gray-100 text-gray-500"
-                            }`}
-                            aria-label="Cerrar"
-                        >
-                            <X className="w-5 h-5" />
-                        </button>
-                    )}
-                </div>
-
-                {/* Buscador */}
-                <div className="relative">
-                    <Search
-                        className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
-                            isDarkMode ? "text-gray-400" : "text-gray-500"
-                        }`}
-                    />
-                    <input
-                        type="text"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Buscar categoría..."
-                        className={`w-full pl-9 pr-9 py-2.5 text-sm rounded-xl transition-all outline-none ${
-                            isDarkMode
-                                ? "bg-gray-900/60 ring-1 ring-gray-700 focus:ring-2 focus:ring-blue-500/50 text-white placeholder-gray-500"
-                                : "bg-gray-50 ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500/50 text-gray-900 placeholder-gray-400"
-                        }`}
-                    />
-                    {searchTerm && (
-                        <button
-                            onClick={() => setSearchTerm("")}
-                            className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md transition-colors ${
-                                isDarkMode
-                                    ? "hover:bg-gray-700 text-gray-400"
-                                    : "hover:bg-gray-200 text-gray-500"
-                            }`}
-                            aria-label="Limpiar búsqueda"
-                        >
-                            <X className="w-3.5 h-3.5" />
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            {/* Lista de categorías */}
-            <nav className="flex-1 overflow-y-auto scrollbar-thin p-3">
-                {isLoading ? (
-                    <SkeletonCategorias isDarkMode={isDarkMode} />
-                ) : categoriasArray.length === 0 ? (
-                    <SinCategorias
-                        isDarkMode={isDarkMode}
-                        searchTerm={searchTerm}
-                    />
-                ) : (
-                    <div className="space-y-1.5">
-                        {categoriasArray.map((categoria, index) => (
-                            <CategoryItem
-                                key={categoria.id_categoria}
-                                categoria={categoria}
-                                index={index}
-                                isDarkMode={isDarkMode}
-                                isOpen={
-                                    openCategories[categoria.id_categoria]
-                                }
-                                isActive={
-                                    activeCategory === categoria.id_categoria
-                                }
-                                onToggle={() =>
-                                    toggleCategory(categoria.id_categoria)
-                                }
-                                marcaId={marcaId}
-                                seccion={seccion}
-                            />
-                        ))}
-                    </div>
-                )}
-            </nav>
-
-            {/* Footer del sidebar */}
-            <div
-                className={`p-4 border-t ${
-                    isDarkMode ? "border-gray-700/50" : "border-gray-200"
-                }`}
-            >
-                <div
-                    className={`flex items-center gap-2 text-xs ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                    }`}
-                >
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Catálogo actualizado</span>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function CategoryItem({
-    categoria,
-    index,
-    isDarkMode,
-    isOpen,
-    isActive,
-    onToggle,
-    marcaId,
-    seccion,
-}) {
-    const hasSubcategorias =
-        categoria.subcategorias && categoria.subcategorias.length > 0;
-
-    return (
-        <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.04 }}
-        >
-            <button
-                onClick={onToggle}
-                className={`group w-full text-left p-3 rounded-xl transition-all duration-200 ${
-                    isActive || isOpen
-                        ? isDarkMode
-                            ? "bg-gradient-to-r from-blue-600/20 to-emerald-600/10 ring-1 ring-blue-500/40 shadow-lg shadow-blue-500/5"
-                            : "bg-gradient-to-r from-blue-50 to-emerald-50 ring-1 ring-blue-200 shadow-sm"
-                        : isDarkMode
-                        ? "hover:bg-gray-700/50 ring-1 ring-transparent hover:ring-gray-600/50"
-                        : "hover:bg-gray-50 ring-1 ring-transparent hover:ring-gray-200"
-                }`}
-            >
-                <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                        <div
-                            className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${
-                                isActive || isOpen
-                                    ? isDarkMode
-                                        ? "bg-gradient-to-br from-blue-500 to-emerald-500 text-white"
-                                        : "bg-gradient-to-br from-blue-600 to-emerald-500 text-white"
-                                    : isDarkMode
-                                    ? "bg-gray-700 text-gray-300"
-                                    : "bg-gray-100 text-gray-600"
-                            }`}
-                        >
-                            {categoria.nombre.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                            <span
-                                className={`block text-sm font-semibold truncate ${
-                                    isActive || isOpen
-                                        ? isDarkMode
-                                            ? "text-white"
-                                            : "text-gray-900"
-                                        : isDarkMode
-                                        ? "text-gray-200"
-                                        : "text-gray-800"
-                                }`}
-                            >
-                                {categoria.nombre}
-                            </span>
-                            {hasSubcategorias && (
-                                <span
-                                    className={`text-xs ${
-                                        isDarkMode
-                                            ? "text-gray-400"
-                                            : "text-gray-500"
-                                    }`}
-                                >
-                                    {categoria.subcategorias.length}{" "}
-                                    {categoria.subcategorias.length === 1
-                                        ? "subcategoría"
-                                        : "subcategorías"}
-                                </span>
-                            )}
-                        </div>
-                    </div>
-                    {hasSubcategorias ? (
-                        <motion.div
-                            animate={{ rotate: isOpen ? 180 : 0 }}
-                            transition={{ duration: 0.2 }}
-                            className={`flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center ${
-                                isActive || isOpen
-                                    ? isDarkMode
-                                        ? "bg-blue-500/20 text-blue-300"
-                                        : "bg-blue-100 text-blue-600"
-                                    : isDarkMode
-                                    ? "bg-gray-700/50 text-gray-400 group-hover:bg-gray-600/50"
-                                    : "bg-gray-100 text-gray-500 group-hover:bg-gray-200"
-                            }`}
-                        >
-                            <ChevronDown className="w-3.5 h-3.5" />
-                        </motion.div>
-                    ) : (
-                        <Link
-                            href={getCategoriaUrl(categoria, seccion)}
-                            onClick={(e) => e.stopPropagation()}
-                            className={`flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-all ${
-                                isDarkMode
-                                    ? "text-gray-400 hover:bg-gray-700 hover:text-blue-300"
-                                    : "text-gray-400 hover:bg-blue-50 hover:text-blue-600"
-                            }`}
-                            aria-label="Ver categoría"
-                        >
-                            <ArrowRight className="w-3.5 h-3.5" />
-                        </Link>
-                    )}
-                </div>
-            </button>
-
-            <AnimatePresence initial={false}>
-                {isOpen && hasSubcategorias && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: "easeInOut" }}
-                        className="overflow-hidden"
-                    >
-                        <div className="pl-3 pt-1.5 pb-1 space-y-1">
-                            {categoria.subcategorias.map((sub, subIdx) => (
-                                <motion.div
-                                    key={sub.id_subcategoria}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{
-                                        duration: 0.2,
-                                        delay: subIdx * 0.03,
-                                    }}
-                                >
-                                    <Link
-                                        href={
-                                            marcaId
-                                                ? `/subcategoria/${sub.id_subcategoria}/${marcaId}`
-                                                : `/subcategoria/${sub.id_subcategoria}`
-                                        }
-                                        className={`group/sub flex items-center gap-2.5 p-2 pl-3 rounded-lg text-sm transition-all ${
-                                            isDarkMode
-                                                ? "text-gray-300 hover:bg-gray-700/50 hover:text-white"
-                                                : "text-gray-700 hover:bg-blue-50/70 hover:text-blue-700"
-                                        }`}
-                                    >
-                                        <div
-                                            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors ${
-                                                isDarkMode
-                                                    ? "bg-emerald-400 group-hover/sub:bg-emerald-300"
-                                                    : "bg-emerald-500 group-hover/sub:bg-emerald-600"
-                                            }`}
-                                        />
-                                        <span className="truncate flex-1 font-medium">
-                                            {sub.nombre}
-                                        </span>
-                                        <ArrowRight
-                                            className={`w-3 h-3 opacity-0 -translate-x-1 group-hover/sub:opacity-100 group-hover/sub:translate-x-0 transition-all ${
-                                                isDarkMode
-                                                    ? "text-blue-400"
-                                                    : "text-blue-600"
-                                            }`}
-                                        />
-                                    </Link>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </motion.div>
-    );
-}
-
-function SkeletonCategorias({ isDarkMode }) {
-    return (
-        <div className="space-y-2">
-            {[...Array(6)].map((_, i) => (
-                <div
-                    key={i}
-                    className={`h-14 rounded-xl animate-pulse ${
-                        isDarkMode ? "bg-gray-700/50" : "bg-gray-100"
-                    }`}
-                />
-            ))}
-        </div>
-    );
-}
-
-function SinCategorias({ isDarkMode, searchTerm }) {
-    return (
-        <div className="text-center py-10 px-4">
-            <div
-                className={`w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center ${
-                    isDarkMode ? "bg-gray-700/50" : "bg-gray-100"
-                }`}
-            >
-                <Search
-                    className={`w-5 h-5 ${
-                        isDarkMode ? "text-gray-500" : "text-gray-400"
-                    }`}
-                />
-            </div>
-            <p
-                className={`text-sm font-medium ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
-                }`}
-            >
-                {searchTerm
-                    ? "Sin resultados"
-                    : "No hay categorías disponibles"}
-            </p>
-            {searchTerm && (
-                <p
-                    className={`text-xs mt-1 ${
-                        isDarkMode ? "text-gray-500" : "text-gray-500"
-                    }`}
-                >
-                    Prueba con otro término
-                </p>
-            )}
-        </div>
-    );
-}
-
-function EmptyState({ isDarkMode, marca }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-center py-16 lg:py-24 px-4"
-        >
-            <div
-                className={`max-w-md mx-auto p-8 rounded-2xl ${
-                    isDarkMode
-                        ? "bg-gray-800/60 ring-1 ring-gray-700"
-                        : "bg-white ring-1 ring-gray-200 shadow-xl"
-                }`}
-            >
-                <div
-                    className={`w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center ${
-                        isDarkMode
-                            ? "bg-gradient-to-br from-blue-500/20 to-emerald-500/20 ring-1 ring-blue-400/30"
-                            : "bg-gradient-to-br from-blue-100 to-emerald-100 ring-1 ring-blue-200"
-                    }`}
-                >
-                    <Package
-                        className={`w-10 h-10 ${
-                            isDarkMode ? "text-blue-300" : "text-blue-600"
-                        }`}
-                    />
-                </div>
-                <h2
-                    className={`text-2xl font-bold mb-2 ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                    }`}
-                >
-                    No hay productos disponibles
-                </h2>
-                <p
-                    className={`text-sm ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                >
-                    {marca
-                        ? `Aún no hay productos de ${marca.nombre} en esta sección. Explora la sección completa para ver otras marcas.`
-                        : "Aún no hay productos asignados a esta sección. Vuelve pronto, estamos actualizando nuestro catálogo."}
-                </p>
-                <div className="mt-6 flex items-center justify-center gap-2">
-                    <div
-                        className={`w-1.5 h-1.5 rounded-full ${
-                            isDarkMode ? "bg-blue-400" : "bg-blue-500"
-                        }`}
-                    />
-                    <div
-                        className={`w-1.5 h-1.5 rounded-full ${
-                            isDarkMode ? "bg-emerald-400" : "bg-emerald-500"
-                        }`}
-                    />
-                    <div
-                        className={`w-1.5 h-1.5 rounded-full ${
-                            isDarkMode ? "bg-blue-400" : "bg-blue-500"
-                        }`}
-                    />
-                </div>
-            </div>
-        </motion.div>
     );
 }
