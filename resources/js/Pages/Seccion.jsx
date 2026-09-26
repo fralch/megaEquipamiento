@@ -324,6 +324,7 @@ export default function Seccion({ seccion, productos, categorias = [], seoSlug }
                                                 }
                                                 searchTerm={searchTerm}
                                                 setSearchTerm={setSearchTerm}
+                                                seccion={seccion}
                                                 onClose={() =>
                                                     setIsMobileSidebarOpen(
                                                         false
@@ -346,6 +347,7 @@ export default function Seccion({ seccion, productos, categorias = [], seoSlug }
                                     toggleCategory={toggleCategory}
                                     searchTerm={searchTerm}
                                     setSearchTerm={setSearchTerm}
+                                    seccion={seccion}
                                 />
                             </div>
                         </aside>
@@ -425,6 +427,7 @@ function SidebarContent({
     toggleCategory,
     searchTerm,
     setSearchTerm,
+    seccion,
     onClose,
 }) {
     return (
@@ -555,6 +558,7 @@ function SidebarContent({
                                 onToggle={() =>
                                     toggleCategory(categoria.id_categoria)
                                 }
+                                seccion={seccion}
                             />
                         ))}
                     </div>
@@ -587,6 +591,7 @@ function CategoryItem({
     isOpen,
     isActive,
     onToggle,
+    seccion,
 }) {
     const hasSubcategorias =
         categoria.subcategorias && categoria.subcategorias.length > 0;

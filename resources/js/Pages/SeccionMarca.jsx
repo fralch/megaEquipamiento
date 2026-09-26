@@ -365,6 +365,7 @@ export default function SeccionMarca({ seccion, marca, productos, categorias = [
                                                 searchTerm={searchTerm}
                                                 setSearchTerm={setSearchTerm}
                                                 marcaId={marca?.id_marca}
+                                                seccion={seccion}
                                                 onClose={() =>
                                                     setIsMobileSidebarOpen(
                                                         false
@@ -388,6 +389,7 @@ export default function SeccionMarca({ seccion, marca, productos, categorias = [
                                     searchTerm={searchTerm}
                                     setSearchTerm={setSearchTerm}
                                     marcaId={marca?.id_marca}
+                                    seccion={seccion}
                                 />
                             </div>
                         </aside>
@@ -471,6 +473,7 @@ function SidebarContent({
     searchTerm,
     setSearchTerm,
     marcaId,
+    seccion,
     onClose,
 }) {
     return (
@@ -602,6 +605,7 @@ function SidebarContent({
                                     toggleCategory(categoria.id_categoria)
                                 }
                                 marcaId={marcaId}
+                                seccion={seccion}
                             />
                         ))}
                     </div>
@@ -635,6 +639,7 @@ function CategoryItem({
     isActive,
     onToggle,
     marcaId,
+    seccion,
 }) {
     const hasSubcategorias =
         categoria.subcategorias && categoria.subcategorias.length > 0;
