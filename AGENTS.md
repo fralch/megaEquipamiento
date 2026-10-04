@@ -4,7 +4,7 @@
 - Laravel 11 (PHP 8.2) + Inertia.js + React 18 + Vite 5
 - MySQL primary DB; Sanctum (API) + Breeze (auth scaffolding present, but custom `AuthController` in `app/Http/Controllers/AuthController.php` handles the main web login/register/logout — see routes/web.php:36)
 - Pest 3 (PHPUnit-compatible). Tests are in `tests/Feature` and `tests/Unit`
-- Spatie medialibrary, DomPDF, FPDF/FPDI, Kreait Firebase, Sitemap packages installed
+- Spatie medialibrary, DomPDF, FPDF/FPDI, Sitemap packages installed
 
 ## Project shape
 - Main app: e-commerce catalog (productos, categorías, subcategorías, marcas, cotizaciones, carrito, comparaciones) — controllers in `app/Http/Controllers`
@@ -50,11 +50,6 @@ See `.github/workflows/deploy.yml` for the full deploy order used in production.
 - **JS path alias**: `@/*` maps to `resources/js/*` (jsconfig.json:5) and `ziggy-js` resolves to the vendored package — use these in React imports
 - **Performance optimizations** (file cache, eager loading, response middleware) are baked in — see `PERFORMANCE.md` for the full list. Don't blindly switch cache driver to `database` in `.env` without re-reading that file
 - **`config-local/`** is NOT autoloaded; it's leftover reference material. Edits go in `config/` and `app/Providers/`
-
-## Firebase
-- Config is in `config/firebase.php`; credentials come from `FIREBASE_CREDENTIALS` (JSON string) and `FIREBASE_PROJECT_ID` env vars (see `.env.example:66`)
-- Service: `App\Services\FirebaseNotificationService`
-- Test script: `test_firebase_temp.php` at repo root — throwaway, not a real test
 
 ## Scheduled tasks
 - `cotizaciones:generar-notificaciones` runs hourly (bootstrap/app.php:41). Source: `app/Console/Commands/GenerarNotificacionesCotizaciones.php`

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Link } from "@inertiajs/react";
 import { useTheme } from "../../storage/ThemeContext";
+import { getCategoriaUrl } from "../../utils/productUrl";
 
 const URL_API = import.meta.env.VITE_API_URL;
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 horas
@@ -18,8 +19,9 @@ const SubcategoryLink = React.memo(({ item, isDarkMode }) => (
 
 SubcategoryLink.displayName = 'SubcategoryLink';
 
-export const CategoryCard = React.memo(({ title, items, categoryId, categoryImages }) => {
+export const CategoryCard = React.memo(({ title, items, categoryId, categoryImages, categorySlug }) => {
   const { isDarkMode } = useTheme();
+  const categoryUrl = getCategoriaUrl({ id_categoria: categoryId, nombre: title, slug: categorySlug });
   const [imagePaths, setImagePaths] = useState([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -158,7 +160,7 @@ export const CategoryCard = React.memo(({ title, items, categoryId, categoryImag
           {/* Contenido oculto que aparece con hover */}
           <div className={`absolute inset-0 ${isDarkMode ? 'bg-gray-900 bg-opacity-95' : 'bg-gray-800 bg-opacity-90'} text-white flex flex-col justify-center items-center transition-opacity duration-300 opacity-0 group-hover:opacity-100`}>
             <Link 
-              href={`/categorias/${categoryId}`} 
+              href={categoryUrl} 
               className="cursor-pointer hover:text-blue-400 transition-colors duration-200"
             >
               <h2 className="text-2xl font-semibold mb-4 text-center">{title}</h2>
@@ -177,7 +179,7 @@ export const CategoryCard = React.memo(({ title, items, categoryId, categoryImag
 
             {/* Botón que también lleva a los productos de la categoría */}
             <Link 
-              href={`/categorias/${categoryId}`}
+              href={categoryUrl}
               className={`${isDarkMode ? 'bg-blue-700 hover:bg-blue-800' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold py-2 px-4 rounded-md mt-4 transition-colors duration-200 z-50`}
             >
               {title}
@@ -337,6 +339,7 @@ const Categories = () => {
               items={category.subcategorias || []} 
               categoryId={category.id_categoria}
               categoryImages={category.img}
+              categorySlug={category.slug}
             />
           ))}
         </div>

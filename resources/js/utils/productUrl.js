@@ -56,3 +56,51 @@ export const getSeccionMarcaUrl = (brand, seccion) => {
 
   return `/seccion/${seccion.slug}/marca/${getMarcaSeoSlug(brand)}`;
 };
+
+export const getCategoriaSlug = (categoria) => {
+  if (!categoria) return '';
+
+  if (typeof categoria === 'string') {
+    return categoria;
+  }
+
+  if (categoria.slug) {
+    return categoria.slug;
+  }
+
+  const name = categoria.nombre || categoria.nombre_categoria || categoria.name || '';
+  return name
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
+export const getCategoriaUrl = (categoria, seccion) => {
+  if (!categoria) return '/categorias';
+
+  if (typeof categoria === 'string' && categoria.startsWith('/categorias/')) {
+    return categoria;
+  }
+
+  const slug = getCategoriaSlug(categoria);
+  const seccionSlug = seccion ? (typeof seccion === 'string' ? seccion : seccion.slug) : null;
+
+  if (slug) {
+    return seccionSlug
+      ? `/seccion/${seccionSlug}/categoria/${slug}`
+      : `/categorias/${slug}`;
+  }
+
+  const id = typeof categoria === 'object' ? (categoria.id_categoria || categoria.id) : categoria;
+  if (id) {
+    return seccionSlug
+      ? `/seccion/${seccionSlug}/categoria/${id}`
+      : `/categorias/${id}`;
+  }
+
+  return '/categorias';
+};
+

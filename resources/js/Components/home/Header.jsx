@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, memo } from "react";
 import axios from "axios";
 import CartIcon from "./CartIcon";
 import { useTheme } from "../../storage/ThemeContext";
-import { getProductUrl, getMarcaUrl } from "../../utils/productUrl";
+import { getProductUrl, getMarcaUrl, getCategoriaUrl } from "../../utils/productUrl";
 
 const URL_API = import.meta.env.VITE_API_URL || '';
 
@@ -194,7 +194,7 @@ const Header = memo(() => {
   // Navegación
   const handleProductClick = (p) => { window.location.href = getProductUrl(p); setIsModalOpen(false); };
   const handleMarcaClick = (m) => { window.location.href = getMarcaUrl(m); setIsModalOpen(false); };
-  const handleCategoriaClick = (c) => { window.location.href = `/categorias/${c.id_categoria}`; setIsModalOpen(false); };
+  const handleCategoriaClick = (c) => { window.location.href = getCategoriaUrl(c); setIsModalOpen(false); };
   const handleSubcategoriaClick = (s) => { window.location.href = `/subcategoria/${s.id_subcategoria}`; setIsModalOpen(false); };
 
   const handleFocus = () => { if (searchTerm.length >= 2) setShowResults(true); };

@@ -6,6 +6,7 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
+import { getCategoriaUrl } from "../utils/productUrl";
 
 const URL_API = import.meta.env.VITE_API_URL;
 
@@ -19,6 +20,7 @@ export default function SubcategoriaMarcas({ productos: productosIniciales, marc
     const [subcategoriaNombre, setSubcategoriaNombre] = useState("");
     const [categoriaNombre, setCategoriaNombre] = useState("");
     const [categoriaId, setCategoriaId] = useState("");
+    const [categoriaSlug, setCategoriaSlug] = useState("");
     const [isLoading, setIsLoading] = useState(true);
 
     const [productos, setProductos] = useState(productosIniciales || []);
@@ -100,6 +102,7 @@ export default function SubcategoriaMarcas({ productos: productosIniciales, marc
                             console.log('Datos de categoría:', categoriaData);
                             setCategoriaNombre(categoriaData.nombre_categoria);
                             setCategoriaId(categoriaData.id_categoria);
+                            setCategoriaSlug(categoriaData.slug || '');
                         } else {
                             console.error('Error al cargar categoría:', categoriaResponse.status);
                         }
@@ -158,7 +161,7 @@ export default function SubcategoriaMarcas({ productos: productosIniciales, marc
                                         <h1 className={`text-xl lg:text-2xl font-bold mb-2 ${ 
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         } transition-colors duration-200`}>
-                                            <Link href={`/categorias/${categoriaId}`}>
+                                            <Link href={getCategoriaUrl({ id_categoria: categoriaId, nombre: categoriaNombre, slug: categoriaSlug })}>
                                                 <span className={`text-xl lg:text-2xl font-bold hover:underline ${ 
                                                     isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
                                                 } transition-colors duration-200`}>
@@ -185,7 +188,7 @@ export default function SubcategoriaMarcas({ productos: productosIniciales, marc
                                         <h1 className={`text-3xl lg:text-4xl font-bold mb-2 ${
                                             isDarkMode ? 'text-white' : 'text-gray-900'
                                         } transition-colors duration-200`}>
-                                            <Link href={`/categorias/${categoriaId}`}>
+                                            <Link href={getCategoriaUrl({ id_categoria: categoriaId, nombre: categoriaNombre, slug: categoriaSlug })}>
                                                 <span className={`text-2xl lg:text-3xl font-bold hover:underline ${
                                                     isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-600 hover:text-gray-500'
                                                 } transition-colors duration-200`}>

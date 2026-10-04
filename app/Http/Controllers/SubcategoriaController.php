@@ -223,14 +223,18 @@ class SubcategoriaController extends Controller
         $categoria = $subcategoria->categoria;
 
         // Devolver el nombre de la categoría
-        return response()->json(['nombre_categoria' => $categoria->nombre, 'id_categoria' => $categoria->id_categoria]);
+        return response()->json([
+            'nombre_categoria' => $categoria->nombre,
+            'id_categoria' => $categoria->id_categoria,
+            'slug' => $categoria->getSeoSlug(),
+        ]);
     }
 
     public function getCategoriasOptimizadasPorMarca($marca_id = null)
     {
         try {
             // Consulta optimizada usando subconsultas
-            $categorias = Categoria::select('id_categoria', 'nombre', 'descripcion', 'img')
+            $categorias = Categoria::select('id_categoria', 'nombre', 'slug', 'descripcion', 'img')
                 ->with(['subcategorias' => function ($query) use ($marca_id) {
                     $query->select('id_subcategoria', 'nombre', 'descripcion', 'id_categoria')
                         ->whereExists(function ($subQuery) use ($marca_id) {

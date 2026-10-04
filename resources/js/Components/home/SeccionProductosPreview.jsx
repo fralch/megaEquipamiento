@@ -192,6 +192,7 @@ function SectionContent({ seccion }) {
                                     items={categoria.subcategorias || []}
                                     categoryId={categoria.id_categoria}
                                     categoryImages={categoria.img}
+                                    categorySlug={categoria.slug}
                                 />
                             ))}
                         </div>

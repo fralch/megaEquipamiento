@@ -17,6 +17,7 @@ import Menu from "../Components/home/Menu";
 import NavVertical from "../Components/home/NavVertical";
 import ProductGrid from "../Components/store/ProductGrid";
 import Footer from "../Components/home/Footer";
+import { getCategoriaUrl } from "../utils/productUrl";
 
 export default function Seccion({ seccion, productos, categorias = [], seoSlug }) {
     const { isDarkMode } = useTheme();
@@ -323,6 +324,7 @@ export default function Seccion({ seccion, productos, categorias = [], seoSlug }
                                                 }
                                                 searchTerm={searchTerm}
                                                 setSearchTerm={setSearchTerm}
+                                                seccion={seccion}
                                                 onClose={() =>
                                                     setIsMobileSidebarOpen(
                                                         false
@@ -345,6 +347,7 @@ export default function Seccion({ seccion, productos, categorias = [], seoSlug }
                                     toggleCategory={toggleCategory}
                                     searchTerm={searchTerm}
                                     setSearchTerm={setSearchTerm}
+                                    seccion={seccion}
                                 />
                             </div>
                         </aside>
@@ -424,6 +427,7 @@ function SidebarContent({
     toggleCategory,
     searchTerm,
     setSearchTerm,
+    seccion,
     onClose,
 }) {
     return (
@@ -554,6 +558,7 @@ function SidebarContent({
                                 onToggle={() =>
                                     toggleCategory(categoria.id_categoria)
                                 }
+                                seccion={seccion}
                             />
                         ))}
                     </div>
@@ -586,6 +591,7 @@ function CategoryItem({
     isOpen,
     isActive,
     onToggle,
+    seccion,
 }) {
     const hasSubcategorias =
         categoria.subcategorias && categoria.subcategorias.length > 0;
@@ -671,7 +677,7 @@ function CategoryItem({
                         </motion.div>
                     ) : (
                         <Link
-                            href={`/categorias/${categoria.id_categoria}`}
+                            href={getCategoriaUrl(categoria, seccion)}
                             onClick={(e) => e.stopPropagation()}
                             className={`flex-shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-all ${
                                 isDarkMode
