@@ -24,8 +24,8 @@ const LabEquipmentSection = () => {
     const swiperRef = useRef(null);
 
     return (
-        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-            <div className="relative group overflow-hidden rounded-2xl md:rounded-3xl shadow-lg md:shadow-xl">
+        <section className="w-full relative my-0 sm:my-2 md:my-4">
+            <div className="relative group w-full overflow-hidden">
                 <Swiper
                     modules={[Autoplay, A11y]}
                     slidesPerView={1}
@@ -43,15 +43,15 @@ const LabEquipmentSection = () => {
                     onSlideChange={(swiper) => {
                         setActiveIndex(swiper.realIndex);
                     }}
-                    className="w-full h-full"
+                    className="w-full h-40 sm:h-52 md:h-64 lg:h-72"
                 >
                     {images.map((image, index) => (
                         <SwiperSlide key={index}>
-                            <div className="w-full select-none overflow-hidden">
+                            <div className="w-full h-full select-none overflow-hidden">
                                 <img
                                     src={image.src}
                                     alt={image.alt}
-                                    className="w-full h-auto block select-none pointer-events-none transition-transform duration-500 ease-out group-hover:scale-[1.01]"
+                                    className="w-full h-full object-cover object-center block select-none pointer-events-none transition-transform duration-500 ease-out group-hover:scale-[1.008]"
                                     loading={index === 0 ? "eager" : "lazy"}
                                     decoding="async"
                                     draggable={false}
@@ -64,7 +64,7 @@ const LabEquipmentSection = () => {
                 {/* Botón Navegación Izquierda */}
                 <button
                     onClick={() => swiperRef.current?.slidePrev()}
-                    className="absolute left-3 sm:left-5 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 opacity-80 sm:opacity-0 sm:-translate-x-2 sm:group-hover:translate-x-0 sm:group-hover:opacity-100 focus:opacity-100 focus:translate-x-0"
+                    className="absolute left-4 sm:left-6 md:left-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 opacity-80 sm:opacity-0 sm:-translate-x-2 sm:group-hover:translate-x-0 sm:group-hover:opacity-100 focus:opacity-100 focus:translate-x-0"
                     aria-label="Anterior"
                 >
                     <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
@@ -73,14 +73,14 @@ const LabEquipmentSection = () => {
                 {/* Botón Navegación Derecha */}
                 <button
                     onClick={() => swiperRef.current?.slideNext()}
-                    className="absolute right-3 sm:right-5 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 opacity-80 sm:opacity-0 sm:translate-x-2 sm:group-hover:translate-x-0 sm:group-hover:opacity-100 focus:opacity-100 focus:translate-x-0"
+                    className="absolute right-4 sm:right-6 md:right-8 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 opacity-80 sm:opacity-0 sm:translate-x-2 sm:group-hover:translate-x-0 sm:group-hover:opacity-100 focus:opacity-100 focus:translate-x-0"
                     aria-label="Siguiente"
                 >
                     <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
                 </button>
 
                 {/* Indicadores / Dots */}
-                <div className="absolute bottom-3 sm:bottom-4 md:bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-md shadow-md">
+                <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/35 backdrop-blur-md shadow-md">
                     {images.map((_, index) => (
                         <button
                             key={index}
