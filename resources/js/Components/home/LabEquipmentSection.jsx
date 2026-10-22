@@ -1,37 +1,9 @@
-// LabEquipmentSection.jsx
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, A11y } from "swiper/modules";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import "swiper/css";
 
-// --- Image Carousel ---
-const ImageCarousel = ({ currentIndex, goToPrevious, goToNext, goToSlide, images }) => {
-    return (
-        <div className="relative w-full h-auto overflow-hidden">
-            {/* Main image - OPTIMIZADO */}
-            <div>
-                <img
-                    src={images[currentIndex].src}
-                    alt={images[currentIndex].alt}
-                    className="w-full h-auto transition-opacity duration-500"
-                    loading="lazy"
-                    decoding="async"
-                />
-            </div>
-            {/* Dots indicator (opcional) */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                {images.map((_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => goToSlide(index)}
-                        className={`w-3 h-3 rounded-full transition-all duration-200 
-                            ${index === currentIndex ? 'bg-white' : 'bg-white bg-opacity-50 hover:bg-opacity-75'}`}
-                        aria-label={`Ir a imagen ${index + 1}`}
-                    />
-                ))}
-            </div>
-        </div>
-    );
-};
-
-// --- Main Section ---
 const LabEquipmentSection = () => {
     const images = [
         {
@@ -48,73 +20,80 @@ const LabEquipmentSection = () => {
         }
     ];
 
-    const [currentIndex, setCurrentIndex] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentIndex((prevIndex) =>
-                prevIndex === images.length - 1 ? 0 : prevIndex + 1
-            );
-        }, 5000);
-        return () => clearInterval(interval);
-    }, [images.length]);
-
-    const goToSlide = (index) => setCurrentIndex(index);
-    const goToPrevious = () => setCurrentIndex(currentIndex === 0 ? images.length - 1 : currentIndex - 1);
-    const goToNext = () => setCurrentIndex(currentIndex === images.length - 1 ? 0 : currentIndex + 1);
+    const [activeIndex, setActiveIndex] = useState(0);
+    const swiperRef = useRef(null);
 
     return (
-        <section className="flex flex-col lg:flex-row relative w-full">
-            {/* Text + Navigation */}
-            <div className="bg-[#0c2249] w-full lg:w-1/2 p-4 md:p-6 lg:p-8 flex flex-col gap-4 mt-6 md:mt-8 lg:mt-10 text-white relative z-0">
-                <h3 className="text-xl md:text-2xl lg:text-3xl font-bold pt-4 md:pt-8 lg:pt-12">
-                    Equipos de laboratorio
-                </h3>
-                <p className="text-sm md:text-base lg:text-xl pr-2 md:pr-8 lg:pr-36 pb-4 md:pb-8 lg:pb-12">
-                    Los equipos de laboratorio son instrumentos utilizados para llevar a cabo experimentos,
-                    análisis y estudios en diferentes disciplinas científicas. Algunos equipos de laboratorio
-                    incluyen microscopios, espectrofotómetros, balanzas de laboratorio, centrífugas, autoclaves,
-                    agitadores magnéticos, incubadoras, pipetas, y sistemas de cromatografía, entre muchos otros.
-                    <span className="hidden xl:inline"> Cada equipo tiene su propia utilidad y está diseñado para manipular muestras y realizar
-                    mediciones con precisión. Estos instrumentos son esenciales para la investigación científica,
-                    el desarrollo de productos, el control de calidad y el análisis en una amplia gama de campos,
-                    como la biología, la química, la física, la medicina, la ingeniería y las ciencias ambientales</span>
-                </p>
+        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+            <div className="relative group overflow-hidden rounded-2xl md:rounded-3xl shadow-lg md:shadow-xl">
+                <Swiper
+                    modules={[Autoplay, A11y]}
+                    slidesPerView={1}
+                    loop={true}
+                    speed={650}
+                    grabCursor={true}
+                    autoplay={{
+                        delay: 4500,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true,
+                    }}
+                    onSwiper={(swiper) => {
+                        swiperRef.current = swiper;
+                    }}
+                    onSlideChange={(swiper) => {
+                        setActiveIndex(swiper.realIndex);
+                    }}
+                    className="w-full h-full"
+                >
+                    {images.map((image, index) => (
+                        <SwiperSlide key={index}>
+                            <div className="w-full select-none overflow-hidden">
+                                <img
+                                    src={image.src}
+                                    alt={image.alt}
+                                    className="w-full h-auto block select-none pointer-events-none transition-transform duration-500 ease-out group-hover:scale-[1.01]"
+                                    loading={index === 0 ? "eager" : "lazy"}
+                                    decoding="async"
+                                    draggable={false}
+                                />
+                            </div>
+                        </SwiperSlide>
+                    ))}
+                </Swiper>
 
-                {/* Navigation Buttons - Bottom right position */}
-                <div className="absolute bottom-2 md:bottom-4 right-2 md:right-4 flex flex-row items-center gap-2 md:gap-4">
-                    <button
-                        onClick={goToPrevious}
-                        className="border-2 border-white rounded-full w-8 h-8 md:w-10 md:h-10 grid place-items-center hover:bg-white/20 transition"
-                        aria-label="Anterior"
-                    >
-                        {/* Izquierda */}
-                        <svg className="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </button>
-                    <button
-                        onClick={goToNext}
-                        className="border-2 border-white rounded-full w-8 h-8 md:w-10 md:h-10 grid place-items-center hover:bg-white/20 transition"
-                        aria-label="Siguiente"
-                    >
-                        {/* Derecha */}
-                        <svg className="w-4 h-4 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
+                {/* Botón Navegación Izquierda */}
+                <button
+                    onClick={() => swiperRef.current?.slidePrev()}
+                    className="absolute left-3 sm:left-5 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 opacity-80 sm:opacity-0 sm:-translate-x-2 sm:group-hover:translate-x-0 sm:group-hover:opacity-100 focus:opacity-100 focus:translate-x-0"
+                    aria-label="Anterior"
+                >
+                    <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
+                </button>
+
+                {/* Botón Navegación Derecha */}
+                <button
+                    onClick={() => swiperRef.current?.slideNext()}
+                    className="absolute right-3 sm:right-5 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-md flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 opacity-80 sm:opacity-0 sm:translate-x-2 sm:group-hover:translate-x-0 sm:group-hover:opacity-100 focus:opacity-100 focus:translate-x-0"
+                    aria-label="Siguiente"
+                >
+                    <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
+                </button>
+
+                {/* Indicadores / Dots */}
+                <div className="absolute bottom-3 sm:bottom-4 md:bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/30 backdrop-blur-md shadow-md">
+                    {images.map((_, index) => (
+                        <button
+                            key={index}
+                            onClick={() => swiperRef.current?.slideToLoop(index)}
+                            className={`transition-all duration-300 rounded-full h-2 sm:h-2.5 ${
+                                index === activeIndex
+                                    ? "w-7 sm:w-9 bg-white shadow-sm"
+                                    : "w-2 sm:w-2.5 bg-white/45 hover:bg-white/80"
+                            }`}
+                            aria-label={`Ir al slide ${index + 1}`}
+                        />
+                    ))}
                 </div>
-            </div>
-
-            {/* Slider Imagenes - Centrado verticalmente */}
-            <div className="w-full md:w-full lg:w-7/12 relative lg:absolute lg:top-1/2 lg:-translate-y-1/2 lg:right-0 z-10 md:mt-4 lg:mt-0">
-                <ImageCarousel
-                    currentIndex={currentIndex}
-                    goToPrevious={goToPrevious}
-                    goToNext={goToNext}
-                    goToSlide={goToSlide}
-                    images={images}
-                />
             </div>
         </section>
     );
